@@ -18,6 +18,7 @@ import UserInfo from "@/pages/user/UserInfo";
 import ProtectedRoute from "@/components/common/ProtectedRoute";
 import Interests from "@/pages/interests/Interests";
 import Chatting from "@/pages/chat/Chatting";
+import ClassManagementPage from "@/pages/class/manage/ClassManagementPage";
 
 export const routeList = [
   {
@@ -98,6 +99,14 @@ export const routeList = [
             element: <Participations />,
           },
         ],
+      },
+      {
+        path: "/classes-manage",
+        element: (
+          <ProtectedRoute>
+            <ClassManagementPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/interests",
