@@ -2,12 +2,24 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import { NotificationDropdown } from "@/components/common/NotificationDropdown";
 import { ProfileDropdown } from "@/components/common/ProfileDropdown";
-import { Link } from "react-router-dom";
-import { IoIosChatbubbles } from "react-icons/io";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Link, useNavigate } from "react-router-dom";
+import { IoIosChatbubbles, IoIosSearch } from "react-icons/io";
+// import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "../ui/input";
+import { useState } from "react";
 
 function Header() {
   const { isLoggedIn } = useAuthStore();
+  const navigate = useNavigate();
+  const [searchTopic, setSearchTopic] = useState("");
+
+  const handleSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!searchTopic.trim()) return;
+    // navigate(`/meetings/search?keyword=${searchTopic}`); TODO: API 확인 후 경로 수정
+    navigate(`/`);
+  };
   return (
     <div className="w-full h-[80px] bg-card sticky top-0 z-50 shrink-0 border-b border-gray-300">
       <div className="flex items-center w-full h-full max-w-screen-xl mx-auto px-4 md:px-8">
@@ -17,9 +29,28 @@ function Header() {
           variant="ghost"
           className="cursor-pointer hover:bg-medium font-bold text-2xl p-0"
         >
-          <Link to="/">MoiMo</Link>
+          <Link to="/">MoaCle</Link>
         </Button>
-        <div className="flex gap-2 ml-8">
+
+        <form onSubmit={handleSearch} className="relative ml-8 w-full max-w-xs">
+          <Input
+            type="text"
+            placeholder="관심있는 클래스 제목을 검색해 보세요"
+            className="pl-4 h-11 flex-1 bg-card"
+            value={searchTopic}
+            onChange={(e) => setSearchTopic(e.target.value)}
+          />
+          <Button
+            type="submit"
+            size="icon"
+            variant="ghost"
+            className="absolute right-1 top-1/2 -translate-y-1/2"
+          >
+            <IoIosSearch size={24} />
+          </Button>
+        </form>
+
+        {/* <div className="flex gap-2 ml-8">
           <Button
             asChild
             size="default"
@@ -36,10 +67,21 @@ function Header() {
           >
             <Link to="/meetings">원하는 모임 찾기</Link>
           </Button>
+        </div> */}
+        {/* TODO: API 확인 후 경로 수정 */}
+        <div className="ml-8">
+          <Button
+            asChild
+            size="default"
+            variant="ghost"
+            className="cursor-pointer hover:bg-medium text-base"
+          >
+            <Link to="/">클래스 등록</Link>
+          </Button>
         </div>
         {isLoggedIn ? (
           <div className="ml-auto flex items-center gap-3 md:gap-4">
-            <Link to="/chats">
+            {/* <Link to="/chats">
               <button className="focus:outline-none focus:ring-offset-2 rounded-full">
                 <Avatar className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border-none bg-medium">
                   <AvatarFallback className="bg-medium">
@@ -47,7 +89,7 @@ function Header() {
                   </AvatarFallback>
                 </Avatar>
               </button>
-            </Link>
+            </Link> */}
             <NotificationDropdown />
             <ProfileDropdown />
           </div>
