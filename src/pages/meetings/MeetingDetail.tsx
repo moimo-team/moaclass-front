@@ -14,7 +14,7 @@ import { useJoinMeetingMutation } from "@/hooks/useMeetingMutations";
 import { useMeetingQuery } from "@/hooks/useMeetingQuery";
 import { useMeQuery } from "@/hooks/useMeQuery";
 import MeetingActionButtons from "@/components/features/meetings/MeetingActionButtons";
-import { formatMeetingDate } from "@/utils/dateFormat";
+import { formatClassCreateDate } from "@/utils/dateFormat";
 import { useNavigate } from "react-router-dom";
 import { useDeleteMeetingDialog } from "@/hooks/useDeleteMeetingDialog";
 import { useInterestQuery } from "@/hooks/useInterestQuery";
@@ -222,7 +222,7 @@ function MeetingDetailPage() {
 
                 <div className="flex items-center gap-3 text-lg text-foreground/80">
                   <Calendar className="w-5 h-5 text-primary shrink-0" />
-                  <span>{formatMeetingDate(meetingDetail.meetingDate)}</span>
+                  <span>{formatClassCreateDate(meetingDetail.meetingDate)}</span>
                 </div>
 
                 {meetingDetail.maxParticipants && (
