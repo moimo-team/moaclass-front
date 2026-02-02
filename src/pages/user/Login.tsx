@@ -71,8 +71,7 @@ const Login = () => {
         }
     };
 
-    // 구글 로그인
-    // 1. Authorization Code Flow 방식 (새로운 방식)
+    // 구글 로그인(Authorization Code Flow 방식)
     const handleGoogleCodeSuccess = async (codeResponse: CodeResponse) => {
         try {
             // codeResponse.code가 Authorization Code
@@ -103,45 +102,14 @@ const Login = () => {
         flow: 'auth-code',
     });
 
-    /* 2. ID Token 방식 (기존 방식 - 주석 처리)
-    const handleGoogleSuccess = async (credentialResponse: any) => {
-        try {
-            // credentialResponse.credential이 ID Token
-            const res = await googleLoginMutation.mutateAsync({
-                token: credentialResponse.credential,
-                redirectUri: window.location.origin
-            });
-  
-            if (res.isNewUser) {
-                // 신규 유저인 경우 추가 정보 입력 페이지로 이동
-                navigate("/user-info", {
-                    state: {
-                        accessToken: res.accessToken,
-                        user: res.user
-                    }
-                });
-            } else {
-                navigate("/");
-            }
-        } catch (error) {
-            console.error(error);
-            setError("root", { type: "manual", message: "Google 로그인에 실패했습니다." });
-        }
-    };
-  
-    const handleGoogleError = () => {
-        setError("root", { type: "manual", message: "Google 로그인에 실패했습니다." });
-    };
-    */
-
     return (
-        <div className="flex min-h-full w-full flex-col items-center justify-center bg-transparent p-4">
-            <Card className="w-full max-w-[440px] p-8 shadow-lg border-none bg-login-form rounded-[12px]">
+        <div className="flex flex-1 w-full flex-col items-center justify-center bg-transparent p-4">
+            <Card className="w-full max-w-[330px] p-8 shadow-lg border-none bg-login-form rounded-[12px]">
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-center text-foreground mb-2">모이모 로그인</CardTitle>
-                    <CardDescription className="text-center">이메일과 비밀번호를 입력하여 로그인하세요</CardDescription>
+                    <CardTitle className="text-2xl font-bold text-center text-foreground mb-2">모아클 로그인</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-8 p-0">
+                    {/* 추후 제거 예정 */}
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="flex flex-col gap-6">
                             <div className="grid gap-2">
@@ -191,30 +159,27 @@ const Login = () => {
                         <Link to="/find-password" className="hover:underline">비밀번호 찾기</Link>
                     </div>
 
-                    <div className="flex flex-col gap-6 pt-4">
-                        <div className="flex justify-center items-center gap-6">
-                            {/* Social Login Buttons */}
-                            {/* 1. Authorization Code Flow 방식 버튼 */}
-                            <button
-                                type="button"
-                                onClick={() => handleGoogleLogin()}
-                                className="flex items-center justify-center w-7 h-7 bg-[#ffffff] hover:bg-[#d4e2f8] transition-colors"
-                            >
-                                <FcGoogle size={24} />
-                            </button>
+                    <div className="flex flex-col gap-4 pt-4">
+                        {/* 구글 로그인 버튼 - 가로 전체 너비 */}
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => handleGoogleLogin()}
+                            className="w-full h-12 flex items-center justify-center gap-2 bg-white text-foreground hover:bg-gray-50 border-input shadow-sm"
+                        >
+                            <FcGoogle size={24} />
+                            <span className="text-sm font-medium">Google 계정으로 로그인</span>
+                        </Button>
 
-                            {/* 2. ID Token 방식 컴포넌트 (기존 방식 - 주석 처리)
-                            <GoogleLogin
-                                onSuccess={handleGoogleSuccess}
-                                onError={handleGoogleError}
-                                type="icon"
-                                size="medium"
-                                theme="filled_black"
-                            />
-                            */}
-                            <SiNaver size={24} color="#03C75A" onClick={() => toast.error("준비 중인 서비스입니다.")} />
-                            <SiKakaotalk size={24} color="#FFEB3B" onClick={() => toast.error("준비 중인 서비스입니다.")} />
-                        </div>
+                        {/* 카카오 로그인 버튼 - 가로 전체 너비 */}
+                        <Button
+                            type="button"
+                            onClick={() => toast.error("준비 중인 서비스입니다.")}
+                            className="w-full h-12 flex items-center justify-center gap-2 bg-[#FEE500] text-[#191919] hover:bg-[#FEE500]/90 border-none shadow-sm"
+                        >
+                            <SiKakaotalk size={20} />
+                            <span className="text-sm font-semibold">Kakao 계정으로 로그인</span>
+                        </Button>
                     </div>
                 </CardContent>
             </Card>
