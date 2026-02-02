@@ -1,9 +1,9 @@
 /**
  * ISO 날짜 문자열을 "YYYY. M. D(요일) HH:MM" 형식으로 변환
  * @param dateString - ISO 형식의 날짜 문자열
- * @returns 포맷된 날짜 문자열 (예: "2026. 1. 19(일) 14:30")
+ * @returns 포맷된 날짜 문자열 (예: "2026. 1. 19 (일) 14:30")
  */
-export function formatMeetingDate(dateString: string): string {
+export function formatClassCreateDate(dateString: string): string {
   const date = new Date(dateString);
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
@@ -13,7 +13,7 @@ export function formatMeetingDate(dateString: string): string {
   const hours = date.getHours();
   const minutes = date.getMinutes();
 
-  return `${year}. ${month}. ${day}(${weekday}) ${hours}:${minutes
+  return `${year}. ${month}. ${day} (${weekday}) ${hours}:${minutes
     .toString()
     .padStart(2, "0")}`;
 }
@@ -59,3 +59,4 @@ export function formatDateSeparator(dateString: string): string {
     weekday: "long",
   });
 }
+
