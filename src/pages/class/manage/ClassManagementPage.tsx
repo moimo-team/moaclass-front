@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ClassManageCard, type ClassCardData } from "@/components/features/class-manage/ClassManageCard";
+import { ClassManageCard } from "@/components/features/class-manage/ClassManageCard";
+import type { ClassCardData } from "@/models/class.model";
 import { CreateClassButton } from "@/components/features/class-manage/CreateClassButton";
 import {
   AlertDialog,

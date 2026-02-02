@@ -8,15 +8,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import type { ClassCardData } from "@/models/class.model";
 
-export interface ClassCardData {
-  id: number;
-  title: string;
-  category: string;
-  thumbnailImage: string;
-  status: "RECRUITING" | "CLOSED" | "COMPLETED";
-  createdAt: string;
-}
 
 interface ClassCardProps {
   classData: ClassCardData;
