@@ -2,53 +2,17 @@ import { useState } from "react";
 import { ClassManageCard } from "@/components/features/class-manage/ClassManageCard";
 import type { ClassCardData } from "@/models/class.model";
 import { CreateClassButton } from "@/components/features/class-manage/CreateClassButton";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import ConfirmDialog from "@/components/common/ConfirmDialog";
 import { toast } from "sonner";
 import { formatClassCreateDate } from "@/utils/dateFormat";
-
-// Mock 데이터
-const MOCK_CLASSES: ClassCardData[] = [
-  {
-    id: 1,
-    title: "좋은 클래스입니다bbbbbbbbbbbbbbbbbbbbbbbbb",
-    category: "베이킹",
-    thumbnailImage: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop",
-    status: "RECRUITING",
-    createdAt: "2026. 1. 28 (수) 16:52",
-  },
-  {
-    id: 2,
-    title: "React 심화 과정",
-    category: "IT",
-    thumbnailImage: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=600&fit=crop",
-    status: "RECRUITING",
-    createdAt: "2026. 1. 27 (화) 14:30",
-  },
-  {
-    id: 3,
-    title: "TypeScript 기초",
-    category: "IT",
-    thumbnailImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=600&fit=crop",
-    status: "CLOSED",
-    createdAt: "2026. 1. 25 (월) 10:15",
-  },
-];
+import { MOCK_CLASSES } from "@/constants/mockClassData";
 
 const ClassManagementPage = () => {
   const [classes, setClasses] = useState<ClassCardData[]>(MOCK_CLASSES);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
-  const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
   const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
 
   const handleEdit = (id: number) => {
     toast.info(`클래스 ${id} 수정 (준비중)`);
@@ -157,59 +121,38 @@ const ClassManagementPage = () => {
       </div>
 
       {/* 삭제 확인 다이얼로그 */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>클래스 삭제</AlertDialogTitle>
-            <AlertDialogDescription>
-              정말로 이 클래스를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>취소</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteConfirm}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              삭제
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="클래스 삭제"
+        description="정말로 이 클래스를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+        confirmText="삭제"
+        onConfirm={handleDeleteConfirm}
+        variant="destructive"
+      />
 
       {/* 상태 변경 확인 다이얼로그 */}
-      <AlertDialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>클래스 상태 변경</AlertDialogTitle>
-            <AlertDialogDescription>
-              {selectedClassId && classes.find((c) => c.id === selectedClassId)?.status === "RECRUITING"
-                ? "이 클래스를 휴면 상태로 전환하시겠습니까?"
-                : "이 클래스를 활성화하시겠습니까?"}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>취소</AlertDialogCancel>
-            <AlertDialogAction onClick={handleStatusConfirm}>확인</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={statusDialogOpen}
+        onOpenChange={setStatusDialogOpen}
+        title="클래스 상태 변경"
+        description={
+          selectedClassId && classes.find((c) => c.id === selectedClassId)?.status === "RECRUITING"
+            ? "이 클래스를 휴면 상태로 전환하시겠습니까?"
+            : "이 클래스를 활성화하시겠습니까?"
+        }
+        onConfirm={handleStatusConfirm}
+      />
 
       {/* 복제 클래스 다이얼로그 */}
-      <AlertDialog open={duplicateDialogOpen} onOpenChange={setDuplicateDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>클래스 복제</AlertDialogTitle>
-            <AlertDialogDescription>
-              해당 클래스를 복제하시겠습니까? 복제된 클래스는 휴면 상태로 설정됩니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>취소</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDuplicateConfirm}>복제</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={duplicateDialogOpen}
+        onOpenChange={setDuplicateDialogOpen}
+        title="클래스 복제"
+        description="해당 클래스를 복제하시겠습니까? 복제된 클래스는 휴면 상태로 설정됩니다."
+        confirmText="복제"
+        onConfirm={handleDuplicateConfirm}
+      />
     </div>
   );
 };
