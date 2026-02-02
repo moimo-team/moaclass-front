@@ -1,4 +1,5 @@
 import { PaySectionCard } from './PaySectionCard';
+import { formatClassCreateDate, formatDateSeparator } from "@/utils/dateFormat";
 
 interface TicketSectionProps {
     classInfo: {
@@ -27,7 +28,7 @@ export const TicketSection = ({ classInfo }: TicketSectionProps) => {
                     </div>
                     <div>
                         <p className="text-muted-foreground font-semibold mb-0.5">일시</p>
-                        <p>{classInfo.date}</p>
+                        <p>{formatClassCreateDate(classInfo.date)}</p>
                     </div>
                     <div>
                         <p className="text-muted-foreground font-semibold mb-0.5">장소</p>

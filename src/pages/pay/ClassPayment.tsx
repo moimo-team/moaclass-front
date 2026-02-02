@@ -10,7 +10,7 @@ import { PayInfoSection } from "@/components/features/pay/PayInfoSection";
 const MOCK_DATA = {
     classInfo: {
         name: "나만의 모우인형, 귀염뽀짝 모우키링 만들기",
-        date: "2026년 1월 20일, 신청 후 일정 조율이 필요해요",
+        date: "2026.01.20 19:00",
         location: "대한민국 서울특별시 강남구 논현로152길 37",
         thumbnailUrl: "https://picsum.photos/id/111/300/300",
     },
