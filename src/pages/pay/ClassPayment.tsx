@@ -28,8 +28,8 @@ const MOCK_DATA = {
 };
 
 const ClassPayment = () => {
-    const [isCancelOpen, setIsCancelOpen] = useState(true);
-    const [isGuideOpen, setIsGuideOpen] = useState(true);
+    const [isCancelOpen, setIsCancelOpen] = useState(false);
+    const [isGuideOpen, setIsGuideOpen] = useState(false);
     const [creditToUse, setCreditToUse] = useState("0");
 
     const { classInfo, userInfo, paymentInfo } = MOCK_DATA;
@@ -37,7 +37,7 @@ const ClassPayment = () => {
     const totalPayment = subTotal - parseInt(creditToUse || "0", 10);
 
     return (
-        <div className="max-w-5xl mx-auto p-4 md:p-6 pb-20">
+        <div className="w-full max-w-5xl mx-auto p-4 md:p-6 pb-20">
             {/* Header */}
             <header className="flex items-center gap-2 mb-6">
                 <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -78,10 +78,6 @@ const ClassPayment = () => {
                                 <div className="border rounded-sm overflow-hidden border-border/60">
                                     <table className="w-full text-left border-collapse">
                                         <tbody className="divide-y divide-border/60 text-[11px]">
-                                            <tr className="bg-muted/20">
-                                                <td className="p-2 border-r border-border/60 w-1/2">결제 후 1시간 이내 취소</td>
-                                                <td className="p-2 text-primary font-semibold text-center">100% 환불</td>
-                                            </tr>
                                             <tr>
                                                 <td className="p-2 border-r border-border/60">클래스 4일 이전 취소</td>
                                                 <td className="p-2 text-primary font-semibold text-center">100% 환불</td>
