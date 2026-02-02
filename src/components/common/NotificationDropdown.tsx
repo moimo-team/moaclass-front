@@ -77,8 +77,7 @@ export const NotificationDropdown = () => {
   };
 
   const handleNotificationClick = (notificationId: number) => {
-    // 알림 클릭 시 실행될 로직 (예: 해당 페이지로 이동, 알림을 읽음 처리)
-    console.log(`${notificationId}번 알림 클릭!`);
+    // 알림 클릭 시 로직 실행
     setNotifications((prev) =>
       prev.map((notif) =>
         notif.id === notificationId ? { ...notif, isUnread: false } : notif,
@@ -88,13 +87,12 @@ export const NotificationDropdown = () => {
   };
 
   const handleMarkAsRead = (notificationId: number) => {
-    // 특정 알림을 읽음 상태로 변경
+    // 읽음 버튼 눌러 특정 알림을 읽음 상태로 변경
     setNotifications((prev) =>
       prev.map((notif) =>
         notif.id === notificationId ? { ...notif, isUnread: false } : notif,
       ),
     );
-    console.log(`${notificationId}번 알림을 읽음 처리했습니다.`);
   };
 
   const unreadCount = notifications.filter((n) => n.isUnread).length;

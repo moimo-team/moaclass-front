@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import ReviewList from "@/components/features/home/ReviewList";
+import ReviewModal from "@/components/features/home/ReviewModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useReviewsQuery } from "@/hooks/useReviewsQuery";
+import type { Review } from "@/mock/reviewMock";
 
 interface ReviewListSectionProps {
   title: string;
@@ -15,6 +18,19 @@ const ReviewListSection = ({
   hideIfEmpty = false,
 }: ReviewListSectionProps) => {
   const { reviews, isLoading, isError } = useReviewsQuery();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+
+  const handleReviewClick = (review: Review) => {
+    setSelectedReview(review);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedReview(null);
+  };
 
   const finalTitle = title;
 
@@ -45,10 +61,18 @@ const ReviewListSection = ({
         </p>
       )}
       {!isLoading && !isError && reviews.length > 0 && (
-        <ReviewList reviews={reviews} />
+        <ReviewList reviews={reviews} onReviewClick={handleReviewClick} />
       )}
       {!isLoading && !isError && reviews.length === 0 && (
         <p className="text-center py-16">후기가 없습니다.</p>
+      )}
+
+      {selectedReview && (
+        <ReviewModal
+          open={isModalOpen}
+          onOpenChange={handleModalClose}
+          review={selectedReview}
+        />
       )}
     </div>
   );

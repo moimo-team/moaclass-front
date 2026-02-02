@@ -3,8 +3,6 @@ import JoinedMeetingsList from "@/components/features/home/JoinedMeetingsList";
 import PendingMeetingsList from "@/components/features/home/PendingMeetingsList";
 import HostedMeetingsList from "@/components/features/home/HostedMeetingsList";
 import ReviewListSection from "@/components/features/home/ReviewListSection";
-// import SearchSection from "@features/search/SearchSection";
-// import TopicSection from "@features/topics/TopicSection";
 import CategorySection from "@/components/features/home/CategorySection";
 import { useAuthStore } from "@store/authStore";
 import Banner from "@/components/features/home/banner";
@@ -13,12 +11,8 @@ function Home() {
   const { isLoggedIn } = useAuthStore();
   return (
     <div className="flex flex-col justify-center items-center">
-      {/* TODO: SearchSection 삭제 */}
-      {/* <SearchSection /> */}
       <Banner />
       <div className="flex flex-col pt-8 items-center w-full">
-        {/* TODO: TopicSection 삭제 */}
-        {/* <TopicSection /> */}
         <CategorySection />
         {/* TODO: LikeMeetingList(좋아요순), 특정 카테고리 몇 개 추가 */}
         <NewMeetingList />
@@ -29,6 +23,7 @@ function Home() {
         />
         {isLoggedIn && (
           <>
+            {/* TODO: 리스트 삭제 or 그대로 사용할지 회의 */}
             <JoinedMeetingsList />
             <HostedMeetingsList />
             <PendingMeetingsList />

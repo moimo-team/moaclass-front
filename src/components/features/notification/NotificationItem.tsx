@@ -18,15 +18,15 @@ type NotificationType =
 // TODO: 실제 알림 API에 맞춰 수정하기
 export interface Notification {
   id: number;
-  lessonId: number; // 클래스 제목 가져오기
+  lessonId: number;
   receiverId: number;
   senderId: number;
-  senderNickname: string; // 알림을 보낸 사람의 닉네임
-  type: NotificationType; // 알림 종류 -> 알림 설명 가져오기
-  meetingTitle: string; // 클래스 제목
-  description: string; // 알림 설명
-  createdAt: string; // 알림 생성 시간
-  isUnread: boolean; // 읽지 않은 알림 여부
+  senderNickname: string;
+  type: NotificationType;
+  meetingTitle: string;
+  description: string;
+  createdAt: string;
+  isUnread: boolean;
   // TODO: 알림 클릭 시 이동할 경로 등의 추가 정보 입력
 }
 

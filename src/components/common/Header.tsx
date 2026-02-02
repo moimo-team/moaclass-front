@@ -3,8 +3,7 @@ import { useAuthStore } from "@/store/authStore";
 import { NotificationDropdown } from "@/components/common/NotificationDropdown";
 import { ProfileDropdown } from "@/components/common/ProfileDropdown";
 import { Link, useNavigate } from "react-router-dom";
-import { IoIosChatbubbles, IoIosSearch } from "react-icons/io";
-// import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { IoIosSearch } from "react-icons/io";
 import { Input } from "../ui/input";
 import { useState } from "react";
 
@@ -50,24 +49,6 @@ function Header() {
           </Button>
         </form>
 
-        {/* <div className="flex gap-2 ml-8">
-          <Button
-            asChild
-            size="default"
-            variant="ghost"
-            className="cursor-pointer hover:bg-medium text-base"
-          >
-            <Link to="/moimer-intro">모이머란?</Link>
-          </Button>
-          <Button
-            asChild
-            size="default"
-            variant="ghost"
-            className="cursor-pointer hover:bg-medium text-base"
-          >
-            <Link to="/meetings">원하는 모임 찾기</Link>
-          </Button>
-        </div> */}
         {/* TODO: API 확인 후 경로 수정 */}
         <div className="ml-8">
           <Button
@@ -81,15 +62,6 @@ function Header() {
         </div>
         {isLoggedIn ? (
           <div className="ml-auto flex items-center gap-3 md:gap-4">
-            {/* <Link to="/chats">
-              <button className="focus:outline-none focus:ring-offset-2 rounded-full">
-                <Avatar className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border-none bg-medium">
-                  <AvatarFallback className="bg-medium">
-                    <IoIosChatbubbles className="w-7 h-7 text-foreground/80" />
-                  </AvatarFallback>
-                </Avatar>
-              </button>
-            </Link> */}
             <NotificationDropdown />
             <ProfileDropdown />
           </div>

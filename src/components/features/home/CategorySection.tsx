@@ -76,7 +76,6 @@ const REGIONS = [
 ];
 
 const CategorySection = () => {
-  // 지역 드롭다운 아이템 준비
   const regionItems: FilterDropdownItem[] = REGIONS.map((region) => ({
     key: region.id,
     label: region.name,
@@ -84,7 +83,6 @@ const CategorySection = () => {
     //href: `/meetings?region=${region}`,
   }));
 
-  // 카테고리 드롭다운 아이템 준비
   const categoryItems: FilterDropdownItem[] = interestCategories.map(
     (category) => ({
       key: category.id,
