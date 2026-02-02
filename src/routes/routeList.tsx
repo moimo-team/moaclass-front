@@ -73,11 +73,12 @@ export const routeList = [
       },
       {
         path: "/mypage",
-        element: (
-          <ProtectedRoute>
-            <MypageSession />,
-          </ProtectedRoute>
-        ),
+        element: <MypageSession />,
+        // (
+        //   <ProtectedRoute>
+        //     <MypageSession />,
+        //   </ProtectedRoute>
+        // ),
         children: [
           {
             index: true,

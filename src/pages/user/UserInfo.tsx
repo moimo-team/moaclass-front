@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RegionSelect } from "@/components/features/mypage/RegionSelect";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useInterestQuery } from "@/hooks/useInterestQuery";
@@ -10,7 +10,6 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserUpdateMutation } from "@/hooks/useUserInfoMutations";
-import { REGIONS } from "@/constants/regions";
 import { Textarea } from "@/components/ui/textarea";
 
 // zod schema 정의
@@ -115,18 +114,13 @@ const UserInfo = () => {
               >
                 지역을 선택해 주세요
               </Label>
-              <Select onValueChange={(value) => setValue("region", value, { shouldValidate: true })}>
-                <SelectTrigger id="region" className="h-12 border-input focus:ring-primary bg-card">
-                  <SelectValue placeholder="지역 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  {REGIONS.map((region) => (
-                    <SelectItem key={region.id} value={region.name}>
-                      {region.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <RegionSelect
+                value={watch("region")}
+                onValueChange={(value) => setValue("region", value as string, { shouldValidate: true })}
+                valueType="name"
+                placeholder="지역 선택"
+                className="h-12 border-input focus:ring-primary bg-card w-full"
+              />
               {errors.region && <p className="text-sm text-destructive">{errors.region.message}</p>}
             </div>
 

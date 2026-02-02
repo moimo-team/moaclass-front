@@ -95,7 +95,7 @@ export const PayInfoSection = ({
 
                 <div className="space-y-2">
                     <div className="flex justify-between items-center text-sm">
-                        <span className="font-semibold text-xs">크레딧</span>
+                        <span className="font-semibold text-xs">포인트</span>
                         <span className="text-[10px] text-primary">보유 : {paymentInfo.availableCredit.toLocaleString()}원</span>
                     </div>
                     <div className="flex gap-2">
