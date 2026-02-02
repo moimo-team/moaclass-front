@@ -11,9 +11,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserUpdateMutation } from "@/hooks/useUserInfoMutations";
 import { REGIONS } from "@/constants/regions";
+import { Textarea } from "@/components/ui/textarea";
 
 // zod schema 정의
 const userInfoSchema = z.object({
+  bio: z.string().min(1, "자기소개를 입력해주세요.")
+    .max(100, "자기소개는 100자 이내로 입력해주세요."),
   region: z.string().min(1, "지역을 선택해주세요."),
   interests: z.array(z.number()).min(3, "관심사를 3개 이상 선택해주세요."),
 });
@@ -26,6 +29,7 @@ const UserInfo = () => {
   const userUpdateMutation = useUserUpdateMutation();
 
   const {
+    register,
     handleSubmit,
     setError,
     setValue,
@@ -35,6 +39,7 @@ const UserInfo = () => {
     resolver: zodResolver(userInfoSchema),
     mode: "onChange",
     defaultValues: {
+      bio: "",
       region: "",
       interests: [],
     }
@@ -58,7 +63,8 @@ const UserInfo = () => {
   const onSubmit = async (data: UserInfoFormValues) => {
     try {
       const formData = new FormData();
-      formData.append("bio", data.region); // 백엔드 필드명이 bio인 경우를 대비해 region 값을 bio로 전달
+      formData.append("bio", data.bio);
+      formData.append("region", data.region);
       formData.append("interests", JSON.stringify(data.interests));
 
       await userUpdateMutation.mutateAsync(formData);
@@ -85,6 +91,22 @@ const UserInfo = () => {
         </CardHeader>
         <CardContent className="flex flex-col gap-8 p-0">
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+            {/* 자기소개 입력 섹션 */}
+            <div className="grid gap-2">
+              <Label
+                htmlFor="bio"
+                className="text-sm font-medium text-muted-foreground mr-auto"
+              >
+                자기소개
+              </Label>
+              <Textarea
+                id="bio"
+                {...register("bio")}
+                placeholder="자기소개를 입력해주세요"
+                className="h-12 border-input focus-visible:ring-primary min-h-[100px] py-3 bg-card"
+              />
+              {errors.bio && <p className="text-sm text-destructive">{errors.bio.message}</p>}
+            </div>
             {/* 지역 선택 섹션 */}
             <div className="grid gap-2">
               <Label
