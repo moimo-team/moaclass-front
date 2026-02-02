@@ -17,7 +17,7 @@ function Header() {
           variant="ghost"
           className="cursor-pointer hover:bg-medium font-bold text-2xl p-0"
         >
-          <Link to="/">MoiMo</Link>
+          <Link to="/">모아클</Link>
         </Button>
         <div className="flex gap-2 ml-8">
           <Button
@@ -39,6 +39,14 @@ function Header() {
         </div>
         {isLoggedIn ? (
           <div className="ml-auto flex items-center gap-3 md:gap-4">
+            <Button
+              asChild
+              size="default"
+              variant="ghost"
+              className="cursor-pointer hover:bg-medium text-base border border-gray-300"
+            >
+              <Link to="/classes-manage">클래스 관리</Link>
+            </Button>
             <Link to="/chats">
               <button className="focus:outline-none focus:ring-offset-2 rounded-full">
                 <Avatar className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border-none bg-medium">
