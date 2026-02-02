@@ -19,6 +19,7 @@ import ProtectedRoute from "@/components/common/ProtectedRoute";
 import Interests from "@/pages/interests/Interests";
 import Chatting from "@/pages/chat/Chatting";
 import ClassManagementPage from "@/pages/class/manage/ClassManagementPage";
+import ClassPayment from "@/pages/pay/ClassPayment";
 
 export const routeList = [
   {
@@ -111,6 +112,10 @@ export const routeList = [
       {
         path: "/interests",
         element: <Interests />,
+      },
+      {
+        path: "/pay-class",
+        element: <ClassPayment />,
       },
     ],
   },
