@@ -6,6 +6,7 @@ import { getMyMeetings } from "./meHandler";
 import { userInfoHandler } from "./userInfoHandler";
 import { chatHandler } from "./chatHandler";
 import { participationHandlers } from "./participationHandler";
+import { notificationHandlers } from "./notificationHandler";
 
 const handlers = [
   ...authHandler,
@@ -15,6 +16,7 @@ const handlers = [
   ...meetingHandler,
   ...chatHandler,
   ...participationHandlers,
+  ...notificationHandlers,
 ];
 
 export const worker = setupWorker(...handlers);
