@@ -23,7 +23,7 @@ export const RegionSelect = ({
                 const newValue = valueType === "id" ? Number(val) : val;
                 onValueChange(newValue);
             }}
-            value={value?.toString()}
+            value={value ? value.toString() : undefined}
         >
             <SelectTrigger className={cn("w-50 bg-white border-gray-200 rounded-lg focus-visible:ring-yellow-400 text-sm", className)}>
                 <SelectValue placeholder={placeholder} />
