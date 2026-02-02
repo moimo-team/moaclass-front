@@ -1,7 +1,10 @@
+import { useState } from 'react';
+import { X } from 'lucide-react';
 import { PaySectionCard } from './PaySectionCard';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
+import { CouponModal } from './CouponModal';
 
 interface PayInfoSectionProps {
     paymentInfo: {
@@ -24,6 +27,14 @@ export const PayInfoSection = ({
     subTotal,
     totalPayment
 }: PayInfoSectionProps) => {
+    const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
+    const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+
+    const handleApplyCoupon = (coupon: any) => {
+        setAppliedCoupon(coupon);
+        // In a real app, we would update the total payment here
+    };
+
     return (
         <PaySectionCard title="결제 정보">
             <div className="space-y-4">
@@ -49,18 +60,36 @@ export const PayInfoSection = ({
                         <span className="text-[10px] text-primary">사용 가능 쿠폰 : {paymentInfo.availableCoupons}개</span>
                     </div>
                     <div className="flex gap-2">
-                        <div className="flex-1">
+                        <div className="flex-1 relative group">
                             <Input
                                 disabled
-                                placeholder="쿠폰을 선택해주세요"
-                                className="h-10 rounded-sm border-border/60 bg-muted/20"
+                                placeholder={appliedCoupon ? appliedCoupon.name : "쿠폰을 선택해주세요"}
+                                className={`h-10 rounded-sm border-border/60 ${appliedCoupon ? "bg-white text-primary font-medium pr-8" : "bg-muted/20"}`}
                             />
+                            {appliedCoupon && (
+                                <button
+                                    onClick={() => setAppliedCoupon(null)}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
+                            )}
                         </div>
-                        <Button className="text-sm bg-slate-800 text-white hover:bg-slate-700 rounded-sm">
-                            쿠폰 적용
+                        <Button
+                            className="text-sm bg-slate-800 text-white hover:bg-slate-700 rounded-sm"
+                            onClick={() => setIsCouponModalOpen(true)}
+                        >
+                            {appliedCoupon ? "변경" : "쿠폰 적용"}
                         </Button>
                     </div>
                 </div>
+
+                <CouponModal
+                    isOpen={isCouponModalOpen}
+                    onClose={() => setIsCouponModalOpen(false)}
+                    onApply={handleApplyCoupon}
+                    selectedId={appliedCoupon?.id}
+                />
 
                 <Separator className="bg-border/60" />
 

@@ -1,5 +1,4 @@
 import { PaySectionCard } from './PaySectionCard';
-import { Input } from "@/components/ui/input";
 
 interface ContactSectionProps {
     userInfo: {

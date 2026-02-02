@@ -9,15 +9,14 @@ import { PayInfoSection } from "@/components/features/pay/PayInfoSection";
 // Mock Data
 const MOCK_DATA = {
     classInfo: {
-        type: "원데이 클래스",
         name: "나만의 모우인형, 귀염뽀짝 모우키링 만들기",
         date: "2026년 1월 20일, 신청 후 일정 조율이 필요해요",
         location: "대한민국 서울특별시 강남구 논현로152길 37",
-        thumbnailUrl: "https://images.unsplash.com/photo-1544391684-21950d2f0eb1?q=80&w=600",
+        thumbnailUrl: "https://picsum.photos/id/111/300/300",
     },
     userInfo: {
-        email: "zkvpeoa@naver.com",
-        nickname: "김영지",
+        email: "7777@naver.com",
+        nickname: "김세븐",
     },
     paymentInfo: {
         ticketTitle: "원데이 클래스 수강권",
