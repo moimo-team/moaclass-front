@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PointChargeModal } from '@/components/features/pay/PointChargeModal';
+import { PointChargeModal } from '@/components/features/point/PointChargeModal';
 import { toast } from 'sonner';
+import { PointCouponInfo } from '@/components/features/mypage/PointCouponInfo';
+import { POINT_TABS } from '@/constants/tabs';
+
+type PointTab = typeof POINT_TABS[number];
 
 // 유저 정보
 interface UserInfo {
@@ -75,7 +78,7 @@ const MOCK_POINT_HISTORY: PointHistory[] = [
 ];
 
 const Points = () => {
-    const [activeTab, setActiveTab] = useState<'전체' | '적립' | '사용'>('전체');
+    const [activeTab, setActiveTab] = useState<PointTab>('전체');
     const [isChargeModalOpen, setIsChargeModalOpen] = useState(false);
     const [userPoints, setUserPoints] = useState(MOCK_USER_POINTS.point);
 
@@ -103,41 +106,15 @@ const Points = () => {
                 </Button>
             </div>
 
-            {/* 메인 포인트 카드 */}
-            <Card className="bg-[#dfece3] border-none shadow-none rounded-3xl overflow-hidden relative pb-14">
-                <CardContent className="pt-8 px-8 flex flex-col items-start gap-8">
-                    <h2 className="text-xl font-extrabold text-[#2f2f2f] tracking-tight">
-                        사용 가능 포인트
-                    </h2>
-                    <div className="w-full flex justify-end items-baseline gap-2 mt-4 bg-white p-6 rounded-2xl border border-black/5 shadow-sm">
-                        <span className="text-4xl font-black text-[#2f2f2f]">{userPoints.toLocaleString()}</span>
-                        <span className="text-2xl font-bold text-[#2f2f2f]">원</span>
-                    </div>
-                </CardContent>
-
-                {/* 탭 시스템 */}
-                <div className="absolute bottom-0 left-0 w-full flex border-t border-black/10 bg-[#dfece3]/50 backdrop-blur-sm">
-                    {(['전체', '적립', '사용'] as const).map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`flex-1 py-4 text-lg font-bold transition-all relative ${activeTab === tab ? 'text-black' : 'text-black/40'
-                                }`}
-                        >
-                            {tab}
-                            {activeTab === tab && (
-                                <motion.div
-                                    layoutId="activeTabUnderline"
-                                    className="absolute bottom-0 left-0 w-full h-1 bg-[#6b8f71]"
-                                />
-                            )}
-                            {tab !== '사용' && (
-                                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-px h-6 bg-black/10" />
-                            )}
-                        </button>
-                    ))}
-                </div>
-            </Card>
+            {/* 메인 포인트 카드 & 탭 시스템 */}
+            <PointCouponInfo
+                title="사용 가능 포인트"
+                value={userPoints}
+                unit="원"
+                tabs={POINT_TABS}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+            />
 
             {/* 내역 리스트 */}
             <div className="space-y-1 mt-4 min-h-[400px]">

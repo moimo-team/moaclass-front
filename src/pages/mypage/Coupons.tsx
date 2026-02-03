@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PointCouponInfo } from '@/components/features/mypage/PointCouponInfo';
+import { COUPON_TABS } from '@/constants/tabs';
 
 // 쿠폰 상태 타입
-type CouponStatus = '사용가능' | '사용완료' | '기간만료';
-type TabStatus = CouponStatus | '전체';
+type TabStatus = typeof COUPON_TABS[number];
+type CouponStatus = Exclude<TabStatus, '전체'>;
 
 // 쿠폰 데이터 인터페이스
 interface Coupon {
@@ -73,41 +74,15 @@ const Coupons = () => {
                 <h1 className="text-2xl font-bold text-foreground">쿠폰 내역</h1>
             </div>
 
-            {/* 메인 쿠폰 요약 카드 (Points.tsx 스타일 참조) */}
-            <Card className="bg-[#dfece3] border-none shadow-none rounded-3xl overflow-hidden relative pb-14">
-                <CardContent className="pt-8 px-8 flex flex-col items-start gap-8">
-                    <h2 className="text-xl font-extrabold text-[#2f2f2f] tracking-tight">
-                        사용 가능 쿠폰
-                    </h2>
-                    <div className="w-full flex justify-end items-baseline gap-2 mt-4 bg-white p-6 rounded-2xl border border-black/5 shadow-sm">
-                        <span className="text-4xl font-black text-[#2f2f2f]">{availableCount}</span>
-                        <span className="text-2xl font-bold text-[#2f2f2f]">개</span>
-                    </div>
-                </CardContent>
-
-                {/* 탭 시스템 */}
-                <div className="absolute bottom-0 left-0 w-full flex border-t border-black/10 bg-[#dfece3]/50 backdrop-blur-sm">
-                    {(['사용가능', '사용완료', '기간만료', '전체'] as const).map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`flex-1 py-4 text-sm font-bold transition-all relative ${activeTab === tab ? 'text-black' : 'text-black/40'
-                                }`}
-                        >
-                            {tab}
-                            {activeTab === tab && (
-                                <motion.div
-                                    layoutId="activeTabUnderline"
-                                    className="absolute bottom-0 left-0 w-full h-1 bg-[#6b8f71]"
-                                />
-                            )}
-                            {tab !== '전체' && (
-                                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-px h-6 bg-black/10" />
-                            )}
-                        </button>
-                    ))}
-                </div>
-            </Card>
+            {/* 메인 쿠폰 요약 카드 (공통 컴포넌트) */}
+            <PointCouponInfo
+                title="사용 가능 쿠폰"
+                value={availableCount}
+                unit="개"
+                tabs={COUPON_TABS}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+            />
 
             {/* 쿠폰 리스트 그리드 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
