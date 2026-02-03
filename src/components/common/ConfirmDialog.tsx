@@ -18,6 +18,7 @@ interface ConfirmDialogProps {
   cancelText?: string;
   onConfirm: () => void;
   onCancel?: () => void;
+  variant?: "default" | "destructive"; // 삭제 등 위험한 액션용
 }
 
 function ConfirmDialog({
@@ -29,6 +30,7 @@ function ConfirmDialog({
   cancelText = "취소",
   onConfirm,
   onCancel,
+  variant = "default",
 }: ConfirmDialogProps) {
   const handleConfirm = () => {
     onConfirm();
@@ -55,7 +57,14 @@ function ConfirmDialog({
           <AlertDialogCancel onClick={handleCancel}>
             {cancelText}
           </AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm}>
+          <AlertDialogAction
+            onClick={handleConfirm}
+            className={
+              variant === "destructive"
+                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                : ""
+            }
+          >
             {confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>

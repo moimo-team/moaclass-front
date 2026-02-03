@@ -7,64 +7,96 @@
 :root {
   color-scheme: light;
 
+  /* =========================
+     Radius
+  ========================= */
   --radius: 0.625rem;
 
-  /* Palette 1: Warmth, Casual & Palette 2: Softness */
-  --background: #ffffff;
-  /* Warm White */
-  --foreground: #2e2e2e;
-  /* Text Main */
-  --medium: #ffe7b7;
-  --login-form: #FFF9EE;
+  /* =========================
+     Base Colors
+     전체 배경 & 기본 텍스트
+  ========================= */
+  --background: #ffffff;        /* Clean White */
+  --foreground: #2f2f2f;        /* Main Text (Soft Black) */
 
+  /* =========================
+     Brand / Primary
+     멘토의 신뢰감, 중심 컬러
+  ========================= */
+  --primary: #6b8f71;            /* Warm Olive Green */
+  --primary-foreground: #ffffff;
+
+  /* =========================
+     Secondary
+     멘티·보조 액션용
+  ========================= */
+  --secondary: #a9c3b0;          /* Soft Sage Green */
+  --secondary-foreground: #2f2f2f;
+
+  /* =========================
+     Accent
+     포인트 / 강조
+  ========================= */
+  --accent: #dfece3;             /* Very Soft Green */
+  --accent-foreground: #2f2f2f;
+
+  /* =========================
+     Neutral / Muted
+     카드 배경, 구분선
+  ========================= */
+  --muted: #f3f5f2;              /* Warm Light Gray */
+  --muted-foreground: #6b6b6b;
+
+  --border: #e3e8e3;
+  --input: #e3e8e3;
+  --ring: #6b8f71;
+
+  /* =========================
+     Surface
+     카드 / 팝오버
+  ========================= */
   --card: #ffffff;
-  --card-foreground: #2e2e2e;
+  --card-foreground: #2f2f2f;
 
   --popover: #ffffff;
-  --popover-foreground: #2e2e2e;
+  --popover-foreground: #2f2f2f;
 
-  --primary: #ffc34a;
-  /* Main Yellow */
-  --primary-foreground: #2e2e2e;
-
-  --secondary: #ffe1a3;
-  /* Sub Yellow (Soft) */
-  --secondary-foreground: #2e2e2e;
-
-  --muted: #efe4cc;
-  /* Border/Divider color for backgrounds */
-  --muted-foreground: #6b6b6b;
-  /* Text Sub */
-
-  --accent: #ffd77d;
-  /* Bubble Point Yellow */
-  --accent-foreground: #2e2e2e;
-
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-
-  --success: #16a34a;
+  /* =========================
+     State Colors
+  ========================= */
+  --success: #4f8f6a;            /* Positive Green */
   --success-foreground: #ffffff;
 
-  --border: #efe4cc;
-  --input: #efe4cc;
-  --ring: #ffc34a;
+  --destructive: #d9776c;        /* Warm Red (톤 다운) */
+  --destructive-foreground: #ffffff;
 
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  /* =========================
+     Sidebar
+     멘토 공간 느낌 (조금 더 따뜻)
+  ========================= */
+  --sidebar: #f6faf7;            /* Green-tinted White */
+  --sidebar-foreground: #2f2f2f;
 
-  --sidebar: #fff9ee;
-  --sidebar-foreground: #2e2e2e;
-  --sidebar-primary: #ffc34a;
-  --sidebar-primary-foreground: #2e2e2e;
-  --sidebar-accent: #ffe1a3;
-  --sidebar-accent-foreground: #2e2e2e;
-  --sidebar-border: #efe4cc;
-  --sidebar-ring: #ffc34a;
+  --sidebar-primary: #6b8f71;
+  --sidebar-primary-foreground: #ffffff;
+
+  --sidebar-accent: #e7f1eb;
+  --sidebar-accent-foreground: #2f2f2f;
+
+  --sidebar-border: #e3e8e3;
+  --sidebar-ring: #6b8f71;
+
+  /* =========================
+     Charts
+     자연스러운 그린 베리에이션
+  ========================= */
+  --chart-1: #6b8f71;
+  --chart-2: #8fb3a1;
+  --chart-3: #4f6f5a;
+  --chart-4: #b9d6c4;
+  --chart-5: #ddebe2;
 }
+
 
 @theme inline {
   --font-sans: "Pretendard", ui-sans-serif, system-ui, -apple-system,
@@ -156,6 +188,7 @@
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden;
+    font-family: 'NanumSquare', sans-serif;
   }
 }
 
@@ -169,3 +202,5 @@
     display: none;  /* Chrome, Safari and Opera */
   }
 }
+
+

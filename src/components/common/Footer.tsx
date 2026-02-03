@@ -3,7 +3,7 @@ import { FaGithub } from "react-icons/fa";
 function Footer() {
   return (
     <>
-      <div className="w-full py-8 bg-foreground text-sm text-card shrink-0">
+      <div className="w-full py-8 bg-card text-sm text-card shrink-0 border-y border-primary">
         <div className="w-full max-w-screen-xl mx-auto px-4 md:px-8 flex flex-col justify-around gap-1">
           <div className="text-lg text-primary ">MoaClass</div>
           <div className="text-xs text-primary">

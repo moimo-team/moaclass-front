@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@radix-ui/react-label";
+import { Label } from "@/components/ui/label";
+import { RegionSelect } from "@/components/features/mypage/RegionSelect";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useInterestQuery } from "@/hooks/useInterestQuery";
@@ -10,12 +10,14 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserUpdateMutation } from "@/hooks/useUserInfoMutations";
+import { Textarea } from "@/components/ui/textarea";
 
 // zod schema 정의
 const userInfoSchema = z.object({
-    bio: z.string().min(1, "자기소개를 입력해주세요.")
-        .max(100, "자기소개는 100자 이내로 입력해주세요."),
-    interests: z.array(z.number()).min(3, "관심사를 3개 이상 선택해주세요."),
+  bio: z.string().min(1, "자기소개를 입력해주세요.")
+    .max(100, "자기소개는 100자 이내로 입력해주세요."),
+  regionId: z.number().min(1, "지역을 선택해주세요."),
+  interests: z.array(z.number()).min(3, "관심사를 3개 이상 선택해주세요."),
 });
 
 export type UserInfoFormValues = z.infer<typeof userInfoSchema>;
@@ -37,6 +39,7 @@ const UserInfo = () => {
     mode: "onChange",
     defaultValues: {
       bio: "",
+      regionId: 0,
       interests: [],
     }
   });
@@ -60,6 +63,7 @@ const UserInfo = () => {
     try {
       const formData = new FormData();
       formData.append("bio", data.bio);
+      formData.append("regionId", data.regionId.toString());
       formData.append("interests", JSON.stringify(data.interests));
 
       await userUpdateMutation.mutateAsync(formData);
@@ -81,7 +85,7 @@ const UserInfo = () => {
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center text-foreground mb-2">프로필 등록하기</CardTitle>
           <CardDescription className="text-center">
-            프로필을 등록하여 모이모와 친해져요
+            프로필을 등록하여 모아클과 친해져요
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-8 p-0">
@@ -102,13 +106,30 @@ const UserInfo = () => {
               />
               {errors.bio && <p className="text-sm text-destructive">{errors.bio.message}</p>}
             </div>
+            {/* 지역 선택 섹션 */}
+            <div className="grid gap-2">
+              <Label
+                htmlFor="region"
+                className="text-sm font-medium text-muted-foreground mr-auto"
+              >
+                지역을 선택해 주세요
+              </Label>
+              <RegionSelect
+                value={watch("regionId")}
+                onValueChange={(value) => setValue("regionId", value as number, { shouldValidate: true })}
+                valueType="id"
+                placeholder="지역 선택"
+                className="h-12 border-input focus:ring-primary bg-card w-full"
+              />
+              {errors.regionId && <p className="text-sm text-destructive">{errors.regionId.message}</p>}
+            </div>
 
-            {/* 관심사 선택 섹션 */}
+            {/* 카테고리 선택 섹션 */}
             <div className="grid gap-2">
               <Label
                 className="text-sm font-medium text-muted-foreground mr-auto"
               >
-                관심사 (3개 이상 선택해주세요)
+                카테고리 (3개 이상 선택해주세요)
               </Label>
               <div className="grid grid-cols-4 gap-3">
                 {interests?.map((interest) => (

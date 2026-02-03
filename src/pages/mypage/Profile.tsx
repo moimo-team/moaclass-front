@@ -6,11 +6,33 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import ProfileModal from "@/components/features/mypage/ProfileModal";
 import { useUserInfoQuery } from "@/hooks/useUserInfoQuery";
+import { REGIONS } from "@/constants/regions";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+
+const MOCK_USER_INFO = {
+  id: 1,
+  email: "[EMAIL_ADDRESS]",
+  nickname: "테스트",
+  bio: "안녕하세요",
+  regionId: 1,
+  profileImage: "",
+  categories: [
+    {
+      id: 1,
+      name: "개발",
+    },
+    {
+      id: 2,
+      name: "디자인",
+    },
+  ],
+}
 
 const Profile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { data: userInfo, isLoading } = useUserInfoQuery();
+  // const { data: userInfo, isLoading } = useUserInfoQuery();
+  const userInfo = MOCK_USER_INFO;
+  const isLoading = false;
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -18,22 +40,6 @@ const Profile = () => {
 
   return (
     <div className="w-full h-full py-10 bg-white overflow-y-auto">
-      {/* Top Stats Header */}
-      <div className="mb-12">
-        <div className="flex items-center gap-2 mb-4">
-          <h1 className="text-3xl font-bold text-yellow-400">
-            {userInfo?.nickname || "프로모이머"}
-          </h1>
-          <Crown className="w-8 h-8 text-yellow-600 fill-yellow-600" />
-        </div>
-
-        <Link to="/mypage/meetings/join" className="text-gray-900 font-medium hover:underline flex items-center gap-1">
-          어떤 만남이 있었을까요? &gt;
-        </Link>
-      </div>
-
-      <Separator className="bg-gray-200 mb-12" />
-
       {/* Profile Section */}
       <div className="space-y-12 ">
         {/* Basic Profile Edit Header */}
@@ -41,29 +47,47 @@ const Profile = () => {
           <h3 className="text-2xl font-bold text-gray-900">프로필</h3>
           <Button
             variant="outline"
-            className="border-yellow-400 text-gray-900 hover:bg-yellow-50"
+            className="border-primary text-gray-900 hover:bg-primary/10"
             onClick={() => setIsModalOpen(true)}
           >
-            <Pencil className="w-4 h-4 mr-2 text-yellow-500" />
+            <Pencil className="w-4 h-4 mr-2 text-primary" />
             프로필 수정
           </Button>
         </div>
 
-        {/* Interests Section */}
+        {/* Category Section */}
         <div>
-          <h4 className="text-lg font-medium text-gray-900 mb-4">관심사</h4>
+          <h4 className="text-lg font-medium text-gray-900 mb-4">선호 카테고리</h4>
           <div className="flex flex-wrap gap-2">
-            {userInfo?.interests?.map((interest) => (
+            {userInfo?.categories?.map((category) => (
               <Badge
-                key={interest.id}
+                key={category.id}
                 variant="secondary"
-                className="bg-orange-200 text-orange-800 hover:bg-orange-300 px-4 py-1.5 text-sm font-normal rounded-md"
+                className="bg-primary/20 text-primary hover:bg-primary/30 px-4 py-1.5 text-sm font-normal rounded-md"
               >
-                {interest.name}
+                {category.name}
               </Badge>
             ))}
-            {(!userInfo?.interests || userInfo.interests.length === 0) && (
-              <p className="text-sm text-gray-400">선택된 관심사가 없습니다.</p>
+            {(!userInfo?.categories || userInfo.categories.length === 0) && (
+              <p className="text-sm text-gray-400">선택된 카테고리가 없습니다.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Region Section */}
+        <div>
+          <h4 className="text-lg font-medium text-gray-900 mb-4">지역</h4>
+          <div className="flex flex-wrap gap-2">
+            {userInfo?.regionId && (
+              <Badge
+                variant="secondary"
+                className="bg-primary/60 text-white hover:bg-primary/70 px-4 py-1.5 text-sm font-normal rounded-md"
+              >
+                {REGIONS.find((region) => region.id === userInfo?.regionId)?.name}
+              </Badge>
+            )}
+            {(!userInfo?.regionId) && (
+              <p className="text-sm text-gray-400">선택한 지역이 없습니다.</p>
             )}
           </div>
         </div>
