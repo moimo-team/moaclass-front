@@ -49,17 +49,6 @@ function Header() {
           </Button>
         </form>
 
-        {/* TODO: API 확인 후 경로 수정 */}
-        <div className="ml-8">
-          <Button
-            asChild
-            size="default"
-            variant="ghost"
-            className="cursor-pointer hover:bg-medium text-base"
-          >
-            <Link to="/">클래스 등록</Link>
-          </Button>
-        </div>
         {isLoggedIn ? (
           <div className="ml-auto flex items-center gap-3 md:gap-4">
             <Button

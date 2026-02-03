@@ -21,10 +21,7 @@ function Home() {
         {/* TODO: LikeMeetingList(좋아요순), 특정 카테고리 몇 개 추가 */}
         <NewLessonList />
         {/* TODO: 후기 리스트 추가 후 mock 데이터 삭제 */}
-        <ReviewListSection
-          title="모멘티들의 따끈따끈한 후기"
-          seeMoreHref="/reviews"
-        />
+        <ReviewListSection />
         {isLoggedIn && (
           <>
             {/* TODO: 리스트 삭제 or 그대로 사용할지 회의 */}

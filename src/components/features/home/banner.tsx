@@ -134,6 +134,7 @@ function Banner() {
         </div>
       </div>
 
+      {/* TODO: 하드코딩된 데이터 제거 */}
       <AlertDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
