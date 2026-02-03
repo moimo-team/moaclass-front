@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ClassManageCard } from "@/components/features/class-manage/ClassManageCard";
-import type { ClassCardData } from "@/models/class.model";
+import type { ClassCardData } from "@/models/lesson.model";
 import { CreateClassButton } from "@/components/features/class-manage/CreateClassButton";
-import ConfirmDialog from "@/components/common/ConfirmDialog";
+import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
 import { toast } from "sonner";
 import { formatClassCreateDate } from "@/utils/dateFormat";
 import { MOCK_CLASSES } from "@/constants/mockClassData";
@@ -90,34 +90,32 @@ const ClassManagementPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-nanum-bold mb-2">클래스 관리</h1>
-          <p className="text-muted-foreground">
-            원데이 클래스를 생성하고 관리하세요
-          </p>
-        </div>
+    <div className="w-full">
+      <div className="mb-8">
+        <h1 className="text-3xl font-nanum-bold mb-2">클래스 관리</h1>
+        <p className="text-muted-foreground">
+          원데이 클래스를 생성하고 관리하세요
+        </p>
+      </div>
 
-        {/* 클래스 그리드 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {/* 생성 버튼 (항상 첫 번째) */}
-          <CreateClassButton />
+      {/* 클래스 그리드 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {/* 생성 버튼 (항상 첫 번째) */}
+        <CreateClassButton />
 
-          {/* 클래스 카드들 (최신순) */}
-          {classes.map((classData) => (
-            <ClassManageCard
-              key={classData.id}
-              classData={classData}
-              onEdit={() => handleEdit(classData.id)}
-              onDelete={() => handleDeleteClick(classData.id)}
-              onDuplicate={() => handleDuplicate(classData.id)}
-              onManage={() => handleManage(classData.id)}
-              onViewClass={() => handleViewClass(classData.id)}
-              onToggleStatus={() => handleToggleStatus(classData.id)}
-            />
-          ))}
-        </div>
+        {/* 클래스 카드들 (최신순) */}
+        {classes.map((classData) => (
+          <ClassManageCard
+            key={classData.id}
+            classData={classData}
+            onEdit={() => handleEdit(classData.id)}
+            onDelete={() => handleDeleteClick(classData.id)}
+            onDuplicate={() => handleDuplicate(classData.id)}
+            onManage={() => handleManage(classData.id)}
+            onViewClass={() => handleViewClass(classData.id)}
+            onToggleStatus={() => handleToggleStatus(classData.id)}
+          />
+        ))}
       </div>
 
       {/* 삭제 확인 다이얼로그 */}
@@ -131,7 +129,7 @@ const ClassManagementPage = () => {
         variant="destructive"
       />
 
-      {/* 상태 변경 확인 다이얼로그 */}
+      {/* 상태 변경 다이얼로그 */}
       <ConfirmDialog
         open={statusDialogOpen}
         onOpenChange={setStatusDialogOpen}
@@ -141,6 +139,7 @@ const ClassManagementPage = () => {
             ? "이 클래스를 휴면 상태로 전환하시겠습니까?"
             : "이 클래스를 활성화하시겠습니까?"
         }
+        confirmText="확인"
         onConfirm={handleStatusConfirm}
       />
 
