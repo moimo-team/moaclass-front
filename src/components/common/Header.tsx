@@ -4,7 +4,7 @@ import { NotificationDropdown } from "@/components/common/NotificationDropdown";
 import { ProfileDropdown } from "@/components/common/ProfileDropdown";
 import { Link, useNavigate } from "react-router-dom";
 import { IoIosSearch } from "react-icons/io";
-import { Input } from "../ui/input";
+import { Input } from "@components/ui/input";
 import { useState } from "react";
 
 function Header() {
@@ -28,7 +28,7 @@ function Header() {
           variant="ghost"
           className="cursor-pointer hover:bg-medium font-bold text-2xl p-0"
         >
-          <Link to="/">MoaCle</Link>
+          <Link to="/">모아클</Link>
         </Button>
 
         <form onSubmit={handleSearch} className="relative ml-8 w-full max-w-xs">
@@ -62,6 +62,14 @@ function Header() {
         </div>
         {isLoggedIn ? (
           <div className="ml-auto flex items-center gap-3 md:gap-4">
+            <Button
+              asChild
+              size="default"
+              variant="ghost"
+              className="cursor-pointer hover:bg-medium text-base border border-gray-300"
+            >
+              <Link to="/classes-manage">클래스 관리</Link>
+            </Button>
             <NotificationDropdown />
             <ProfileDropdown />
           </div>

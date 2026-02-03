@@ -5,12 +5,12 @@ function Footer() {
     <>
       <div className="w-full py-8 bg-foreground text-sm text-card shrink-0">
         <div className="w-full max-w-screen-xl mx-auto px-4 md:px-8 flex flex-col justify-around gap-1">
-          <div className="text-lg">MoaCle</div>
-          <div className="text-xs text-card/80">
-            모아클: 당신의 취미, 우리의 연결.
+          <div className="text-lg text-primary ">MoaClass</div>
+          <div className="text-xs text-primary">
+            '모여라! 아! 이거다 싶은 클래스!' 원데이클래스 프로젝트 '모아클'
           </div>
-          <div className="text-xs text-card/80 flex items-center gap-2">
-            © 2026 MoaCle. All rights reserved.
+          <div className="text-xs text-primary">
+            © 2026 Team-MoiMo. All rights reserved.
             <a
               href="https://github.com/moimo-team/moaclass-front"
               target="_blank"
