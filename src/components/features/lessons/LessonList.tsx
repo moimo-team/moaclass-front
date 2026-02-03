@@ -1,0 +1,49 @@
+import LessonCard from "@/components/features/lessons/LessonCard";
+import type { Lesson } from "@/models/lesson.model";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+
+interface LessonListProps {
+  lessons: Lesson[];
+  onToggleLike?: (lessonId: number, isLiked: boolean) => void;
+}
+
+const LessonList = ({ lessons, onToggleLike }: LessonListProps) => {
+  return (
+    <Carousel
+      opts={{
+        align: "start",
+        loop: true,
+      }}
+      plugins={[
+        Autoplay({
+          delay: 5000,
+        }),
+      ]}
+      className="w-full max-w-sm sm:max-w-md md:max-w-full mx-auto"
+    >
+      <CarouselContent className="-ml-3">
+        {lessons.map((lesson) => (
+          <CarouselItem
+            key={lesson.id}
+            className="pl-3 md:basis-1/3 lg:basis-1/4"
+          >
+            <div className="p-1">
+              <LessonCard lesson={lesson} onToggleLike={onToggleLike} />
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious />
+      <CarouselNext />
+    </Carousel>
+  );
+};
+
+export default LessonList;

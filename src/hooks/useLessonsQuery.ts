@@ -1,0 +1,12 @@
+import { useQuery } from "@tanstack/react-query";
+import { fetchLatestLessons } from "@/api/lesson.api";
+import type { Lesson } from "@/models/lesson.model";
+
+export const useLatestLessonsQuery = () => {
+  return useQuery<Lesson[], Error>({
+    queryKey: ["latestLessons"],
+    queryFn: fetchLatestLessons,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  });
+};

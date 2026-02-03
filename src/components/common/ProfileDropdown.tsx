@@ -8,9 +8,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AiOutlineUser, AiOutlineTeam } from "react-icons/ai";
-import { IoIosPerson } from "react-icons/io";
-import { LuLogOut } from "react-icons/lu";
+import { AiOutlineUser, AiOutlineMessage } from "react-icons/ai";
+import { IoIosPerson, IoIosHeartEmpty } from "react-icons/io";
+import { LuLogOut, LuShoppingCart } from "react-icons/lu";
 import { useAuthStore } from "@/store/authStore";
 import { useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "@/hooks/useAuthMutations";
@@ -54,9 +54,28 @@ export const ProfileDropdown = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="flex gap-1"
-          onClick={() => navigate("/mypage/meetings/join")}
+          onClick={() => navigate("/")}
+          // TODO: 마이페이지 - 클래스 결제 내역 경로 추가
         >
-          <AiOutlineTeam />내 모임
+          <LuShoppingCart />
+          클래스 결제 내역
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="flex gap-1"
+          onClick={() => navigate("/chats")}
+        >
+          <AiOutlineMessage />
+          메시지
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="flex gap-1"
+          onClick={() => navigate("/")}
+          // TODO: 마이페이지 - 위시리스트 경로 추가
+        >
+          <IoIosHeartEmpty />
+          위시리스트
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="flex gap-1" onClick={handleLogout}>
