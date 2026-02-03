@@ -1,4 +1,4 @@
-import type { ClassCardData } from "@/models/class.model";
+import type { ClassCardData } from "@/models/lesson.model";
 
 export const MOCK_CLASSES: ClassCardData[] = [
   {

@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import type { ClassCardData } from "@/models/class.model";
+import type { ClassCardData } from "@/models/lesson.model";
 import { ClassManageButtons } from "./ClassManageButtons";
 
 

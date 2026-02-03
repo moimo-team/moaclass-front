@@ -1,65 +1,101 @@
-export type Level = "초급" | "중급" | "고급";
+export type Level = "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
 
-export interface ClassCategory {
-  id: number;
-  name: string;
-}
+// 클래스 상태 타입
+export type LessonStatus = "ACTIVE" | "INACTIVE" | "DELETED" | "DRAFT" | "DUPLICATED";
+export type LessonScheduleStatus = "RECRUITING" | "CLOSED" | "COMPLETED";
 
-export interface SubClassCategory {
-  id: number;
-  categoryId: number;
-  name: string;
-}
-
-export interface TeacherProfile {
-  id: number;
-  userId: number;
-  nickname: string;
-  introduction: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface TeacherProfileImage {
-  id: number;
-  profileId: number;
-  imageUrl: string;
-  sequence: number;
-}
-
+// 클래스
 export interface Lesson {
   id: number;
+  teacherId: number; // 선생님 ID
+  classCategoryId: number; // 대분류 ID
+  
   title: string;
-  description: string;
+  description: string; // 클래스 상세내용
+  curriculum: string; // 커리큘럼 (40자~600자)
 
-  level: Level;
+  level: Level; // 난이도
   durationMin: number; // 소요 시간(분 단위)
 
+  status: LessonStatus; // 클래스 상태
   price: number;
+  discountRate: number; // 할인율
+  discountedPrice: number; // 할인된 가격
   maxParticipants?: number;
   currentParticipants: number;
 
   representativeImage: string; // 클래스 대표 이미지
+  likes: number;
 
   regionId: number; // 지역 참조값
   address: string;
   latitude: number;
   longitude: number;
-  detailAddress?: string;
-  directionsText?: string; // 찾아오는 길
+  detailAddress: string; // 상세 주소
+  directionsText: string; // 찾아오는 길
 
-  isSameDayReservable: boolean; // 당일 예약 가능 여부
+  reservationLeadDays: number; // 몇일 전 예약 가능 (0 = 당일 가능)
 
   rate: number; // 리뷰 점수 평균
 
-  reviewAiSummary?: string;
+  reviewAiSummary?: string; // 리뷰 AI 요약
+  deletedAt?: string; // 삭제 일시
   createdAt: string;
   updatedAt: string;
-  isLiked: boolean;
-  likes: number;
 
-  classCategory: ClassCategory;
-  subClassCategory: SubClassCategory;
-  teacherProfile: TeacherProfile;
-  teacherProfileImages: TeacherProfileImage[];
+  // 관계 데이터 (optional)
+  isLiked?: boolean; // 프론트 전용
+  classCategory?: ClassCategory;
+  subClassCategories?: SubClassCategory[];
+  teacherProfile?: TeacherProfile;
+  lessonImages?: LessonImage[];
+}
+
+// 클래스 갤러리 이미지
+export interface LessonImage {
+  id: number;
+  lessonId: number;
+  image: string;
+  sequence: number;
+}
+
+// 클래스 대분류 카테고리
+export interface ClassCategory {
+  id: number;
+  name: string; // 운동, 미술 등
+}
+
+// 클래스 소분류 카테고리
+export interface SubClassCategory {
+  id: number;
+  categoryId: number;
+  name: string; // 축구, 야구 등
+}
+
+// 선생님 프로필
+export interface TeacherProfile {
+  id: number;
+  userId: number;
+  nickname: string; // 선생님 활동 닉네임/상호명
+  image: string; // 선생님 프로필 이미지
+  introduction: string; // 40자~600자
+  createdAt: string;
+  updatedAt: string;
+}
+
+// 선생님 프로필 생성/수정 요청 타입
+export interface TeacherProfileRequest {
+  nickname: string;
+  image: string;
+  introduction: string;
+}
+
+// 클래스 카드 데이터 (관리 페이지용)
+export interface ClassCardData {
+  id: number;
+  title: string;
+  category: string;
+  thumbnailImage: string;
+  status: LessonStatus;
+  createdAt: string;
 }
