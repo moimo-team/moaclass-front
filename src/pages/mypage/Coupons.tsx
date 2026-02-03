@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PointCouponInfo } from '@/components/features/mypage/PointCouponInfo';
 import { COUPON_TABS } from '@/constants/tabs';
+import { CouponCard } from '@/components/features/coupon/CouponCard';
 
 // 쿠폰 상태 타입
 type TabStatus = typeof COUPON_TABS[number];
@@ -94,42 +95,8 @@ const Coupons = () => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                             transition={{ delay: index * 0.05 }}
-                            className={`relative p-5 rounded-2xl border border-gray-100 shadow-sm bg-white overflow-hidden group transition-all ${coupon.status === '사용가능'
-                                ? 'hover:border-[#6b8f71]/30'
-                                : 'opacity-40 grayscale pointer-events-none'
-                                }`}
                         >
-                            <div className="flex flex-col h-full justify-between gap-4">
-                                <div className="space-y-1">
-                                    <div className="text-[11px] font-medium text-black/30">
-                                        {coupon.expiryDate} 까지
-                                    </div>
-                                    <h3 className={`text-[15px] font-bold leading-tight transition-colors ${coupon.status === '사용가능' ? 'text-[#2f2f2f] group-hover:text-[#4f8f6a]' : 'text-gray-400'
-                                        }`}>
-                                        {coupon.name}
-                                    </h3>
-                                </div>
-                                <div className="flex items-baseline justify-between mt-2">
-                                    <span className={`text-xs font-bold ${coupon.status === '사용가능' ? 'text-black' : 'text-black/20'
-                                        }`}>
-                                        {coupon.status}
-                                    </span>
-                                    <div className="text-right">
-                                        <span className={`text-xl font-black ${coupon.status === '사용가능' ? 'text-[#4f8f6a]' : 'text-gray-400'
-                                            }`}>
-                                            {coupon.type === 'percentage' ? `${coupon.amount}%` : `${coupon.amount.toLocaleString()}원`}
-                                        </span>
-                                        <div className={`text-[11px] font-semibold mt-1 ${coupon.status === '사용가능' ? 'text-black/50' : 'text-black/20'
-                                            }`}>
-                                            {coupon.discountLabel}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* 장식용 사이드 바 */}
-                            <div className={`absolute left-0 top-0 w-1.5 h-full ${coupon.status === '사용가능' ? 'bg-[#6b8f71]' : 'bg-gray-200'
-                                }`} />
+                            <CouponCard coupon={coupon} />
                         </motion.div>
                     ))}
                 </AnimatePresence>

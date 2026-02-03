@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Ticket } from "lucide-react";
+import { CouponCard } from "./CouponCard";
 import {
     Dialog,
     DialogContent,
@@ -7,7 +7,6 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 interface Coupon {
     id: string;
@@ -42,7 +41,6 @@ interface CouponModalProps {
 }
 
 export const CouponModal = ({ isOpen, onClose, onApply, selectedId }: CouponModalProps) => {
-    const [couponCode, setCouponCode] = useState("");
     const [selectedCouponId, setSelectedCouponId] = useState<string | null>(null);
 
     useEffect(() => {
@@ -73,47 +71,13 @@ export const CouponModal = ({ isOpen, onClose, onApply, selectedId }: CouponModa
 
                         <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
                             {MOCK_COUPONS.map((coupon) => (
-                                <div
+                                <CouponCard
                                     key={coupon.id}
-                                    className={`relative group cursor-pointer transition-all duration-200 border-2 rounded-xl p-4 bg-white shadow-sm hover:shadow-md ${selectedCouponId === coupon.id
-                                        ? "border-primary bg-primary/5 shadow-primary/10"
-                                        : "border-slate-100 hover:border-slate-200"
-                                        }`}
+                                    coupon={coupon}
+                                    selected={selectedCouponId === coupon.id}
                                     onClick={() => setSelectedCouponId(coupon.id)}
-                                >
-                                    <div className="flex items-start gap-3">
-                                        <div className={`p-2 rounded-lg ${selectedCouponId === coupon.id ? "bg-primary text-white" : "bg-slate-100 text-slate-400 group-hover:bg-slate-200"
-                                            }`}>
-                                            <Ticket className="h-5 w-5" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex justify-between items-start mb-1">
-                                                <h4 className="font-bold text-slate-800 line-clamp-1">{coupon.name}</h4>
-                                                <Badge variant="secondary" className="bg-slate-100 text-slate-600 text-[10px] whitespace-nowrap ml-2">
-                                                    {coupon.expiryDate} 까지
-                                                </Badge>
-                                            </div>
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-xl font-black text-primary">
-                                                    {coupon.discountType === "PERCENT"
-                                                        ? `${coupon.discountValue}%`
-                                                        : `${coupon.discountValue.toLocaleString()}원`}
-                                                </span>
-                                                <span className="text-xs font-medium text-slate-500">할인</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Selection indicator */}
-                                    <div className={`absolute top-4 right-4 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedCouponId === coupon.id
-                                        ? "border-primary bg-primary"
-                                        : "border-slate-200"
-                                        }`}>
-                                        {selectedCouponId === coupon.id && (
-                                            <div className="h-2 w-2 rounded-full bg-white" />
-                                        )}
-                                    </div>
-                                </div>
+                                    showSelectionIndicator
+                                />
                             ))}
                         </div>
                     </div>
