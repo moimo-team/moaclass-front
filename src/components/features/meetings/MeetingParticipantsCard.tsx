@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronDown, ChevronUp, Crown, User } from "lucide-react";
-import ProfileModal from "../mypage/ProfileModal";
+import UserProfileModal from "../modal/UserProfileModal";
 import type { MeetingDetail } from "@/models/meeting.model";
 import defaultProfile from "@/assets/images/profile.png";
 
@@ -174,7 +174,7 @@ export function MeetingParticipantsCard({ meetingId, host, currentParticipants, 
 
       {/* 프로필 모달 */}
       {selectedUserId && (
-        <ProfileModal
+        <UserProfileModal
           isOpen={!!selectedUserId}
           onClose={() => setSelectedUserId(null)}
           userId={selectedUserId}
