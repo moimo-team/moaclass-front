@@ -48,7 +48,7 @@ export const ProfileFormModal = ({
           <Button
             type="submit"
             disabled={isSubmitDisabled || isLoading}
-            className="w-full h-12 bg-yellow-400 hover:bg-yellow-500 text-white font-bold rounded-lg shadow-sm disabled:bg-gray-200 disabled:text-gray-400 border-none"
+            className="w-full h-12 bg-primary hover:bg-primary/80 text-white font-bold rounded-lg shadow-sm disabled:bg-gray-200 disabled:text-gray-400 border-none"
           >
             {isLoading ? "처리 중..." : submitButtonText}
           </Button>
