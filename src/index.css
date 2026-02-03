@@ -37,7 +37,8 @@
      Accent
      포인트 / 강조
   ========================= */
-  --accent: #dfece3;             /* Very Soft Green */
+  --carrot: #F97316;
+  --carrot-hover:#EA580C;             /* Cute Carrot Color */
   --accent-foreground: #2f2f2f;
 
   /* =========================
@@ -125,6 +126,8 @@
   --color-destructive: var(--destructive);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-carrot: var(--carrot);
+  --color-carrot-hover: var(--carrot-hover);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
