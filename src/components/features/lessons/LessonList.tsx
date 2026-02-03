@@ -1,5 +1,5 @@
-import ReviewCard from "@/components/features/home/Review";
-import type { Review } from "@/mock/reviewMock";
+import LessonCard from "@/components/features/lessons/LessonCard";
+import type { Lesson } from "@/models/lesson.model";
 import {
   Carousel,
   CarouselContent,
@@ -9,12 +9,12 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 
-interface ReviewListProps {
-  reviews: Review[];
-  onReviewClick: (review: Review) => void;
+interface LessonListProps {
+  lessons: Lesson[];
+  onToggleLike?: (lessonId: number, isLiked: boolean) => void;
 }
 
-const ReviewList = ({ reviews, onReviewClick }: ReviewListProps) => {
+const LessonList = ({ lessons, onToggleLike }: LessonListProps) => {
   return (
     <Carousel
       opts={{
@@ -23,26 +23,19 @@ const ReviewList = ({ reviews, onReviewClick }: ReviewListProps) => {
       }}
       plugins={[
         Autoplay({
-          delay: 4000,
+          delay: 5000,
         }),
       ]}
       className="w-full max-w-sm sm:max-w-md md:max-w-full mx-auto"
     >
       <CarouselContent className="-ml-3">
-        {reviews.map((review) => (
+        {lessons.map((lesson) => (
           <CarouselItem
-            key={review.reviewId}
+            key={lesson.id}
             className="pl-3 md:basis-1/3 lg:basis-1/4"
           >
             <div className="p-1">
-              <ReviewCard
-                className="h-80"
-                meeting={review.meeting}
-                imageUrls={review.imageUrl}
-                rating={review.rating}
-                content={review.content}
-                onCardClick={() => onReviewClick(review)}
-              />
+              <LessonCard lesson={lesson} onToggleLike={onToggleLike} />
             </div>
           </CarouselItem>
         ))}
@@ -53,4 +46,4 @@ const ReviewList = ({ reviews, onReviewClick }: ReviewListProps) => {
   );
 };
 
-export default ReviewList;
+export default LessonList;

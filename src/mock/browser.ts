@@ -7,6 +7,7 @@ import { userInfoHandler } from "./userInfoHandler";
 import { chatHandler } from "./chatHandler";
 import { participationHandlers } from "./participationHandler";
 import { notificationHandlers } from "./notificationHandler";
+import { lessonHandlers } from "./lessonHandler";
 
 const handlers = [
   ...authHandler,
@@ -17,6 +18,7 @@ const handlers = [
   ...chatHandler,
   ...participationHandlers,
   ...notificationHandlers,
+  ...lessonHandlers,
 ];
 
 export const worker = setupWorker(...handlers);

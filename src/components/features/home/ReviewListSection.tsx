@@ -50,7 +50,7 @@ const ReviewListSection = ({
       </div>
       {isLoading && (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3 justify-items-center">
-          {[...Array(8)].map((_, index) => (
+          {[...Array(4)].map((_, index) => (
             <Skeleton key={index} className="w-full h-80 rounded-lg" />
           ))}
         </div>
@@ -61,7 +61,10 @@ const ReviewListSection = ({
         </p>
       )}
       {!isLoading && !isError && reviews.length > 0 && (
-        <ReviewList reviews={reviews} onReviewClick={handleReviewClick} />
+        <ReviewList
+          reviews={reviews.slice(0, 6)}
+          onReviewClick={handleReviewClick}
+        />
       )}
       {!isLoading && !isError && reviews.length === 0 && (
         <p className="text-center py-16">후기가 없습니다.</p>

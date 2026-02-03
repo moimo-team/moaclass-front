@@ -1,4 +1,9 @@
 export type NotificationType =
+  | "PARTICIPATION_REQUEST" // 참가 신청
+  | "PARTICIPATION_ACCEPTED" // 참가 수락
+  | "PARTICIPATION_REJECTED" // 참가 거절
+  | "PARTICIPATION_CANCELLED" //참가취소
+  | "MEETING_DELETED" //미팅삭제
   | "COMMENT_ON_LESSON" // 클래스에 새로운 문의 댓글 등록 (선생님 수신)
   | "REPLY_ON_COMMENT" // 내 댓글에 답글 등록 (작성자/선생님 수신)
   | "PAYMENT_SUCCESS" // 수강생 결제 완료 (선생님 수신)
