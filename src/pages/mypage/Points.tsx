@@ -93,7 +93,7 @@ const Points = () => {
         <div className="max-w-3xl mx-auto w-full p-6 space-y-6 bg-white min-h-screen">
             {/* 헤더 영역 */}
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-foreground">포인트</h1>
+                <h1 className="text-2xl font-bold text-foreground">포인트 내역</h1>
                 <Button
                     variant="outline"
                     onClick={() => setIsChargeModalOpen(true)}
