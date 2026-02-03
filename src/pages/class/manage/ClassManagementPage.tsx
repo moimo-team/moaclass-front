@@ -46,7 +46,7 @@ const ClassManagementPage = () => {
           ...original,
           id: Math.max(...classes.map((c) => c.id)) + 1,
           title: `${original.title} (복제)`,
-          status: "CLOSED", // 복제된 클래스는 마감 상태
+          status: "INACTIVE", // 복제된 클래스는 마감 상태
           createdAt: formatClassCreateDate(new Date().toISOString()),
         };
         setClasses([newClass, ...classes]);
@@ -74,9 +74,9 @@ const ClassManagementPage = () => {
     if (selectedClassId) {
       setClasses(classes.map((c) => {
         if (c.id === selectedClassId) {
-          const newStatus = c.status === "RECRUITING" ? "CLOSED" : "RECRUITING";
+          const newStatus = c.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
           toast.success(
-            newStatus === "RECRUITING"
+            newStatus === "ACTIVE"
               ? "클래스가 활성화되었습니다"
               : "클래스가 휴면 상태로 전환되었습니다"
           );
@@ -137,7 +137,7 @@ const ClassManagementPage = () => {
         onOpenChange={setStatusDialogOpen}
         title="클래스 상태 변경"
         description={
-          selectedClassId && classes.find((c) => c.id === selectedClassId)?.status === "RECRUITING"
+          selectedClassId && classes.find((c) => c.id === selectedClassId)?.status === "ACTIVE"
             ? "이 클래스를 휴면 상태로 전환하시겠습니까?"
             : "이 클래스를 활성화하시겠습니까?"
         }
