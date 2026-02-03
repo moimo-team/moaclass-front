@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import FilterDropdown, {
   type FilterDropdownItem,
 } from "@/components/common/FilterDropdown";
@@ -75,7 +76,11 @@ const REGIONS = [
   },
 ];
 
-const CategorySection = () => {
+interface CategorySectionProps {
+  className?: string;
+}
+
+const CategorySection = ({ className }: CategorySectionProps) => {
   const regionItems: FilterDropdownItem[] = REGIONS.map((region) => ({
     key: region.id,
     label: region.name,
@@ -92,17 +97,14 @@ const CategorySection = () => {
   );
 
   return (
-    <section className="w-full max-w-4xl mx-auto py-8">
-      <h2 className="text-2xl font-bold mb-4 text-left px-4 md:px-0">
-        클래스 찾기
-      </h2>
-      <div className="flex justify-start gap-4 px-4 md:px-0">
+    <section className={cn("w-full py-12", className)}>
+      <h2 className="text-2xl font-bold mb-4 text-left">클래스 찾기</h2>
+      <div className="flex justify-start gap-4">
         <FilterDropdown
           title="지역별 클래스 둘러보기"
           items={regionItems}
           allOptionHref="/meetings"
         />
-
         <FilterDropdown
           title="카테고리별 클래스 둘러보기"
           items={categoryItems}

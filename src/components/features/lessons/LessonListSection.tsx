@@ -30,7 +30,7 @@ function LessonListSection({
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto py-8 pt-12">
+    <div className="w-full py-8 pt-12">
       <div className="flex justify-between w-full mb-4">
         <div className="text-xl font-bold ">{title}</div>
         {seeMoreHref && (

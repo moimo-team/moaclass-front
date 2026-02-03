@@ -9,10 +9,14 @@ import Banner from "@/components/features/home/banner";
 
 function Home() {
   const { isLoggedIn } = useAuthStore();
+  const GLOBAL_PX_CLASSES = "px-4 md:px-18"; // 배너만 가로 공간 전부 차지
+
   return (
-    <div className="flex flex-col justify-center items-center">
+    <>
       <Banner />
-      <div className="flex flex-col pt-8 items-center w-full">
+      <div
+        className={`flex flex-col pt-8 items-center w-full ${GLOBAL_PX_CLASSES}`}
+      >
         <CategorySection />
         {/* TODO: LikeMeetingList(좋아요순), 특정 카테고리 몇 개 추가 */}
         <NewLessonList />
@@ -30,7 +34,7 @@ function Home() {
           </>
         )}
       </div>
-    </div>
+    </>
   );
 }
 

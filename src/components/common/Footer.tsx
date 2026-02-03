@@ -9,7 +9,7 @@ function Footer() {
           <div className="text-xs text-primary">
             '모여라! 아! 이거다 싶은 클래스!' 원데이클래스 프로젝트 '모아클'
           </div>
-          <div className="text-xs text-primary">
+          <div className="text-xs text-primary flex flex-row gap-3">
             © 2026 Team-MoiMo. All rights reserved.
             <a
               href="https://github.com/moimo-team/moaclass-front"

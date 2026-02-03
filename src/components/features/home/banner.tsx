@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -92,7 +90,7 @@ function Banner() {
 
   return (
     <>
-      <div className="relative w-full max-w-screen-lg mx-auto">
+      <div className="relative w-full">
         <Carousel
           setApi={setApi}
           plugins={[
