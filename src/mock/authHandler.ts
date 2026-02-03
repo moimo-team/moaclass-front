@@ -1,5 +1,5 @@
 import { http, HttpResponse, delay } from "msw";
-import { httpUrl } from "./mockData";
+import { httpUrl } from "./mockData/mockData";
 
 // Mock 사용자 정보 상태 관리 (userInfoHandler에서 이동)
 let mockUserInfo = {
