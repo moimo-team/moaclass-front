@@ -23,10 +23,14 @@ import type { UserInfo } from "@/models/user.model";
 import defaultProfile from "@/assets/images/profile.png";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RegionSelect } from "./RegionSelect";
+import { REGIONS } from "@/constants/regions";
+import { Controller } from "react-hook-form";
 
 const profileSchema = z.object({
   nickname: z.string().min(2, "닉네임은 2자 이상 입력해주세요.").max(20, "닉네임은 20자 이내로 입력해주세요."),
   bio: z.string().max(100, "자기소개는 100자 이내로 입력해주세요."),
+  regionId: z.number().min(1, "지역을 선택해주세요."),
   interests: z.array(z.number()).min(3, "관심사를 3개 이상 선택해주세요!"),
 });
 
@@ -75,7 +79,8 @@ const ProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: ProfileMo
 
   // userInfo.id (User) 또는 userInfo.userId (Participant) 또는 userId 대응
   const targetUserId = userId || displayUserInfo?.id || displayUserInfo?.userId;
-  const isReadOnly = readOnly ?? (targetUserId !== undefined && currentUser?.id !== undefined ? targetUserId !== currentUser.id : true);
+  // const isReadOnly = readOnly ?? (targetUserId !== undefined && currentUser?.id !== undefined ? targetUserId !== currentUser.id : true);
+  const isReadOnly = readOnly;
 
   const {
     register,
@@ -83,6 +88,7 @@ const ProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: ProfileMo
     setValue,
     watch,
     reset,
+    control,
     formState: { errors, isValid }
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -90,6 +96,7 @@ const ProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: ProfileMo
     defaultValues: {
       nickname: "",
       bio: "",
+      regionId: 0,
       interests: [],
     }
   });
@@ -99,7 +106,8 @@ const ProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: ProfileMo
       reset({
         nickname: displayUserInfo.nickname || "",
         bio: displayUserInfo.bio || "",
-        interests: displayUserInfo.interests?.map((i: Interest) => i.id) || [],
+        regionId: displayUserInfo.regionId || 0,
+        interests: displayUserInfo.categories?.map((i: Interest) => i.id) || [],
       });
       const img = displayUserInfo.profileImage || defaultProfile;
       setPreviewImage(img);
@@ -137,6 +145,7 @@ const ProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: ProfileMo
       const formData = new FormData();
       formData.append("nickname", data.nickname);
       formData.append("bio", data.bio);
+      formData.append("regionId", data.regionId.toString());
       formData.append("interests", JSON.stringify(data.interests));
 
       if (fileInputRef.current?.files?.[0]) {
@@ -271,15 +280,36 @@ const ProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: ProfileMo
                 {!isReadOnly && errors.bio && <p className="text-xs text-red-500 mt-1">{errors.bio.message}</p>}
               </div>
 
-              {/* Interests Section */}
+              {/* Region Section */}
+              <div className="space-y-2">
+                <Label htmlFor="regionId" className="text-sm font-bold text-gray-700">지역</Label>
+                {isReadOnly ? (
+                  <div className="w-50 bg-gray-50 border border-gray-100 rounded-lg p-3 text-sm text-gray-700">
+                    {REGIONS.find(r => r.id === watch("regionId"))?.name || "지역 정보 없음"}
+                  </div>
+                ) : (
+                  <Controller
+                    name="regionId"
+                    control={control}
+                    render={({ field }) => (
+                      <RegionSelect
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      />
+                    )}
+                  />
+                )}
+                {!isReadOnly && errors.regionId && <p className="text-xs text-red-500 mt-1">{errors.regionId.message}</p>}
+              </div>
+              {/* Categories Section */}
               <div className="space-y-3">
                 <div className="space-y-1">
-                  <Label className="text-sm font-bold text-gray-700">관심사</Label>
-                  {!isReadOnly && <p className="text-[10px] text-gray-400 text-center block">최소 3개이상 선택해주세요!</p>}
+                  <Label className="text-sm font-bold text-gray-700">카테고리</Label>
+                  {!isReadOnly && <p className="text-[10px] text-gray-400 block">최소 3개이상 선택해주세요!</p>}
                 </div>
                 <div className="grid grid-cols-4 gap-2">
                   {isReadOnly && selectedInterests.length === 0 ? (
-                    <p className="text-sm text-gray-400 col-span-4 py-2">선택한 관심사가 없습니다.</p>
+                    <p className="text-sm text-gray-400 col-span-4 py-2">선택한 카테고리가 없습니다.</p>
                   ) : (
                     allInterests?.map((interest) => (
                       <button

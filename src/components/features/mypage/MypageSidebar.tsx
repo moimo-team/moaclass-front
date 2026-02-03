@@ -3,6 +3,7 @@ import { useUserInfoQuery } from "@/hooks/useUserInfoQuery";
 import { Check } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import defaultProfile from "@/assets/images/profile.png";
+import { toast } from "sonner";
 
 export const MypageSidebar = () => {
 
@@ -38,13 +39,14 @@ export const MypageSidebar = () => {
             </div>
 
             {/* Navigation Menu */}
-            <nav className="w-full px-8 flex-1">
-                <div className="flex flex-col gap-6">
+            <nav className="w-full px-8 flex-1 overflow-y-auto">
+                <div className="flex flex-col gap-8">
+                    {/* 프로필 */}
                     <div>
                         <NavLink
                             to="/mypage/profile"
                             className={({ isActive }) =>
-                                `block text-lg font-bold mb-2 transition-colors ${isActive ? "text-primary" : "text-gray-900 hover:text-gray-700"
+                                `block text-lg font-bold transition-colors ${isActive ? "text-primary" : "text-gray-900 hover:text-gray-700"
                                 }`
                             }
                         >
@@ -52,6 +54,50 @@ export const MypageSidebar = () => {
                         </NavLink>
                     </div>
 
+                    {/* 원데이클래스 */}
+                    <div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">원데이클래스</h3>
+                        <div className="flex flex-col gap-3 pl-2">
+                            <NavLink
+                                to="/mypage/class/wish-list"
+                                className={({ isActive }) =>
+                                    `transition-colors ${isActive ? "text-primary font-bold" : "text-gray-500 hover:text-gray-900"
+                                    }`
+                                }
+                            >
+                                위시리스트
+                            </NavLink>
+                            <NavLink
+                                to="/mypage/class/points"
+                                className={({ isActive }) =>
+                                    `transition-colors ${isActive ? "text-primary font-bold" : "text-gray-500 hover:text-gray-900"
+                                    }`
+                                }
+                            >
+                                포인트
+                            </NavLink>
+                            <NavLink
+                                to="/mypage/class/coupons"
+                                className={({ isActive }) =>
+                                    `transition-colors ${isActive ? "text-primary font-bold" : "text-gray-500 hover:text-gray-900"
+                                    }`
+                                }
+                            >
+                                쿠폰
+                            </NavLink>
+                            <NavLink
+                                to="/mypage/class/orders"
+                                className={({ isActive }) =>
+                                    `transition-colors ${isActive ? "text-primary font-bold" : "text-gray-500 hover:text-gray-900"
+                                    }`
+                                }
+                            >
+                                클래스 신청 내역
+                            </NavLink>
+                        </div>
+                    </div>
+
+                    {/* 모임 */}
                     <div>
                         <h3 className="text-lg font-bold text-gray-900 mb-4">모임</h3>
                         <div className="flex flex-col gap-3 pl-2">
@@ -75,12 +121,31 @@ export const MypageSidebar = () => {
                             </NavLink>
                         </div>
                     </div>
+
+                    {/* 모멘토 */}
+                    <div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">모멘토</h3>
+                        <div className="flex flex-col gap-3 pl-2">
+                            <NavLink
+                                to="/classes-manage"
+                                className={({ isActive }) =>
+                                    `transition-colors ${isActive ? "text-primary font-bold" : "text-gray-500 hover:text-gray-900"
+                                    }`
+                                }
+                            >
+                                클래스 관리
+                            </NavLink>
+                        </div>
+                    </div>
                 </div>
             </nav>
 
             {/* Footer */}
-            <div className="w-full px-8 mt-auto">
-                <button className="text-gray-400 hover:text-gray-600 text-sm" disabled>
+            <div className="w-full px-8 mt-auto pt-20 pb-4">
+                <button
+                    onClick={() => toast.error("준비 중인 서비스입니다.")}
+                    className="text-gray-400 hover:text-gray-600 text-sm"
+                >
                     탈퇴하기
                 </button>
             </div>

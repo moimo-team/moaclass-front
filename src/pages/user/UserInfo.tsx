@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RegionSelect } from "@/components/features/mypage/RegionSelect";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useInterestQuery } from "@/hooks/useInterestQuery";
@@ -10,14 +10,13 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserUpdateMutation } from "@/hooks/useUserInfoMutations";
-import { REGIONS } from "@/constants/regions";
 import { Textarea } from "@/components/ui/textarea";
 
 // zod schema 정의
 const userInfoSchema = z.object({
   bio: z.string().min(1, "자기소개를 입력해주세요.")
     .max(100, "자기소개는 100자 이내로 입력해주세요."),
-  region: z.string().min(1, "지역을 선택해주세요."),
+  regionId: z.number().min(1, "지역을 선택해주세요."),
   interests: z.array(z.number()).min(3, "관심사를 3개 이상 선택해주세요."),
 });
 
@@ -40,7 +39,7 @@ const UserInfo = () => {
     mode: "onChange",
     defaultValues: {
       bio: "",
-      region: "",
+      regionId: 0,
       interests: [],
     }
   });
@@ -64,7 +63,7 @@ const UserInfo = () => {
     try {
       const formData = new FormData();
       formData.append("bio", data.bio);
-      formData.append("region", data.region);
+      formData.append("regionId", data.regionId.toString());
       formData.append("interests", JSON.stringify(data.interests));
 
       await userUpdateMutation.mutateAsync(formData);
@@ -115,19 +114,14 @@ const UserInfo = () => {
               >
                 지역을 선택해 주세요
               </Label>
-              <Select onValueChange={(value) => setValue("region", value, { shouldValidate: true })}>
-                <SelectTrigger id="region" className="h-12 border-input focus:ring-primary bg-card">
-                  <SelectValue placeholder="지역 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  {REGIONS.map((region) => (
-                    <SelectItem key={region.id} value={region.name}>
-                      {region.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.region && <p className="text-sm text-destructive">{errors.region.message}</p>}
+              <RegionSelect
+                value={watch("regionId")}
+                onValueChange={(value) => setValue("regionId", value as number, { shouldValidate: true })}
+                valueType="id"
+                placeholder="지역 선택"
+                className="h-12 border-input focus:ring-primary bg-card w-full"
+              />
+              {errors.regionId && <p className="text-sm text-destructive">{errors.regionId.message}</p>}
             </div>
 
             {/* 카테고리 선택 섹션 */}

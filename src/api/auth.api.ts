@@ -176,6 +176,7 @@ export interface VerifyUserResponse {
   email: string;
   nickname: string;
   bio: string;
+  regionId?: number;
   profileImage: string;
   interests: {
     id: number;

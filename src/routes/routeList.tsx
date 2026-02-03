@@ -20,6 +20,10 @@ import Interests from "@/pages/interests/Interests";
 import Chatting from "@/pages/chat/Chatting";
 import ClassManagementPage from "@/pages/class/manage/ClassManagementPage";
 import ClassPayment from "@/pages/pay/ClassPayment";
+import WishLists from "@/pages/mypage/WishLists";
+import Points from "@/pages/mypage/Points";
+import Coupons from "@/pages/mypage/Coupons";
+import OrderList from "@/pages/mypage/OrderList";
 
 export const routeList = [
   {
@@ -73,11 +77,12 @@ export const routeList = [
       },
       {
         path: "/mypage",
-        element: (
-          <ProtectedRoute>
-            <MypageSession />,
-          </ProtectedRoute>
-        ),
+        element: <MypageSession />,
+        // (
+        //   <ProtectedRoute>
+        //     <MypageSession />,
+        //   </ProtectedRoute>
+        // ),
         children: [
           {
             index: true,
@@ -86,6 +91,22 @@ export const routeList = [
           {
             path: "profile",
             element: <Profile />,
+          },
+          {
+            path: "class/wish-list",
+            element: <WishLists />,
+          },
+          {
+            path: "class/points",
+            element: <Points />,
+          },
+          {
+            path: "class/coupons",
+            element: <Coupons />,
+          },
+          {
+            path: "class/orders",
+            element: <OrderList />,
           },
           {
             path: "meetings/join",
