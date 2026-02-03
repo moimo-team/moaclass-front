@@ -1,0 +1,54 @@
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
+import { Link } from "react-router-dom";
+
+export interface FilterDropdownItem {
+  key: number;
+  label: string;
+  href?: string;
+}
+
+interface FilterDropdownProps {
+  title: string;
+  items: FilterDropdownItem[];
+  allOptionHref?: string;
+}
+
+const FilterDropdown: React.FC<FilterDropdownProps> = ({
+  title,
+  items,
+  allOptionHref = "/meetings",
+}) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="flex items-center gap-2">
+          {title}
+          <ChevronDown className="w-4 h-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuItem asChild>
+          <Link to={allOptionHref}>전체 보기</Link>
+        </DropdownMenuItem>
+        {items.map((item) => (
+          <DropdownMenuItem key={item.key} asChild>
+            {item.href ? (
+              <Link to={item.href}>{item.label}</Link>
+            ) : (
+              <span>{item.label}</span>
+            )}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+export default FilterDropdown;
