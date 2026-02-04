@@ -5,10 +5,10 @@ import * as z from "zod";
 import type { TeacherProfile } from "@/models/lesson.model";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ProfileFormModal } from "@/components/features/modal/profile/ProfileFormModal";
-import { ProfileImageUpload } from "@/components/features/modal/profile/ProfileImageUpload";
-import { ProfileNameField } from "@/components/features/modal/profile/ProfileNameField";
-import { ProfileFormTextarea } from "@/components/features/modal/profile/ProfileFormTextarea";
+import { FormModal } from "@/components/features/modal/components/FormModal";
+import { FormImageUpload } from "@/components/features/modal/components/FormImageUpload";
+import { FormInput } from "@/components/features/modal/components/FormInput";
+import { FormTextarea } from "@/components/features/modal/components/FormTextarea";
 
 const teacherProfileSchema = z.object({
   nickname: z.string().min(2, "활동명은 2자 이상 입력해주세요.").max(30, "활동명은 30자 이내로 입력해주세요."),
@@ -81,15 +81,8 @@ export const TeacherProfileModal = ({
     }
   }, [profile, reset, isOpen]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleImageChange = (dataUrl: string) => {
+    setPreviewImage(dataUrl);
   };
 
   const onSubmit = async (data: TeacherProfileFormValues) => {
@@ -137,7 +130,7 @@ export const TeacherProfileModal = ({
   };
 
   return (
-    <ProfileFormModal
+    <FormModal
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={handleSubmit(onSubmit)}
@@ -149,16 +142,16 @@ export const TeacherProfileModal = ({
     >
       {/* 프로필 이미지 */}
       <div className="flex flex-col items-center gap-4 py-4">
-        <ProfileImageUpload
+        <FormImageUpload
           ref={fileInputRef}
+          variant="profile"
           previewImage={previewImage || ""}
           onImageChange={handleImageChange}
-          readOnly={false}
         />
       </div>
 
       {/* 활동명/상호명 */}
-      <ProfileNameField
+      <FormInput
         id="nickname"
         label="활동명 / 상호명"
         register={register("nickname")}
@@ -170,7 +163,7 @@ export const TeacherProfileModal = ({
       />
 
       {/* 소개글 */}
-      <ProfileFormTextarea
+      <FormTextarea
         id="introduction"
         label="소개"
         register={register("introduction")}
@@ -181,6 +174,6 @@ export const TeacherProfileModal = ({
         currentLength={watch("introduction")?.length || 0}
         error={errors.introduction?.message}
       />
-    </ProfileFormModal>
+    </FormModal>
   );
 };

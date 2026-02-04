@@ -1,8 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose, DialogDescription } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +18,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import type { PlaceInfo } from "@/models/kakao-maps.model";
-import { FormImageUpload } from "@/components/common/FormImageUpload";
+import { FormModal } from "@/components/features/modal/components/FormModal";
+import { FormImageUpload } from "@/components/features/modal/components/FormImageUpload";
+import { FormInput } from "@/components/features/modal/components/FormInput";
+import { FormTextarea } from "@/components/features/modal/components/FormTextarea";
 import { combineDateAndTime, parseToTimeComponents } from "@/utils/dateFormat";
 
 // Zod 스키마 정의
@@ -237,171 +236,126 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
   };
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden bg-card flex flex-col p-0">
-          <DialogHeader className="sticky top-0 bg-card z-10 px-6 pt-6 pb-4 border-b">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-2xl font-bold">
-                {meeting ? "모임 정보 수정하기" : "모이머 신청하기"}
-              </DialogTitle>
-              <DialogDescription className="sr-only">
-                {meeting ? "모임 정보를 수정하는 양식입니다." : "새로운 모임을 신청하는 양식입니다."}
-              </DialogDescription>
-              <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                <X className="h-5 w-5" />
-                <span className="sr-only">닫기</span>
-              </DialogClose>
-            </div>
-          </DialogHeader>
+    <FormModal
+      isOpen={open}
+      onClose={() => onOpenChange(false)}
+      onSubmit={handleSubmit(onSubmit)}
+      title={meeting ? "모임 정보 수정하기" : "모이머 신청하기"}
+      submitButtonText={meeting ? (updateMeetingMutation.isPending ? "수정 중..." : "수정하기") : (createMeetingMutation.isPending ? "신청 중..." : "신청하기")}
+      isSubmitDisabled={!isValid || createMeetingMutation.isPending || updateMeetingMutation.isPending}
+      isLoading={isMeetingLoading || !isFormReady}
+      loadingComponent={<LoadingSpinner />}
+      containerClassName="max-w-2xl"
+    >
+      {/* 모임명 */}
+      <FormInput
+        id="title"
+        label="모임명"
+        register={register("title")}
+        placeholder="표현하고 싶은 모임명을 입력하세요! (100자 이내)"
+        maxLength={100}
+        currentLength={watch("title")?.length || 0}
+        error={errors.title?.message}
+      />
 
-          {(isMeetingLoading || !isFormReady) ? (
-            <div className="overflow-y-auto px-6 pb-6 scrollbar-hide">
-              <div className="flex h-[400px] items-center justify-center">
-                <LoadingSpinner />
-              </div>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col min-h-0">
-              <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 scrollbar-hide">
-                {/* 모임명 */}
-                <FormField label="모임명" htmlFor="title">
-                  <Input
-                    id="title"
-                    {...register("title")}
-                    placeholder="표현하고 싶은 모임명을 입력하세요! (100자 이내)"
-                    className="h-12"
-                  />
-                  {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title.message}</p>}
-                </FormField>
+      {/* 모임 소개글 */}
+      <FormTextarea
+        id="description"
+        label="모임 소개글"
+        register={register("description")}
+        placeholder="모임에 대해 자유롭게 설명해주세요! (4000자 이내)&#10;ex) (필수) 모임의 정확한 위치, 개성적인 특징, 참여자가 가지면 좋은 마인드, 지켜야 할 사항"
+        maxLength={4000}
+        currentLength={watch("description")?.length || 0}
+        error={errors.description?.message}
+        className="min-h-[120px]"
+      />
 
-                {/* 모임 소개글 */}
-                <FormField label="모임 소개글" htmlFor="description">
-                  <Textarea
-                    id="description"
-                    {...register("description")}
-                    placeholder="모임에 대해 자유롭게 설명해주세요! (4000자 이내)&#10;ex) (필수) 모임의 정확한 위치, 개성적인 특징, 참여자가 가지면 좋은 마인드, 지켜야 할 사항"
-                    className="min-h-[120px] resize-none"
-                  />
-                  {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description.message}</p>}
-                </FormField>
+      {/* 관심사 선택 */}
+      <FormField
+        label="관심사"
+        description="모임과 관련된 관심사를 선택해주세요"
+      >
+        <div className="flex flex-wrap gap-2">
+          {interests?.map((interest) => (
+            <Badge
+              key={interest.id}
+              variant={selectedInterestId === interest.id ? "default" : "outline"}
+              className={cn(
+                "cursor-pointer transition-colors px-4 py-2 text-sm",
+                selectedInterestId === interest.id
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "hover:bg-secondary"
+              )}
+              onClick={() => toggleInterest(interest.id)}
+            >
+              {interest.name}
+              {selectedInterestId === interest.id && (
+                <X className="ml-1 h-3 w-3" />
+              )}
+            </Badge>
+          ))}
+        </div>
+        {errors.interestId && <p className="text-xs text-red-500 mt-1">{errors.interestId.message}</p>}
+      </FormField>
 
-                {/* 관심사 선택 */}
-                <FormField
-                  label="관심사"
-                  description="모임과 관련된 관심사를 선택해주세요"
-                >
-                  <div className="flex flex-wrap gap-2">
-                    {interests?.map((interest) => (
-                      <Badge
-                        key={interest.id}
-                        variant={selectedInterestId === interest.id ? "default" : "outline"}
-                        className={cn(
-                          "cursor-pointer transition-colors px-4 py-2 text-sm",
-                          selectedInterestId === interest.id
-                            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                            : "hover:bg-secondary"
-                        )}
-                        onClick={() => toggleInterest(interest.id)}
-                      >
-                        {interest.name}
-                        {selectedInterestId === interest.id && (
-                          <X className="ml-1 h-3 w-3" />
-                        )}
-                      </Badge>
-                    ))}
-                  </div>
-                  {errors.interestId && <p className="text-xs text-red-500 mt-1">{errors.interestId.message}</p>}
-                </FormField>
+      {/* 모임 대표 사진 */}
+      <FormImageUpload
+        ref={fileInputRef}
+        previewImage={previewImage}
+        onImageChange={handleImageChange}
+        shape="square"
+        label="모임 대표 사진"
+        description="모임을 대표할 사진을 선택해주세요 (4.5MB 이하 영문 파일명만 가능)"
+      />
 
-                {/* 모임 대표 사진 */}
-                <FormImageUpload
-                  ref={fileInputRef}
-                  previewImage={previewImage}
-                  onImageChange={handleImageChange}
-                  shape="square"
-                  label="모임 대표 사진"
-                  description="모임을 대표할 사진을 선택해주세요 (4.5MB 이하 영문 파일명만 가능)"
-                />
+      {/* 모임 날짜 및 시간 */}
+      <FormField label="모임 날짜 및 시간" description="모임이 진행될 날짜와 시간을 선택해주세요">
+        <DateTimePicker
+          date={meetingDate}
+          hour={meetingHour}
+          minute={meetingMinute}
+          period={meetingPeriod}
+          onDateChange={(date) => setValue("meetingDate", date as any, { shouldValidate: true })}
+          onHourChange={(hour) => setValue("meetingHour", hour)}
+          onMinuteChange={(minute) => setValue("meetingMinute", minute)}
+          onPeriodChange={(period) => setValue("meetingPeriod", period)}
+        />
+        {errors.meetingDate && <p className="text-xs text-red-500 mt-1">{errors.meetingDate.message}</p>}
+      </FormField>
 
-                {/* 모임 날짜 및 시간 */}
-                <FormField label="모임 날짜 및 시간" description="모임이 진행될 날짜와 시간을 선택해주세요">
-                  <DateTimePicker
-                    date={meetingDate}
-                    hour={meetingHour}
-                    minute={meetingMinute}
-                    period={meetingPeriod}
-                    onDateChange={(date) => setValue("meetingDate", date as any, { shouldValidate: true })}
-                    onHourChange={(hour) => setValue("meetingHour", hour)}
-                    onMinuteChange={(minute) => setValue("meetingMinute", minute)}
-                    onPeriodChange={(period) => setValue("meetingPeriod", period)}
-                  />
-                  {errors.meetingDate && <p className="text-xs text-red-500 mt-1">{errors.meetingDate.message}</p>}
-                </FormField>
+      {/* 모임 장소 */}
+      <FormField
+        label="모임 장소"
+        description="카카오맵에서 장소를 검색하여 선택해주세요"
+      >
+        <KakaoMapSearch
+          onPlaceSelect={handlePlaceSelect}
+          defaultValue={watch("address")}
+        />
+        {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address.message}</p>}
+      </FormField>
 
-                {/* 모임 장소 */}
-                <FormField
-                  label="모임 장소"
-                  description="카카오맵에서 장소를 검색하여 선택해주세요"
-                >
-                  <KakaoMapSearch
-                    onPlaceSelect={handlePlaceSelect}
-                    defaultValue={watch("address")}
-                  />
-                  {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address.message}</p>}
-                </FormField>
-
-                {/* 최대 인원수 */}
-                <FormField
-                  label="최대 인원수"
-                  description="수용할 수 있는 인원수 만큼만 받는게 중요해요!"
-                >
-                  <div className="space-y-4">
-                    <Slider
-                      value={[maxParticipants]}
-                      onValueChange={(value) => setValue("maxParticipants", value[0], { shouldValidate: true })}
-                      max={50}
-                      min={2}
-                      step={1}
-                      className="w-full"
-                    />
-                    <p className="text-lg font-semibold text-foreground">
-                      {maxParticipants}명
-                    </p>
-                  </div>
-                  {errors.maxParticipants && <p className="text-xs text-red-500 mt-1">{errors.maxParticipants.message}</p>}
-                </FormField>
-              </div>
-
-              {/* Fixed Footer Buttons */}
-              <div className="shrink-0 px-6 py-4 border-t bg-card flex gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => onOpenChange(false)}
-                  className="flex-1 h-12"
-                  disabled={createMeetingMutation.isPending || updateMeetingMutation.isPending}
-                >
-                  취소
-                </Button>
-                <Button
-                  type="submit"
-                  className="flex-1 h-12 bg-primary hover:bg-primary/90 text-primary-foreground"
-                  disabled={!isValid || createMeetingMutation.isPending || updateMeetingMutation.isPending}
-                >
-                  {meeting ?
-                    (updateMeetingMutation.isPending ? "수정 중..." : "수정하기") :
-                    (createMeetingMutation.isPending ? "신청 중..." : "신청하기")
-                  }
-                </Button>
-              </div>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
-
-
-    </>
+      {/* 최대 인원수 */}
+      <FormField
+        label="최대 인원수"
+        description="수용할 수 있는 인원수 만큼만 받는게 중요해요!"
+      >
+        <div className="space-y-4">
+          <Slider
+            value={[maxParticipants]}
+            onValueChange={(value) => setValue("maxParticipants", value[0], { shouldValidate: true })}
+            max={50}
+            min={2}
+            step={1}
+            className="w-full"
+          />
+          <p className="text-lg font-semibold text-foreground">
+            {maxParticipants}명
+          </p>
+        </div>
+        {errors.maxParticipants && <p className="text-xs text-red-500 mt-1">{errors.maxParticipants.message}</p>}
+      </FormField>
+    </FormModal>
   );
 }
 
