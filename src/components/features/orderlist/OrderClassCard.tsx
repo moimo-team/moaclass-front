@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import ActionButton from "@/components/common/ActionButton";
@@ -34,6 +35,7 @@ const getStatusBadgeVariant = (status: string) => {
 };
 
 const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
+    const navigate = useNavigate();
     const isInactive = order.status === "참석완료" || order.status === "예약취소";
 
     return (
@@ -104,6 +106,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
                                 icon={<X className="w-3.5 h-3.5" />}
                                 disabled={order.status !== "예약완료"}
                                 className="w-full"
+                                onClick={() => navigate(`/mypage/class/orders/${order.id}/cancel`)}
                             />
                         </div>
                     </div>

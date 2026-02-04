@@ -24,6 +24,7 @@ import WishList from "@/pages/mypage/WishList";
 import Points from "@/pages/mypage/Points";
 import Coupons from "@/pages/mypage/Coupons";
 import OrderList from "@/pages/mypage/OrderList";
+import CancelClass from "@/pages/mypage/CancelClass";
 
 export const routeList = [
   {
@@ -107,6 +108,10 @@ export const routeList = [
           {
             path: "class/orders",
             element: <OrderList />,
+          },
+          {
+            path: "class/orders/:id/cancel",
+            element: <CancelClass />,
           },
           {
             path: "meetings/join",

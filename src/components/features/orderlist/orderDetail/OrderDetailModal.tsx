@@ -7,6 +7,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { Order } from "../OrderClassCard";
+import { OrderClassInfo } from "./OrderClassInfo";
 
 interface OrderDetailModalProps {
     isOpen: boolean;
@@ -43,11 +44,7 @@ const OrderDetailModal = ({ isOpen, onClose, order }: OrderDetailModalProps) => 
 
                 <div className="space-y-4">
                     {/* 클래스 정보 섹션 */}
-                    <div className="border border-[#4A5D4A] rounded-[16px] p-5 space-y-1">
-                        <h3 className="font-bold text-lg text-[#2D3A3A]">{order.className}</h3>
-                        <p className="text-muted-foreground">{mockDetail.instructor}</p>
-                        <p className="text-[#2D3A3A] font-medium">{order.price?.toLocaleString() || mockDetail.price.toLocaleString()}원</p>
-                    </div>
+                    <OrderClassInfo order={order} instructor={mockDetail.instructor} />
 
                     {/* 수강취소사유 (조건부) - 개선된 디자인 */}
                     {isCanceled && (

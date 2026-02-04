@@ -5,6 +5,7 @@ import { PaySectionCard } from "@/components/features/pay/PaySectionCard";
 import { TicketSection } from "@/components/features/pay/TicketSection";
 import { ContactSection } from "@/components/features/pay/ContactSection";
 import { PayInfoSection } from "@/components/features/pay/PayInfoSection";
+import { RefundRuleSection } from "@/components/features/pay/RefundRuleSection";
 
 // Mock Data
 const MOCK_DATA = {
@@ -75,28 +76,7 @@ const ClassPayment = () => {
                         {isCancelOpen && (
                             <div className="space-y-4 text-xs">
                                 <p className="font-bold">1. 날짜 별 취소 및 환불 정책</p>
-                                <div className="border rounded-sm overflow-hidden border-border/60">
-                                    <table className="w-full text-left border-collapse">
-                                        <tbody className="divide-y divide-border/60 text-[11px]">
-                                            <tr>
-                                                <td className="p-2 border-r border-border/60">클래스 4일 이전 취소</td>
-                                                <td className="p-2 text-primary font-semibold text-center">100% 환불</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="p-2 border-r border-border/60">클래스 3일 전 취소</td>
-                                                <td className="p-2 text-center">70% 환불</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="p-2 border-r border-border/60">클래스 2일 전 취소</td>
-                                                <td className="p-2 text-center">50% 환불</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="p-2 border-r border-border/60">클래스 하루 전 또는 당일 취소</td>
-                                                <td className="p-2 text-destructive font-semibold text-center">환불 불가</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <RefundRuleSection className="text-xs" />
                                 <p className="font-bold">2. 취소 방법</p>
                                 <p className="text-muted-foreground leading-relaxed">
                                     클래스 결제/예약 내역 페이지에서 취소하고자 하시는 클래스 티켓의
