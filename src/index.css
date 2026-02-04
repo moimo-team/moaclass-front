@@ -39,8 +39,9 @@
   ========================= */
   --carrot: #F97316;
   --carrot-hover:#EA580C;             /* Cute Carrot Color */
+  --accent: #dfece3;     
   --accent-foreground: #2f2f2f;
-
+  
   /* =========================
      Neutral / Muted
      카드 배경, 구분선

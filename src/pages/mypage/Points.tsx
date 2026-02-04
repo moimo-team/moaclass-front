@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PointChargeModal } from '@/components/features/point/PointChargeModal';
+import { PointChargeModal } from '@/components/features/modal/point/PointChargeModal';
 import { toast } from 'sonner';
 import { PointCouponInfo } from '@/components/features/mypage/PointCouponInfo';
 import { POINT_TABS } from '@/constants/tabs';
