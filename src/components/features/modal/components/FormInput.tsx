@@ -2,7 +2,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
-interface ProfileFormFieldProps {
+interface FormInputProps {
   id: string;
   label: string;
   register: UseFormRegisterReturn;
@@ -11,9 +11,17 @@ interface ProfileFormFieldProps {
   maxLength?: number;
   currentLength?: number;
   error?: string;
+  className?: string;
 }
 
-export const ProfileNameField = ({
+/**
+ * React Hook Form 통합 Input 컴포넌트
+ * - 글자 수 카운터 자동 표시
+ * - 에러 메시지 통합 처리
+ * - 프로필, 모임, 클래스 등 다양한 폼에서 재사용 가능
+ * - MeetingModal 디자인 스타일 적용 (h-12)
+ */
+export const FormInput = ({
   id,
   label,
   register,
@@ -22,7 +30,8 @@ export const ProfileNameField = ({
   maxLength,
   currentLength = 0,
   error,
-}: ProfileFormFieldProps) => {
+  className = "",
+}: FormInputProps) => {
   return (
     <div className="space-y-2">
       <Label htmlFor={id} className="text-sm font-bold text-gray-700">
@@ -32,7 +41,7 @@ export const ProfileNameField = ({
         id={id}
         {...register}
         placeholder={placeholder}
-        className="bg-white border-gray-200 rounded-lg focus-visible:ring-yellow-400"
+        className={`h-12 bg-white border-gray-200 rounded-lg focus-visible:ring-yellow-400 ${className}`}
         maxLength={maxLength}
       />
       {maxLength && (
