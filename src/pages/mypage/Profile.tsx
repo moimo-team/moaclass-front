@@ -39,7 +39,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="w-full h-full py-10 bg-white overflow-y-auto">
+    <div className="max-w-6xl mx-auto w-full h-full py-10 bg-white overflow-y-auto">
       {/* Profile Section */}
       <div className="space-y-12 ">
         {/* Basic Profile Edit Header */}

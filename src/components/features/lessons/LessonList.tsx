@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 
-interface LessonListProps {
+export interface LessonListProps {
   lessons: Lesson[];
   onToggleLike?: (lessonId: number, isLiked: boolean) => void;
 }

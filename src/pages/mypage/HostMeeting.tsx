@@ -3,7 +3,7 @@ import SmallMeetingCard from "@/components/features/mypage/SmallMeetingCard";
 import { useMeQuery } from "@/hooks/useMeQuery";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Link } from "react-router-dom";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import PaginationComponent from "@/components/common/PaginationComponent";
 import CreateMeetingModal from "@/components/features/meetings/CreateMeetingModal";
 import MeetingActionButtons from "@/components/features/meetings/MeetingActionButtons";
 import type { MyMeetingsResponse } from "@/api/me.api";
@@ -50,9 +50,6 @@ const HostMeeting = () => {
   const { meetings: hostedMeetings, totalPages, isLoading } = useMeQuery('hosted', 'all', page, 5);
   const { handleDeleteMeeting, DeleteConfirmDialog } = useDeleteMeetingDialog();
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-  };
 
   return (
     <div className="w-full h-full py-10 bg-white overflow-y-auto">
@@ -99,37 +96,11 @@ const HostMeeting = () => {
       />
 
       {totalPages > 0 && (
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => { e.preventDefault(); if (page > 1) handlePageChange(page - 1); }}
-                className={page === 1 ? 'pointer-events-none opacity-50' : ''}
-              />
-            </PaginationItem>
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <PaginationItem key={pageNum}>
-                <PaginationLink
-                  href="#"
-                  isActive={page === pageNum}
-                  onClick={(e) => { e.preventDefault(); handlePageChange(pageNum); }}
-                >
-                  {pageNum}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => { e.preventDefault(); if (page < totalPages) handlePageChange(page + 1); }}
-                className={page === totalPages ? 'pointer-events-none opacity-50' : ''}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+        <PaginationComponent
+          totalPages={totalPages}
+          page={page}
+          setPage={setPage}
+        />
       )}
 
       {/* 삭제 확인 모달 */}
