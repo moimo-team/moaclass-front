@@ -80,3 +80,67 @@ export function formatDateSeparator(dateString: string): string {
   });
 }
 
+/**
+ * 날짜와 시간(12시간제)을 결합하여 ISO 형식 문자열로 변환
+ * @param date - 날짜 객체
+ * @param hour - 시간 (1-12)
+ * @param minute - 분 (00-59)
+ * @param period - AM/PM
+ * @returns ISO 형식 문자열 (YYYY-MM-DDTHH:mm:ss)
+ */
+export function combineDateAndTime(
+  date: Date,
+  hour: string,
+  minute: string,
+  period: "AM" | "PM"
+): string {
+  const combinedDateTime = new Date(date);
+  
+  // 12시간제를 24시간제로 변환
+  let hour24 = parseInt(hour);
+  if (period === "PM" && hour24 !== 12) {
+    hour24 += 12;
+  } else if (period === "AM" && hour24 === 12) {
+    hour24 = 0;
+  }
+  
+  combinedDateTime.setHours(hour24);
+  combinedDateTime.setMinutes(parseInt(minute));
+  // 초는 기존 값 유지 (수정 모드에서 기존 초 정보 보존)
+  // 새로 생성하는 경우 Date 객체의 기본값(0)이 사용됨
+  
+  // YYYY-MM-DDTHH:mm:ss 형식으로 변환
+  const year = combinedDateTime.getFullYear();
+  const month = String(combinedDateTime.getMonth() + 1).padStart(2, "0");
+  const day = String(combinedDateTime.getDate()).padStart(2, "0");
+  const hours = String(combinedDateTime.getHours()).padStart(2, "0");
+  const minutes = String(combinedDateTime.getMinutes()).padStart(2, "0");
+  const seconds = String(combinedDateTime.getSeconds()).padStart(2, "0");
+  
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+}
+
+/**
+ * ISO 날짜 문자열을 12시간제 시간 정보로 파싱
+ * @param dateString - ISO 형식의 날짜 문자열
+ * @returns 시간, 분, AM/PM 정보
+ */
+export function parseToTimeComponents(dateString: string): {
+  hour: string;
+  minute: string;
+  period: "AM" | "PM";
+} {
+  const date = new Date(dateString);
+  const hour24 = date.getHours();
+  const minute = date.getMinutes();
+  
+  const period: "AM" | "PM" = hour24 >= 12 ? "PM" : "AM";
+  const hour12 = hour24 % 12 || 12;
+  
+  return {
+    hour: String(hour12),
+    minute: String(minute).padStart(2, "0"),
+    period,
+  };
+}
+
