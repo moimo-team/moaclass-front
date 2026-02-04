@@ -4,7 +4,7 @@ import { useMeQuery } from "@/hooks/useMeQuery";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Link } from "react-router-dom";
 import PaginationComponent from "@/components/common/PaginationComponent";
-import CreateMeetingModal from "@/components/features/modal/CreateMeetingModal";
+import CreateMeetingModal from "@/components/features/modal/create/CreateMeetingModal";
 import MeetingActionButtons from "@/components/features/meetings/MeetingActionButtons";
 import type { MyMeetingsResponse } from "@/api/me.api";
 

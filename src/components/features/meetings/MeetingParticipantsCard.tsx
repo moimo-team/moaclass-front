@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronDown, ChevronUp, Crown, User } from "lucide-react";
-import UserProfileModal from "@/components/features/modal/UserProfileModal";
+import UserProfileModal from "@/components/features/modal/profile/UserProfileModal";
 import type { MeetingDetail } from "@/models/meeting.model";
 import defaultProfile from "@/assets/images/profile.png";
 
