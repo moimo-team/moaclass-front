@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import ActionButton from "@/components/common/ActionButton";
 import { FileText, Pencil, MessageCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ReviewModal from "@/components/features/review/SetReviewModal";
 
 export interface Order {
     id: number;
@@ -36,6 +38,7 @@ const getStatusBadgeVariant = (status: string) => {
 
 const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
     const navigate = useNavigate();
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const isInactive = order.status === "참석완료" || order.status === "예약취소";
 
     return (
@@ -93,6 +96,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
                                 icon={<Pencil className="w-3.5 h-3.5 text-primary" fill="currentColor" />}
                                 disabled={order.status !== "참석완료"}
                                 className="w-full"
+                                onClick={() => setIsReviewModalOpen(true)}
                             />
                             <ActionButton
                                 label="채팅 문의"
@@ -112,6 +116,11 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
                     </div>
                 </div>
             </CardContent>
+            <ReviewModal
+                open={isReviewModalOpen}
+                onOpenChange={setIsReviewModalOpen}
+                orderId={order.id}
+            />
         </Card>
     );
 };
