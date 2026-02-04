@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { validateImageFile, fileToDataURL } from "@/utils/imageValidation";
 import { toast } from "sonner";
@@ -8,28 +8,33 @@ import { toast } from "sonner";
 interface FormImageUploadProps {
   previewImage: string | null;
   onImageChange: (dataUrl: string) => void;
+  variant?: "form" | "profile";
   shape?: "circle" | "square";
   readOnly?: boolean;
   label?: string;
   description?: string;
+  required?: boolean;
   className?: string;
 }
 
 /**
- * 공통 이미지 업로드 컴포넌트
- * - 프로필 이미지 (원형) 및 모임/클래스 대표 이미지 (사각형) 지원
+ * 통합 이미지 업로드 컴포넌트
+ * - variant="profile": 프로필 전용 스타일 (카메라 아이콘 오버레이)
+ * - variant="form": 범용 폼 스타일 (버튼 + 미리보기) - 기본값
  * - 파일 검증 (타입, 크기, 한글 파일명) 자동 처리
- * - 미리보기 기능 제공
+ * - 원형/사각형 지원
  */
 export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps>(
   (
     {
       previewImage,
       onImageChange,
+      variant = "form",
       shape = "square",
       readOnly = false,
       label,
       description,
+      required = false,
       className,
     },
     ref
@@ -65,11 +70,59 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
       }
     };
 
+    // Profile 스타일 (카메라 오버레이)
+    if (variant === "profile") {
+      return (
+        <div className={cn("flex flex-col items-center gap-4", className)}>
+          {label && (
+            <label className="text-sm font-bold text-gray-700">
+              {label} {required && <span className="text-red-500">*</span>}
+            </label>
+          )}
+          <div className="relative">
+            <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-gray-200">
+              {previewImage ? (
+                <img
+                  src={previewImage}
+                  alt="Profile Preview"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <Camera className="w-8 h-8 text-gray-400" />
+                </div>
+              )}
+            </div>
+            {!readOnly && (
+              <button
+                type="button"
+                onClick={handleButtonClick}
+                className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+              >
+                <Camera className="w-5 h-5 text-gray-600" />
+              </button>
+            )}
+            <input
+              type="file"
+              ref={ref}
+              onChange={handleFileChange}
+              className="hidden"
+              accept="image/*"
+              disabled={readOnly}
+            />
+          </div>
+        </div>
+      );
+    }
+
+    // Form 스타일 (버튼 + 미리보기)
     return (
       <div className={cn("space-y-3", className)}>
         {label && (
           <div className="space-y-1">
-            <label className="text-sm font-bold text-gray-700">{label}</label>
+            <label className="text-sm font-bold text-gray-700">
+              {label} {required && <span className="text-red-500">*</span>}
+            </label>
             {description && (
               <p className="text-xs text-gray-500">{description}</p>
             )}
