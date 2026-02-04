@@ -1,5 +1,5 @@
 import { http, HttpResponse, delay } from 'msw';
-import { httpUrl, myMeetings } from './mockData';
+import { httpUrl, myMeetings } from './mockData/mockData';
 
 // 내 모임 목록조회 핸들러
 export const getMyMeetings = http.get(`${httpUrl}/meetings/me`, async ({ request }) => {

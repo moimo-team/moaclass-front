@@ -1,5 +1,5 @@
 import { http, HttpResponse, delay } from "msw";
-import { httpUrl, mockLessons } from "./mockData";
+import { httpUrl, mockLessons } from "./mockData/mockData";
 
 export const lessonHandlers = [
   // TODO: URL 확정되면 수정
