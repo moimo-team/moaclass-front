@@ -371,8 +371,11 @@ const verifyUser = http.get(`${httpUrl}/users/verify`, async ({ request }) => {
     // 토큰도 없고 쿠키도 없는 경우
     if (!token && (!cookies || !cookies.includes("refreshToken="))) {
         return new HttpResponse(
-            JSON.stringify({ message: "인증 토큰이 없습니다." }),
-            { status: 401 },
+            JSON.stringify({
+                authenticated: false,
+                message: "인증 토큰이 없습니다.",
+            }),
+            { status: 200 },
         );
     }
 
