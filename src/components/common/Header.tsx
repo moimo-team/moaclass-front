@@ -6,11 +6,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { IoIosSearch } from "react-icons/io";
 import { Input } from "@components/ui/input";
 import { useState } from "react";
+import LessonFilterSection from "@components/features/lessons/LessonFilterSection";
 
 function Header() {
   const { isLoggedIn } = useAuthStore();
   const navigate = useNavigate();
   const [searchTopic, setSearchTopic] = useState("");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
@@ -19,8 +21,17 @@ function Header() {
     // navigate(`/meetings/search?keyword=${searchTopic}`); TODO: API 확인 후 경로 수정
     navigate(`/`);
   };
+
+  const handleInputFocus = () => {
+    setIsFilterOpen(true);
+  };
+
+  const handleCloseFilter = () => {
+    setIsFilterOpen(false);
+  };
+
   return (
-    <div className="w-full h-[80px] bg-card sticky top-0 z-50 shrink-0 border-b border-gray-300">
+    <div className="w-full h-[80px] bg-card sticky top-0 z-50 shrink-0 border-b border-gray-300 relative">
       <div className="flex items-center w-full h-full max-w-screen-xl mx-auto px-4 md:px-8">
         <Button
           asChild
@@ -38,6 +49,7 @@ function Header() {
             className="pl-4 h-11 flex-1 bg-card"
             value={searchTopic}
             onChange={(e) => setSearchTopic(e.target.value)}
+            onFocus={handleInputFocus}
           />
           <Button
             type="submit"
@@ -75,6 +87,12 @@ function Header() {
           </div>
         )}
       </div>
+
+      {isFilterOpen && (
+        <div className="absolute top-[80px] left-0 right-0 z-40 bg-card shadow-lg">
+          <LessonFilterSection onClose={handleCloseFilter} />
+        </div>
+      )}
     </div>
   );
 }
