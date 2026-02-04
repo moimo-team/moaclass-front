@@ -39,7 +39,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="w-full h-full py-10 bg-white overflow-y-auto">
+    <div className="max-w-6xl mx-auto w-full h-full py-10 bg-white overflow-y-auto">
       {/* 프로필 섹션 */}
       <div className="space-y-12 ">
         {/* 기본 프로필 수정 헤더 */}

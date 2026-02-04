@@ -4,7 +4,7 @@ import { PaySectionCard } from './PaySectionCard';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
-import { CouponModal } from './CouponModal';
+import { CouponModal } from '../coupon/CouponModal';
 
 interface PayInfoSectionProps {
   paymentInfo: {

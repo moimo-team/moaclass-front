@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import FilterDropdown, {
   type FilterDropdownItem,
 } from "@/components/common/FilterDropdown";
-import { interestCategories } from "@/mock/mockData";
+import { interestCategories } from "@/mock/mockData/mockData";
 
 // TODO: 하드코딩 데이터 삭제
 const REGIONS = [

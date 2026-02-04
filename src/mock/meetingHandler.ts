@@ -1,5 +1,5 @@
 import { http, HttpResponse, delay } from "msw";
-import { mockMeetings, httpUrl } from "./mockData";
+import { mockMeetings, httpUrl } from "./mockData/mockData";
 import type { MeetingMeta, CreateMeetingRequest } from "@/models/meeting.model";
 
 export const meetingHandler = [

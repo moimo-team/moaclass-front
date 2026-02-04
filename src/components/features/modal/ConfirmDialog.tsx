@@ -13,12 +13,13 @@ interface ConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  description: string;
+  description?: string;
   confirmText?: string;
   cancelText?: string;
   onConfirm: () => void;
   onCancel?: () => void;
   variant?: "default" | "destructive"; // 삭제 등 위험한 액션용
+  children?: React.ReactNode;
 }
 
 function ConfirmDialog({
@@ -31,6 +32,7 @@ function ConfirmDialog({
   onConfirm,
   onCancel,
   variant = "default",
+  children,
 }: ConfirmDialogProps) {
   const handleConfirm = () => {
     onConfirm();
@@ -49,10 +51,13 @@ function ConfirmDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription className="whitespace-pre-line">
-            {description}
-          </AlertDialogDescription>
+          {description && (
+            <AlertDialogDescription className="whitespace-pre-line">
+              {description}
+            </AlertDialogDescription>
+          )}
         </AlertDialogHeader>
+        {children}
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleCancel}>
             {cancelText}
