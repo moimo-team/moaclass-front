@@ -12,10 +12,12 @@ export interface Order {
     endTime: string;
     status: string;
     imageUrl: string;
+    price?: number;
 }
 
 interface OrderClassCardProps {
     order: Order;
+    onDetailClick?: (order: Order) => void;
 }
 
 const getStatusBadgeVariant = (status: string) => {
@@ -31,7 +33,7 @@ const getStatusBadgeVariant = (status: string) => {
     }
 };
 
-const OrderClassCard = ({ order }: OrderClassCardProps) => {
+const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
     const isInactive = order.status === "참석완료" || order.status === "예약취소";
 
     return (
@@ -81,6 +83,7 @@ const OrderClassCard = ({ order }: OrderClassCardProps) => {
                                 theme="outline"
                                 icon={<FileText className="w-3.5 h-3.5 text-primary" fill="currentColor" />}
                                 className="w-full"
+                                onClick={() => onDetailClick?.(order)}
                             />
                             <ActionButton
                                 label="후기 작성"

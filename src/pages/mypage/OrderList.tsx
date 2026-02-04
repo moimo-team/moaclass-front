@@ -7,7 +7,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import PaginationComponent from "@/components/common/PaginationComponent";
-import OrderClassCard from "@/components/features/orderlist/OrderClassCard";
+import OrderClassCard, { type Order } from "@/components/features/orderlist/OrderClassCard";
+import OrderDetailModal from "@/components/features/orderlist/orderDetail/OrderDetailModal";
 
 // Mock Data
 const MOCK_ORDERS = Array.from({ length: 15 }, (_, i) => ({
@@ -18,6 +19,7 @@ const MOCK_ORDERS = Array.from({ length: 15 }, (_, i) => ({
     endTime: "오후 15:00",
     status: i % 3 === 0 ? "예약완료" : i % 3 === 1 ? "예약취소" : "참석완료",
     imageUrl: `https://picsum.photos/seed/${i + 100}/200/120`,
+    price: 33000,
 }));
 
 type OrderStatus = "전체" | "예약완료" | "예약취소" | "참석완료";
@@ -25,6 +27,8 @@ type OrderStatus = "전체" | "예약완료" | "예약취소" | "참석완료";
 const OrderList = () => {
     const [filterStatus, setFilterStatus] = useState<OrderStatus>("전체");
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const itemsPerPage = 5;
 
     // Filter Logic
@@ -42,6 +46,11 @@ const OrderList = () => {
     const handleFilterChange = (value: string) => {
         setFilterStatus(value as OrderStatus);
         setCurrentPage(1);
+    };
+
+    const handleDetailClick = (order: Order) => {
+        setSelectedOrder(order);
+        setIsModalOpen(true);
     };
 
 
@@ -68,7 +77,11 @@ const OrderList = () => {
             <div className="space-y-4 mb-10">
                 {currentOrders.length > 0 ? (
                     currentOrders.map((order) => (
-                        <OrderClassCard key={order.id} order={order} />
+                        <OrderClassCard
+                            key={order.id}
+                            order={order}
+                            onDetailClick={handleDetailClick}
+                        />
                     ))
                 ) : (
                     <div className="text-center py-20 bg-muted/30 rounded-lg border border-dashed border-primary/20">
@@ -86,6 +99,12 @@ const OrderList = () => {
                     />
                 </div>
             )}
+
+            <OrderDetailModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                order={selectedOrder}
+            />
         </div>
     );
 };

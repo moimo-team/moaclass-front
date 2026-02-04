@@ -20,7 +20,7 @@ import Interests from "@/pages/interests/Interests";
 import Chatting from "@/pages/chat/Chatting";
 import ClassManagementPage from "@/pages/class/manage/ClassManagementPage";
 import ClassPayment from "@/pages/pay/ClassPayment";
-import WishLists from "@/pages/mypage/WishLists";
+import WishList from "@/pages/mypage/WishList";
 import Points from "@/pages/mypage/Points";
 import Coupons from "@/pages/mypage/Coupons";
 import OrderList from "@/pages/mypage/OrderList";
@@ -94,7 +94,7 @@ export const routeList = [
           },
           {
             path: "class/wish-list",
-            element: <WishLists />,
+            element: <WishList />,
           },
           {
             path: "class/points",
