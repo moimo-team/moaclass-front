@@ -8,6 +8,9 @@ export const MOCK_CLASSES: ClassCardData[] = [
     thumbnailImage: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop",
     status: "ACTIVE",
     createdAt: "2026. 2. 4 (화) 10:00",
+    price: 50000,
+    discountRate: 10,
+    discountedPrice: 45000,
   },
   {
     id: 2,
@@ -16,6 +19,9 @@ export const MOCK_CLASSES: ClassCardData[] = [
     thumbnailImage: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=600&fit=crop",
     status: "ACTIVE",
     createdAt: "2026. 2. 3 (월) 14:30",
+    price: 150000,
+    discountRate: 20,
+    discountedPrice: 120000,
   },
   {
     id: 3,
@@ -24,6 +30,9 @@ export const MOCK_CLASSES: ClassCardData[] = [
     thumbnailImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=600&fit=crop",
     status: "INACTIVE",
     createdAt: "2026. 2. 2 (일) 09:15",
+    price: 80000,
+    discountRate: 0,
+    discountedPrice: 80000,
   },
   {
     id: 4,
@@ -32,6 +41,9 @@ export const MOCK_CLASSES: ClassCardData[] = [
     thumbnailImage: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&h=600&fit=crop",
     status: "DELETED",
     createdAt: "2026. 2. 1 (토) 11:20",
+    price: 100000,
+    discountRate: 5,
+    discountedPrice: 95000,
   },
   {
     id: 5,
@@ -40,6 +52,9 @@ export const MOCK_CLASSES: ClassCardData[] = [
     thumbnailImage: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop",
     status: "DRAFT",
     createdAt: "2026. 1. 31 (금) 16:45",
+    price: 30000,
+    discountRate: 0,
+    discountedPrice: 30000,
   },
   {
     id: 6,
@@ -48,5 +63,8 @@ export const MOCK_CLASSES: ClassCardData[] = [
     thumbnailImage: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop",
     status: "DUPLICATED",
     createdAt: "2026. 1. 30 (목) 13:10",
+    price: 50000,
+    discountRate: 10,
+    discountedPrice: 45000,
   },
 ];

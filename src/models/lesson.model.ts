@@ -98,4 +98,7 @@ export interface ClassCardData {
   thumbnailImage: string;
   status: LessonStatus;
   createdAt: string;
+  price: number;            
+  discountRate: number;      
+  discountedPrice: number;   
 }
