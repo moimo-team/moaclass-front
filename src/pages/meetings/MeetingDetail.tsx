@@ -6,7 +6,7 @@ import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import moimoMeeting from "@/assets/images/moimo-meetings.png";
 import { useAuthStore } from "@/store/authStore";
 import LoginRequiredDialog from "@/components/features/login/LoginRequiredDialog";
-import KakaoMapView from "@/components/features/meetings/kakaoMaps/KakaoMapView";
+import KakaoMapView from "@/components/features/map/kakaoMaps/KakaoMapView";
 import { toast } from "sonner";
 import CreateMeetingModal from "@/components/features/modal/create/CreateMeetingModal";
 import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
