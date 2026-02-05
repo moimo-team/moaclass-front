@@ -14,7 +14,7 @@ import type { UserInfo } from "@/models/user.model";
 import defaultProfile from "@/assets/images/profile.png";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RegionSelect } from "../../map/RegionSelect";
+import { RegionSelect } from "@/components/common/RegionSelect";
 import { REGIONS } from "@/constants/regions";
 import { Controller } from "react-hook-form";
 import { FormModal } from "@/components/features/modal/components/FormModal";

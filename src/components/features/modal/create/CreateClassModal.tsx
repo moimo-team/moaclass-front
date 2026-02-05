@@ -9,13 +9,13 @@ import { FormModal } from "@/components/features/modal/components/FormModal";
 import { FormImageUpload } from "@/components/features/modal/components/FormImageUpload";
 import { FormInput } from "@/components/features/modal/components/FormInput";
 import { FormTextarea } from "@/components/features/modal/components/FormTextarea";
-import { RegionSelect } from "@/components/features/map/RegionSelect";
+import { RegionSelect } from "@/components/common/RegionSelect";
 import KakaoMapSearch from "@/components/features/map/kakaoMaps/KakaoMapSearch";
 import { SelectableBadge } from "@/components/common/SelectableBadge";
 import { cn } from "@/lib/utils";
 import type { Level } from "@/models/lesson.model";
 import type { PlaceInfo } from "@/models/kakao-maps.model";
-import { CLASS_CATEGORIES, SUB_CLASS_CATEGORIES } from "@/mock/mockData/categoryMock";
+import { LESSON_CATEGORIES, LESSON_SUB_CATEGORIES } from "@/mock/mockData/categoryMock";
 
 // Zod 스키마 정의
 const classSchema = z.object({
@@ -101,7 +101,7 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
   const reservationLeadDays = watch("reservationLeadDays");
 
   // 선택된 대분류에 해당하는 소분류 필터링
-  const availableSubCategories = SUB_CLASS_CATEGORIES.filter(
+  const availableSubCategories = LESSON_SUB_CATEGORIES.filter(
     (sub) => sub.category_id === selectedCategoryId
   );
 
@@ -268,7 +268,7 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
       {/* 대분류 카테고리 선택 */}
       <FormField label="대분류 카테고리" description="클래스의 카테고리를 선택해주세요" required>
         <div className="flex flex-wrap gap-2">
-          {CLASS_CATEGORIES.map((category) => (
+          {LESSON_CATEGORIES.map((category) => (
             <SelectableBadge
               key={category.id}
               label={category.name}

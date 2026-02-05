@@ -1,6 +1,7 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { REGIONS } from "@/constants/regions";
 import { cn } from "@/lib/utils";
+import { useRegionQuery } from "@/hooks/useRegionQuery";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 interface RegionSelectProps {
   value: string | number | undefined;
@@ -22,6 +23,16 @@ export const RegionSelect = ({
   className,
   valueType = "id"
 }: RegionSelectProps) => {
+  const { data: regionsData, isLoading, error } = useRegionQuery();
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <div>에러</div>;
+  }
+
   return (
     <Select
       onValueChange={(val) => {
@@ -39,7 +50,7 @@ export const RegionSelect = ({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent className="max-h-[200px] bg-card border-input">
-        {REGIONS.map((region) => (
+        {regionsData?.regions?.map((region) => (
           <SelectItem
             key={region.id}
             value={valueType === "id" ? region.id.toString() : region.name}
