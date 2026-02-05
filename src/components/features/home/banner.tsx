@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 function Banner() {
+  const negativeMarginClasses = "-mx-4 md:-mx-32";
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,7 +91,7 @@ function Banner() {
 
   return (
     <>
-      <div className="relative w-full">
+      <div className={`relative w-screen ${negativeMarginClasses}`}>
         <Carousel
           setApi={setApi}
           plugins={[
@@ -134,6 +135,7 @@ function Banner() {
         </div>
       </div>
 
+      {/* TODO: 하드코딩된 데이터 제거 */}
       <AlertDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

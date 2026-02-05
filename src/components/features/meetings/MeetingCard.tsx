@@ -4,7 +4,7 @@ import { IoLocationOutline } from "react-icons/io5";
 import { AiOutlineTeam } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import type { Meeting } from "@/models/meeting.model";
-import { getDistrictFromAddress } from "@/utils/formatAddress";
+import { getDisplayAddress } from "@/utils/formatAddress";
 import { isMeetingClosed } from "@/utils/meetingUtils";
 import defaultMeetingImage from "@/assets/images/moimo-meetings.png";
 
@@ -14,7 +14,12 @@ interface MeetingCardProps {
   className?: string;
   hasPendingApplicants?: boolean;
 }
-function MeetingCard({ meeting, imageUrl, className, hasPendingApplicants }: MeetingCardProps) {
+function MeetingCard({
+  meeting,
+  imageUrl,
+  className,
+  hasPendingApplicants,
+}: MeetingCardProps) {
   const { meetingId, title, address, currentParticipants } = meeting;
   const href = `/meetings/${meetingId}`;
   return (
@@ -36,7 +41,11 @@ function MeetingCard({ meeting, imageUrl, className, hasPendingApplicants }: Mee
         )}
         {/* 상단: 모임 사진*/}
         <div className="relative w-full h-[60%]">
-          {isMeetingClosed(meeting.currentParticipants, meeting.maxParticipants, meeting.meetingDate) && (
+          {isMeetingClosed(
+            meeting.currentParticipants,
+            meeting.maxParticipants,
+            meeting.meetingDate,
+          ) && (
             <div className="absolute inset-0 z-10 bg-black/40 flex items-center justify-center">
               <span className="bg-black/60 text-white px-3 py-1.5 rounded-full text-sm font-bold border border-white/20">
                 마감됨
@@ -49,7 +58,11 @@ function MeetingCard({ meeting, imageUrl, className, hasPendingApplicants }: Mee
               alt={title}
               className={cn(
                 "w-full h-full object-cover",
-                isMeetingClosed(meeting.currentParticipants, meeting.maxParticipants, meeting.meetingDate) && "grayscale-[0.5]"
+                isMeetingClosed(
+                  meeting.currentParticipants,
+                  meeting.maxParticipants,
+                  meeting.meetingDate,
+                ) && "grayscale-[0.5]",
               )}
             />
           ) : (
@@ -58,7 +71,11 @@ function MeetingCard({ meeting, imageUrl, className, hasPendingApplicants }: Mee
               alt={title}
               className={cn(
                 "w-full h-full object-cover",
-                isMeetingClosed(meeting.currentParticipants, meeting.maxParticipants, meeting.meetingDate) && "grayscale-[0.5]"
+                isMeetingClosed(
+                  meeting.currentParticipants,
+                  meeting.maxParticipants,
+                  meeting.meetingDate,
+                ) && "grayscale-[0.5]",
               )}
             />
           )}
@@ -75,7 +92,7 @@ function MeetingCard({ meeting, imageUrl, className, hasPendingApplicants }: Mee
         <CardFooter className="p-3 pt-0 flex gap-4 items-center text-sm text-muted-foreground">
           <div className="flex items-center">
             <IoLocationOutline />
-            <span>{getDistrictFromAddress(address)}</span>
+            <span>{getDisplayAddress(address)}</span>
           </div>
           <div className="flex items-center">
             <AiOutlineTeam />

@@ -33,7 +33,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
           <ChevronDown className="w-4 h-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
+      <DropdownMenuContent className="w-56 max-h-[300px] overflow-y-auto">
         <DropdownMenuItem asChild>
           <Link to={allOptionHref}>전체 보기</Link>
         </DropdownMenuItem>
