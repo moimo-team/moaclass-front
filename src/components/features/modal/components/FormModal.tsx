@@ -8,7 +8,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
-interface ProfileFormModalProps {
+interface FormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (e: React.FormEvent) => void;
@@ -22,7 +22,13 @@ interface ProfileFormModalProps {
   containerClassName?: string;
 }
 
-export const ProfileFormModal = ({
+/**
+ * 범용 폼 모달 컴포넌트
+ * - 고정 헤더 + 스크롤 가능한 본문 + 고정 버튼 구조
+ * - 로딩 상태 자동 처리
+ * - 프로필, 모임, 클래스 등 다양한 폼에서 재사용 가능
+ */
+export const FormModal = ({
   isOpen,
   onClose,
   onSubmit,
@@ -34,7 +40,7 @@ export const ProfileFormModal = ({
   loadingComponent,
   showFooter = true,
   containerClassName = "max-w-xl",
-}: ProfileFormModalProps) => {
+}: FormModalProps) => {
   const content = (
     <>
       {/* 스크롤바 */}

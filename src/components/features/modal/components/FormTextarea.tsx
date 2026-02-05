@@ -2,7 +2,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
-interface ProfileFormTextareaProps {
+interface FormTextareaProps {
   id: string;
   label: string;
   register: UseFormRegisterReturn;
@@ -15,7 +15,13 @@ interface ProfileFormTextareaProps {
   className?: string;
 }
 
-export const ProfileFormTextarea = ({
+/**
+ * React Hook Form 통합 Textarea 컴포넌트
+ * - 글자 수 카운터 자동 표시
+ * - 에러 메시지 통합 처리
+ * - 프로필, 모임, 클래스 등 다양한 폼에서 재사용 가능
+ */
+export const FormTextarea = ({
   id,
   label,
   register,
@@ -26,7 +32,7 @@ export const ProfileFormTextarea = ({
   currentLength = 0,
   error,
   className = "min-h-[200px]",
-}: ProfileFormTextareaProps) => {
+}: FormTextareaProps) => {
   return (
     <div className="space-y-2">
       <Label htmlFor={id} className="text-sm font-bold text-gray-700">

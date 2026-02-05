@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { Crown, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import UserProfileModal from "@/components/features/modal/UserProfileModal";
+import UserProfileModal from "@/components/features/modal/profile/UserProfileModal";
 import { useUserInfoQuery } from "@/hooks/useUserInfoQuery";
 import { REGIONS } from "@/constants/regions";
 import LoadingSpinner from "@/components/common/LoadingSpinner";

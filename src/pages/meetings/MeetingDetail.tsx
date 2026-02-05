@@ -8,7 +8,7 @@ import { useAuthStore } from "@/store/authStore";
 import LoginRequiredDialog from "@/components/features/login/LoginRequiredDialog";
 import KakaoMapView from "@/components/features/meetings/kakaoMaps/KakaoMapView";
 import { toast } from "sonner";
-import CreateMeetingModal from "@/components/features/meetings/CreateMeetingModal";
+import CreateMeetingModal from "@/components/features/modal/create/CreateMeetingModal";
 import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
 import { useJoinMeetingMutation } from "@/hooks/useMeetingMutations";
 import { useMeetingQuery } from "@/hooks/useMeetingQuery";

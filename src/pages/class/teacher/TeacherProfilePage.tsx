@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
-import { TeacherProfileModal } from "@/components/features/modal/TeacherProfileModal";
+import { TeacherProfileModal } from "@/components/features/modal/profile/TeacherProfileModal";
 import type { TeacherProfile } from "@/models/lesson.model";
 
 // Mock 데이터 (나중에 API로 교체)

@@ -2,7 +2,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useInterestQuery } from "@/hooks/useInterestQuery";
 import { useUserUpdateMutation } from "@/hooks/useUserInfoMutations";
-import { useAuthQuery } from "@/hooks/useAuthQuery";
 import { useUserInfoByIdQuery } from "@/hooks/useUserInfoQuery";
 import type { Interest } from "@/models/interest.model";
 import { cn } from "@/lib/utils";
@@ -15,12 +14,12 @@ import type { UserInfo } from "@/models/user.model";
 import defaultProfile from "@/assets/images/profile.png";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RegionSelect } from "../mypage/RegionSelect";
+import { RegionSelect } from "../../mypage/RegionSelect";
 import { REGIONS } from "@/constants/regions";
 import { Controller } from "react-hook-form";
-import { ProfileFormModal } from "@/components/features/modal/profile/ProfileFormModal";
-import { ProfileImageUpload } from "@/components/features/modal/profile/ProfileImageUpload";
-import { ProfileFormTextarea } from "@/components/features/modal/profile/ProfileFormTextarea";
+import { FormModal } from "@/components/features/modal/components/FormModal";
+import { FormImageUpload } from "@/components/features/modal/components/FormImageUpload";
+import { FormTextarea } from "@/components/features/modal/components/FormTextarea";
 
 const profileSchema = z.object({
   nickname: z.string().min(2, "닉네임은 2자 이상 입력해주세요.").max(20, "닉네임은 20자 이내로 입력해주세요."),
@@ -61,7 +60,6 @@ const ProfileSkeleton = () => (
 );
 
 const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: ProfileModalProps) => {
-  const { data: currentUser } = useAuthQuery();
   const { data: allInterests } = useInterestQuery();
   const { data: fetchedUser, isLoading: isUserLoading } = useUserInfoByIdQuery(userId || 0);
   const userUpdateMutation = useUserUpdateMutation();
@@ -71,9 +69,6 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
 
   // 우선순위: fetch된 데이터 > props로 전달된 데이터
   const displayUserInfo = fetchedUser || userInfo;
-
-  // userInfo.id (User) 또는 userInfo.userId (Participant) 또는 userId 대응
-  const targetUserId = userId || displayUserInfo?.id || displayUserInfo?.userId;
   const isReadOnly = readOnly;
 
   const {
@@ -123,15 +118,8 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
     setValue("interests", currentInterests, { shouldValidate: true });
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleImageChange = (dataUrl: string) => {
+    setPreviewImage(dataUrl);
   };
 
   const onSubmit = async (data: ProfileFormValues) => {
@@ -156,7 +144,7 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
   };
 
   return (
-    <ProfileFormModal
+    <FormModal
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={!isReadOnly ? handleSubmit(onSubmit) : undefined}
@@ -170,8 +158,9 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
     >
       {/* 프로필 이미지 */}
       <div className="flex flex-col items-center gap-4 py-4">
-        <ProfileImageUpload
+        <FormImageUpload
           ref={fileInputRef}
+          variant="profile"
           previewImage={previewImage || defaultProfile}
           onImageChange={handleImageChange}
           readOnly={isReadOnly}
@@ -224,7 +213,7 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
 
       {/* 자기소개 */}
       {!isReadOnly ? (
-        <ProfileFormTextarea
+        <FormTextarea
           id="bio"
           label="자기소개"
           register={register("bio")}
@@ -296,7 +285,7 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
         </div>
         {!isReadOnly && errors.interests && <p className="text-xs text-red-500 mt-1">{errors.interests.message}</p>}
       </div>
-    </ProfileFormModal>
+    </FormModal>
   );
 };
 

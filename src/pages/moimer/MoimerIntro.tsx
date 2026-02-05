@@ -2,7 +2,7 @@ import InfoSection from "@features/moimer/InfoSection";
 import GuidelineCard from "@features/moimer/GuidelineCard";
 import FAQCard from "@features/moimer/FAQCard";
 import FixedBottomButton from "@components/common/FixedBottomButton";
-import MoimerApplicationModal from "@features/meetings/CreateMeetingModal";
+import MoimerApplicationModal from "@/components/features/modal/create/CreateMeetingModal";
 import { useState } from 'react';
 import { guidelines, faqs } from "@/constants/moimerIntroData"
 import moimer from "@/assets/images/moimer.png"

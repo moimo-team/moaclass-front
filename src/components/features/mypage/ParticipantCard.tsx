@@ -8,7 +8,7 @@ import {
 } from "@/hooks/useParticipateMutations";
 
 import { useState } from "react";
-import UserProfileModal from "../modal/UserProfileModal";
+import UserProfileModal from "@/components/features/modal/profile/UserProfileModal";
 import defaultProfile from "@/assets/images/profile.png";
 import MeetingActionButtons from "@/components/features/meetings/MeetingActionButtons";
 import { toast } from "sonner";
