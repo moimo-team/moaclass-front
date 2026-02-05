@@ -1,26 +1,31 @@
 import { forwardRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, Camera } from "lucide-react";
+import { Upload, Camera, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { validateImageFile, fileToDataURL } from "@/utils/imageValidation";
 import { toast } from "sonner";
 
 interface FormImageUploadProps {
-  previewImage: string | null;
-  onImageChange: (dataUrl: string) => void;
-  variant?: "form" | "profile";
+  previewImage?: string | null;
+  previewImages?: string[];
+  onImageChange?: (dataUrl: string) => void;
+  onImagesChange?: (dataUrls: string[]) => void;
+  onRemoveImage?: (index: number) => void;
+  variant?: "form" | "profile" | "multiple";
   shape?: "circle" | "square";
   readOnly?: boolean;
   label?: string;
   description?: string;
   required?: boolean;
+  maxImages?: number;
   className?: string;
 }
 
 /**
  * 통합 이미지 업로드 컴포넌트
  * - variant="profile": 프로필 전용 스타일 (카메라 아이콘 오버레이)
- * - variant="form": 범용 폼 스타일 (버튼 + 미리보기) - 기본값
+ * - variant="form": 단일 이미지 업로드 (그리드 미리보기) - 기본값
+ * - variant="multiple": 다중 이미지 업로드 (그리드 미리보기)
  * - 파일 검증 (타입, 크기, 한글 파일명) 자동 처리
  * - 원형/사각형 지원
  */
@@ -28,38 +33,83 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
   (
     {
       previewImage,
+      previewImages = [],
       onImageChange,
+      onImagesChange,
+      onRemoveImage,
       variant = "form",
       shape = "square",
       readOnly = false,
       label,
       description,
       required = false,
+      maxImages = 8,
       className,
     },
     ref
   ) => {
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
+      const files = e.target.files;
+      if (!files || files.length === 0) return;
 
-      // 파일 검증
-      const validation = validateImageFile(file);
-      if (!validation.isValid) {
-        toast.error(validation.error!, {
-          description: validation.errorDescription,
-        });
-        e.target.value = ""; // 입력 초기화
+      // 단일 이미지 모드
+      if (variant === "form" && onImageChange) {
+        const file = files[0];
+        const validation = validateImageFile(file);
+        if (!validation.isValid) {
+          toast.error(validation.error!, {
+            description: validation.errorDescription,
+          });
+          e.target.value = "";
+          return;
+        }
+
+        try {
+          const dataUrl = await fileToDataURL(file);
+          onImageChange(dataUrl);
+        } catch (error) {
+          console.error("Image conversion failed:", error);
+          toast.error("이미지 변환에 실패했습니다");
+          e.target.value = "";
+        }
         return;
       }
 
-      // 파일을 Data URL로 변환
-      try {
-        const dataUrl = await fileToDataURL(file);
-        onImageChange(dataUrl);
-      } catch (error) {
-        console.error("Image conversion failed:", error);
-        toast.error("이미지 변환에 실패했습니다");
+      // 다중 이미지 모드
+      if (variant === "multiple" && onImagesChange) {
+        const validFiles: File[] = [];
+
+        for (const file of Array.from(files)) {
+          const validation = validateImageFile(file);
+          if (!validation.isValid) {
+            toast.error(`${file.name}: ${validation.error}`);
+            continue;
+          }
+          validFiles.push(file);
+        }
+
+        if (validFiles.length === 0) {
+          e.target.value = "";
+          return;
+        }
+
+        // 최대 개수 체크
+        if (previewImages.length + validFiles.length > maxImages) {
+          toast.error(`최대 ${maxImages}장까지 업로드 가능합니다`);
+          e.target.value = "";
+          return;
+        }
+
+        try {
+          const dataUrls = await Promise.all(
+            validFiles.map((file) => fileToDataURL(file))
+          );
+          onImagesChange([...previewImages, ...dataUrls]);
+        } catch (error) {
+          console.error("Image conversion failed:", error);
+          toast.error("이미지 변환에 실패했습니다");
+        }
+
         e.target.value = "";
       }
     };
@@ -67,6 +117,12 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
     const handleButtonClick = () => {
       if (ref && "current" in ref && ref.current) {
         ref.current.click();
+      }
+    };
+
+    const handleRemove = (index: number) => {
+      if (onRemoveImage) {
+        onRemoveImage(index);
       }
     };
 
@@ -115,7 +171,73 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
       );
     }
 
-    // Form 스타일 (버튼 + 미리보기)
+    // Form 스타일 (단일 이미지 - 그리드 미리보기)
+    if (variant === "form") {
+      return (
+        <div className={cn("space-y-3", className)}>
+          {label && (
+            <div className="space-y-1">
+              <label className="text-sm font-bold text-gray-700">
+                {label} {required && <span className="text-red-500">*</span>}
+              </label>
+              {description && (
+                <p className="text-xs text-gray-500">{description}</p>
+              )}
+            </div>
+          )}
+
+          <div className="space-y-3">
+            {/* 이미지 미리보기 (있을 경우) */}
+            {previewImage && (
+              <div className="relative group w-full">
+                <img
+                  src={previewImage}
+                  alt="Preview"
+                  className={cn(
+                    "w-full h-92 object-cover border-2 border-gray-200",
+                    shape === "circle" ? "rounded-full" : "rounded-lg"
+                  )}
+                />
+                {!readOnly && onRemoveImage && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemove(0)}
+                    className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity border border-gray-200"
+                  >
+                    <X className="h-4 w-4 text-gray-600" />
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* 업로드 버튼 */}
+            {!readOnly && (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground border-none"
+                onClick={handleButtonClick}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                {previewImage ? "이미지 변경" : "이미지 찾기"}
+              </Button>
+            )}
+
+            {/* Hidden File Input */}
+            <input
+              ref={ref}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+              disabled={readOnly}
+            />
+          </div>
+        </div>
+      );
+    }
+
+    // Multiple 스타일 (다중 이미지 - 그리드 미리보기)
     return (
       <div className={cn("space-y-3", className)}>
         {label && (
@@ -129,36 +251,42 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
           </div>
         )}
 
-        <div className="flex items-center gap-4">
+        <div className="space-y-3">
+          {/* 이미지 미리보기 그리드 */}
+          {previewImages.length > 0 && (
+            <div className="grid grid-cols-5 gap-3">
+              {previewImages.map((image, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={image}
+                    alt={`이미지 ${index + 1}`}
+                    className="w-full aspect-square object-cover rounded-lg border-2 border-gray-200"
+                  />
+                  {!readOnly && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemove(index)}
+                      className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity border border-gray-200"
+                    >
+                      <X className="h-4 w-4 text-gray-600" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* 업로드 버튼 */}
-          {!readOnly && (
+          {!readOnly && previewImages.length < maxImages && (
             <Button
               type="button"
               variant="outline"
-              className="h-12 px-6 bg-primary hover:bg-primary/90 text-primary-foreground border-none"
               onClick={handleButtonClick}
+              className="w-full h-12"
             >
-              <Upload className="mr-2 h-4 w-4" />
-              {previewImage ? "이미지 변경" : "이미지 찾기"}
+              <Upload className="h-4 w-4 mr-2" />
+              추가 이미지 업로드 ({previewImages.length}/{maxImages})
             </Button>
-          )}
-
-          {/* 이미지 미리보기 */}
-          {previewImage && (
-            <div
-              className={cn(
-                "overflow-hidden border-2 border-gray-200",
-                shape === "circle"
-                  ? "w-20 h-20 rounded-full"
-                  : "w-20 h-20 rounded-lg"
-              )}
-            >
-              <img
-                src={previewImage}
-                alt="Preview"
-                className="w-full h-full object-cover"
-              />
-            </div>
           )}
 
           {/* Hidden File Input */}
@@ -166,14 +294,12 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
             ref={ref}
             type="file"
             accept="image/*"
+            multiple
             onChange={handleFileChange}
             className="hidden"
             disabled={readOnly}
           />
         </div>
-
-        {/* TODO: 드래그앤드롭 기능 추가 예정 */}
-        {/* <FileDragAndDrop onDrop={handleFileDrop} /> */}
       </div>
     );
   }
