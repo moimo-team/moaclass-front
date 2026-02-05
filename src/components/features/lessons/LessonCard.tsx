@@ -4,7 +4,7 @@ import { IoLocationOutline } from "react-icons/io5";
 import { IoIosHeartEmpty, IoIosHeart } from "react-icons/io";
 import { Link } from "react-router-dom";
 import type { Lesson } from "@/models/lesson.model";
-import { getDistrictFromAddress } from "@/utils/formatAddress";
+import { getDisplayAddress } from "@/utils/formatAddress";
 import defaultLessonImage from "@/assets/images/moimer-intro.png";
 import defaultProfileImage from "@/assets/images/profile.png";
 import { ClassInfoBody } from "@/components/common/ClassInfoBody";
@@ -70,7 +70,7 @@ function LessonCard({ lesson, className, onToggleLike }: LessonCardProps) {
               </div>
               <div className="flex items-center gap-1">
                 <IoLocationOutline className="w-3 h-3 text-primary" />
-                <span>{getDistrictFromAddress(address)}</span>
+                <span>{getDisplayAddress(address)}</span>
               </div>
             </div>
 

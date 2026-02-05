@@ -233,7 +233,7 @@ const MOCK_WISH_LESSONS: Lesson[] = [
 
 const ITEMS_PER_PAGE = 6;
 
-const WishLists = () => {
+const WishList = () => {
     const [wishLessons, setWishLessons] = useState<Lesson[]>(MOCK_WISH_LESSONS);
     const [page, setPage] = useState(1);
 
@@ -310,4 +310,4 @@ const WishLists = () => {
     );
 };
 
-export default WishLists;
+export default WishList;

@@ -54,8 +54,7 @@ export const ProfileDropdown = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="flex gap-1"
-          onClick={() => navigate("/")}
-          // TODO: 마이페이지 - 클래스 결제 내역 경로 추가
+          onClick={() => navigate("/mypage/class/orders")}
         >
           <LuShoppingCart />
           클래스 결제 내역
@@ -71,8 +70,7 @@ export const ProfileDropdown = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="flex gap-1"
-          onClick={() => navigate("/")}
-          // TODO: 마이페이지 - 위시리스트 경로 추가
+          onClick={() => navigate("/mypage/class/wish-list")}
         >
           <IoIosHeartEmpty />
           위시리스트
