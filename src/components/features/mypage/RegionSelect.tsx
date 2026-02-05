@@ -21,11 +21,7 @@ export const RegionSelect = ({
     const { data: regionsData, isLoading, error } = useRegionQuery();
 
     if (isLoading) {
-        return (
-            <>
-                <LoadingSpinner />
-            </>
-        );
+        return <LoadingSpinner />;
     }
 
     if (error) {
