@@ -14,12 +14,13 @@ import type { UserInfo } from "@/models/user.model";
 import defaultProfile from "@/assets/images/profile.png";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RegionSelect } from "../../mypage/RegionSelect";
+import { RegionSelect } from "../../map/RegionSelect";
 import { REGIONS } from "@/constants/regions";
 import { Controller } from "react-hook-form";
 import { FormModal } from "@/components/features/modal/components/FormModal";
 import { FormImageUpload } from "@/components/features/modal/components/FormImageUpload";
 import { FormTextarea } from "@/components/features/modal/components/FormTextarea";
+import { SelectableBadge } from "@/components/common/SelectableBadge";
 
 const profileSchema = z.object({
   nickname: z.string().min(2, "닉네임은 2자 이상 입력해주세요.").max(20, "닉네임은 20자 이내로 입력해주세요."),
@@ -52,7 +53,7 @@ const ProfileSkeleton = () => (
       <Skeleton className="h-5 w-16" />
       <div className="grid grid-cols-4 gap-2">
         {[...Array(8)].map((_, i) => (
-          <Skeleton key={i} className="h-10 w-full" />
+          <Skeleton key={i} className="h-12 w-full rounded-lg" />
         ))}
       </div>
     </div>
@@ -265,21 +266,17 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
             <p className="text-sm text-gray-400 col-span-4 py-2">선택한 카테고리가 없습니다.</p>
           ) : (
             allInterests?.map((interest) => (
-              <button
+              <SelectableBadge
                 key={interest.id}
-                type="button"
+                label={interest.name}
+                isSelected={selectedInterests.includes(interest.id)}
                 onClick={() => !isReadOnly && toggleInterest(interest.id)}
-                disabled={isReadOnly && !selectedInterests.includes(interest.id)}
+                variant="card"
                 className={cn(
-                  "h-10 text-xs font-medium rounded-lg transition-all border shadow-sm",
-                  selectedInterests.includes(interest.id)
-                    ? "bg-yellow-400 border-yellow-400 text-gray-900 shadow-md hover:bg-yellow-500"
-                    : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400",
+                  "h-12 text-sm",
                   isReadOnly && !selectedInterests.includes(interest.id) && "hidden"
                 )}
-              >
-                {interest.name}
-              </button>
+              />
             ))
           )}
         </div>

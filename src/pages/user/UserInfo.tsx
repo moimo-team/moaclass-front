@@ -2,15 +2,15 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { RegionSelect } from "@/components/features/mypage/RegionSelect";
+import { RegionSelect } from "@/components/features/map/RegionSelect";
 import { useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
 import { useInterestQuery } from "@/hooks/useInterestQuery";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserUpdateMutation } from "@/hooks/useUserInfoMutations";
 import { Textarea } from "@/components/ui/textarea";
+import { SelectableBadge } from "@/components/common/SelectableBadge";
 
 // zod schema 정의
 const userInfoSchema = z.object({
@@ -118,8 +118,6 @@ const UserInfo = () => {
                 value={watch("regionId")}
                 onValueChange={(value) => setValue("regionId", value as number, { shouldValidate: true })}
                 valueType="id"
-                placeholder="지역 선택"
-                className="h-12 border-input focus:ring-primary bg-card w-full"
               />
               {errors.regionId && <p className="text-sm text-destructive">{errors.regionId.message}</p>}
             </div>
@@ -133,19 +131,13 @@ const UserInfo = () => {
               </Label>
               <div className="grid grid-cols-4 gap-3">
                 {interests?.map((interest) => (
-                  <button
+                  <SelectableBadge
                     key={interest.id}
-                    type="button"
+                    label={interest.name}
+                    isSelected={selectedInterests.includes(interest.id)}
                     onClick={() => toggleInterest(interest.id)}
-                    className={cn(
-                      "h-12 rounded-[8px] text-sm font-medium transition-all duration-200 border-none shadow-sm",
-                      selectedInterests.includes(interest.id)
-                        ? "bg-primary text-white shadow-md transform scale-[0.98]"
-                        : "bg-secondary/40 text-foreground hover:bg-secondary/60"
-                    )}
-                  >
-                    {interest.name}
-                  </button>
+                    variant="card"
+                  />
                 ))}
               </div>
               {errors.interests && <p className="text-sm text-destructive">{errors.interests.message}</p>}
