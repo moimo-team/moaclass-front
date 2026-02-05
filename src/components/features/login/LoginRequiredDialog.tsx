@@ -1,4 +1,4 @@
-import ConfirmDialog from "@/components/common/ConfirmDialog";
+import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
 import { useNavigate } from "react-router-dom";
 
 interface LoginRequiredDialogProps {

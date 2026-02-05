@@ -8,7 +8,7 @@ import {
 } from "@/hooks/useParticipateMutations";
 
 import { useState } from "react";
-import ProfileModal from "./ProfileModal";
+import UserProfileModal from "../modal/UserProfileModal";
 import defaultProfile from "@/assets/images/profile.png";
 import MeetingActionButtons from "@/components/features/meetings/MeetingActionButtons";
 import { toast } from "sonner";
@@ -80,10 +80,13 @@ const ParticipantCard = ({ meetingId, participant }: ParticipantCardProps) => {
         isLoading={isLoading}
       />
 
-      <ProfileModal
+      <UserProfileModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        userInfo={{ ...participant, interests: participant.interests || [] }}
+        userInfo={{
+          ...participant,
+          categories: participant.interests || [],
+        }}
         userId={participant.userId}
         readOnly={true}
       />

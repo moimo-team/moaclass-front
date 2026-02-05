@@ -8,7 +8,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import type { ClassCardData } from "@/models/class.model";
+import type { ClassCardData } from "@/models/lesson.model";
+import { ClassManageButtons } from "./ClassManageButtons";
 
 
 interface ClassCardProps {
@@ -32,12 +33,16 @@ export function ClassManageCard({
 }: ClassCardProps) {
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "RECRUITING":
-        return <Badge className="bg-success text-white">운영중</Badge>;
-      case "CLOSED":
-        return <Badge variant="secondary">휴면</Badge>;
-      case "COMPLETED":
-        return <Badge variant="outline">종료</Badge>;
+      case "ACTIVE":
+        return <Badge variant="active">운영중</Badge>;
+      case "INACTIVE":
+        return <Badge variant="inactive">휴면</Badge>;
+      case "DRAFT":
+        return <Badge variant="draft">임시저장</Badge>;
+      case "DUPLICATED":
+        return <Badge variant="duplicated">복제됨</Badge>;
+      case "DELETED":
+        return null;
       default:
         return null;
     }
@@ -61,7 +66,7 @@ export function ClassManageCard({
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={onDuplicate}>클래스 복제</DropdownMenuItem>
               <DropdownMenuItem onClick={onToggleStatus}>
-                {classData.status === "RECRUITING" ? "휴면" : "휴면 해제"}
+                {classData.status === "ACTIVE" ? "휴면" : "휴면 해제"}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onDelete} className="text-destructive">
                 삭제
@@ -73,7 +78,7 @@ export function ClassManageCard({
         {/* 썸네일 */}
         <div className="aspect-[4/3] w-full overflow-hidden bg-muted">
           {/* 휴면 상태 오버레이 */}
-          {classData.status === "CLOSED" && (
+          {classData.status === "INACTIVE" && (
             <div className="absolute inset-0 z-10 bg-black/40 flex items-center justify-center">
               <span className="bg-black/60 text-white px-3 py-1.5 rounded-full text-sm font-bold border border-white/20">
                 내용 수정에서 활성화하세요
@@ -85,7 +90,7 @@ export function ClassManageCard({
             alt={classData.title}
             className={cn(
               "w-full h-full object-cover",
-              classData.status === "CLOSED" && "grayscale-[0.5]"
+              classData.status === "INACTIVE" && "grayscale-[0.5]"
             )}
           />
         </div>
@@ -110,31 +115,11 @@ export function ClassManageCard({
         </div>
 
         {/* 버튼들 */}
-        <div className="space-y-2">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={onManage}
-          >
-            일정 및 예약 관리
-          </Button>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={onViewClass}
-            >
-              클래스 바로가기
-            </Button>
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={onEdit}
-            >
-              내용 수정
-            </Button>
-          </div>
-        </div>
+        <ClassManageButtons
+          onManage={onManage || (() => { })}
+          onViewClass={onViewClass || (() => { })}
+          onEdit={onEdit || (() => { })}
+        />
       </div>
     </div>
   );

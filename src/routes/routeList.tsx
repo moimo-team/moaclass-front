@@ -18,13 +18,13 @@ import UserInfo from "@/pages/user/UserInfo";
 import ProtectedRoute from "@/components/common/ProtectedRoute";
 import Interests from "@/pages/interests/Interests";
 import Chatting from "@/pages/chat/Chatting";
-import ClassManagementPage from "@/pages/class/manage/ClassManagementPage";
 import ClassPayment from "@/pages/pay/ClassPayment";
 import WishList from "@/pages/mypage/WishList";
 import Points from "@/pages/mypage/Points";
 import Coupons from "@/pages/mypage/Coupons";
 import OrderList from "@/pages/mypage/OrderList";
 import CancelClass from "@/pages/mypage/CancelClass";
+import ClassDashboardPage from "@/pages/class/ClassDashboardPage";
 
 export const routeList = [
   {
@@ -77,6 +77,22 @@ export const routeList = [
         element: <Chatting />,
       },
       {
+        path: "/classes-manage",
+        element: (
+          <ProtectedRoute>
+            <ClassDashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/interests",
+        element: <Interests />,
+      },
+      {
+        path: "/pay-class",
+        element: <ClassPayment />,
+      },
+      {
         path: "/mypage",
         element: <MypageSession />,
         // (
@@ -126,22 +142,6 @@ export const routeList = [
             element: <Participations />,
           },
         ],
-      },
-      {
-        path: "/classes-manage",
-        element: (
-          <ProtectedRoute>
-            <ClassManagementPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/interests",
-        element: <Interests />,
-      },
-      {
-        path: "/pay-class",
-        element: <ClassPayment />,
       },
     ],
   },

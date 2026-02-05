@@ -131,68 +131,77 @@ export const mockMeetings: Meeting[] = Array.from({ length: 25 }, (_, i) => {
 // Mock 원데이클래스 데이터
 export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
   const interest = interestCategories[i % interestCategories.length];
-  const lessonLevels: Level[] = ["초급", "중급", "고급"];
-
-  // 새로운 필드를 위한 모의 데이터 생성
-  const classCategoryData = {
-    id: interest.id,
-    name: interest.name,
-  };
-  const subClassCategoryData = {
-    id: faker.number.int({ min: 1, max: 5 }),
-    category_id: interest.id,
-    name: faker.lorem.word(),
-  };
-  const teacherProfileData = {
-    id: faker.number.int({ min: 1, max: 100 }),
-    user_id: faker.number.int({ min: 100, max: 200 }),
-    nickname: faker.person.fullName(),
-    introduction: faker.lorem.sentence(),
-    created_at: faker.date.recent().toISOString(),
-    updated_at: faker.date.recent().toISOString(),
-  };
-  const teacherProfileImagesData = [
-    {
-      id: faker.number.int({ min: 1, max: 1000 }),
-      profile_id: teacherProfileData.id,
-      image_url: faker.image.avatar(),
-      sequence: 1,
-    },
-  ];
-  const meetingCategoryData = {
-    id: faker.number.int({ min: 1, max: 5 }),
-    name: faker.lorem.word(),
-  };
+  const lessonLevels: Level[] = ["BEGINNER", "INTERMEDIATE", "ADVANCED"];
+  const basePrice = faker.number.int({ min: 30000, max: 100000 });
+  const discountRate = faker.number.int({ min: 0, max: 30 });
 
   return {
     id: i + 1,
+    teacherId: faker.number.int({ min: 1, max: 100 }),
+    classCategoryId: interest.id,
+
     title: `${interest.name} 원데이 클래스 ${i + 1}`,
     description: faker.lorem.paragraph(),
+    curriculum: faker.lorem.paragraphs(2), // 커리큘럼 추가
+
     level: lessonLevels[i % lessonLevels.length],
-    duration_min: faker.number.int({ min: 60, max: 240 }),
-    price: faker.number.int({ min: 30000, max: 100000 }),
-    max_participants: faker.number.int({ min: 5, max: 20 }),
-    current_participants: faker.number.int({ min: 0, max: 4 }),
-    representative_image:
+    durationMin: faker.number.int({ min: 60, max: 240 }),
+
+    status: "ACTIVE", // 클래스 상태 추가
+    price: basePrice,
+    discountRate: discountRate,
+    discountedPrice: Math.floor(basePrice * (1 - discountRate / 100)),
+    maxParticipants: faker.number.int({ min: 5, max: 20 }),
+    currentParticipants: faker.number.int({ min: 0, max: 4 }),
+
+    representativeImage:
       interestImageMap[interest.name] ||
       faker.image.urlLoremFlickr({ category: "class" }),
-    region_id: faker.number.int({ min: 1, max: 10 }),
+    likes: faker.number.int({ min: 0, max: 500 }),
+
+    regionId: faker.number.int({ min: 1, max: 10 }),
     address: `서울시 ${faker.location.county()} ${faker.location.city()} ${faker.location.streetAddress()}`,
     latitude: faker.location.latitude(),
     longitude: faker.location.longitude(),
-    isSameDayReservable: faker.datatype.boolean(),
-    rate: faker.number.float({ min: 3.0, max: 5.0 }),
-    created_at: faker.date.recent().toISOString(),
-    updated_at: faker.date.recent().toISOString(),
-    isLiked: faker.datatype.boolean(),
-    likes: faker.number.int({ min: 0, max: 500 }),
+    detailAddress: `${faker.number.int({ min: 1, max: 20 })}층 ${faker.number.int({ min: 101, max: 999 })}호`,
+    directionsText: "지하철 2호선 강남역 3번 출구에서 도보 5분",
 
-    // 새로 추가된 필드
-    classCategory: classCategoryData,
-    subClassCategory: subClassCategoryData,
-    meetingCategory: faker.datatype.boolean() ? meetingCategoryData : undefined,
-    teacherProfile: teacherProfileData,
-    teacherProfileImages: teacherProfileImagesData,
+    reservationLeadDays: faker.number.int({ min: 0, max: 7 }), // 0 = 당일 가능
+
+    rate: faker.number.float({ min: 3.0, max: 5.0, fractionDigits: 1 }),
+
+    reviewAiSummary: faker.datatype.boolean() ? faker.lorem.sentence() : undefined,
+    createdAt: faker.date.recent().toISOString(),
+    updatedAt: faker.date.recent().toISOString(),
+
+    // 관계 데이터 (optional)
+    isLiked: faker.datatype.boolean(),
+    classCategory: {
+      id: interest.id,
+      name: interest.name,
+    },
+    subClassCategories: [
+      {
+        id: faker.number.int({ min: 1, max: 5 }),
+        categoryId: interest.id,
+        name: faker.lorem.word(),
+      },
+    ],
+    teacherProfile: {
+      id: faker.number.int({ min: 1, max: 100 }),
+      userId: faker.number.int({ min: 100, max: 200 }),
+      nickname: faker.person.fullName(),
+      image: faker.image.avatar(),
+      introduction: faker.lorem.sentence(),
+      createdAt: faker.date.recent().toISOString(),
+      updatedAt: faker.date.recent().toISOString(),
+    },
+    lessonImages: Array.from({ length: faker.number.int({ min: 1, max: 4 }) }, (_, idx) => ({
+      id: faker.number.int({ min: 1, max: 1000 }),
+      lessonId: i + 1,
+      image: faker.image.urlLoremFlickr({ category: "class" }),
+      sequence: idx + 1,
+    })),
   };
 });
 

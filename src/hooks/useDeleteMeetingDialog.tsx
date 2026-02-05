@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDeleteMeetingMutation } from "./useMeetingMutations";
 import { toast } from "sonner";
-import ConfirmDialog from "@/components/common/ConfirmDialog";
+import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
 
 interface UseDeleteMeetingDialogOptions {
   onSuccess?: () => void;

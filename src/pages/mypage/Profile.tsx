@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { Crown, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import ProfileModal from "@/components/features/mypage/ProfileModal";
+import UserProfileModal from "@/components/features/modal/UserProfileModal";
 import { useUserInfoQuery } from "@/hooks/useUserInfoQuery";
 import { REGIONS } from "@/constants/regions";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -40,9 +40,9 @@ const Profile = () => {
 
   return (
     <div className="max-w-6xl mx-auto w-full h-full py-10 bg-white overflow-y-auto">
-      {/* Profile Section */}
+      {/* 프로필 섹션 */}
       <div className="space-y-12 ">
-        {/* Basic Profile Edit Header */}
+        {/* 기본 프로필 수정 헤더 */}
         <div className="flex items-center justify-between">
           <h3 className="text-2xl font-bold text-gray-900">프로필</h3>
           <Button
@@ -55,7 +55,7 @@ const Profile = () => {
           </Button>
         </div>
 
-        {/* Category Section */}
+        {/* 선호 카테고리 */}
         <div>
           <h4 className="text-lg font-medium text-gray-900 mb-4">선호 카테고리</h4>
           <div className="flex flex-wrap gap-2">
@@ -74,7 +74,7 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Region Section */}
+        {/* 지역  */}
         <div>
           <h4 className="text-lg font-medium text-gray-900 mb-4">지역</h4>
           <div className="flex flex-wrap gap-2">
@@ -92,7 +92,7 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Bio Section */}
+        {/* 자기소개*/}
         <div>
           <h4 className="text-lg font-medium text-gray-900 mb-4">자기소개</h4>
           <div className="p-4 bg-gray-50 rounded-lg min-h-[120px] whitespace-pre-wrap text-gray-700 border border-gray-100">
@@ -101,7 +101,7 @@ const Profile = () => {
         </div>
       </div>
 
-      <ProfileModal
+      <UserProfileModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         userInfo={userInfo}
