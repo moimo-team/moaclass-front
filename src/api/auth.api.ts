@@ -53,6 +53,25 @@ export const googleLogin = async (data: {
   }
 };
 
+export const kakaoLogin = async (data: {
+  code: string;
+  redirectUri: string;
+}): Promise<LoginResponse> => {
+  try {
+    const response = await apiClient.post("/users/login/kakao", data);
+    const accessToken =
+      response.data.accessToken ||
+      response.headers.authorization?.replace("Bearer ", "");
+    return {
+      ...response.data,
+      accessToken,
+    };
+  } catch (error) {
+    console.error("kakaoLogin error:", error);
+    throw error;
+  }
+};
+
 // 로그아웃
 export const logout = async () => {
   try {

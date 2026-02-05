@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useGoogleLoginMutation, useLoginMutation } from "@/hooks/useAuthMutations";
+import { useGoogleLoginMutation, useKakaoLoginMutation, useLoginMutation } from "@/hooks/useAuthMutations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -34,6 +34,7 @@ export type LoginFormValues = z.infer<typeof loginSchema>;
 const Login = () => {
     const { mutateAsync: loginMutation, isPending } = useLoginMutation();
     const googleLoginMutation = useGoogleLoginMutation();
+    const kakaoLoginMutation = useKakaoLoginMutation();
     const navigate = useNavigate();
 
     const [mode, setMode] = useState<'SELECT' | 'EMAIL'>('SELECT');
@@ -105,6 +106,76 @@ const Login = () => {
         onError: () => setError("root", { type: "manual", message: "Google 로그인에 실패했습니다." }),
         flow: 'auth-code',
     });
+
+    // 카카오 로그인(팝업 + postMessage 방식)
+    const handleKakaoLogin = () => {
+        const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
+        const KAKAO_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
+
+        // 카카오 인가 URL 생성
+        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}&response_type=code`;
+
+        // 팝업 창을 화면 중앙에 배치하기 위한 좌표 계산
+        const popupWidth = 500;
+        const popupHeight = 600;
+        const left = (window.screen.width - popupWidth) / 2;
+        const top = (window.screen.height - popupHeight) / 2;
+
+        // 팝업 창 열기
+        const popup = window.open(
+            kakaoAuthUrl,
+            'kakaoLogin',
+            `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes`
+        );
+
+        // postMessage 이벤트 리스너 등록
+        const handleMessage = async (event: MessageEvent) => {
+            // 보안: origin 검증
+            if (event.origin !== window.location.origin) return;
+
+            if (event.data.type === 'KAKAO_LOGIN_SUCCESS') {
+                const code = event.data.code;
+
+                try {
+                    // 백엔드로 인가 코드 전달
+                    const loginInfo = await kakaoLoginMutation.mutateAsync({
+                        code,
+                        redirectUri: KAKAO_REDIRECT_URI
+                    });
+
+                    if (loginInfo.user.isNewUser) {
+                        navigate("/user-info", {
+                            state: {
+                                accessToken: loginInfo.accessToken,
+                                user: loginInfo.user
+                            }
+                        });
+                    } else {
+                        navigate("/");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    setError("root", { type: "manual", message: "Kakao 로그인에 실패했습니다." });
+                } finally {
+                    // 이벤트 리스너 제거
+                    window.removeEventListener('message', handleMessage);
+                }
+            } else if (event.data.type === 'KAKAO_LOGIN_ERROR') {
+                setError("root", { type: "manual", message: "Kakao 로그인에 실패했습니다." });
+                window.removeEventListener('message', handleMessage);
+            }
+        };
+
+        window.addEventListener('message', handleMessage);
+
+        // 팝업이 닫혔을 때 리스너 정리
+        const checkPopupClosed = setInterval(() => {
+            if (popup?.closed) {
+                clearInterval(checkPopupClosed);
+                window.removeEventListener('message', handleMessage);
+            }
+        }, 500);
+    };
 
     return (
         <div className="flex flex-1 w-full flex-col items-center justify-center bg-transparent p-4">
@@ -190,7 +261,7 @@ const Login = () => {
                             {/* 카카오 로그인 버튼 */}
                             <Button
                                 type="button"
-                                onClick={() => toast.error("준비 중인 서비스입니다.")}
+                                onClick={() => handleKakaoLogin()}
                                 className="w-full h-12 flex items-center justify-center gap-2 bg-[#FEE500] text-[#191919] hover:bg-[#FEE500]/90 border-none shadow-sm"
                             >
                                 <SiKakaotalk size={20} />
