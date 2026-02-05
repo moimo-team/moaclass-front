@@ -3,38 +3,52 @@ import { REGIONS } from "@/constants/regions";
 import { cn } from "@/lib/utils";
 
 interface RegionSelectProps {
-    value: string | number | undefined;
-    onValueChange: (value: string | number) => void;
-    placeholder?: string;
-    className?: string;
-    valueType?: "id" | "name";
+  value: string | number | undefined;
+  onValueChange: (value: string | number) => void;
+  placeholder?: string;
+  className?: string;
+  valueType?: "id" | "name";
 }
 
+/**
+ * 전역 지역 선택 컴포넌트
+ * - UserInfo, MyPage, CreateClass 등에서 공통으로 사용
+ * - h-12 높이와 일관된 디자인 적용
+ */
 export const RegionSelect = ({
-    value,
-    onValueChange,
-    placeholder = "지역을 선택해주세요.",
-    className,
-    valueType = "id"
+  value,
+  onValueChange,
+  placeholder = "지역 선택",
+  className,
+  valueType = "id"
 }: RegionSelectProps) => {
-    return (
-        <Select
-            onValueChange={(val) => {
-                const newValue = valueType === "id" ? Number(val) : val;
-                onValueChange(newValue);
-            }}
-            value={value ? value.toString() : undefined}
-        >
-            <SelectTrigger className={cn("w-50 bg-white border-gray-200 rounded-lg focus-visible:ring-yellow-400 text-sm", className)}>
-                <SelectValue placeholder={placeholder} />
-            </SelectTrigger>
-            <SelectContent className="max-h-[200px]">
-                {REGIONS.map((region) => (
-                    <SelectItem key={region.id} value={valueType === "id" ? region.id.toString() : region.name}>
-                        {region.name}
-                    </SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
-    );
+  return (
+    <Select
+      onValueChange={(val) => {
+        const newValue = valueType === "id" ? Number(val) : val;
+        onValueChange(newValue);
+      }}
+      value={value ? value.toString() : undefined}
+    >
+      <SelectTrigger
+        className={cn(
+          "h-12 w-full bg-card border-input rounded-lg focus-visible:ring-primary text-sm shadow-sm",
+          className
+        )}
+      >
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent className="max-h-[200px] bg-card border-input">
+        {REGIONS.map((region) => (
+          <SelectItem
+            key={region.id}
+            value={valueType === "id" ? region.id.toString() : region.name}
+            className="focus:bg-primary/10 focus:text-primary cursor-pointer"
+          >
+            {region.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
 };
