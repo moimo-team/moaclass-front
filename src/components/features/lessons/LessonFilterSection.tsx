@@ -93,7 +93,7 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
   return (
     <section className="w-full py-8 px-4 md:px-8">
       {/* 중간: 필터 영역 */}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-4 mb-4 p-4 border rounded-md bg-gray-50">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 mb-4 p-4 border rounded-md bg-gray-50">
         {/* 왼쪽 열 */}
         <div className="flex flex-col gap-2">
           {/* 1. 지역 필터 */}

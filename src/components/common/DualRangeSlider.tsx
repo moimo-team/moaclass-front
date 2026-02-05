@@ -108,7 +108,7 @@ export function DualRangeSlider({
   return (
     <div className={cn("space-y-4", className)}>
       <div className="flex items-center justify-between gap-4">
-        <div className="relative w-24">
+        <div className="relative w-16 sm:w-24">
           <Input
             type="text"
             value={displayMin}
@@ -128,7 +128,7 @@ export function DualRangeSlider({
             minStepsBetweenThumbs={1}
           />
         </div>
-        <div className="relative w-24">
+        <div className="relative w-16 sm:w-24">
           <Input
             type="text"
             value={displayMax}
