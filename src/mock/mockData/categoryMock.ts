@@ -1,5 +1,5 @@
 // 클래스 카테고리
-export const CLASS_CATEGORIES = [
+export const LESSON_CATEGORIES = [
     {
         id: 1,
         name: "핸드메이드"
@@ -51,7 +51,7 @@ export const CLASS_CATEGORIES = [
 ];
 
 // 서브 클래스 카테고리
-export const SUB_CLASS_CATEGORIES = [
+export const LESSON_SUB_CATEGORIES = [
     // 핸드메이드
     {
         id: 1,

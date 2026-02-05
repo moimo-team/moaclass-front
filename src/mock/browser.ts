@@ -8,6 +8,8 @@ import { chatHandler } from "./chatHandler";
 import { participationHandlers } from "./participationHandler";
 import { notificationHandlers } from "./notificationHandler";
 import { lessonHandlers } from "./lessonHandler";
+import { regionHandler } from "./regionHandler";
+import { categoryHandler } from "./categoryHandler";
 
 const handlers = [
   ...authHandler,
@@ -19,6 +21,8 @@ const handlers = [
   ...participationHandlers,
   ...notificationHandlers,
   ...lessonHandlers,
+  ...regionHandler,
+  ...categoryHandler,
 ];
 
 export const worker = setupWorker(...handlers);
