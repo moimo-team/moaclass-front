@@ -6,7 +6,7 @@ import FormField from "@components/common/FormField";
 import { useCreateMeetingMutation, useUpdateMeetingMutation } from "@/hooks/useMeetingMutations";
 import { useMeetingQuery } from "@/hooks/useMeetingQuery";
 import DateTimePicker from "@components/common/DateTimePicker";
-import KakaoMapSearch from "@/components/features/kakaoMaps/KakaoMapSearch";
+import KakaoMapSearch from "@/components/features/map/kakaoMaps/KakaoMapSearch";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Meeting, MeetingDetail } from "@/models/meeting.model";

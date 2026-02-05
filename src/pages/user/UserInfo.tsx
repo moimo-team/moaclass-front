@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { RegionSelect } from "@/components/features/mypage/RegionSelect";
+import { RegionSelect } from "@/components/features/map/RegionSelect";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useInterestQuery } from "@/hooks/useInterestQuery";
