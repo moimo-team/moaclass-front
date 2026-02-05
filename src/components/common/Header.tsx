@@ -7,12 +7,15 @@ import { IoIosSearch } from "react-icons/io";
 import { Input } from "@components/ui/input";
 import { useState } from "react";
 import LessonFilterSection from "@components/features/lessons/LessonFilterSection";
+import { useLessonFilters } from "@/hooks/useLessonFilters";
 
 function Header() {
   const { isLoggedIn } = useAuthStore();
   const navigate = useNavigate();
   const [searchTopic, setSearchTopic] = useState("");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const lessonFilters = useLessonFilters();
 
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
@@ -27,6 +30,12 @@ function Header() {
   };
 
   const handleCloseFilter = () => {
+    setIsFilterOpen(false);
+  };
+
+  const handleFilterSearch = () => {
+    // TODO: URL 확정되면 이동
+    // ex) navigate(`/lessons?region=${lessonFilters.selectedRegions.join(",")}`);
     setIsFilterOpen(false);
   };
 
@@ -90,7 +99,11 @@ function Header() {
 
       {isFilterOpen && (
         <div className="absolute top-[80px] left-0 right-0 z-40 bg-card shadow-lg">
-          <LessonFilterSection onClose={handleCloseFilter} />
+          <LessonFilterSection
+            {...lessonFilters}
+            onClose={handleCloseFilter}
+            onSearch={handleFilterSearch}
+          />
         </div>
       )}
     </div>

@@ -25,6 +25,7 @@ import Coupons from "@/pages/mypage/Coupons";
 import OrderList from "@/pages/mypage/OrderList";
 import CancelClass from "@/pages/mypage/CancelClass";
 import ClassDashboardPage from "@/pages/class/ClassDashboardPage";
+import LessonListPage from "@/pages/class/LessonList";
 
 export const routeList = [
   {
@@ -75,6 +76,10 @@ export const routeList = [
       {
         path: "/chats",
         element: <Chatting />,
+      },
+      {
+        path: "/lessons",
+        element: <LessonListPage />,
       },
       {
         path: "/classes-manage",

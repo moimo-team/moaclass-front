@@ -1,7 +1,12 @@
 export type Level = "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
 
 // 클래스 상태 타입
-export type LessonStatus = "ACTIVE" | "INACTIVE" | "DELETED" | "DRAFT" | "DUPLICATED";
+export type LessonStatus =
+  | "ACTIVE"
+  | "INACTIVE"
+  | "DELETED"
+  | "DRAFT"
+  | "DUPLICATED";
 export type LessonScheduleStatus = "RECRUITING" | "CLOSED" | "COMPLETED";
 
 // 클래스
@@ -9,7 +14,7 @@ export interface Lesson {
   id: number;
   teacherId: number; // 선생님 ID
   classCategoryId: number; // 대분류 ID
-  
+
   title: string;
   description: string; // 클래스 상세내용
   curriculum: string; // 커리큘럼 (40자~600자)
@@ -45,8 +50,8 @@ export interface Lesson {
 
   // 관계 데이터 (optional)
   isLiked?: boolean; // 프론트 전용
-  classCategory?: ClassCategory;
-  subClassCategories?: SubClassCategory[];
+  classCategory?: LessonCategory;
+  subClassCategories?: LessonSubCategory[];
   teacherProfile?: TeacherProfile;
   lessonImages?: LessonImage[];
 }
@@ -60,13 +65,13 @@ export interface LessonImage {
 }
 
 // 클래스 대분류 카테고리
-export interface ClassCategory {
+export interface LessonCategory {
   id: number;
   name: string; // 운동, 미술 등
 }
 
 // 클래스 소분류 카테고리
-export interface SubClassCategory {
+export interface LessonSubCategory {
   id: number;
   categoryId: number;
   name: string; // 축구, 야구 등
@@ -98,4 +103,25 @@ export interface ClassCardData {
   thumbnailImage: string;
   status: LessonStatus;
   createdAt: string;
+}
+
+// 클래스 목록 조회 params & response
+export interface FetchLessonsParams {
+  page?: number;
+  limit?: number;
+  categories?: string[];
+  regions?: string[];
+  days?: string[];
+  difficulty?: string[];
+  personnel?: number;
+  minTime?: number;
+  maxTime?: number;
+  minPrice?: number;
+  maxPrice?: number;
+}
+
+export interface FetchLessonsResponse {
+  lessons: Lesson[];
+  totalCount: number;
+  totalPages: number;
 }

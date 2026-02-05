@@ -14,9 +14,13 @@ interface LessonCardProps {
   onToggleLike?: (lessonId: number, isLiked: boolean) => void;
 }
 
-function LessonCard({ lesson, className, onToggleLike }: LessonCardProps) {
+export function LessonCard({
+  lesson,
+  className,
+  onToggleLike,
+}: LessonCardProps) {
   const { id, title, address, isLiked } = lesson;
-  const href = `/lessons/${id}`; // TODO: URL 확정되면 수정
+  const href = `/lessons/${id}`;
 
   const handleLikeClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -72,10 +76,7 @@ function LessonCard({ lesson, className, onToggleLike }: LessonCardProps) {
           {/* 모멘토 프로필 이미지, 닉네임 */}
           <div className="flex items-center gap-2 mt-1">
             <img
-              src={
-                lesson.teacherProfileImages?.[0]?.imageUrl ||
-                defaultProfileImage
-              }
+              src={lesson.teacherProfile?.image || defaultProfileImage}
               alt={lesson.teacherProfile?.nickname || "모멘토"}
               className="w-6 h-6 rounded-full object-cover"
             />
