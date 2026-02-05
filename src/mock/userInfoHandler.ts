@@ -33,4 +33,6 @@ const getUserInfoById = http.get(`${httpUrl}/users/:userId`, async ({ params }) 
     }
 });
 
-export const userInfoHandler: any[] = [getUserInfoById];
+export const userInfoHandler = [
+    getUserInfoById
+];
