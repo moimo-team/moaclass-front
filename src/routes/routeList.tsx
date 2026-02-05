@@ -19,10 +19,11 @@ import ProtectedRoute from "@/components/common/ProtectedRoute";
 import Interests from "@/pages/interests/Interests";
 import Chatting from "@/pages/chat/Chatting";
 import ClassPayment from "@/pages/pay/ClassPayment";
-import WishLists from "@/pages/mypage/WishLists";
+import WishList from "@/pages/mypage/WishList";
 import Points from "@/pages/mypage/Points";
 import Coupons from "@/pages/mypage/Coupons";
 import OrderList from "@/pages/mypage/OrderList";
+import CancelClass from "@/pages/mypage/CancelClass";
 import ClassDashboardPage from "@/pages/class/ClassDashboardPage";
 
 export const routeList = [
@@ -110,7 +111,7 @@ export const routeList = [
           },
           {
             path: "class/wish-list",
-            element: <WishLists />,
+            element: <WishList />,
           },
           {
             path: "class/points",
@@ -123,6 +124,10 @@ export const routeList = [
           {
             path: "class/orders",
             element: <OrderList />,
+          },
+          {
+            path: "class/orders/:id/cancel",
+            element: <CancelClass />,
           },
           {
             path: "meetings/join",
