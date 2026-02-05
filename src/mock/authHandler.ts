@@ -111,6 +111,48 @@ const googleLogin = http.post(
     },
 );
 
+// 카카오 로그인
+const kakaoLogin = http.post(
+    `${httpUrl}/users/login/kakao`,
+    async ({ request }) => {
+        try {
+            const { code, redirectUri } = (await request.json()) as any;
+            console.log("kakao login request:", { code, redirectUri });
+            await delay(1000);
+            return HttpResponse.json(
+                {
+                    user: {
+                        id: 5,
+                        isNewUser: true,
+                        email: "kakao-user@email.com",
+                        nickname: "카카오사용자",
+                    },
+                    accessToken: "mock-jwt-token",
+                },
+                {
+                    status: 200,
+                    headers: {
+                        Authorization: "Bearer mock-jwt-token",
+                        "Set-Cookie":
+                            "refreshToken=mock-refresh-token; HttpOnly; Secure; SameSite=Strict",
+                    },
+                },
+            );
+        } catch (error) {
+            console.error("MSW googleLogin error:", error);
+            return new HttpResponse(
+                JSON.stringify({
+                    error: {
+                        code: "500",
+                        message: error instanceof Error ? error.message : "Unknown error",
+                    },
+                }),
+                { status: 500 },
+            );
+        }
+    },
+);
+
 // 로그아웃 핸들러
 const logout = http.post(`${httpUrl}/users/logout`, async () => {
     await delay(1000);
@@ -477,6 +519,7 @@ export const authHandler = [
     verifyResetCode,
     resetPassword,
     googleLogin,
+    kakaoLogin,
     logout,
     refresh,
     verifyUser,

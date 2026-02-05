@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import FilterDropdown, {
   type FilterDropdownItem,
 } from "@/components/common/FilterDropdown";
-import { interestCategories } from "@/mock/mockData";
+import { interestCategories } from "@/mock/mockData/mockData";
 import { REGIONS } from "@/constants/regions";
 
 interface CategorySectionProps {
