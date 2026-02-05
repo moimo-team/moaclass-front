@@ -1,5 +1,5 @@
 import { http, HttpResponse, delay } from 'msw';
-import { httpUrl, myMeetings, mockParticipants } from './mockData';
+import { httpUrl, myMeetings, mockParticipants } from './mockData/mockData';
 
 // 참여자 목록 조회 핸들러 (관리용 - status 포함)
 const getParticipationsManagement = http.get(`${httpUrl}/meetings/:meetingId/participations`, async ({ params }) => {

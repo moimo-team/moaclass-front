@@ -1,5 +1,5 @@
 import { http, HttpResponse, delay } from 'msw';
-import { httpUrl } from './mockData';
+import { httpUrl } from './mockData/mockData';
 
 let mockMemberInfo = {
     id: 4,

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAuthStore } from "@/store/authStore";
 import type { ChatMessage } from "@/models/chat.model";
-import type { createMockSocket } from "@/mock/socketMock";
+import type { createMockSocket } from "@/mock/mockData/socketMock";
 
 type MockSocketType = ReturnType<typeof createMockSocket>;
 
@@ -14,7 +14,7 @@ const isMockingEnabled =
 // 소켓 인스턴스 팩토리
 const getSocketInstance = async (accessToken: string | null): Promise<Socket | MockSocketType | null> => {
   if (isMockingEnabled) {
-    const { createMockSocket } = await import("@/mock/socketMock");
+    const { createMockSocket } = await import("@/mock/mockData/socketMock");
     return createMockSocket();
   }
 
@@ -35,7 +35,7 @@ export const useChatSocket = (
   const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([]);
 
   const socketRef = useRef<Socket | MockSocketType | null>(null);
-  
+
   // 리스너 재등록 방지를 위한 핸들러 Ref
   const onNewMessageRef = useRef(onNewMessage);
   const { accessToken, userId } = useAuthStore();
@@ -115,7 +115,7 @@ export const useChatSocket = (
         }
       }
     );
-    
+
   }, [meetingId]); // meetingId가 바뀔 때만 실행됨
 
   // 메시지 전송 함수
@@ -126,7 +126,7 @@ export const useChatSocket = (
         content,
       };
 
-      
+
       socketRef.current.emit("sendMessage", payload, (_response: any) => {
 
       });

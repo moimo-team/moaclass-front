@@ -12,8 +12,8 @@ interface PaginationComponentProps {
   totalPages: number;
   page: number;
   setPage: (page: number) => void;
-  goToNextPage: () => void;
-  goToPreviousPage: () => void;
+  goToNextPage?: () => void;
+  goToPreviousPage?: () => void;
   isFirstPage?: boolean;
   isLastPage?: boolean;
 }
@@ -24,9 +24,14 @@ const PaginationComponent = ({
   setPage,
   goToNextPage,
   goToPreviousPage,
-  isFirstPage = false,
-  isLastPage = false,
+  isFirstPage,
+  isLastPage,
 }: PaginationComponentProps) => {
+  const finalIsFirstPage = isFirstPage ?? page === 1;
+  const finalIsLastPage = isLastPage ?? page === totalPages;
+  const finalGoToNextPage = goToNextPage ?? (() => setPage(page + 1));
+  const finalGoToPreviousPage = goToPreviousPage ?? (() => setPage(page - 1));
+
   const renderPageItems = () => {
     const pageItems = [];
 
@@ -83,11 +88,11 @@ const PaginationComponent = ({
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              if (!isFirstPage) goToPreviousPage();
+              if (!finalIsFirstPage) finalGoToPreviousPage();
             }}
-            aria-disabled={isFirstPage}
+            aria-disabled={finalIsFirstPage}
             className={
-              isFirstPage ? "pointer-events-none text-muted-foreground" : ""
+              finalIsFirstPage ? "pointer-events-none text-muted-foreground" : ""
             }
           />
         </PaginationItem>
@@ -99,11 +104,11 @@ const PaginationComponent = ({
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              if (!isLastPage) goToNextPage();
+              if (!finalIsLastPage) finalGoToNextPage();
             }}
-            aria-disabled={isLastPage}
+            aria-disabled={finalIsLastPage}
             className={
-              isLastPage ? "pointer-events-none text-muted-foreground" : ""
+              finalIsLastPage ? "pointer-events-none text-muted-foreground" : ""
             }
           />
         </PaginationItem>

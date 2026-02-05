@@ -9,7 +9,7 @@ import LoginRequiredDialog from "@/components/features/login/LoginRequiredDialog
 import KakaoMapView from "@/components/features/meetings/kakaoMaps/KakaoMapView";
 import { toast } from "sonner";
 import CreateMeetingModal from "@/components/features/meetings/CreateMeetingModal";
-import ConfirmDialog from "@/components/common/ConfirmDialog";
+import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
 import { useJoinMeetingMutation } from "@/hooks/useMeetingMutations";
 import { useMeetingQuery } from "@/hooks/useMeetingQuery";
 import { useMeQuery } from "@/hooks/useMeQuery";
