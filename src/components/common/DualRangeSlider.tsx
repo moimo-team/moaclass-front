@@ -39,28 +39,14 @@ export function DualRangeSlider({
 
   // 최소값 인풋 변경 핸들러
   const handleMinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // 숫자만 추출
-    const newValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-    setMinInput(newValue.toString());
-
-    // 유효성 검사 및 적용
-    if (newValue < min) return; // 전체 최소값보다 작으면 무시 (혹은 min으로 고정)
-
-    // 최대값을 넘지 않도록 조정 (교차 방지)
-    const validMin = Math.min(newValue, value[1]);
-    onValueChange([validMin, value[1]]);
+    const newValue = e.target.value.replace(/[^0-9]/g, "");
+    setMinInput(newValue);
   };
 
   // 최대값 인풋 변경 핸들러
   const handleMaxInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = Number(e.target.value.replace(/[^0-9]/g, ""));
-    setMaxInput(newValue.toString());
-
-    if (newValue > max) return; // 전체 최대값보다 크면 무시
-
-    // 최소값보다 작아지지 않도록 조정 (교차 방지)
-    const validMax = Math.max(newValue, value[0]);
-    onValueChange([value[0], validMax]);
+    const newValue = e.target.value.replace(/[^0-9]/g, "");
+    setMaxInput(newValue);
   };
 
   // 인풋 포커스 해제(Blur) 시 값이 비어있거나 이상하면 보정

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useCategoryFilter } from "./useCategoryFilter";
+import { useCategoryFilter } from "@hooks/useCategoryFilter";
 
 const INITIAL_FILTERS = {
   PERSONNEL: "",

@@ -16,7 +16,6 @@ export const getDisplayAddress = (fullAddress: string): string => {
       part.endsWith("시")
     ) {
       firstLevel = part;
-      break;
     }
   }
 

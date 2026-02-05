@@ -17,9 +17,9 @@ import { DualRangeSlider } from "@/components/common/DualRangeSlider";
 import { REGIONS } from "@/constants/regions";
 
 import { useLessonFilters } from "@/hooks/useLessonFilters";
-import { CategoryFilter } from "./CategoryFilter";
+import { CategoryFilter } from "@components/features/lessons/CategoryFilter";
 import { FilterToggleGroup } from "@/components/common/FilterToggleGroup";
-import { FilterBadges } from "./FilterBadges";
+import { FilterBadges } from "@components/features/lessons/FilterBadges";
 
 interface LessonFilterSectionProps {
   onClose?: () => void;
@@ -221,11 +221,7 @@ const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
       {/* 소분류 배지 표시 공간 */}
       <FilterBadges
         regions={selectedRegions}
-        categories={selectedCategories.filter(
-          (cat) =>
-            !REGIONS.some((region) => region.name === cat) &&
-            !CLASS_CATEGORIES.some((mainCat) => mainCat.name === cat),
-        )} // 메인 카테고리는 제외
+        categories={selectedCategories.slice(1)}
         onRemoveRegion={handleRemoveRegionBadge}
         onRemoveCategory={handleRemoveCategoryBadge}
       />
