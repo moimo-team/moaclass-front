@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Card, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { IoLocationOutline } from "react-icons/io5";
 import { IoIosHeartEmpty, IoIosHeart } from "react-icons/io";
 import { Link } from "react-router-dom";
@@ -7,6 +7,7 @@ import type { Lesson } from "@/models/lesson.model";
 import { getDistrictFromAddress } from "@/utils/formatAddress";
 import defaultLessonImage from "@/assets/images/moimer-intro.png";
 import defaultProfileImage from "@/assets/images/profile.png";
+import { ClassInfoBody } from "@/components/common/ClassInfoBody";
 
 interface LessonCardProps {
   lesson: Lesson;
@@ -29,16 +30,16 @@ function LessonCard({ lesson, className, onToggleLike }: LessonCardProps) {
   return (
     <Link
       to={href}
-      className="relative block w-full h-80 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+      className="relative block w-full h-[380px] rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
     >
       <Card
         className={cn(
-          "h-full flex flex-col overflow-hidden cursor-pointer hover:shadow-lg transition-shadow",
+          "h-full flex flex-col overflow-hidden cursor-pointer hover:shadow-lg transition-shadow bg-white",
           className,
         )}
       >
         {/* 상단: 클래스 사진 */}
-        <div className="relative w-full h-[60%]">
+        <div className="relative w-full h-[55%]">
           <img
             src={lesson.representativeImage || defaultLessonImage}
             alt={title}
@@ -53,53 +54,51 @@ function LessonCard({ lesson, className, onToggleLike }: LessonCardProps) {
             {isLiked ? (
               <IoIosHeart className="text-red-500 text-3xl" />
             ) : (
-              <IoIosHeartEmpty className="text-red-500 text-3xl" />
+              <IoIosHeartEmpty className="text-white text-3xl drop-shadow-md" />
             )}
           </div>
         </div>
 
-        {/* 중간: 카테고리, 평점, 좋아요 수, 모멘토 정보 */}
-        <div className="p-3 flex flex-col gap-1">
-          <div className="flex justify-between items-center text-sm text-gray-600">
-            <span className="font-semibold">
-              {lesson.classCategory?.name || "원데이클래스"}
-            </span>
-            <div className="flex items-center gap-1">
-              <span>⭐️ {lesson.rate.toFixed(1)}</span>
-              <span>❤️ {lesson.likes}</span>
+        {/* 정보 섹션 */}
+        <div className="p-4 flex flex-col gap-3 flex-1 justify-between">
+          <div className="space-y-3">
+            {/* 평점, 좋아요, 지역 위치 정보 */}
+            <div className="flex justify-between items-center text-[11px] text-gray-500">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-0.5">⭐ {lesson.rate.toFixed(1)}</span>
+                <span className="flex items-center gap-0.5">❤️ {lesson.likes}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <IoLocationOutline className="w-3 h-3 text-primary" />
+                <span>{getDistrictFromAddress(address)}</span>
+              </div>
             </div>
-          </div>
-          {/* 모멘토 프로필 이미지, 닉네임 */}
-          <div className="flex items-center gap-2 mt-1">
-            <img
-              src={
-                lesson.teacherProfileImages?.[0]?.imageUrl ||
-                defaultProfileImage
-              }
-              alt={lesson.teacherProfile?.nickname || "모멘토"}
-              className="w-6 h-6 rounded-full object-cover"
+
+            <ClassInfoBody
+              title={title}
+              category={lesson.classCategory?.name || "전체"}
+              price={lesson.price}
+              discountRate={lesson.discountRate}
+              discountedPrice={lesson.discountedPrice}
+              showDate={false}
+              titleClassName="text-base"
             />
-            <span className="text-sm font-medium text-gray-700">
+          </div>
+
+          {/* 모멘토 프로필 */}
+          <div className="flex items-center gap-2 pt-3 border-t border-gray-100 mt-auto">
+            <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-200">
+              <img
+                src={lesson.teacherProfile?.image || defaultProfileImage}
+                alt={lesson.teacherProfile?.nickname || "모멘토"}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <span className="text-xs font-medium text-gray-600">
               {lesson.teacherProfile?.nickname || "모멘토"}
             </span>
           </div>
         </div>
-
-        {/* 하단: 클래스 제목, 지역, 가격 */}
-        <CardFooter className="p-3 pt-0 flex flex-col items-start text-sm">
-          <CardTitle className="text-base font-semibold text-foreground line-clamp-1 mb-1">
-            {title}
-          </CardTitle>
-          <div className="flex justify-between items-center w-full mb-1">
-            <div className="flex items-center text-muted-foreground gap-1">
-              <IoLocationOutline />
-              <span>{getDistrictFromAddress(address)}</span>
-            </div>
-            <div className="text-md font-bold">
-              {lesson.price.toLocaleString()}원
-            </div>
-          </div>
-        </CardFooter>
       </Card>
     </Link>
   );
