@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -34,6 +34,11 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
     const [content, setContent] = useState("");
     // 첨부된 이미지 데이터 URL 리스트 상태
     const [images, setImages] = useState<string[]>([]);
+
+    // 이미지 삭제 콜백
+    const handleRemoveImage = useCallback((index: number) => {
+        setImages(prev => prev.filter((_, i) => i !== index));
+    }, []);
 
     /**
      * 후기 등록 버튼 클릭 시 처리
@@ -89,9 +94,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
                             variant="multiple"
                             previewImages={images}
                             onImagesChange={setImages}
-                            onRemoveImage={(index) => {
-                                setImages(prev => prev.filter((_, i) => i !== index));
-                            }}
+                            onRemoveImage={handleRemoveImage}
                             maxImages={8}
                             enableDragAndDrop={true}
                             dragDropHintText={
