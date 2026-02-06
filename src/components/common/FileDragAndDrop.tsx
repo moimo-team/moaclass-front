@@ -25,7 +25,7 @@ const FileDragAndDrop: React.FC<FileDragAndDropProps> = ({
     files,
     setFiles,
     maxFiles,
-    accept = "image/*,video/*",
+    accept = "image/*",
     hintText,
     className,
 }) => {
@@ -133,7 +133,7 @@ const FileDragAndDrop: React.FC<FileDragAndDropProps> = ({
                 {/* 업로드 아이콘 및 메인 문구 */}
                 <div className="flex items-center gap-2 font-bold text-gray-700">
                     <Camera className="w-5 h-5 text-gray-800" />
-                    <span className="text-[15px] text-gray-800 font-bold">사진/동영상 첨부하기</span>
+                    <span className="text-[15px] text-gray-800 font-bold">이미지 첨부하기</span>
                 </div>
 
                 {/* 추가 안내 문구 (hintText 프롭이 있을 경우 표시) */}
