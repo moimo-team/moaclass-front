@@ -195,7 +195,11 @@ export interface VerifyUserResponse {
   email: string;
   nickname: string;
   bio: string;
-  regionId?: number;
+  point: number;
+  region?: {
+    id: number;
+    name: string;
+  };
   profileImage: string;
   interests: {
     id: number;
@@ -208,9 +212,9 @@ export interface VerifyUserResponse {
 export const verifyUser = async () => {
   try {
     const response = await apiClient.get<VerifyUserResponse>("/users/verify");
-    const headerToken = response.headers.authorization?.replace("Bearer ", "");
-    const bodyToken = response.data.accessToken;
-    const accessToken = bodyToken || headerToken;
+    const accessToken = response.headers.authorization?.replace("Bearer ", "");
+    // const bodyToken = response.data.accessToken;
+    // const accessToken = bodyToken || headerToken;
 
     if (accessToken) {
       return {

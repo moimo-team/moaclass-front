@@ -14,7 +14,7 @@ export const getUserInfo = async () => {
 // 프로필 등록/수정
 export const userInfoUpdate = async (data: FormData) => {
     try {
-        return apiClient.put("/users/user-update", data);
+        return apiClient.put("/users", data);
     } catch (error) {
         console.error("userInfoUpdate error:", error);
         throw error;

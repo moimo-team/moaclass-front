@@ -31,7 +31,7 @@ export const useAuthQuery = () => {
             }
         },
         // 사용자가 앱을 사용하는 동안 인증 상태를 유지하기 위해 staleTime 설정
-        staleTime: 1000 * 60 * 5, // 5분
+        staleTime: 1000 * 60 * 30, // 30분
         retry: false, // 인증 실패 시 반복 요청 방지
     });
 };

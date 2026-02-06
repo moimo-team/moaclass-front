@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { RegionSelect } from "@/components/common/RegionSelect";
 import { useNavigate } from "react-router-dom";
-import { useInterestQuery } from "@/hooks/useInterestQuery";
+import { useCategoryQuery } from "@/hooks/useCategoryQuery";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,7 +24,7 @@ export type UserInfoFormValues = z.infer<typeof userInfoSchema>;
 
 const UserInfo = () => {
   const navigate = useNavigate();
-  const { data: interests } = useInterestQuery();
+  const { data: interests } = useCategoryQuery();
   const userUpdateMutation = useUserUpdateMutation();
 
   const {
