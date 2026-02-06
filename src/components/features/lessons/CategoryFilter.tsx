@@ -7,8 +7,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { CLASS_CATEGORIES } from "@/mock/mockData/categoryMock"; // 경로 확인 필요
-import type { LessonCategory, LessonSubCategory } from "@/models/lesson.model"; // 경로 확인 필요
+import { LESSON_CATEGORIES } from "@/mock/mockData/categoryMock";
+import type { LessonCategory, LessonSubCategory } from "@/models/lesson.model";
 
 interface CategoryFilterProps {
   selectedCategories: string[];
@@ -53,7 +53,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
               대분류
             </h4>
             <div className="space-y-1">
-              {CLASS_CATEGORIES.map((category) => (
+              {LESSON_CATEGORIES.map((category) => (
                 <div
                   key={category.id}
                   className={cn(

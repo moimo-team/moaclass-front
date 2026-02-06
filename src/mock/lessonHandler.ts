@@ -1,6 +1,6 @@
 import { http, HttpResponse, delay } from "msw";
 import { httpUrl, mockLessons } from "./mockData/mockData";
-import { CLASS_CATEGORIES } from "./mockData/categoryMock";
+import { LESSON_CATEGORIES } from "./mockData/categoryMock";
 import type { Level } from "@/models/lesson.model";
 import type { FetchLessonsResponse } from "@/models/lesson.model";
 
@@ -41,7 +41,7 @@ export const lessonHandlers = [
     // 필터 적용
     if (categories.length > 0) {
       filteredLessons = filteredLessons.filter((lesson) => {
-        const categoryName = CLASS_CATEGORIES.find(
+        const categoryName = LESSON_CATEGORIES.find(
           (cat) => cat.id === lesson.classCategoryId,
         )?.name;
         return categoryName && categories.includes(categoryName);
@@ -99,5 +99,21 @@ export const lessonHandlers = [
       } as FetchLessonsResponse,
       { status: 200 },
     );
+  }),
+
+  // 클래스 1개 정보
+  http.get(`${httpUrl}/lessons/:lessonId`, async ({ params }) => {
+    await delay(500);
+    const lessonId = Number(params.lessonId);
+    const lesson = mockLessons.find((l) => l.id === lessonId);
+
+    if (lesson) {
+      return HttpResponse.json(lesson, { status: 200 });
+    } else {
+      return HttpResponse.json(
+        { message: "레슨을 찾을 수 없습니다." },
+        { status: 404 },
+      );
+    }
   }),
 ];

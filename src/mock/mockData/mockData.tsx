@@ -9,8 +9,8 @@ import type {
 import { interestImageMap } from "@/utils/interestImageMap";
 import type { Lesson, Level, LessonSubCategory } from "@/models/lesson.model";
 import {
-  CLASS_CATEGORIES,
-  SUB_CLASS_CATEGORIES,
+  LESSON_CATEGORIES,
+  LESSON_SUB_CATEGORIES,
 } from "@/mock/mockData/categoryMock";
 
 export const httpUrl =
@@ -134,9 +134,9 @@ export const mockMeetings: Meeting[] = Array.from({ length: 25 }, (_, i) => {
 
 // Mock 원데이클래스 데이터
 export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
-  const selectedClassCategory = faker.helpers.arrayElement(CLASS_CATEGORIES);
+  const selectedClassCategory = faker.helpers.arrayElement(LESSON_CATEGORIES);
 
-  const relevantSubCategories = SUB_CLASS_CATEGORIES.filter(
+  const relevantSubCategories = LESSON_SUB_CATEGORIES.filter(
     (sub) => sub.category_id === selectedClassCategory.id,
   );
 
