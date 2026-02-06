@@ -9,6 +9,7 @@ import {
   findPassword,
   resetPassword,
   googleLogin,
+  kakaoLogin,
   logout,
   verifyResetCode,
 } from "@/api/auth.api";
@@ -49,6 +50,28 @@ export const useGoogleLoginMutation = () => {
   return useMutation({
     mutationFn: async (data: { code: string; redirectUri: string }) => {
       return await googleLogin(data);
+    },
+    onSuccess: (data) => {
+      storeLogin(
+        { id: data.user.id, nickname: data.user.nickname },
+        data.accessToken
+      );
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
+    },
+    onError: (error: AxiosError<{ message: string }>) => {
+      console.error(error);
+    },
+  });
+};
+
+// 카카오 로그인 Mutation
+export const useKakaoLoginMutation = () => {
+  const { storeLogin } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { code: string; redirectUri: string }) => {
+      return await kakaoLogin(data);
     },
     onSuccess: (data) => {
       storeLogin(

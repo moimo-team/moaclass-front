@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import type { ClassCardData } from "@/models/lesson.model";
 import { ClassManageButtons } from "./ClassManageButtons";
+import { ClassInfoBody } from "@/components/common/ClassInfoBody";
 
 
 interface ClassCardProps {
@@ -98,21 +99,14 @@ export function ClassManageCard({
 
       {/* 내용 */}
       <div className="p-4 space-y-3">
-        {/* 날짜와 카테고리 */}
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <p className="text-sm text-muted-foreground mb-1">
-              {classData.createdAt}
-            </p>
-            <h3 className="font-nanum-bold text-base line-clamp-1 break-all">
-              {classData.title}
-            </h3>
-          </div>
-          <span className="inline-block px-2 py-1 text-sm text-primary bg-secondary/20 border border-secondary rounded whitespace-nowrap flex-shrink-0">
-            {/* TODO: 카테고리 별 색상 도입 희망 */}
-            {classData.category}
-          </span>
-        </div>
+        <ClassInfoBody
+          title={classData.title}
+          category={classData.category}
+          price={classData.price}
+          discountRate={classData.discountRate}
+          discountedPrice={classData.discountedPrice}
+          createdAt={classData.createdAt}
+        />
 
         {/* 버튼들 */}
         <ClassManageButtons

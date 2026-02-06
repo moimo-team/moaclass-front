@@ -10,6 +10,7 @@ interface FormInputProps {
   required?: boolean;
   maxLength?: number;
   currentLength?: number;
+  suffix?: string;
   error?: string;
   className?: string;
 }
@@ -29,6 +30,7 @@ export const FormInput = ({
   required = false,
   maxLength,
   currentLength = 0,
+  suffix,
   error,
   className = "",
 }: FormInputProps) => {
@@ -37,13 +39,20 @@ export const FormInput = ({
       <Label htmlFor={id} className="text-sm font-bold text-gray-700">
         {label} {required && <span className="text-red-500">*</span>}
       </Label>
-      <Input
-        id={id}
-        {...register}
-        placeholder={placeholder}
-        className={`h-12 bg-white border-gray-200 rounded-lg focus-visible:ring-yellow-400 ${className}`}
-        maxLength={maxLength}
-      />
+      <div className="relative">
+        <Input
+          id={id}
+          {...register}
+          placeholder={placeholder}
+          className={`h-12 bg-white border-gray-200 rounded-lg focus-visible:ring-yellow-400 pr-10 ${className}`}
+          maxLength={maxLength}
+        />
+        {suffix && (
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium">
+            {suffix}
+          </span>
+        )}
+      </div>
       {maxLength && (
         <p className="text-xs text-gray-400">
           {currentLength}/{maxLength}자

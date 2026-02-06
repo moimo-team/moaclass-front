@@ -3,6 +3,7 @@ import { ClassManageCard } from "@/components/features/class-manage/ClassManageC
 import type { ClassCardData } from "@/models/lesson.model";
 import { CreateClassButton } from "@/components/features/class-manage/CreateClassButton";
 import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
+import CreateClassModal from "@/components/features/modal/create/CreateClassModal";
 import { toast } from "sonner";
 import { formatClassCreateDate } from "@/utils/dateFormat";
 import { MOCK_CLASSES } from "@/constants/mockClassData";
@@ -12,6 +13,7 @@ const ClassManagementPage = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
 
   const handleEdit = (id: number) => {
@@ -101,7 +103,7 @@ const ClassManagementPage = () => {
       {/* 클래스 그리드 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {/* 생성 버튼 (항상 첫 번째) */}
-        <CreateClassButton />
+        <CreateClassButton onClick={() => { setCreateModalOpen(true); /**TODO: 호스트 프로필 생성 유무 판단*/ }} />
 
         {/* 클래스 카드들 (최신순) */}
         {classes.map((classData) => (
@@ -151,6 +153,12 @@ const ClassManagementPage = () => {
         description="해당 클래스를 복제하시겠습니까? 복제된 클래스는 휴면 상태로 설정됩니다."
         confirmText="복제"
         onConfirm={handleDuplicateConfirm}
+      />
+
+      {/* 클래스 생성 모달 */}
+      <CreateClassModal
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
       />
     </div>
   );

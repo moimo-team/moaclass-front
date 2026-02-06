@@ -7,6 +7,7 @@ import Login from "@/pages/user/Login";
 import Join from "@/pages/user/Join";
 import FindPassword from "@/pages/user/FindPassword";
 import ResetPassword from "@/pages/user/ResetPassword";
+import KakaoCallback from "@/pages/user/KakaoCallback";
 import MypageSession from "@/pages/mypage/MypageSession";
 import Profile from "@/pages/mypage/Profile";
 import JoinedMeeting from "@/pages/mypage/JoinedMeeting";
@@ -64,6 +65,10 @@ export const routeList = [
       {
         path: "/reset-password",
         element: <ResetPassword />,
+      },
+      {
+        path: "/oauth/kakao/callback",
+        element: <KakaoCallback />,
       },
       {
         path: "/user-info",

@@ -103,6 +103,9 @@ export interface ClassCardData {
   thumbnailImage: string;
   status: LessonStatus;
   createdAt: string;
+  price: number;            
+  discountRate: number;      
+  discountedPrice: number;  
 }
 
 // 클래스 목록 조회 params & response
