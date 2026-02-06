@@ -15,9 +15,13 @@ interface LessonCardProps {
   onToggleLike?: (lessonId: number, isLiked: boolean) => void;
 }
 
-function LessonCard({ lesson, className, onToggleLike }: LessonCardProps) {
+export function LessonCard({
+  lesson,
+  className,
+  onToggleLike,
+}: LessonCardProps) {
   const { id, title, address, isLiked } = lesson;
-  const href = `/lessons/${id}`; // TODO: URL 확정되면 수정
+  const href = `/lessons/${id}`;
 
   const handleLikeClick = (e: React.MouseEvent) => {
     e.preventDefault();

@@ -7,7 +7,11 @@ import type {
   ParticipationStatus,
 } from "@/models/participation.model";
 import { interestImageMap } from "@/utils/interestImageMap";
-import type { Lesson, Level } from "@/models/lesson.model";
+import type { Lesson, Level, LessonSubCategory } from "@/models/lesson.model";
+import {
+  CLASS_CATEGORIES,
+  SUB_CLASS_CATEGORIES,
+} from "@/mock/mockData/categoryMock";
 
 export const httpUrl =
   import.meta.env.VITE_API_URL || "https://moimo-back.vercel.app";
@@ -130,7 +134,21 @@ export const mockMeetings: Meeting[] = Array.from({ length: 25 }, (_, i) => {
 
 // Mock 원데이클래스 데이터
 export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
-  const interest = interestCategories[i % interestCategories.length];
+  const selectedClassCategory = faker.helpers.arrayElement(CLASS_CATEGORIES);
+
+  const relevantSubCategories = SUB_CLASS_CATEGORIES.filter(
+    (sub) => sub.category_id === selectedClassCategory.id,
+  );
+
+  const numberOfSubCategories = faker.number.int({ min: 0, max: 3 });
+  const selectedSubCategories = faker.helpers
+    .arrayElements(relevantSubCategories, numberOfSubCategories)
+    .map((sub) => ({
+      id: sub.id,
+      categoryId: sub.category_id,
+      name: sub.name,
+    })) as LessonSubCategory[];
+
   const lessonLevels: Level[] = ["BEGINNER", "INTERMEDIATE", "ADVANCED"];
   const basePrice = faker.number.int({ min: 30000, max: 100000 });
   const discountRate = faker.number.int({ min: 0, max: 30 });
@@ -138,16 +156,16 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
   return {
     id: i + 1,
     teacherId: faker.number.int({ min: 1, max: 100 }),
-    classCategoryId: interest.id,
+    classCategoryId: selectedClassCategory.id,
 
-    title: `${interest.name} 원데이 클래스 ${i + 1}`,
+    title: `${selectedClassCategory.name} 원데이 클래스 ${i + 1}`,
     description: faker.lorem.paragraph(),
-    curriculum: faker.lorem.paragraphs(2), // 커리큘럼 추가
+    curriculum: faker.lorem.paragraphs(2),
 
     level: lessonLevels[i % lessonLevels.length],
     durationMin: faker.number.int({ min: 60, max: 240 }),
 
-    status: "ACTIVE", // 클래스 상태 추가
+    status: "ACTIVE",
     price: basePrice,
     discountRate: discountRate,
     discountedPrice: Math.floor(basePrice * (1 - discountRate / 100)),
@@ -155,7 +173,7 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
     currentParticipants: faker.number.int({ min: 0, max: 4 }),
 
     representativeImage:
-      interestImageMap[interest.name] ||
+      interestImageMap[selectedClassCategory.name] ||
       faker.image.urlLoremFlickr({ category: "class" }),
     likes: faker.number.int({ min: 0, max: 500 }),
 
@@ -166,27 +184,22 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
     detailAddress: `${faker.number.int({ min: 1, max: 20 })}층 ${faker.number.int({ min: 101, max: 999 })}호`,
     directionsText: "지하철 2호선 강남역 3번 출구에서 도보 5분",
 
-    reservationLeadDays: faker.number.int({ min: 0, max: 7 }), // 0 = 당일 가능
+    reservationLeadDays: faker.number.int({ min: 0, max: 7 }),
 
     rate: faker.number.float({ min: 3.0, max: 5.0, fractionDigits: 1 }),
 
-    reviewAiSummary: faker.datatype.boolean() ? faker.lorem.sentence() : undefined,
+    reviewAiSummary: faker.datatype.boolean()
+      ? faker.lorem.sentence()
+      : undefined,
     createdAt: faker.date.recent().toISOString(),
     updatedAt: faker.date.recent().toISOString(),
 
-    // 관계 데이터 (optional)
     isLiked: faker.datatype.boolean(),
     classCategory: {
-      id: interest.id,
-      name: interest.name,
+      id: selectedClassCategory.id,
+      name: selectedClassCategory.name,
     },
-    subClassCategories: [
-      {
-        id: faker.number.int({ min: 1, max: 5 }),
-        categoryId: interest.id,
-        name: faker.lorem.word(),
-      },
-    ],
+    subClassCategories: selectedSubCategories,
     teacherProfile: {
       id: faker.number.int({ min: 1, max: 100 }),
       userId: faker.number.int({ min: 100, max: 200 }),
@@ -196,12 +209,15 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
       createdAt: faker.date.recent().toISOString(),
       updatedAt: faker.date.recent().toISOString(),
     },
-    lessonImages: Array.from({ length: faker.number.int({ min: 1, max: 4 }) }, (_, idx) => ({
-      id: faker.number.int({ min: 1, max: 1000 }),
-      lessonId: i + 1,
-      image: faker.image.urlLoremFlickr({ category: "class" }),
-      sequence: idx + 1,
-    })),
+    lessonImages: Array.from(
+      { length: faker.number.int({ min: 1, max: 4 }) },
+      (_, idx) => ({
+        id: faker.number.int({ min: 1, max: 1000 }),
+        lessonId: i + 1,
+        image: faker.image.urlLoremFlickr({ category: "class" }),
+        sequence: idx + 1,
+      }),
+    ),
   };
 });
 

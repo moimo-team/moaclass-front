@@ -16,54 +16,87 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DualRangeSlider } from "@/components/common/DualRangeSlider";
 import { REGIONS } from "@/constants/regions";
 
-import { useLessonFilters } from "@/hooks/useLessonFilters";
-import { CategoryFilter } from "@components/features/lessons/CategoryFilter";
+import { CategoryFilter } from "@/components/features/lessons/CategoryFilter";
 import { FilterToggleGroup } from "@/components/common/FilterToggleGroup";
-import { FilterBadges } from "@components/features/lessons/FilterBadges";
+import { FilterBadges } from "@/components/features/lessons/FilterBadges";
+
+import { useFilterStore } from "@/store/filterStore";
+import { SUB_CLASS_CATEGORIES } from "@/mock/mockData/categoryMock";
 
 interface LessonFilterSectionProps {
   onClose?: () => void;
+  showCloseButton?: boolean;
+  onSearch?: () => void;
+  onReset?: () => void;
 }
 
-const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
+export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
   onClose,
+  showCloseButton = true,
+  onSearch,
+  onReset,
 }) => {
   const {
-    selectedPersonnel,
-    setSelectedPersonnel,
-    timeRange,
-    setTimeRange,
-    priceRange,
-    setPriceRange,
+    // 상태
     selectedRegions,
-    setSelectedRegions,
+    selectedPersonnel,
+    timeRange,
+    priceRange,
+    selectedDays,
+    selectedDifficulty,
     selectedCategories,
     activeMainCategoryId,
     selectedMainCategory,
-    handleResetFilters,
-    handleRemoveRegionBadge,
-    handleRemoveCategoryBadge,
-    handleCheckedChange,
-    handleMainCategoryClick,
-    handleSubCategoryCheckedChange,
-    getCategoryButtonText,
-    getRegionButtonText,
-    currentSubCategories,
-    handleSearch,
-    CLASS_CATEGORIES,
-    selectedDays,
-    setSelectedDays,
-    selectedDifficulty,
-    setSelectedDifficulty,
-  } = useLessonFilters();
+
+    // 액션
+    toggleRegion,
+    setSelectedPersonnel,
+    setTimeRange,
+    setPriceRange,
+    toggleDay,
+    toggleDifficulty,
+    selectMainCategory,
+    toggleSubCategory,
+    removeCategoryBadge,
+    resetFilters,
+  } = useFilterStore();
+
+  // 렌더링 함수
+
+  const getRegionButtonText = () => {
+    if (!selectedRegions.length) return "지역을 선택하세요";
+    if (selectedRegions.includes("전체")) return "전체 지역";
+    if (selectedRegions.length > 3)
+      return `지역 (${selectedRegions.length}개 선택됨)`;
+    return selectedRegions.join(", ");
+  };
+
+  const getCategoryButtonText = (mainCategory: string | null) => {
+    if (!mainCategory) return "카테고리를 선택하세요";
+    const subSelectionsCount = Math.max(0, selectedCategories.length - 1);
+    if (subSelectionsCount > 0)
+      return `${mainCategory} 외 ${subSelectionsCount}개`;
+    return mainCategory;
+  };
+
+  // 소분류 목록 계산 (Memoization은 store 내부에서 처리하거나 여기서 처리)
+  const currentSubCategories = activeMainCategoryId
+    ? SUB_CLASS_CATEGORIES.filter(
+        (subCat) => subCat.category_id === activeMainCategoryId,
+      ).map((subCat) => ({
+        id: subCat.id,
+        name: subCat.name,
+        categoryId: subCat.category_id,
+      }))
+    : [];
 
   return (
     <section className="w-full py-8 px-4 md:px-8">
-      {/* 중간: 필터 7개 공간 */}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-4 mb-4 p-4 border rounded-md bg-gray-50">
+      {/* 중간: 필터 영역 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 mb-4 p-4 border rounded-md bg-gray-50">
         {/* 왼쪽 열 */}
         <div className="flex flex-col gap-2">
-          {/* 지역 필터 */}
+          {/* 1. 지역 필터 */}
           <div className="p-2 border rounded-md bg-white flex flex-row items-center gap-6">
             <label className="block text-lg font-bold text-gray-700 min-w-[70px]">
               지역
@@ -71,30 +104,23 @@ const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-[180px] justify-start">
-                  {getRegionButtonText(selectedRegions)}
+                  {getRegionButtonText()}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
                 <div className="grid grid-cols-3 gap-4 p-4">
-                  <div key="region-all" className="flex items-center space-x-2">
+                  {/* 전체 버튼 */}
+                  <div className="flex items-center space-x-2">
                     <Checkbox
                       id="region-all"
                       checked={selectedRegions.includes("전체")}
-                      onCheckedChange={() =>
-                        handleCheckedChange(
-                          selectedRegions,
-                          setSelectedRegions,
-                          "전체",
-                        )
-                      }
+                      onCheckedChange={() => toggleRegion("전체")}
                     />
-                    <label
-                      htmlFor="region-all"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
+                    <label htmlFor="region-all" className="text-sm font-medium">
                       전체
                     </label>
                   </div>
+                  {/* 개별 지역 */}
                   {REGIONS.map((region) => (
                     <div
                       key={region.id}
@@ -103,17 +129,11 @@ const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
                       <Checkbox
                         id={`region-${region.id}`}
                         checked={selectedRegions.includes(region.name)}
-                        onCheckedChange={() =>
-                          handleCheckedChange(
-                            selectedRegions,
-                            setSelectedRegions,
-                            region.name,
-                          )
-                        }
+                        onCheckedChange={() => toggleRegion(region.name)}
                       />
                       <label
                         htmlFor={`region-${region.id}`}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        className="text-sm font-medium"
                       >
                         {region.name}
                       </label>
@@ -124,38 +144,37 @@ const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
             </Popover>
           </div>
 
-          {/* 카테고리 필터 컴포넌트 */}
+          {/* 2. 카테고리 필터 */}
           <CategoryFilter
             selectedCategories={selectedCategories}
             activeMainCategoryId={activeMainCategoryId}
             selectedMainCategory={selectedMainCategory}
-            handleMainCategoryClick={handleMainCategoryClick}
-            handleSubCategoryCheckedChange={handleSubCategoryCheckedChange}
+            handleMainCategoryClick={selectMainCategory}
+            handleSubCategoryCheckedChange={toggleSubCategory}
             getCategoryButtonText={getCategoryButtonText}
             currentSubCategories={currentSubCategories}
-            CLASS_CATEGORIES={CLASS_CATEGORIES}
           />
 
-          {/* 요일 필터 */}
+          {/* 3. 요일 필터 */}
           <FilterToggleGroup
             label="요일"
             options={["평일", "토요일", "일요일"]}
             value={selectedDays}
-            onValueChange={setSelectedDays}
+            onValueChange={toggleDay}
           />
 
-          {/* 난이도 필터  */}
+          {/* 4. 난이도 필터 */}
           <FilterToggleGroup
             label="난이도"
             options={["입문", "중급", "고급"]}
             value={selectedDifficulty}
-            onValueChange={setSelectedDifficulty}
+            onValueChange={toggleDifficulty}
           />
         </div>
 
         {/* 오른쪽 열 */}
         <div className="flex flex-col gap-2">
-          {/* 인원 필터 */}
+          {/* 5. 인원 필터 */}
           <div className="p-2 border rounded-md bg-white flex flex-row items-center gap-6">
             <label className="block text-lg font-bold text-gray-700 min-w-[70px]">
               인원
@@ -168,15 +187,11 @@ const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
                 <SelectValue placeholder="인원을 선택하세요" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">1명</SelectItem>
-                <SelectItem value="2">2명</SelectItem>
-                <SelectItem value="3">3명</SelectItem>
-                <SelectItem value="4">4명</SelectItem>
-                <SelectItem value="5">5명</SelectItem>
-                <SelectItem value="6">6명</SelectItem>
-                <SelectItem value="7">7명</SelectItem>
-                <SelectItem value="8">8명</SelectItem>
-                <SelectItem value="9">9명</SelectItem>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                  <SelectItem key={num} value={String(num)}>
+                    {num}명
+                  </SelectItem>
+                ))}
                 <SelectItem value="10+">10명 이상</SelectItem>
                 <SelectItem value="20+">20명 이상</SelectItem>
                 <SelectItem value="30+">30명 이상</SelectItem>
@@ -185,7 +200,8 @@ const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
               </SelectContent>
             </Select>
           </div>
-          {/* 시간 필터 */}
+
+          {/* 6. 시간 필터 */}
           <div className="p-2 border rounded-md bg-white flex flex-row items-center gap-6">
             <label className="block text-lg font-bold text-gray-700 min-w-[70px]">
               시간
@@ -200,7 +216,8 @@ const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
               className="flex-grow"
             />
           </div>
-          {/* 금액 필터 */}
+
+          {/* 7. 금액 필터 */}
           <div className="p-2 border rounded-md bg-white flex flex-row items-center gap-6">
             <label className="block text-lg font-bold text-gray-700 min-w-[70px]">
               금액
@@ -218,23 +235,31 @@ const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
         </div>
       </div>
 
-      {/* 소분류 배지 표시 공간 */}
+      {/* 배지 영역 */}
       <FilterBadges
         regions={selectedRegions}
         categories={selectedCategories.slice(1)}
-        onRemoveRegion={handleRemoveRegionBadge}
-        onRemoveCategory={handleRemoveCategoryBadge}
+        onRemoveRegion={(region) => toggleRegion(region)}
+        onRemoveCategory={removeCategoryBadge}
       />
 
-      {/* 하단: 초기화 및 검색 버튼 */}
+      {/* 하단 버튼 */}
       <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={onClose}>
-          닫기
-        </Button>
-        <Button variant="outline" onClick={handleResetFilters}>
+        {showCloseButton && (
+          <Button variant="outline" onClick={onClose}>
+            닫기
+          </Button>
+        )}
+        <Button
+          variant="outline"
+          onClick={onReset || resetFilters} // 클래스 조회 페이지일 경우 조회 결과 초기화도 진행
+          className="px-6"
+        >
           초기화
         </Button>
-        <Button onClick={handleSearch}>검색</Button>
+        <Button onClick={onSearch} className="px-8 font-bold">
+          검색
+        </Button>
       </div>
     </section>
   );

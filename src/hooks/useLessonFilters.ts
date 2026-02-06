@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useCategoryFilter } from "@hooks/useCategoryFilter";
+import { useCategoryFilter } from "@/hooks/useCategoryFilter";
 
 const INITIAL_FILTERS = {
   PERSONNEL: "",
@@ -39,12 +39,10 @@ export const useLessonFilters = () => {
     setSelectedRegions(INITIAL_FILTERS.REGIONS);
     setSelectedDays(INITIAL_FILTERS.DAYS);
     setSelectedDifficulty(INITIAL_FILTERS.DIFFICULTY);
-
     categoryFilter.resetCategories();
   };
 
   const handleRemoveRegionBadge = (regionName: string) => {
-    // "전체"가 포함된 상태에서 다른 것을 지우면 "전체"도 같이 지우는 로직 유지
     if (selectedRegions.includes("전체") && regionName !== "전체") {
       setSelectedRegions((prev) =>
         prev.filter((item) => item !== regionName && item !== "전체"),
@@ -60,10 +58,8 @@ export const useLessonFilters = () => {
     value: string,
   ) => {
     if (value === "전체") {
-      // 전체 클릭 시: 이미 전체면 해제, 아니면 전체만 선택
       setter(currentSelection.includes("전체") ? [] : ["전체"]);
     } else {
-      // 일반 항목 클릭 시: "전체"는 무조건 제거하고 토글
       const withoutAll = currentSelection.filter((item) => item !== "전체");
       if (withoutAll.includes(value)) {
         setter(withoutAll.filter((item) => item !== value));
@@ -73,34 +69,11 @@ export const useLessonFilters = () => {
     }
   };
 
-  // 지역 버튼 텍스트 생성
   const getRegionButtonText = (regions: string[]) => {
     if (!regions.length) return "지역을 선택하세요";
     if (regions.includes("전체")) return "전체 지역";
     if (regions.length > 3) return `지역 (${regions.length}개 선택됨)`;
     return regions.join(", ");
-  };
-
-  // 검색 버튼 클릭 핸들러
-  const handleSearch = () => {
-    let personnelCount = 0;
-    if (selectedPersonnel) {
-      // "10+" -> 10, "5" -> 5 로 변환
-      personnelCount = parseInt(selectedPersonnel.replace(/\D/g, ""), 10);
-    }
-
-    const filterQuery = {
-      personnel: personnelCount || null,
-      timeRange,
-      priceRange,
-      regions: selectedRegions.includes("전체") ? [] : selectedRegions,
-      categories: categoryFilter.selectedCategories,
-      days: selectedDays,
-      difficulty: selectedDifficulty,
-    };
-
-    console.log("필터링 쿼리:", filterQuery);
-    // TODO: API 호출
   };
 
   return {
@@ -116,13 +89,10 @@ export const useLessonFilters = () => {
     setSelectedDays,
     selectedDifficulty,
     setSelectedDifficulty,
-
     handleResetFilters,
     handleRemoveRegionBadge,
     handleCheckedChange,
     getRegionButtonText,
-    handleSearch,
-
     ...categoryFilter,
   };
 };
