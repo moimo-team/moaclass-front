@@ -4,9 +4,7 @@ import { REGIONS } from "@/constants/regions";
 
 const getRegions = http.get(`${httpUrl}/regions`, async () => {
     await delay(1000);
-    return HttpResponse.json({
-        regions: REGIONS,
-    }, {
+    return HttpResponse.json(REGIONS, {
         status: 200,
     });
 });

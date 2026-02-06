@@ -1,38 +1,18 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Crown, Pencil } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Pencil } from "lucide-react";
 import { useState } from "react";
 import UserProfileModal from "@/components/features/modal/profile/UserProfileModal";
-import { useUserInfoQuery } from "@/hooks/useUserInfoQuery";
-import { REGIONS } from "@/constants/regions";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-
-const MOCK_USER_INFO = {
-  id: 1,
-  email: "[EMAIL_ADDRESS]",
-  nickname: "테스트",
-  bio: "안녕하세요",
-  regionId: 1,
-  profileImage: "",
-  categories: [
-    {
-      id: 1,
-      name: "개발",
-    },
-    {
-      id: 2,
-      name: "디자인",
-    },
-  ],
-}
+import { useAuthQuery } from "@/hooks/useAuthQuery";
+import { useRegionQuery } from "@/hooks/useRegionQuery";
 
 const Profile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const { data: userInfo, isLoading } = useUserInfoQuery();
-  const userInfo = MOCK_USER_INFO;
-  const isLoading = false;
+  const { data: userInfo, isLoading } = useAuthQuery();
+  const { data: regionsData } = useRegionQuery();
+  // const userInfo = MOCK_USER_INFO;
+  // const isLoading = false;
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -59,16 +39,16 @@ const Profile = () => {
         <div>
           <h4 className="text-lg font-medium text-gray-900 mb-4">선호 카테고리</h4>
           <div className="flex flex-wrap gap-2">
-            {userInfo?.categories?.map((category) => (
+            {userInfo?.interests?.map((interest) => (
               <Badge
-                key={category.id}
+                key={interest.id}
                 variant="secondary"
                 className="bg-primary/20 text-primary hover:bg-primary/30 px-4 py-1.5 text-sm font-normal rounded-md"
               >
-                {category.name}
+                {interest.name}
               </Badge>
             ))}
-            {(!userInfo?.categories || userInfo.categories.length === 0) && (
+            {(!userInfo?.interests || userInfo.interests.length === 0) && (
               <p className="text-sm text-gray-400">선택된 카테고리가 없습니다.</p>
             )}
           </div>
@@ -78,15 +58,15 @@ const Profile = () => {
         <div>
           <h4 className="text-lg font-medium text-gray-900 mb-4">지역</h4>
           <div className="flex flex-wrap gap-2">
-            {userInfo?.regionId && (
+            {userInfo?.region && (
               <Badge
                 variant="secondary"
                 className="bg-primary/60 text-white hover:bg-primary/70 px-4 py-1.5 text-sm font-normal rounded-md"
               >
-                {REGIONS.find((region) => region.id === userInfo?.regionId)?.name}
+                {regionsData?.find((region) => region.id === userInfo?.region?.id)?.name}
               </Badge>
             )}
-            {(!userInfo?.regionId) && (
+            {(!userInfo?.region) && (
               <p className="text-sm text-gray-400">선택한 지역이 없습니다.</p>
             )}
           </div>

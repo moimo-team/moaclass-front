@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import StarRating from "@/components/common/StarRating";
-import FileDragAndDrop from "@/components/common/FileDragAndDrop";
+import { FormImageUpload } from "@/components/features/modal/components/FormImageUpload";
 import { cn } from "@/lib/utils";
 
 interface ReviewModalProps {
@@ -32,15 +32,20 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
     const [rating, setRating] = useState(0);
     // 후기 텍스트 내용 상태
     const [content, setContent] = useState("");
-    // 첨부된 파일 리스트 상태
-    const [files, setFiles] = useState<File[]>([]);
+    // 첨부된 이미지 데이터 URL 리스트 상태
+    const [images, setImages] = useState<string[]>([]);
+
+    // 이미지 삭제 콜백
+    const handleRemoveImage = useCallback((index: number) => {
+        setImages(prev => prev.filter((_, i) => i !== index));
+    }, []);
 
     /**
      * 후기 등록 버튼 클릭 시 처리
      */
     const handleRegister = () => {
         // TODO: 실제 서버 API 연동 필요
-        console.log("후기 등록 데이터:", { orderId, rating, content, files });
+        console.log("후기 등록 데이터:", { orderId, rating, content, images });
         onOpenChange(false); // 등록 후 모달 닫기
     };
 
@@ -83,14 +88,19 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
                         </div>
                     </div>
 
-                    {/* 하단: 파일 첨부 섹션 (공통 컴포넌트 활용) */}
+                    {/* 하단: 파일 첨부 섹션 (공통 컴포넌트 활용 - FormImageUpload로 통합) */}
                     <div className="w-full space-y-4">
-                        <FileDragAndDrop
-                            files={files}
-                            setFiles={setFiles}
-                            hintText={
+                        <FormImageUpload
+                            variant="multiple"
+                            previewImages={images}
+                            onImagesChange={setImages}
+                            onRemoveImage={handleRemoveImage}
+                            maxImages={8}
+                            enableDragAndDrop={true}
+                            dragDropHintText={
                                 <p>첨부하면 <span className="text-emerald-500 font-bold">같은 카테고리 클래스 할인 쿠폰 발급!</span></p>
                             }
+                            label="이미지 첨부"
                         />
 
                         {/* 포인트 적립 안내 문구 */}

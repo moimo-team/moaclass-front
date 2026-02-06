@@ -1,4 +1,5 @@
 import type { Interest } from "./interest.model";
+import type { Region } from "./region.model";
 
 export interface User {
   id: number;
@@ -8,20 +9,13 @@ export interface User {
   resetToken?: string;
   refreshToken?: string;
   profileImage?: string | null;  // image > profile_image > profileImage로 변경
-  regionId?: number | null;
+  region?: Region;
+  point?: number;
   createdAt: Date;
   updatedAt?: Date;
 }
 
 export type UserInfo = Partial<User> & {
-  categories: Interest[];
+  interests: Interest[];
   userId?: number;
-}
-
-export interface SocialAccounts {
-  id: number;
-  googleSubId: string;
-  userId: number;
-  createdAt: Date;
-  updatedAt?: Date;
 }
