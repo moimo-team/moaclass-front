@@ -34,7 +34,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userInfo?: UserInfo;
+  userInfo?: UserInfo | null;
   userId?: number;
   readOnly?: boolean;
 }
@@ -96,8 +96,8 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
       reset({
         nickname: displayUserInfo.nickname || "",
         bio: displayUserInfo.bio || "",
-        regionId: displayUserInfo.regionId || 0,
-        interests: displayUserInfo.categories?.map((i: Interest) => i.id) || [],
+        regionId: displayUserInfo.region?.id || 0,
+        interests: displayUserInfo.interests?.map((i: Interest) => i.id) || [],
       });
       const img = displayUserInfo.profileImage || defaultProfile;
       setPreviewImage(img);

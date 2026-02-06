@@ -50,7 +50,7 @@ export const RegionSelect = ({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent className="max-h-[200px] bg-card border-input">
-        {regionsData?.regions?.map((region) => (
+        {regionsData?.map((region) => (
           <SelectItem
             key={region.id}
             value={valueType === "id" ? region.id.toString() : region.name}

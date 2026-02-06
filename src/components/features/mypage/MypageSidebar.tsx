@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useUserInfoQuery } from "@/hooks/useUserInfoQuery";
+import { useAuthQuery } from "@/hooks/useAuthQuery";
 import { Check } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import defaultProfile from "@/assets/images/profile.png";
@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 export const MypageSidebar = () => {
 
-    const { data: user } = useUserInfoQuery();
+    const { data: user } = useAuthQuery();
 
     if (!user) return null;
 
@@ -35,7 +35,7 @@ export const MypageSidebar = () => {
                     </div>
                 </div>
 
-                <p className="text-sm text-gray-400">인증 완료된 계정입니다.</p>
+                <p className="text-sm text-gray-400">{user.email}</p>
             </div>
 
             {/* Navigation Menu */}
