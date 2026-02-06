@@ -21,7 +21,7 @@ import { FilterToggleGroup } from "@/components/common/FilterToggleGroup";
 import { FilterBadges } from "@/components/features/lessons/FilterBadges";
 
 import { useFilterStore } from "@/store/filterStore";
-import { SUB_CLASS_CATEGORIES } from "@/mock/mockData/categoryMock";
+import { LESSON_SUB_CATEGORIES } from "@/mock/mockData/categoryMock";
 
 interface LessonFilterSectionProps {
   onClose?: () => void;
@@ -81,13 +81,13 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 
   // 소분류 목록 계산 (Memoization은 store 내부에서 처리하거나 여기서 처리)
   const currentSubCategories = activeMainCategoryId
-    ? SUB_CLASS_CATEGORIES.filter(
-        (subCat) => subCat.category_id === activeMainCategoryId,
-      ).map((subCat) => ({
-        id: subCat.id,
-        name: subCat.name,
-        categoryId: subCat.category_id,
-      }))
+    ? LESSON_SUB_CATEGORIES.filter(
+      (subCat) => subCat.category_id === activeMainCategoryId,
+    ).map((subCat) => ({
+      id: subCat.id,
+      name: subCat.name,
+      categoryId: subCat.category_id,
+    }))
     : [];
 
   return (
