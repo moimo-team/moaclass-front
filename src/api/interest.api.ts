@@ -1,17 +1,13 @@
 import { apiClient } from "@/api/client";
-import type { LessonCategory } from "@/models/lesson.model";
+import type { Interest } from "@/models/interest.model";
 
-/** 
- * @deprecated 
- * getLessonCategories로 변경됨
-*/
-// 관심사 카테고리 조회
+// 모임 카테고리 조회
 export const getInterests = async () => {
     try {
-        const response = await apiClient.get<LessonCategory[]>("/lesson-categories");
+        const response = await apiClient.get<Interest[]>("/interests");
         return response.data;
     } catch (error) {
-        console.error("관심사 카테고리 조회 에러:", error);
+        console.error("모임 카테고리 조회 에러:", error);
         throw error;
     }
 }
