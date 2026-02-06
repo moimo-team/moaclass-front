@@ -28,6 +28,11 @@ allowed-tools: Read, Grep, Glob, Bash
 
 ## PR 리뷰 프로세스
 
+### Language
+
+Please provide all code reviews, summaries, and help messages in Korean (한글)
+
+
 <!-- ### 1. PR 정보 수집
 
 ```bash
