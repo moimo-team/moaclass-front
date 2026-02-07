@@ -99,7 +99,7 @@ export const routeList = [
         element: <Interests />,
       },
       {
-        path: "/pay-class",
+        path: "/pay-class/:lessonId/:scheduleId/:quantity",
         element: <ClassPayment />,
       },
       {

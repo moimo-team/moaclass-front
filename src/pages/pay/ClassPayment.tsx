@@ -6,36 +6,28 @@ import { TicketSection } from "@/components/features/pay/TicketSection";
 import { ContactSection } from "@/components/features/pay/ContactSection";
 import { PayInfoSection } from "@/components/features/pay/PayInfoSection";
 import { RefundRuleSection } from "@/components/features/pay/RefundRuleSection";
-
-// Mock Data
-const MOCK_DATA = {
-    classInfo: {
-        name: "나만의 모우인형, 귀염뽀짝 모우키링 만들기",
-        date: "2026.01.20 19:00",
-        location: "대한민국 서울특별시 강남구 논현로152길 37",
-        thumbnailUrl: "https://picsum.photos/id/111/300/300",
-    },
-    userInfo: {
-        email: "7777@naver.com",
-        nickname: "김세븐",
-    },
-    paymentInfo: {
-        ticketTitle: "원데이 클래스 수강권",
-        pricePerUnit: 20610,
-        quantity: 2,
-        availableCoupons: 0,
-        availableCredit: 0,
-    }
-};
+import { useParams } from "react-router-dom";
+import { usePayPreviewQuery } from "@/hooks/usePayPreviewQuery";
 
 const ClassPayment = () => {
+    const { lessonId, scheduleId, quantity } = useParams();
+    const { data: payPreview, isLoading } = usePayPreviewQuery({
+        lessonId: Number(lessonId),
+        scheduleId: Number(scheduleId),
+        quantity: Number(quantity),
+    });
     const [isCancelOpen, setIsCancelOpen] = useState(false);
     const [isGuideOpen, setIsGuideOpen] = useState(false);
-    const [creditToUse, setCreditToUse] = useState("0");
 
-    const { classInfo, userInfo, paymentInfo } = MOCK_DATA;
-    const subTotal = paymentInfo.pricePerUnit * paymentInfo.quantity;
-    const totalPayment = subTotal - parseInt(creditToUse || "0", 10);
+    const [pointToUse, setPointToUse] = useState(0);
+
+    if (isLoading) return <div>로딩중...</div>;
+    if (!payPreview) return <div>데이터를 불러올 수 없습니다.</div>;
+
+    console.log(payPreview);
+    const { lesson, user, availableCouponCnt, availablePoints, price } = payPreview;
+    const subTotal = price.subtotal;
+    const totalPayment = price.total;
 
     return (
         <div className="w-full max-w-5xl mx-auto p-4 md:p-6 pb-20">
@@ -51,10 +43,10 @@ const ClassPayment = () => {
                 {/* Left Column */}
                 <div className="space-y-6">
                     {/* Class Ticket Info */}
-                    <TicketSection classInfo={classInfo} />
+                    <TicketSection lesson={lesson} />
 
                     {/* Contact Info */}
-                    <ContactSection userInfo={userInfo} />
+                    <ContactSection user={user} />
                 </div>
 
                 {/* Right Column */}
@@ -111,9 +103,12 @@ const ClassPayment = () => {
 
                     {/* Payment Info */}
                     <PayInfoSection
-                        paymentInfo={paymentInfo}
-                        creditToUse={creditToUse}
-                        setCreditToUse={setCreditToUse}
+                        lesson={lesson}
+                        price={price}
+                        availableCouponCnt={availableCouponCnt}
+                        availablePoints={availablePoints}
+                        pointToUse={pointToUse}
+                        setPointToUse={setPointToUse}
                         subTotal={subTotal}
                         totalPayment={totalPayment}
                     />

@@ -10,6 +10,8 @@ import { notificationHandlers } from "./notificationHandler";
 import { lessonHandlers } from "./lessonHandler";
 import { regionHandler } from "./regionHandler";
 import { categoryHandler } from "./categoryHandler";
+import { payHandler } from "./payHandler";
+import { couponHandlers } from "./couponHandler";
 
 const handlers = [
   ...authHandler,
@@ -23,6 +25,8 @@ const handlers = [
   ...lessonHandlers,
   ...regionHandler,
   ...categoryHandler,
+  ...payHandler,
+  ...couponHandlers
 ];
 
 export const worker = setupWorker(...handlers);
