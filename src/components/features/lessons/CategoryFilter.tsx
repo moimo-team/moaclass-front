@@ -7,8 +7,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { LESSON_CATEGORIES } from "@/mock/mockData/categoryMock"; // 경로 확인 필요
-import type { LessonCategory, LessonSubCategory } from "@/models/lesson.model"; // 경로 확인 필요
+import { LESSON_CATEGORIES } from "@/mock/mockData/categoryMock";
+import type { LessonCategory, LessonSubCategory } from "@/models/lesson.model";
 
 interface CategoryFilterProps {
   selectedCategories: string[];

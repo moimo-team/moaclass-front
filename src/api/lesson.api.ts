@@ -37,3 +37,13 @@ export const fetchLessons = async (
     throw error;
   }
 };
+
+export const fetchLesson = async (lessonId: number): Promise<Lesson> => {
+  try {
+    const response = await apiClient.get<Lesson>(`/lessons/${lessonId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`fetchLesson (ID: ${lessonId}) error:`, error);
+    throw error;
+  }
+};

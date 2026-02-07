@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { SUB_CLASS_CATEGORIES } from "@/mock/mockData/categoryMock";
+import { LESSON_SUB_CATEGORIES } from "@/mock/mockData/categoryMock";
 import type { LessonCategory, LessonSubCategory } from "@/models/lesson.model";
 
 export const useCategoryFilter = () => {
@@ -72,7 +72,7 @@ export const useCategoryFilter = () => {
 
   const currentSubCategories = useMemo<LessonSubCategory[]>(() => {
     return activeMainCategoryId
-      ? SUB_CLASS_CATEGORIES.filter(
+      ? LESSON_SUB_CATEGORIES.filter(
           (subCat) => subCat.category_id === activeMainCategoryId,
         ).map((subCat) => ({
           id: subCat.id,

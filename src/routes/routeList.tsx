@@ -27,6 +27,7 @@ import OrderList from "@/pages/mypage/OrderList";
 import CancelClass from "@/pages/mypage/CancelClass";
 import ClassDashboardPage from "@/pages/class/ClassDashboardPage";
 import LessonListPage from "@/pages/class/LessonList";
+import LessonDetail from "@/pages/class/LessonDetail";
 
 export const routeList = [
   {
@@ -85,6 +86,10 @@ export const routeList = [
       {
         path: "/lessons",
         element: <LessonListPage />,
+      },
+      {
+        path: "lessons/:lessonId",
+        element: <LessonDetail />,
       },
       {
         path: "/classes-manage",

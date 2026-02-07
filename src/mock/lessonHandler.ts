@@ -100,4 +100,20 @@ export const lessonHandlers = [
       { status: 200 },
     );
   }),
+
+  // 클래스 1개 정보
+  http.get(`${httpUrl}/lessons/:lessonId`, async ({ params }) => {
+    await delay(500);
+    const lessonId = Number(params.lessonId);
+    const lesson = mockLessons.find((l) => l.id === lessonId);
+
+    if (lesson) {
+      return HttpResponse.json(lesson, { status: 200 });
+    } else {
+      return HttpResponse.json(
+        { message: "레슨을 찾을 수 없습니다." },
+        { status: 404 },
+      );
+    }
+  }),
 ];
