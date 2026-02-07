@@ -53,7 +53,7 @@ export const LessonTabContent = ({
               key={tab.id}
               variant="ghost"
               className={cn(
-                "whitespace-nowrap rounded-none border-b-2 border-transparent px-4 py-2 text-lg font-medium text-muted-foreground transition-colors hover:text-foreground",
+                "whitespace-nowrap rounded-none border-b-2 border-transparent px-2 sm:px-4 py-2 text-base sm:text-lg font-medium text-muted-foreground transition-colors hover:text-foreground",
                 activeTab === tab.id && "border-primary text-foreground",
               )}
               onClick={() => handleTabClick(tab.id)}
