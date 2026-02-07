@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 interface ActionButtonProps extends ButtonProps {
     label: string;
     icon?: React.ReactNode;
-    theme?: "primary" | "destructive" | "outline" | "yellow";
+    theme?: "primary" | "destructive" | "outline" | "yellow" | "carrot";
 }
 
 const ActionButton = ({
@@ -21,6 +21,7 @@ const ActionButton = ({
         destructive: "border-destructive text-destructive hover:bg-destructive/5",
         outline: "border-primary/40 text-gray-900 hover:bg-primary/5",
         yellow: "border-yellow-400 text-gray-900 hover:bg-yellow-50",
+        carrot: "border-carrot text-gray-900 hover:bg-carrot/5",
     };
 
     return (

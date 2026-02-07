@@ -26,6 +26,8 @@ const badgeVariants = cva(
           "border-transparent bg-sky-500 text-white shadow hover:bg-sky-600",
         duplicated:
           "border-transparent bg-amber-500 text-white shadow hover:bg-amber-600",
+        carrot:
+          "border-transparent bg-carrot text-white shadow hover:bg-carrot-hover",
       },
     },
     defaultVariants: {

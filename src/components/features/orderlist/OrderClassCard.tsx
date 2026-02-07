@@ -30,7 +30,7 @@ const getStatusBadgeVariant = (status: string) => {
         case "참석완료":
             return "secondary";
         case "예약취소":
-            return "destructive";
+            return "carrot";
         default:
             return "outline";
     }
@@ -100,8 +100,8 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
                             />
                             <ActionButton
                                 label="채팅 문의"
-                                theme="primary"
-                                icon={<MessageCircle className="w-3.5 h-3.5 text-primary" fill="currentColor" />}
+                                theme="carrot"
+                                icon={<MessageCircle className="w-3.5 h-3.5 text-carrot fill-carrot" />}
                                 className="w-full"
                             />
                             <ActionButton
