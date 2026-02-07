@@ -8,6 +8,7 @@ import { PayInfoSection } from "@/components/features/pay/PayInfoSection";
 import { RefundRuleSection } from "@/components/features/pay/RefundRuleSection";
 import { useParams } from "react-router-dom";
 import { usePayPreviewQuery } from "@/hooks/usePayPreviewQuery";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const ClassPayment = () => {
     const { lessonId, scheduleId, quantity } = useParams();
@@ -21,10 +22,9 @@ const ClassPayment = () => {
 
     const [pointToUse, setPointToUse] = useState(0);
 
-    if (isLoading) return <div>로딩중...</div>;
+    if (isLoading) return <LoadingSpinner />;
     if (!payPreview) return <div>데이터를 불러올 수 없습니다.</div>;
 
-    console.log(payPreview);
     const { lesson, user, availableCouponCnt, availablePoints, price } = payPreview;
     const subTotal = price.subtotal;
     const totalPayment = price.total;
@@ -71,7 +71,7 @@ const ClassPayment = () => {
                                 <RefundRuleSection className="text-xs" />
                                 <p className="font-bold">2. 취소 방법</p>
                                 <p className="text-muted-foreground leading-relaxed">
-                                    클래스 결제/예약 내역 페이지에서 취소하고자 하시는 클래스 티켓의
+                                    <span className="text-destructive/80 font-medium">클래스 결제 내역</span> 페이지에서 취소하고자 하시는 클래스 티켓의
                                     <span className="text-destructive font-semibold mx-1">수강 취소</span>
                                     버튼을 클릭하시면 취소 신청이 완료됩니다.
                                 </p>
@@ -96,7 +96,7 @@ const ClassPayment = () => {
                         {isGuideOpen && (
                             <ul className="space-y-2 text-xs text-muted-foreground list-disc pl-4 leading-relaxed">
                                 <li>개설된 클래스 일정이 없는 경우, 문의를 통해 개설 요청을 드릴 수 있어요.</li>
-                                <li>결제 완료 시 온라인 티켓이 발행되며, <span className="text-destructive/80 font-medium">클래스 결제/예약 내역</span> 페이지를 통해 티켓을 확인 하실 수 있습니다. 그리고 등록해주신 이메일로 클래스 정보를 포함한 안내문이 발송됩니다.</li>
+                                <li>결제 완료 시 온라인 티켓이 발행되며, <span className="text-destructive/80 font-medium">클래스 결제 내역</span> 페이지를 통해 티켓을 확인 하실 수 있습니다. 그리고 등록해주신 이메일로 클래스 정보를 포함한 안내문이 발송됩니다.</li>
                             </ul>
                         )}
                     </PaySectionCard>

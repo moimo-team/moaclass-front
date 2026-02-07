@@ -92,7 +92,7 @@ export const MypageSidebar = () => {
                                     }`
                                 }
                             >
-                                클래스 신청 내역
+                                클래스 결제 내역
                             </NavLink>
                         </div>
                     </div>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { CouponModal } from '../coupon/CouponModal';
-import type { CouponInfo, userCoupons } from '@/models/coupon.model';
+import type { CouponInfo } from '@/models/coupon.model';
 import { useAvailableCouponsQuery } from '@/hooks/useCouponQuery';
 
 interface PayInfoSectionProps {
@@ -42,7 +42,24 @@ export const PayInfoSection = ({
 
   const handleApplyCoupon = (coupon: CouponInfo) => {
     setAppliedCoupon(coupon);
+    // 쿠폰 변경 시 포인트 초기화 (안전장치)
+    setPointToUse(0);
   };
+
+  const getDiscountAmount = () => {
+    if (!appliedCoupon) return 0;
+    const value = appliedCoupon.discountValue || 0;
+    if (appliedCoupon.discountType === 'PERCENT') {
+      return (price.subtotal * value) / 100;
+    }
+    if (appliedCoupon.discountType === 'FIXED') {
+      return value;
+    }
+    return 0;
+  };
+
+  const discountAmount = getDiscountAmount();
+  const finalPrice = totalPayment - discountAmount - pointToUse;
 
   return (
     <PaySectionCard title="결제 정보">
@@ -66,7 +83,10 @@ export const PayInfoSection = ({
         <div className="space-y-2">
           <div className="flex justify-between items-center text-sm">
             <span className="font-semibold text-xs">쿠폰</span>
-            <span className="text-[10px] text-primary">사용 가능 쿠폰 : {availableCouponCnt}개</span>
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] text-primary">사용 가능 쿠폰 : {availableCouponCnt}개</span>
+              {discountAmount > 0 && <span className="text-[10px] text-blue-600 font-bold">-{discountAmount.toLocaleString()}원 할인 적용 중</span>}
+            </div>
           </div>
           <div className="flex gap-2">
             <div className="flex-1 relative group">
@@ -115,7 +135,9 @@ export const PayInfoSection = ({
               value={pointToUse}
               onChange={(e) => {
                 const value = Number(e.target.value);
-                if (!isNaN(value) && value >= 0 && value <= availablePoints && value <= totalPayment) {
+                // 포인트 사용 한도: 보유 포인트, (총금액 - 쿠폰할인) 중 작은 값
+                const maxUsable = Math.min(availablePoints, totalPayment - discountAmount);
+                if (!isNaN(value) && value >= 0 && value <= maxUsable) {
                   setPointToUse(value);
                 }
               }}
@@ -123,7 +145,7 @@ export const PayInfoSection = ({
             <Button
               className="text-sm bg-slate-800 text-white hover:bg-slate-700 rounded-sm"
               onClick={() => {
-                const maxPoints = Math.min(availablePoints, totalPayment);
+                const maxPoints = Math.min(availablePoints, totalPayment - discountAmount);
                 setPointToUse(maxPoints);
               }}
             >
@@ -134,14 +156,30 @@ export const PayInfoSection = ({
 
         <Separator className="bg-border/60" />
 
-        <div className="flex justify-between items-end pb-2">
-          <span className="text-sm font-bold">총 결제 금액</span>
-          <span className="text-xl font-black text-foreground">{(totalPayment - pointToUse).toLocaleString()} 원</span>
-        </div>
+        <div className="space-y-1 pb-2">
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-muted-foreground">총 상품금액</span>
+            <span>{price.total.toLocaleString()} 원</span>
+          </div>
+          {discountAmount > 0 && (
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-blue-600">쿠폰 할인</span>
+              <span className="text-blue-600">-{discountAmount.toLocaleString()} 원</span>
+            </div>
+          )}
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-muted-foreground">포인트 사용</span>
+            <span className="text-red-500">-{pointToUse.toLocaleString()} P</span>
+          </div>
+          <div className="flex justify-between items-end pt-2 border-t mt-2">
+            <span className="text-sm font-bold">총 결제 금액</span>
+            <span className="text-xl font-black text-foreground">{Math.max(0, finalPrice).toLocaleString()} 원</span>
+          </div>
 
-        <Button className="w-full h-11 text-base font-bold bg-carrot hover:bg-carrot-hover text-white rounded-md">
-          결제 하기
-        </Button>
+          <Button variant="carrot" size="carrot" className="w-full">
+            결제 하기
+          </Button>
+        </div>
       </div>
     </PaySectionCard>
   );
