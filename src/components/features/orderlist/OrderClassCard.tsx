@@ -25,11 +25,11 @@ interface OrderClassCardProps {
 
 const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-        case "예약완료":
+        case "수강예정":
             return "default";
-        case "참석완료":
+        case "수강완료":
             return "secondary";
-        case "예약취소":
+        case "수강취소":
             return "carrot";
         default:
             return "outline";
@@ -39,7 +39,7 @@ const getStatusBadgeVariant = (status: string) => {
 const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
     const navigate = useNavigate();
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-    const isInactive = order.status === "참석완료" || order.status === "예약취소";
+    const isInactive = order.status === "수강완료" || order.status === "수강취소";
 
     return (
         <Card
@@ -94,7 +94,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
                                 label="후기 작성"
                                 theme="primary"
                                 icon={<Pencil className="w-3.5 h-3.5 text-primary" fill="currentColor" />}
-                                disabled={order.status !== "참석완료"}
+                                disabled={order.status !== "수강완료"}
                                 className="w-full"
                                 onClick={() => setIsReviewModalOpen(true)}
                             />
@@ -108,7 +108,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
                                 label="수강 취소"
                                 theme="destructive"
                                 icon={<X className="w-3.5 h-3.5" />}
-                                disabled={order.status !== "예약완료"}
+                                disabled={order.status !== "수강예정"}
                                 className="w-full"
                                 onClick={() => navigate(`/mypage/class/orders/${order.id}/cancel`)}
                             />
