@@ -82,12 +82,12 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
   // 소분류 목록 계산 (Memoization은 store 내부에서 처리하거나 여기서 처리)
   const currentSubCategories = activeMainCategoryId
     ? LESSON_SUB_CATEGORIES.filter(
-        (subCat) => subCat.category_id === activeMainCategoryId,
-      ).map((subCat) => ({
-        id: subCat.id,
-        name: subCat.name,
-        categoryId: subCat.category_id,
-      }))
+      (subCat) => subCat.category_id === activeMainCategoryId,
+    ).map((subCat) => ({
+      id: subCat.id,
+      name: subCat.name,
+      categoryId: subCat.category_id,
+    }))
     : [];
 
   return (

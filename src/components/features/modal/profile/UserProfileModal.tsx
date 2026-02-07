@@ -21,6 +21,7 @@ import { FormModal } from "@/components/features/modal/components/FormModal";
 import { FormImageUpload } from "@/components/features/modal/components/FormImageUpload";
 import { FormTextarea } from "@/components/features/modal/components/FormTextarea";
 import { SelectableBadge } from "@/components/common/SelectableBadge";
+import { useCategoryQuery } from "@/hooks/useCategoryQuery";
 
 const profileSchema = z.object({
   nickname: z.string().min(2, "닉네임은 2자 이상 입력해주세요.").max(20, "닉네임은 20자 이내로 입력해주세요."),
@@ -34,7 +35,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userInfo?: UserInfo;
+  userInfo?: UserInfo | null;
   userId?: number;
   readOnly?: boolean;
 }
@@ -62,6 +63,8 @@ const ProfileSkeleton = () => (
 
 const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: ProfileModalProps) => {
   const { data: allInterests } = useInterestQuery();
+  const { data: allCategories } = useCategoryQuery();
+
   const { data: fetchedUser, isLoading: isUserLoading } = useUserInfoByIdQuery(userId || 0);
   const userUpdateMutation = useUserUpdateMutation();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -96,8 +99,8 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
       reset({
         nickname: displayUserInfo.nickname || "",
         bio: displayUserInfo.bio || "",
-        regionId: displayUserInfo.regionId || 0,
-        interests: displayUserInfo.categories?.map((i: Interest) => i.id) || [],
+        regionId: displayUserInfo.region?.id || 0,
+        interests: displayUserInfo.interests?.map((i: Interest) => i.id) || [],
       });
       const img = displayUserInfo.profileImage || defaultProfile;
       setPreviewImage(img);
@@ -256,32 +259,27 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
       </div>
 
       {/* 카테고리 */}
-      <div className="space-y-3">
-        <div className="space-y-1">
-          <Label className="text-sm font-bold text-gray-700">카테고리</Label>
-          {!isReadOnly && <p className="text-[10px] text-gray-400 block">최소 3개이상 선택해주세요!</p>}
-        </div>
-        <div className="grid grid-cols-4 gap-2">
-          {isReadOnly && selectedInterests.length === 0 ? (
-            <p className="text-sm text-gray-400 col-span-4 py-2">선택한 카테고리가 없습니다.</p>
-          ) : (
-            allInterests?.map((interest) => (
+      {!isReadOnly && (
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label className="text-sm font-bold text-gray-700">카테고리</Label>
+            <p className="text-[10px] text-gray-400 block">최소 3개이상 선택해주세요!</p>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {allInterests?.map((interest) => (
               <SelectableBadge
                 key={interest.id}
                 label={interest.name}
                 isSelected={selectedInterests.includes(interest.id)}
-                onClick={() => !isReadOnly && toggleInterest(interest.id)}
+                onClick={() => toggleInterest(interest.id)}
                 variant="card"
-                className={cn(
-                  "h-12 text-sm",
-                  isReadOnly && !selectedInterests.includes(interest.id) && "hidden"
-                )}
+                className="h-12 text-sm"
               />
-            ))
-          )}
+            ))}
+          </div>
+          {errors.interests && <p className="text-xs text-red-500 mt-1">{errors.interests.message}</p>}
         </div>
-        {!isReadOnly && errors.interests && <p className="text-xs text-red-500 mt-1">{errors.interests.message}</p>}
-      </div>
+      )}
     </FormModal>
   );
 };

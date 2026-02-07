@@ -59,7 +59,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
                   className={cn(
                     "flex items-center space-x-2 p-2 cursor-pointer rounded-md transition-colors hover:bg-gray-50",
                     activeMainCategoryId === category.id &&
-                      "bg-gray-100 font-medium",
+                    "bg-gray-100 font-medium",
                   )}
                   onClick={() => handleMainCategoryClick(category)}
                 >

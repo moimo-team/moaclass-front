@@ -1,5 +1,7 @@
 import { http, HttpResponse, delay } from "msw";
 import { httpUrl } from "./mockData/mockData";
+import { REGIONS } from "@/constants/regions";
+import { LESSON_CATEGORIES } from "./mockData/categoryMock";
 
 // Mock 사용자 정보 상태 관리 (userInfoHandler에서 이동)
 let mockUserInfo = {
@@ -7,6 +9,12 @@ let mockUserInfo = {
     email: "moimo@email.com",
     nickname: "테스터",
     bio: "소개글입니다",
+    point: 1000,
+    // regionId: 1,
+    region: {
+        id: 1,
+        name: "서울"
+    },
     interests: [
         { id: 1, name: "인간관계(친목)" },
         { id: 2, name: "술" },
@@ -445,7 +453,7 @@ const verifyUser = http.get(`${httpUrl}/users/verify`, async ({ request }) => {
 
 // 사용자 정보 업데이트 핸들러 (userInfoHandler에서 이동)
 const userUpdate = http.put(
-    `${httpUrl}/users/user-update`,
+    `${httpUrl}/users`,
     async ({ request }) => {
         try {
             const authHeader = request.headers.get("Authorization");
@@ -455,6 +463,7 @@ const userUpdate = http.put(
 
             const formData = await request.formData();
             const bio = formData.get("bio") as string;
+            const regionId = formData.get("regionId") as string;
             const rawInterests = formData.getAll("interests");
             let interests: any[] = [];
 
@@ -477,6 +486,7 @@ const userUpdate = http.put(
 
             console.log("User Update (Token Based):", {
                 bio,
+                regionId,
                 interests,
                 file,
                 token: authHeader
@@ -486,11 +496,15 @@ const userUpdate = http.put(
             mockUserInfo = {
                 ...mockUserInfo,
                 bio: bio || mockUserInfo.bio,
+                region: {
+                    id: Number(regionId),
+                    name: REGIONS.find((region) => region.id === Number(regionId))?.name || ""
+                },
                 // interests가 ID인 경우와 이름인 경우를 모두 대응 (Mock 데이터 보정을 위해)
                 interests: interests.map((item: any, index: number) => {
                     if (typeof item === 'number' || !isNaN(Number(item))) {
                         // ID가 들어온 경우 (실제 서비스와 유사)
-                        return { id: Number(item), name: `관심사 ${item}` };
+                        return { id: Number(item), name: LESSON_CATEGORIES.find((interest) => interest.id === Number(item))?.name || "" };
                     }
                     return { id: index + 100, name: item }; // 이름이 들어온 경우 (기존 방식)
                 }),

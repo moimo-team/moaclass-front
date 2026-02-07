@@ -4,6 +4,7 @@ import { Upload, Camera, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { validateImageFile, fileToDataURL } from "@/utils/imageValidation";
 import { toast } from "sonner";
+import FileDragAndDrop from "@/components/common/FileDragAndDrop";
 
 interface FormImageUploadProps {
   previewImage?: string | null;
@@ -19,6 +20,10 @@ interface FormImageUploadProps {
   required?: boolean;
   maxImages?: number;
   className?: string;
+  // 드래그 앤 드롭 관련 optional props
+  enableDragAndDrop?: boolean;
+  dragDropHintText?: React.ReactNode;
+  dragDropClassName?: string;
 }
 
 /**
@@ -28,6 +33,7 @@ interface FormImageUploadProps {
  * - variant="multiple": 다중 이미지 업로드 (그리드 미리보기)
  * - 파일 검증 (타입, 크기, 한글 파일명) 자동 처리
  * - 원형/사각형 지원
+ * - 선택적 드래그 앤 드롭 지원 (enableDragAndDrop prop)
  */
 export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps>(
   (
@@ -45,13 +51,16 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
       required = false,
       maxImages = 8,
       className,
+      enableDragAndDrop = false,  // 드래그 앤 드롭 지원 여부
+      dragDropHintText,           // 드래그 앤 드롭 영역에 추가할 텍스트
+      dragDropClassName,          // 드래그 앤 드롭 영역 className
     },
     ref
   ) => {
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files;
-      if (!files || files.length === 0) return;
-
+    /**
+     * 파일 처리 공통 로직
+     */
+    const processFiles = async (files: File[]) => {
       // 단일 이미지 모드
       if (variant === "form" && onImageChange) {
         const file = files[0];
@@ -60,7 +69,6 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
           toast.error(validation.error!, {
             description: validation.errorDescription,
           });
-          e.target.value = "";
           return;
         }
 
@@ -70,7 +78,6 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
         } catch (error) {
           console.error("Image conversion failed:", error);
           toast.error("이미지 변환에 실패했습니다");
-          e.target.value = "";
         }
         return;
       }
@@ -79,7 +86,7 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
       if (variant === "multiple" && onImagesChange) {
         const validFiles: File[] = [];
 
-        for (const file of Array.from(files)) {
+        for (const file of files) {
           const validation = validateImageFile(file);
           if (!validation.isValid) {
             toast.error(`${file.name}: ${validation.error}`);
@@ -88,15 +95,11 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
           validFiles.push(file);
         }
 
-        if (validFiles.length === 0) {
-          e.target.value = "";
-          return;
-        }
+        if (validFiles.length === 0) return;
 
         // 최대 개수 체크
         if (previewImages.length + validFiles.length > maxImages) {
           toast.error(`최대 ${maxImages}장까지 업로드 가능합니다`);
-          e.target.value = "";
           return;
         }
 
@@ -109,9 +112,15 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
           console.error("Image conversion failed:", error);
           toast.error("이미지 변환에 실패했습니다");
         }
-
-        e.target.value = "";
       }
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (!files || files.length === 0) return;
+
+      await processFiles(Array.from(files));
+      e.target.value = "";
     };
 
     const handleButtonClick = () => {
@@ -210,17 +219,28 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
               </div>
             )}
 
-            {/* 업로드 버튼 */}
+            {/* 드래그 앤 드롭 영역 또는 업로드 버튼 */}
             {!readOnly && (
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground border-none"
-                onClick={handleButtonClick}
-              >
-                <Upload className="mr-2 h-4 w-4" />
-                {previewImage ? "이미지 변경" : "이미지 찾기"}
-              </Button>
+              <>
+                {enableDragAndDrop ? (
+                  <FileDragAndDrop
+                    onFileSelect={processFiles}
+                    hintText={dragDropHintText}
+                    className={dragDropClassName}
+                    disabled={readOnly}
+                  />
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground border-none"
+                    onClick={handleButtonClick}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    {previewImage ? "이미지 변경" : "이미지 찾기"}
+                  </Button>
+                )}
+              </>
             )}
 
             {/* Hidden File Input */}
@@ -276,17 +296,28 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
             </div>
           )}
 
-          {/* 업로드 버튼 */}
+          {/* 드래그 앤 드롭 영역 또는 업로드 버튼 */}
           {!readOnly && previewImages.length < maxImages && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleButtonClick}
-              className="w-full h-12"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              추가 이미지 업로드 ({previewImages.length}/{maxImages})
-            </Button>
+            <>
+              {enableDragAndDrop ? (
+                <FileDragAndDrop
+                  onFileSelect={processFiles}
+                  hintText={dragDropHintText}
+                  className={dragDropClassName}
+                  disabled={readOnly}
+                />
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleButtonClick}
+                  className="w-full h-12"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  추가 이미지 업로드 ({previewImages.length}/{maxImages})
+                </Button>
+              )}
+            </>
           )}
 
           {/* Hidden File Input */}

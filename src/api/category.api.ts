@@ -1,8 +1,8 @@
-import type { LessonCategoriesResponse, LessonSubCategoriesResponse } from "@/models/category.model";
+import type { LessonCategory, LessonSubCategory } from "@/models/lesson.model";
 import { apiClient } from "./client";
 
 // 클래스 카테고리 조회
-export const getLessonCategories = async (): Promise<LessonCategoriesResponse> => {
+export const getLessonCategories = async (): Promise<LessonCategory[]> => {
     try {
         const response = await apiClient.get("/lesson-categories");
         return response.data;
@@ -13,7 +13,7 @@ export const getLessonCategories = async (): Promise<LessonCategoriesResponse> =
 }
 
 // 서브 클래스 카테고리 조회
-export const getLessonSubCategories = async (id: number): Promise<LessonSubCategoriesResponse> => {
+export const getLessonSubCategories = async (id: number): Promise<LessonSubCategory[]> => {
     try {
         const response = await apiClient.get(`/lesson-categories/${id}`);
         return response.data;

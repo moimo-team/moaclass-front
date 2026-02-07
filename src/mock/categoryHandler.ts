@@ -5,9 +5,7 @@ import { LESSON_CATEGORIES, LESSON_SUB_CATEGORIES } from "./mockData/categoryMoc
 // 클래스 카테고리
 const getLessonCategories = http.get(`${httpUrl}/lesson-categories`, async () => {
     await delay(1000);
-    return HttpResponse.json({
-        lessonCategories: LESSON_CATEGORIES,
-    }, {
+    return HttpResponse.json(LESSON_CATEGORIES, {
         status: 200,
     });
 });
@@ -16,9 +14,7 @@ const getLessonCategories = http.get(`${httpUrl}/lesson-categories`, async () =>
 const getLessonSubCategories = http.get(`${httpUrl}/lesson-categories/:id`, async ({ params }) => {
     await delay(1000);
     const { id } = params;
-    return HttpResponse.json({
-        lessonSubCategories: LESSON_SUB_CATEGORIES.filter((subCategory) => subCategory.id === Number(id)),
-    }, {
+    return HttpResponse.json(LESSON_SUB_CATEGORIES.filter((subCategory) => subCategory.id === Number(id)), {
         status: 200,
     });
 });
