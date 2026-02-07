@@ -266,7 +266,7 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
             <p className="text-[10px] text-gray-400 block">최소 3개이상 선택해주세요!</p>
           </div>
           <div className="grid grid-cols-4 gap-2">
-            {allInterests?.map((interest) => (
+            {allCategories?.map((interest) => (
               <SelectableBadge
                 key={interest.id}
                 label={interest.name}

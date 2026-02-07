@@ -7,41 +7,43 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import type { CouponInfo } from "@/models/coupon.model";
 
-interface Coupon {
-    id: string;
-    name: string;
-    discountValue: number;
-    discountType: "PERCENT" | "FIXED";
-    expiryDate: string;
-}
+// interface Coupon {
+//     id: string;
+//     name: string;
+//     discountValue: number;
+//     discountType: "PERCENT" | "FIXED";
+//     expiryDate: string;
+// }
 
-const MOCK_COUPONS: Coupon[] = [
-    {
-        id: "1",
-        name: "[겨울방학 특가] 전 클래스 10% 할인 쿠폰",
-        discountValue: 10,
-        discountType: "PERCENT",
-        expiryDate: "2026.02.28"
-    },
-    {
-        id: "2",
-        name: "모아클래스 첫 주문 감사 쿠폰",
-        discountValue: 5000,
-        discountType: "FIXED",
-        expiryDate: "2026.12.31"
-    },
-];
+// const MOCK_COUPONS: Coupon[] = [
+//     {
+//         id: "1",
+//         name: "[겨울방학 특가] 전 클래스 10% 할인 쿠폰",
+//         discountValue: 10,
+//         discountType: "PERCENT",
+//         expiryDate: "2026.02.28"
+//     },
+//     {
+//         id: "2",
+//         name: "모아클래스 첫 주문 감사 쿠폰",
+//         discountValue: 5000,
+//         discountType: "FIXED",
+//         expiryDate: "2026.12.31"
+//     },
+// ];
 
 interface CouponModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onApply: (coupon: Coupon) => void;
-    selectedId?: string | null;
+    availableCoupons: CouponInfo[];
+    onApply: (coupon: CouponInfo) => void;
+    selectedId?: number | null;
 }
 
-export const CouponModal = ({ isOpen, onClose, onApply, selectedId }: CouponModalProps) => {
-    const [selectedCouponId, setSelectedCouponId] = useState<string | null>(null);
+export const CouponModal = ({ isOpen, onClose, availableCoupons = [], onApply, selectedId }: CouponModalProps) => {
+    const [selectedCouponId, setSelectedCouponId] = useState<number | null>(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -50,7 +52,7 @@ export const CouponModal = ({ isOpen, onClose, onApply, selectedId }: CouponModa
     }, [isOpen, selectedId]);
 
     const handleApply = () => {
-        const selected = MOCK_COUPONS.find(c => c.id === selectedCouponId);
+        const selected = availableCoupons.find(c => c.id === selectedCouponId);
         if (selected) {
             onApply(selected);
             onClose();
@@ -70,12 +72,13 @@ export const CouponModal = ({ isOpen, onClose, onApply, selectedId }: CouponModa
                         <p className="text-sm font-semibold text-slate-700">적용할 쿠폰을 선택해 주세요</p>
 
                         <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
-                            {MOCK_COUPONS.map((coupon) => (
+                            {availableCoupons.map((coupon) => (
                                 <CouponCard
-                                    key={coupon.id}
-                                    coupon={coupon}
+                                    key={coupon.id || 0}
+                                    // coupon={coupon}
+                                    availableCoupon={coupon}
                                     selected={selectedCouponId === coupon.id}
-                                    onClick={() => setSelectedCouponId(coupon.id)}
+                                    onClick={() => setSelectedCouponId(coupon.id || 0)}
                                     showSelectionIndicator
                                 />
                             ))}

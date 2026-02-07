@@ -17,12 +17,12 @@ const MOCK_ORDERS = Array.from({ length: 15 }, (_, i) => ({
     date: "2026.01.29(목)",
     startTime: "오후 12:00",
     endTime: "오후 15:00",
-    status: i % 3 === 0 ? "예약완료" : i % 3 === 1 ? "예약취소" : "참석완료",
+    status: i % 3 === 0 ? "수강예정" : i % 3 === 1 ? "수강취소" : "수강완료",
     imageUrl: `https://picsum.photos/seed/${i + 100}/200/120`,
     price: 33000,
 }));
 
-type OrderStatus = "전체" | "예약완료" | "예약취소" | "참석완료";
+type OrderStatus = "전체" | "수강예정" | "수강취소" | "수강완료";
 
 const OrderList = () => {
     const [filterStatus, setFilterStatus] = useState<OrderStatus>("전체");
@@ -66,9 +66,9 @@ const OrderList = () => {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="전체">전체</SelectItem>
-                            <SelectItem value="예약완료">예약완료</SelectItem>
-                            <SelectItem value="예약취소">예약취소</SelectItem>
-                            <SelectItem value="참석완료">참석완료</SelectItem>
+                            <SelectItem value="수강예정">수강예정</SelectItem>
+                            <SelectItem value="수강취소">수강취소</SelectItem>
+                            <SelectItem value="수강완료">수강완료</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
