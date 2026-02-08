@@ -128,8 +128,8 @@ const ClassManagementPage = () => {
         </p>
       </div>
 
-      {/* 클래스 그리드 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {/* 클래스 그리드: 320px 아래로 작아지지 않게 하여 큼직하게 유지 */}
+      <div className="grid gap-8" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 2fr))" }}>
         {/* 생성 버튼 (항상 첫 번째) */}
         <CreateClassButton onClick={() => { setCreateModalOpen(true); /**TODO: 호스트 프로필 생성 유무 판단*/ }} />
 
