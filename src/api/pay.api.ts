@@ -7,6 +7,7 @@ export interface GetPayPreviewParams {
     quantity?: number;
 }
 
+// 결제 프리뷰 조회
 export const getPayPreview = async (params: GetPayPreviewParams): Promise<PayPreviewResponse> => {
     try {
         const queryParams = new URLSearchParams();
@@ -23,3 +24,23 @@ export const getPayPreview = async (params: GetPayPreviewParams): Promise<PayPre
         throw error;
     }
 }
+
+export interface PayInfoValues {
+    userId: number;
+    lessonId: number;
+    scheduleId: number;
+    amount: number;
+    couponId: number | null;
+};
+
+// 결제하기
+export const createPayment = async (data: PayInfoValues) => {
+    try {
+        const response = await apiClient.post("/payments", data);
+        return response.data;
+    } catch (error) {
+        console.error("createPayment error:", error);
+        throw error;
+    }
+}
+

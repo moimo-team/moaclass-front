@@ -7,6 +7,10 @@ import { Input } from "@/components/ui/input";
 import { CouponModal } from '../coupon/CouponModal';
 import type { CouponInfo } from '@/models/coupon.model';
 import { useAvailableCouponsQuery } from '@/hooks/useCouponQuery';
+import { usePayMutation } from '@/hooks/usePayMutations';
+import { useAuthStore } from '@/store/authStore';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 interface PayInfoSectionProps {
   lesson: {
@@ -24,6 +28,8 @@ interface PayInfoSectionProps {
   setPointToUse: (value: number) => void;
   subTotal: number;
   totalPayment: number;
+  lessonId: number;
+  scheduleId: number;
 }
 
 export const PayInfoSection = ({
@@ -34,11 +40,16 @@ export const PayInfoSection = ({
   pointToUse,
   setPointToUse,
   subTotal,
-  totalPayment
+  totalPayment,
+  lessonId,
+  scheduleId
 }: PayInfoSectionProps) => {
+  const navigate = useNavigate();
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<CouponInfo | null>(null);
   const { data: availableCoupons } = useAvailableCouponsQuery();
+  const { userId } = useAuthStore();
+  const { mutateAsync: createPayment } = usePayMutation();
 
   const handleApplyCoupon = (coupon: CouponInfo) => {
     setAppliedCoupon(coupon);
@@ -60,6 +71,31 @@ export const PayInfoSection = ({
 
   const discountAmount = getDiscountAmount();
   const finalPrice = totalPayment - discountAmount - pointToUse;
+
+  // 결제하기
+  const handlePay = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    if (!userId) {
+      toast.error("로그인이 필요한 서비스입니다.");
+      return;
+    }
+
+    try {
+      await createPayment({
+        userId,
+        lessonId,
+        scheduleId,
+        amount: finalPrice,
+        couponId: appliedCoupon?.id || null
+      });
+      toast.success("결제가 완료되었습니다.");
+      navigate("/mypage/class/orders", { replace: true });
+    } catch (error) {
+      console.error("handlePay error:", error);
+      toast.error("결제에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
 
   return (
     <PaySectionCard title="결제 정보">
@@ -176,7 +212,10 @@ export const PayInfoSection = ({
             <span className="text-xl font-black text-foreground">{Math.max(0, finalPrice).toLocaleString()} 원</span>
           </div>
 
-          <Button variant="carrot" size="carrot" className="w-full">
+          <Button variant="carrot" size="carrot" className="w-full"
+            type="button"
+            onClick={handlePay}
+          >
             결제 하기
           </Button>
         </div>

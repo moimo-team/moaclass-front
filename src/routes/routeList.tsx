@@ -105,7 +105,11 @@ export const routeList = [
       },
       {
         path: "/pay-class/:lessonId/:scheduleId/:quantity",
-        element: <ClassPayment />,
+        element: (
+          <ProtectedRoute>
+            <ClassPayment />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/mypage",

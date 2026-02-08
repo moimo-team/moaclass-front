@@ -111,6 +111,8 @@ const ClassPayment = () => {
                         setPointToUse={setPointToUse}
                         subTotal={subTotal}
                         totalPayment={totalPayment}
+                        lessonId={Number(lessonId)}
+                        scheduleId={Number(scheduleId)}
                     />
                 </div>
             </div>
