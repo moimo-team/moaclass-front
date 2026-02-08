@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { LESSON_TAB_TITLES } from "../constants/lessonTabs";
+import { LESSON_TAB_TITLES } from "@/constants/lessonTabs";
 
 interface LessonDetailForTabs {
   id: number;

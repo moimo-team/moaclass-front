@@ -75,7 +75,7 @@ export const LessonDetail = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg text-destructive">
-          {error ? (error as Error).message : "클래스을 찾을 수 없습니다."}
+          {error ? (error as Error).message : "클래스를 찾을 수 없습니다."}
         </div>
       </div>
     );
@@ -177,7 +177,7 @@ export const LessonDetail = () => {
         open={showConfirmApply}
         onOpenChange={setShowConfirmApply}
         title="클래스 신청 확인"
-        description={`선택하신 날짜(${tempSelectedDate ? formatClassCreateDate(tempSelectedDate) : "날짜 미선택"})에 ${tempHeadcount}명으로 클래스을 신청하시겠습니까?`}
+        description={`선택하신 날짜(${tempSelectedDate ? formatClassCreateDate(tempSelectedDate) : "날짜 미선택"})에 ${tempHeadcount}명으로 클래스를 신청하시겠습니까?`}
         confirmText="신청하기"
         cancelText="취소"
         onConfirm={confirmApplyAction}

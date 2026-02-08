@@ -45,13 +45,14 @@ export const LessonHeader = ({
           {subClassCategories &&
             subClassCategories.length > 0 &&
             subClassCategories.map((subCat) => (
-                          <Badge
-                            key={subCat.id}
-                            variant="default" // Change to default for more distinction
-                            className="bg-muted text-foreground/70 hover:bg-muted/80 text-base px-3 py-1.5 font-medium border-border/50"
-                          >
-                            {subCat.name}
-                          </Badge>            ))}
+              <Badge
+                key={subCat.id}
+                variant="default"
+                className="bg-muted text-foreground/70 hover:bg-muted/80 text-base px-3 py-1.5 font-medium border-border/50"
+              >
+                {subCat.name}
+              </Badge>
+            ))}
         </div>
         <h1 className="text-4xl font-bold text-foreground">{title}</h1>
         <div className="flex items-center gap-4 text-lg text-foreground/80">

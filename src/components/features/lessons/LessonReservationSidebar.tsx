@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { FaRegHeart, FaCalendarAlt } from "react-icons/fa";
 import { toast } from "sonner";
-import { toYYYYMMDD } from "@/utils/dateFormat";
+import { toYYYYMMDD, formatDateToYYYYMMDD_DOT } from "@/utils/dateFormat";
 import {
   Popover,
   PopoverContent,
@@ -26,15 +26,6 @@ interface LessonReservationSidebarProps {
   onApplyLesson: (selectedDate: string | undefined, headcount: number) => void;
   showLoginPrompt: (show: boolean) => void;
 }
-
-const formatDateToYYYYMMDD_DOT = (dateString: string | undefined): string => {
-  if (!dateString) return "날짜 선택";
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const day = date.getDate().toString().padStart(2, "0");
-  return `${year}.${month}.${day}`;
-};
 
 export const LessonReservationSidebar = ({
   reservationLeadDays,
@@ -84,7 +75,9 @@ export const LessonReservationSidebar = ({
     <div className="md:col-span-1">
       <div className="sticky top-12 space-y-6">
         <Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl p-6">
-          <h2 className="text-xl md:text-2xl font-bold mb-4">클래스 예약하기</h2>
+          <h2 className="text-xl md:text-2xl font-bold mb-4">
+            클래스 예약하기
+          </h2>
 
           {/* 날짜 선택 */}
           <div className="mb-6">
@@ -99,7 +92,7 @@ export const LessonReservationSidebar = ({
                   )}
                 >
                   <FaCalendarAlt className="mr-2 h-4 w-4 text-primary" />
-                  {formatDateToYYYYMMDD_DOT(selectedDate)}
+                  {selectedDate ? formatDateToYYYYMMDD_DOT(selectedDate) : "날짜 선택"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -116,9 +109,13 @@ export const LessonReservationSidebar = ({
           </div>
 
           <div className="bg-secondary/20 p-4 rounded-md mb-6">
-            <p className="text-xs sm:text-sm text-muted-foreground">최소 예약 {reservationLeadDays}일 전 예약 가능합니다.</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              최소 예약 {reservationLeadDays}일 전 예약 가능합니다.
+            </p>
             {/* TODO: 인원별 할인 정책 추가 */}
-            <p className="text-xs sm:text-sm text-muted-foreground">인원별 할인 정책은 현재 적용되지 않습니다.</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              인원별 할인 정책은 현재 적용되지 않습니다.
+            </p>
           </div>
 
           <div className="mb-6">
