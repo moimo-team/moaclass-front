@@ -1,4 +1,5 @@
 export type DiscountType = "FIXED" | "PERCENT";
+export type CouponStatus = "USED" | "AVAILABLE" | "EXPIRED";
 
 // 쿠폰
 export interface Coupons {
@@ -24,5 +25,5 @@ export interface userCoupons {
 }
 
 export type CouponInfo = Partial<Coupons> & {
-    status?: string;
+    status?: CouponStatus;
 };

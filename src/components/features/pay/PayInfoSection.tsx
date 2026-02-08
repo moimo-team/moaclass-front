@@ -38,7 +38,7 @@ export const PayInfoSection = ({
 }: PayInfoSectionProps) => {
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<CouponInfo | null>(null);
-  const { data: availableCoupons } = useAvailableCouponsQuery(1);
+  const { data: availableCoupons } = useAvailableCouponsQuery();
 
   const handleApplyCoupon = (coupon: CouponInfo) => {
     setAppliedCoupon(coupon);

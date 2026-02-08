@@ -23,6 +23,28 @@ export const coupons: Coupons[] = [
         currentUsage: 0,
         validFrom: "2024-01-01T00:00:00",
         validUntil: "2026-12-31T23:59:59"
+    },
+    {
+        id: 3,
+        code: "EXPIRED_COUPON",
+        description: "만료된 할인 쿠폰",
+        discountType: "PERCENT",
+        discountValue: 15,
+        maxUsage: 100,
+        currentUsage: 50,
+        validFrom: "2025-01-01T00:00:00",
+        validUntil: "2025-12-31T23:59:59" // 이미 만료됨
+    },
+    {
+        id: 4,
+        code: "USED_COUPON",
+        description: "이미 사용한 3000원 할인 쿠폰",
+        discountType: "FIXED",
+        discountValue: 3000,
+        maxUsage: 1,
+        currentUsage: 1,
+        validFrom: "2025-01-01T00:00:00",
+        validUntil: "2026-03-31T23:59:59"
     }
 ];
 
@@ -32,7 +54,7 @@ export const userCouponsData: userCoupons[] = [
     {
         id: 101,
         userId: 1,
-        couponId: 1, // [겨울방학 특가]
+        couponId: 1, // [겨울방학 특가] - 사용 가능
         isUsed: false,
         usedAt: "",
         issuedAt: "2026-01-15T10:00:00"
@@ -40,9 +62,25 @@ export const userCouponsData: userCoupons[] = [
     {
         id: 102,
         userId: 1,
-        couponId: 2, // 첫 주문 감사
+        couponId: 2, // 첫 주문 감사 - 사용 가능
         isUsed: false,
         usedAt: "",
         issuedAt: "2026-02-01T09:00:00"
+    },
+    {
+        id: 103,
+        userId: 1,
+        couponId: 3, // 만료된 쿠폰
+        isUsed: false,
+        usedAt: "",
+        issuedAt: "2025-06-01T09:00:00"
+    },
+    {
+        id: 104,
+        userId: 1,
+        couponId: 4, // 사용 완료된 쿠폰
+        isUsed: true,
+        usedAt: "2026-01-20T14:30:00",
+        issuedAt: "2026-01-10T09:00:00"
     }
 ];

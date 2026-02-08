@@ -16,7 +16,7 @@ import { combineDateAndTime, formatClassCreateDate } from "@/utils/dateFormat";
 // }
 
 interface CouponCardProps {
-    availableCoupon?: CouponInfo;
+    coupon?: CouponInfo;
     index?: number;
     selected?: boolean;
     onClick?: () => void;
@@ -24,13 +24,11 @@ interface CouponCardProps {
 }
 
 export const CouponCard = ({
-    availableCoupon,
+    coupon,
     selected = false,
     onClick,
     showSelectionIndicator = false
 }: CouponCardProps) => {
-    const coupon = availableCoupon;
-
     if (!coupon) return null;
 
     const isAvailable = coupon.status === 'AVAILABLE' || !coupon.status; // Default to available if status is missing
