@@ -12,6 +12,7 @@ import {
   LESSON_CATEGORIES,
   LESSON_SUB_CATEGORIES,
 } from "@/mock/mockData/categoryMock";
+import type { Review, UserProfileForReview } from "@/models/review.model";
 
 export const httpUrl =
   import.meta.env.VITE_API_URL || "https://moimo-back.vercel.app";
@@ -220,6 +221,37 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
     ),
   };
 });
+
+// Mock 리뷰 데이터
+export const mockReviews: Review[] = mockLessons.flatMap((lesson) =>
+  Array.from(
+    { length: faker.number.int({ min: 0, max: 10 }) }, // 각 레슨당 0~10개의 리뷰 생성
+    () => {
+      const userProfile: UserProfileForReview = {
+        id: faker.number.int({ min: 1, max: 1000 }),
+        nickname: faker.person.fullName(),
+        profile_image: faker.image.avatar(),
+      };
+
+      return {
+        id: faker.number.int({ min: 1000, max: 9999 }),
+        user: userProfile,
+        lesson_id: lesson.id,
+        rating: faker.number.float({ min: 1.0, max: 5.0 }),
+        representative_image: faker.datatype.boolean()
+          ? faker.image.urlLoremFlickr({
+              category: "food",
+              width: 400,
+              height: 300,
+            })
+          : null,
+        content: faker.lorem.paragraphs(faker.number.int({ min: 1, max: 4 })),
+        created_at: faker.date.recent().toISOString(),
+        updated_at: faker.date.recent().toISOString(),
+      };
+    },
+  ),
+);
 
 // 내 참여모임
 export const myMeetings: MyMeetingsResponse[] = Array.from(

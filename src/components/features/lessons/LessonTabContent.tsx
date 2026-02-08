@@ -4,6 +4,9 @@ import { cn } from "@/lib/utils";
 import KakaoMapView from "@/components/features/map/kakaoMaps/KakaoMapView";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import type { Review } from "@/models/review.model";
+import { ReviewList } from "@components/features/lessons/ReviewList";
+import defaultProfileImage from "@/assets/images/profile.png";
 
 interface LessonTabContentProps {
   activeTab: string;
@@ -16,8 +19,8 @@ interface LessonTabContentProps {
     | {
         userId: number;
         nickname: string;
-        image?: string;
-        introduction?: string;
+        image: string;
+        introduction: string;
       }
     | undefined;
   latitude: number;
@@ -26,6 +29,7 @@ interface LessonTabContentProps {
   detailAddress: string;
   directionsText: string;
   navigate: ReturnType<typeof useNavigate>;
+  reviews: Review[];
 }
 
 export const LessonTabContent = ({
@@ -42,6 +46,7 @@ export const LessonTabContent = ({
   detailAddress,
   directionsText,
   navigate,
+  reviews,
 }: LessonTabContentProps) => {
   return (
     <>
@@ -69,7 +74,7 @@ export const LessonTabContent = ({
         <section id="intro" ref={(el) => onSectionRef("intro", el)}>
           <Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
             <CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
-              <CardTitle className="text-xl font-bold">레슨 소개</CardTitle>
+              <CardTitle className="text-xl font-bold">클래스 소개</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <div className="text-base text-foreground whitespace-pre-wrap leading-relaxed">
@@ -101,10 +106,7 @@ export const LessonTabContent = ({
               {teacherProfile && (
                 <div className="flex items-center gap-4 mb-6 p-4 border rounded-lg bg-secondary/10">
                   <img
-                    src={
-                      teacherProfile.image ||
-                      "https://i.pravatar.cc/150?img=dummy" // TODO: 임시 데이터 삭제
-                    }
+                    src={teacherProfile.image || defaultProfileImage}
                     alt={teacherProfile.nickname}
                     className="w-20 h-20 rounded-full object-cover border border-border flex-shrink-0"
                   />
@@ -164,10 +166,7 @@ export const LessonTabContent = ({
               <CardTitle className="text-xl font-bold">후기</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <p className="text-muted-foreground">
-                {/* TODO: 후기 목록 컴포넌트 추가 */}
-                아직 후기가 없습니다.
-              </p>
+              <ReviewList reviews={reviews} />
             </CardContent>
           </Card>
         </section>
