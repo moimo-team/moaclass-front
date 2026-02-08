@@ -9,9 +9,9 @@ const MypageSession = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex w-full flex-col md:flex-row flex-1 bg-background">
+    <div className="flex w-full flex-col lg:flex-row flex-1 bg-background">
       {/* Mobile Header - 화면 너비 768px 미만일 때 표시 */}
-      <div className="md:hidden p-4 border-b flex items-center bg-white sticky top-0 z-10">
+      <div className="lg:hidden p-4 border-b flex items-center bg-white sticky top-0 z-10">
         <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="-ml-2">
@@ -28,12 +28,12 @@ const MypageSession = () => {
       </div>
 
       {/* Desktop leftSidebar - 마이페이지바 (MD 이상에서만 보임) */}
-      <div className="hidden md:flex flex-[1] shrink-0 flex-col overflow-hidden">
+      <div className="hidden lg:flex flex-[1] shrink-0 flex-col overflow-hidden">
         <MypageSidebar />
       </div>
 
       {/* 메인 영역 - 스크롤 가능하도록 설정 */}
-      <div className="flex flex-col overflow-hidden flex-[4] p-4 md:p-0 md:pl-12">
+      <div className="flex flex-col overflow-hidden flex-[4] p-4 lg:p-0 lg:pl-12">
         <Outlet />
       </div>
     </div>

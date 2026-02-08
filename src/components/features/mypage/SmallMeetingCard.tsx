@@ -22,7 +22,7 @@ const SmallMeetingCard = ({
   return (
     <Card
       key={meeting.meetingId}
-      className={`relative flex flex-col md:flex-row md:items-center p-4 md:p-6 transition-shadow border-none shadow-none gap-4 md:gap-0 
+      className={`relative flex flex-col lg:flex-row lg:items-center p-4 lg:p-6 transition-shadow border-none shadow-none gap-4 lg:gap-0 
           ${className} ${meeting.status === "PENDING" || meeting.isCompleted
           ? "bg-gray-100"
           : "bg-white border border-gray-100 shadow-sm"
@@ -37,7 +37,7 @@ const SmallMeetingCard = ({
       <div className="flex-1 w-full">
         <Link
           to={`/meetings/${meeting.meetingId}`}
-          className="flex items-center gap-2 mb-2 md:mb-3"
+          className="flex items-center gap-2 mb-2 lg:mb-3"
         >
           <h3 className="text-lg font-bold text-gray-900 line-clamp-1">
             {meeting.title}
@@ -58,7 +58,7 @@ const SmallMeetingCard = ({
           </div>
         </div>
       </div>
-      <div className="flex gap-2 w-full md:w-auto justify-end">{children}</div>
+      <div className="flex gap-2 w-full lg:w-auto justify-end">{children}</div>
     </Card>
   );
 };
