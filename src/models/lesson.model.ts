@@ -95,18 +95,6 @@ export interface TeacherProfileRequest {
   introduction: string;
 }
 
-// 클래스 카드 데이터 (관리 페이지용)
-export interface ClassCardData {
-  id: number;
-  title: string;
-  category: string;
-  thumbnailImage: string;
-  status: LessonStatus;
-  createdAt: string;
-  price: number;            
-  discountRate: number;      
-  discountedPrice: number;  
-}
 
 // 클래스 목록 조회 params & response
 export interface FetchLessonsParams {
