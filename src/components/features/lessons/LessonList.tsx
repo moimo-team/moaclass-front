@@ -32,9 +32,9 @@ const LessonList = ({ lessons, onToggleLike }: LessonListProps) => {
         {lessons.map((lesson) => (
           <CarouselItem
             key={lesson.id}
-            className="pl-3 md:basis-1/3 lg:basis-1/4"
+            className="pl-3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
           >
-            <div className="p-1">
+            <div className="p-1 h-full">
               <LessonCard lesson={lesson} onToggleLike={onToggleLike} />
             </div>
           </CarouselItem>

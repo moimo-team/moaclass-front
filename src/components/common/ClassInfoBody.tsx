@@ -31,15 +31,15 @@ export function ClassInfoBody({
   return (
     <div className={cn("flex flex-col gap-2", className)}>
       {showDate && createdAt && (
-        <p className="text-xs text-muted-foreground">
+        <p className="text-[11px] text-muted-foreground">
           {createdAt}
         </p>
       )}
 
       <div className="flex items-start justify-between gap-2">
         <h3 className={cn(
-          "font-nanum-bold text-base line-clamp-1 break-all flex-1 text-gray-900",
-          titleClassName
+          "font-nanum-bold text-base leading-tight text-gray-900 break-words flex-1 overflow-hidden",
+          titleClassName || "line-clamp-1"
         )}>
           {title}
         </h3>
@@ -48,21 +48,21 @@ export function ClassInfoBody({
         </span>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-end gap-2">
         {discountRate > 0 && (
-          <span className="text-sm font-bold text-red-500">
+          <span className="text-primary font-bold text-lg mb-0.5">
             {discountRate}%
           </span>
         )}
-        <div className="flex items-baseline gap-1.5 font-nanum-bold">
-          <span className="text-base text-gray-900">
-            {discountedPrice.toLocaleString()}원
-          </span>
+        <div className="flex flex-col">
           {discountRate > 0 && (
-            <span className="text-xs text-gray-400 line-through font-normal">
+            <span className="text-[10px] text-gray-400 line-through mb-[-3px] font-normal">
               {price.toLocaleString()}원
             </span>
           )}
+          <span className="text-lg font-bold text-gray-900">
+            {discountedPrice.toLocaleString()}원
+          </span>
         </div>
       </div>
     </div>
