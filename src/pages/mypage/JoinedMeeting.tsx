@@ -21,8 +21,8 @@ const JoinedMeeting = () => {
 
 
   return (
-    <div className="w-full h-full py-10 bg-white overflow-y-auto">
-      <div className="flex justify-between items-start mb-8">
+    <div className="w-full h-full py-6 md:py-10 bg-white overflow-y-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
         <h1 className="text-2xl font-bold text-gray-900">참여 모임</h1>
         <Select value={filter} onValueChange={(value) => { setFilter(value); setPage(1); }}>
           <SelectTrigger className="w-[120px]">

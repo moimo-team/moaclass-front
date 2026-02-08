@@ -5,7 +5,12 @@ import { NavLink } from "react-router-dom";
 import defaultProfile from "@/assets/images/profile.png";
 import { toast } from "sonner";
 
-export const MypageSidebar = () => {
+
+interface MypageSidebarProps {
+    onMenuItemClick?: () => void;
+}
+
+export const MypageSidebar = ({ onMenuItemClick }: MypageSidebarProps) => {
 
     const { data: user } = useAuthQuery();
 
@@ -45,6 +50,7 @@ export const MypageSidebar = () => {
                     <div>
                         <NavLink
                             to="/mypage/profile"
+                            onClick={onMenuItemClick}
                             className={({ isActive }) =>
                                 `block text-lg font-bold transition-colors ${isActive ? "text-primary" : "text-gray-900 hover:text-gray-700"
                                 }`
@@ -60,6 +66,7 @@ export const MypageSidebar = () => {
                         <div className="flex flex-col gap-3 pl-2">
                             <NavLink
                                 to="/mypage/class/wish-list"
+                                onClick={onMenuItemClick}
                                 className={({ isActive }) =>
                                     `transition-colors ${isActive ? "text-primary font-bold" : "text-gray-500 hover:text-gray-900"
                                     }`
@@ -69,6 +76,7 @@ export const MypageSidebar = () => {
                             </NavLink>
                             <NavLink
                                 to="/mypage/class/points"
+                                onClick={onMenuItemClick}
                                 className={({ isActive }) =>
                                     `transition-colors ${isActive ? "text-primary font-bold" : "text-gray-500 hover:text-gray-900"
                                     }`
@@ -78,6 +86,7 @@ export const MypageSidebar = () => {
                             </NavLink>
                             <NavLink
                                 to="/mypage/class/coupons"
+                                onClick={onMenuItemClick}
                                 className={({ isActive }) =>
                                     `transition-colors ${isActive ? "text-primary font-bold" : "text-gray-500 hover:text-gray-900"
                                     }`
@@ -87,6 +96,7 @@ export const MypageSidebar = () => {
                             </NavLink>
                             <NavLink
                                 to="/mypage/class/orders"
+                                onClick={onMenuItemClick}
                                 className={({ isActive }) =>
                                     `transition-colors ${isActive ? "text-primary font-bold" : "text-gray-500 hover:text-gray-900"
                                     }`
@@ -103,6 +113,7 @@ export const MypageSidebar = () => {
                         <div className="flex flex-col gap-3 pl-2">
                             <NavLink
                                 to="/mypage/meetings/join"
+                                onClick={onMenuItemClick}
                                 className={({ isActive }) =>
                                     `transition-colors ${isActive ? "text-primary font-bold" : "text-gray-500 hover:text-gray-900"
                                     }`
@@ -112,6 +123,7 @@ export const MypageSidebar = () => {
                             </NavLink>
                             <NavLink
                                 to="/mypage/meetings/hosting"
+                                onClick={onMenuItemClick}
                                 className={({ isActive }) =>
                                     `transition-colors ${isActive ? "text-primary font-bold" : "text-gray-500 hover:text-gray-900"
                                     }`
@@ -128,6 +140,7 @@ export const MypageSidebar = () => {
                         <div className="flex flex-col gap-3 pl-2">
                             <NavLink
                                 to="/classes-manage"
+                                onClick={onMenuItemClick}
                                 className={({ isActive }) =>
                                     `transition-colors ${isActive ? "text-primary font-bold" : "text-gray-500 hover:text-gray-900"
                                     }`
@@ -143,7 +156,10 @@ export const MypageSidebar = () => {
             {/* Footer */}
             <div className="w-full px-8 mt-auto pt-20 pb-4">
                 <button
-                    onClick={() => toast.error("준비 중인 서비스입니다.")}
+                    onClick={() => {
+                        toast.error("준비 중인 서비스입니다.");
+                        onMenuItemClick?.();
+                    }}
                     className="text-gray-400 hover:text-gray-600 text-sm"
                 >
                     탈퇴하기
@@ -152,3 +168,4 @@ export const MypageSidebar = () => {
         </aside>
     );
 };
+

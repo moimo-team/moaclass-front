@@ -52,8 +52,8 @@ const HostMeeting = () => {
 
 
   return (
-    <div className="w-full h-full py-10 bg-white overflow-y-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">내 모임</h1>
+    <div className="w-full h-full py-6 md:py-10 bg-white overflow-y-auto">
+      <h1 className="text-2xl font-bold text-gray-900 mb-6 md:mb-8">내 모임</h1>
 
       {/* 내가 만든 모임 */}
       <div className="space-y-4 mb-10">
