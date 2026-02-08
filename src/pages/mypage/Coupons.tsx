@@ -21,7 +21,7 @@ const mapCouponStatusToTab = (status: CouponStatus): Exclude<TabStatus, '전체'
         'AVAILABLE': '사용가능',
         'EXPIRED': '기간만료'
     };
-    return statusMap[status] || '사용가능';
+    return statusMap[status];
 };
 
 
