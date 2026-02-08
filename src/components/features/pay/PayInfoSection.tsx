@@ -47,8 +47,8 @@ export const PayInfoSection = ({
   const navigate = useNavigate();
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<CouponInfo | null>(null);
+  const { data: availableCoupons } = useAvailableCouponsQuery();
   const { userId } = useAuthStore();
-  const { data: availableCoupons } = useAvailableCouponsQuery(1);
   const { mutateAsync: createPayment } = usePayMutation();
 
   const handleApplyCoupon = (coupon: CouponInfo) => {

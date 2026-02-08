@@ -1,72 +1,55 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PointCouponInfo } from '@/components/features/mypage/PointCouponInfo';
 import { COUPON_TABS } from '@/constants/tabs';
 import { CouponCard } from '@/components/features/coupon/CouponCard';
+import { useUserCouponsQuery } from '@/hooks/useCouponQuery';
+import type { CouponStatus } from '@/models/coupon.model';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
-// 쿠폰 상태 타입
+// 탭 상태 타입
 type TabStatus = typeof COUPON_TABS[number];
-type CouponStatus = Exclude<TabStatus, '전체'>;
 
-// 쿠폰 데이터 인터페이스
-interface Coupon {
-    id: string;
-    name: string;
-    discountLabel: string;
-    expiryDate: string;
-    status: CouponStatus;
-    type: 'percentage' | 'amount';
-    amount: number;
-}
+/**
+ * API 쿠폰 상태를 탭 상태로 변환
+ * @param status API에서 받은 쿠폰 상태 ("USED" | "AVAILABLE" | "EXPIRED")
+ * @returns 탭에서 사용하는 상태 ("사용완료" | "사용가능" | "기간만료")
+ */
+const mapCouponStatusToTab = (status: CouponStatus): Exclude<TabStatus, '전체'> => {
+    const statusMap: Record<CouponStatus, Exclude<TabStatus, '전체'>> = {
+        'USED': '사용완료',
+        'AVAILABLE': '사용가능',
+        'EXPIRED': '기간만료'
+    };
+    return statusMap[status];
+};
 
-const MOCK_COUPONS: Coupon[] = [
-    {
-        id: '1',
-        name: '가입 환영 20% 할인쿠폰',
-        discountLabel: '총 금액에서 20%',
-        expiryDate: '2026.02.28 23:59',
-        status: '사용가능',
-        type: 'percentage',
-        amount: 20
-    },
-    {
-        id: '2',
-        name: '가입 환영 5000원 할인쿠폰',
-        discountLabel: '5,000원',
-        expiryDate: '2026.02.28 23:59',
-        status: '사용가능',
-        type: 'amount',
-        amount: 5000
-    },
-    {
-        id: '3',
-        name: '첫 구매 감사 10% 할인쿠폰',
-        discountLabel: '총 금액에서 10%',
-        expiryDate: '2025.12.31 23:59',
-        status: '기간만료',
-        type: 'percentage',
-        amount: 10
-    },
-    {
-        id: '4',
-        name: '시즌 이벤트 3000원 쿠폰',
-        discountLabel: '3,000원',
-        expiryDate: '2026.01.15 23:59',
-        status: '사용완료',
-        type: 'amount',
-        amount: 3000
-    }
-];
+
 
 const Coupons = () => {
     const [activeTab, setActiveTab] = useState<TabStatus>('사용가능');
+    const { data: userCoupons, isLoading } = useUserCouponsQuery();
 
-    const filteredCoupons = MOCK_COUPONS.filter((coupon) => {
-        if (activeTab === '전체') return true;
-        return coupon.status === activeTab;
-    });
+    // 쿠폰 목록을 탭 상태에 맞게 필터링
+    const filteredCoupons = useMemo(() => {
+        if (!userCoupons) return [];
 
-    const availableCount = MOCK_COUPONS.filter(c => c.status === '사용가능').length;
+        // 전체 탭인 경우 모든 쿠폰 반환
+        if (activeTab === '전체') return userCoupons;
+
+        // 각 쿠폰의 상태를 탭 상태로 변환하여 필터링
+        return userCoupons.filter((coupon) => {
+            if (!coupon.status) return false;
+            const tabStatus = mapCouponStatusToTab(coupon.status);
+            return tabStatus === activeTab;
+        });
+    }, [userCoupons, activeTab]);
+
+    // 사용 가능한 쿠폰 개수 계산
+    const availableCount = useMemo(() => {
+        if (!userCoupons) return 0;
+        return userCoupons.filter(c => c.status === 'AVAILABLE').length;
+    }, [userCoupons]);
 
     return (
         <div className="max-w-3xl mx-auto w-full p-6 space-y-6 bg-white min-h-screen">
@@ -86,23 +69,27 @@ const Coupons = () => {
             />
 
             {/* 쿠폰 리스트 그리드 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                <AnimatePresence mode="popLayout">
-                    {filteredCoupons.map((coupon, index) => (
-                        <motion.div
-                            key={coupon.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            transition={{ delay: index * 0.05 }}
-                        >
-                            <CouponCard coupon={coupon} />
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+                {isLoading ? (
+                    <LoadingSpinner />
+                ) : (
+                    <AnimatePresence mode="popLayout">
+                        {filteredCoupons.map((coupon, index) => (
+                            <motion.div
+                                key={coupon.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                transition={{ delay: index * 0.05 }}
+                            >
+                                <CouponCard coupon={coupon} />
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                )}
             </div>
 
-            {filteredCoupons.length === 0 && (
+            {!isLoading && filteredCoupons.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-20 text-gray-400">
                     <p className="text-lg font-medium">해당되는 쿠폰이 없습니다.</p>
                 </div>

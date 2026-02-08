@@ -124,7 +124,7 @@ function MeetingActionButtons({
 
     // 카드 내부: 관리 + 수정 + 삭제 + 채팅
     return (
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2 justify-end w-full md:w-auto">
         <Button
           variant="outline"
           onClick={handleManageClick}
@@ -144,8 +144,6 @@ function MeetingActionButtons({
             수정
           </Button>
         )}
-
-
 
         <Button
           variant="outline"
