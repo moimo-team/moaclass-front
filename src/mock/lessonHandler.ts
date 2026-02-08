@@ -122,7 +122,7 @@ export const lessonHandlers = [
     await delay(300); // Simulate API call delay
     const lessonId = Number(params.lessonId);
     const filteredReviews = mockReviews.filter(
-      (review) => review.lesson_id === lessonId,
+      (review) => review.lessonId === lessonId,
     );
 
     return HttpResponse.json(filteredReviews, { status: 200 });

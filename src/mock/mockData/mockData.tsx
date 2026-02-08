@@ -230,15 +230,15 @@ export const mockReviews: Review[] = mockLessons.flatMap((lesson) =>
       const userProfile: UserProfileForReview = {
         id: faker.number.int({ min: 1, max: 1000 }),
         nickname: faker.person.fullName(),
-        profile_image: faker.image.avatar(),
+        profileImage: faker.image.avatar(),
       };
 
       return {
         id: faker.number.int({ min: 1000, max: 9999 }),
         user: userProfile,
-        lesson_id: lesson.id,
+        lessonId: lesson.id,
         rating: faker.number.float({ min: 1.0, max: 5.0 }),
-        representative_image: faker.datatype.boolean()
+        representativeImage: faker.datatype.boolean()
           ? faker.image.urlLoremFlickr({
               category: "food",
               width: 400,
@@ -246,8 +246,8 @@ export const mockReviews: Review[] = mockLessons.flatMap((lesson) =>
             })
           : null,
         content: faker.lorem.paragraphs(faker.number.int({ min: 1, max: 4 })),
-        created_at: faker.date.recent().toISOString(),
-        updated_at: faker.date.recent().toISOString(),
+        createdAt: faker.date.recent().toISOString(),
+        updatedAt: faker.date.recent().toISOString(),
       };
     },
   ),

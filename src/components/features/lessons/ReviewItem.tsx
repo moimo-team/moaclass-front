@@ -45,7 +45,7 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({ review }) => {
         <div className="flex items-center gap-3 mb-2">
           <Avatar className="w-10 h-10 border border-border">
             <AvatarImage
-              src={review.user.profile_image || undefined}
+              src={review.user.profileImage || undefined}
               alt={review.user.nickname}
             />
             <AvatarFallback>{review.user.nickname.charAt(0)}</AvatarFallback>
@@ -55,7 +55,7 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({ review }) => {
               {review.user.nickname}
             </p>
             <p className="text-sm text-muted-foreground">
-              {formatDateToYYYYMMDD_DOT(review.created_at)}
+              {formatDateToYYYYMMDD_DOT(review.createdAt)}
             </p>
           </div>
         </div>
@@ -85,9 +85,9 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({ review }) => {
 
       {/* 오른쪽: 후기 이미지 */}
       <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
-        {review.representative_image ? (
+        {review.representativeImage ? (
           <img
-            src={review.representative_image}
+            src={review.representativeImage}
             alt="Review Image"
             className="w-full h-full object-cover rounded-md border border-border"
           />
