@@ -7,7 +7,8 @@ import { useQuery } from "@tanstack/react-query";
  */
 export const useUserCouponsQuery = () => {
     return useQuery({
-        queryKey: ["userCoupons"],
+        // queryKey를 계층적으로 구조화하면 향후 쿼리 무효화(invalidation) 관리가 더 용이해짐
+        queryKey: ["coupons", "me"],
         queryFn: () => getUserCoupons(),
         staleTime: 1000 * 60 * 5, // 5분
         gcTime: 1000 * 60 * 10, // 10분
@@ -20,7 +21,7 @@ export const useUserCouponsQuery = () => {
  */
 export const useAvailableCouponsQuery = () => {
     return useQuery({
-        queryKey: ["availableCoupons"],
+        queryKey: ["coupons", "available"],
         queryFn: () => getAvailableCoupons(),
         staleTime: 1000 * 60 * 5, // 5분
         gcTime: 1000 * 60 * 10, // 10분

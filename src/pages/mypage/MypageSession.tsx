@@ -1,12 +1,17 @@
 import { MypageSidebar } from "@/components/features/mypage/MypageSidebar";
 import { Outlet } from "react-router-dom";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 
 const MypageSession = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // 모바일 사이드바 오픈 함수 메모이제이션
+  const handleMenuItemClick = useCallback(() => {
+    setIsSidebarOpen(false);
+  }, []);
 
   return (
     <div className="flex w-full flex-col lg:flex-row flex-1 bg-background">
@@ -21,7 +26,7 @@ const MypageSession = () => {
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-[300px]">
             {/* 모바일 사이드바에서 메뉴 클릭 시 시트 닫기 */}
-            <MypageSidebar onMenuItemClick={() => setIsSidebarOpen(false)} />
+            <MypageSidebar onMenuItemClick={handleMenuItemClick} />
           </SheetContent>
         </Sheet>
         <h1 className="ml-2 font-bold text-lg">마이페이지</h1>
