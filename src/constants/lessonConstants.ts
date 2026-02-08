@@ -26,6 +26,6 @@ export const getLevelDisplayName = (level: Level): string => {
  * @param displayName - 한글 표시 이름 ("입문" | "중급" | "고급")
  * @returns Level enum 값 또는 매핑되지 않을 경우 undefined
  */
-export const getLevelEnumValue = (displayName: string): Level => {
+export const getLevelEnumValue = (displayName: string): Level | undefined => {
   return REVERSE_LEVEL_MAP[displayName];
 };

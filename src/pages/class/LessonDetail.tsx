@@ -13,6 +13,7 @@ import { LessonTabContent } from "@/components/features/lessons/LessonTabContent
 import { LessonReservationSidebar } from "@/components/features/lessons/LessonReservationSidebar";
 import { useLessonTabs } from "@/hooks/useLessonTabs";
 import { useLessonApplicationConfirmation } from "@/hooks/useLessonApplicationConfirmation";
+import { useLessonReviewsQuery } from "@/hooks/useLessonReviewsQuery";
 
 export const LessonDetail = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
@@ -27,6 +28,12 @@ export const LessonDetail = () => {
     isLoading,
     error,
   } = useLessonQuery(Number(lessonId));
+
+  const {
+    data: reviewsData,
+    isLoading: isReviewsLoading,
+    error: reviewsError,
+  } = useLessonReviewsQuery(Number(lessonId));
 
   const { activeTab, tabTitles, handleTabClick, handleSectionRef } =
     useLessonTabs(lessonDetail);
@@ -67,15 +74,17 @@ export const LessonDetail = () => {
     // TODO: API 연동 필요 (문의 기능)
   };
 
-  if (isLoading) {
+  if (isLoading || isReviewsLoading) {
     return <LoadingSpinner />;
   }
 
-  if (error || !lessonDetail) {
+  if (error || reviewsError || !lessonDetail) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg text-destructive">
-          {error ? (error as Error).message : "클래스을 찾을 수 없습니다."}
+          {error
+            ? (error as Error).message
+            : (reviewsError as Error)?.message || "클래스를 찾을 수 없습니다."}
         </div>
       </div>
     );
@@ -145,6 +154,7 @@ export const LessonDetail = () => {
               detailAddress={detailAddress}
               directionsText={directionsText}
               navigate={navigate}
+              reviews={reviewsData || []}
             />
           </div>
 
@@ -177,7 +187,7 @@ export const LessonDetail = () => {
         open={showConfirmApply}
         onOpenChange={setShowConfirmApply}
         title="클래스 신청 확인"
-        description={`선택하신 날짜(${tempSelectedDate ? formatClassCreateDate(tempSelectedDate) : "날짜 미선택"})에 ${tempHeadcount}명으로 클래스을 신청하시겠습니까?`}
+        description={`선택하신 날짜(${tempSelectedDate ? formatClassCreateDate(tempSelectedDate) : "날짜 미선택"})에 ${tempHeadcount}명으로 클래스를 신청하시겠습니까?`}
         confirmText="신청하기"
         cancelText="취소"
         onConfirm={confirmApplyAction}

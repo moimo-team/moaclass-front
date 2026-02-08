@@ -1,6 +1,6 @@
 import { http, HttpResponse, delay } from "msw";
-import { httpUrl, mockLessons } from "./mockData/mockData";
-import { LESSON_CATEGORIES } from "./mockData/categoryMock";
+import { httpUrl, mockLessons, mockReviews } from "@/mock/mockData/mockData";
+import { LESSON_CATEGORIES } from "@/mock/mockData/categoryMock";
 import type { Level } from "@/models/lesson.model";
 import type { FetchLessonsResponse } from "@/models/lesson.model";
 
@@ -115,5 +115,16 @@ export const lessonHandlers = [
         { status: 404 },
       );
     }
+  }),
+
+  // 레슨 리뷰 목록
+  http.get(`${httpUrl}/lessons/:lessonId/reviews`, async ({ params }) => {
+    await delay(300); // Simulate API call delay
+    const lessonId = Number(params.lessonId);
+    const filteredReviews = mockReviews.filter(
+      (review) => review.lessonId === lessonId,
+    );
+
+    return HttpResponse.json(filteredReviews, { status: 200 });
   }),
 ];
