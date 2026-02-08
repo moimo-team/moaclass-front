@@ -4,20 +4,51 @@ import type { ClassCardData } from "@/models/lesson.model";
 import { CreateClassButton } from "@/components/features/class-manage/CreateClassButton";
 import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
 import CreateClassModal from "@/components/features/modal/create/CreateClassModal";
-import { toast } from "sonner";
+import AlertNotification from "@/components/features/modal/AlertNotification";
 import { formatClassCreateDate } from "@/utils/dateFormat";
-import { MOCK_CLASSES } from "@/constants/mockClassData";
+import { useQuery } from "@tanstack/react-query";
+import { fetchLessons } from "@/api/lesson.api";
+import { useDeleteLessonMutation } from "@/hooks/useLessonMutations";
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const ClassManagementPage = () => {
-  const [classes, setClasses] = useState<ClassCardData[]>(MOCK_CLASSES);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editingClassId, setEditingClassId] = useState<number | null>(null);
   const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
 
+  // 알림 다이얼로그 상태
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertDescription, setAlertDescription] = useState("");
+
+  // 레슨 목록 조회
+  const { data: lessonsResponse, isLoading } = useQuery({
+    queryKey: ["lessons"],
+    queryFn: () => fetchLessons({}),
+    staleTime: 1000 * 60,
+  });
+
+  const { mutate: deleteLesson } = useDeleteLessonMutation();
+
+  // API 데이터를 ClassCardData 형식으로 변환
+  const classes: ClassCardData[] = lessonsResponse?.lessons.map(lesson => ({
+    id: lesson.id,
+    title: lesson.title,
+    category: lesson.classCategory?.name || "미분류",
+    thumbnailImage: lesson.representativeImage,
+    status: lesson.status,
+    createdAt: formatClassCreateDate(lesson.createdAt),
+    price: lesson.price,
+    discountRate: lesson.discountRate,
+    discountedPrice: lesson.discountedPrice,
+  })) || [];
+
   const handleEdit = (id: number) => {
-    toast.info(`클래스 ${id} 수정 (준비중)`);
+    setEditingClassId(id);
+    setCreateModalOpen(true);
   };
 
   const handleDeleteClick = (id: number) => {
@@ -27,10 +58,12 @@ const ClassManagementPage = () => {
 
   const handleDeleteConfirm = () => {
     if (selectedClassId) {
-      setClasses(classes.filter((c) => c.id !== selectedClassId));
-      toast.success("클래스가 삭제되었습니다");
-      setDeleteDialogOpen(false);
-      setSelectedClassId(null);
+      deleteLesson(selectedClassId, {
+        onSuccess: () => {
+          setDeleteDialogOpen(false);
+          setSelectedClassId(null);
+        }
+      });
     }
   };
 
@@ -42,29 +75,24 @@ const ClassManagementPage = () => {
 
   const handleDuplicateConfirm = () => {
     if (selectedClassId) {
-      const original = classes.find((c) => c.id === selectedClassId);
-      if (original) {
-        const newClass: ClassCardData = {
-          ...original,
-          id: Math.max(...classes.map((c) => c.id)) + 1,
-          title: `${original.title} (복제)`,
-          status: "INACTIVE", // 복제된 클래스는 마감 상태
-          createdAt: formatClassCreateDate(new Date().toISOString()),
-        };
-        setClasses([newClass, ...classes]);
-        toast.success("클래스가 복제되었습니다.(내용 수정에서 클래스를 활성화하세요)");
-      }
+      setAlertTitle("준비 중");
+      setAlertDescription("클래스 복제 기능은 준비 중입니다.");
+      setAlertOpen(true);
       setDuplicateDialogOpen(false);
       setSelectedClassId(null);
     }
   };
 
   const handleManage = (id: number) => {
-    toast.info(`클래스 ${id} 관리 페이지 (준비중)`);
+    setAlertTitle("준비 중");
+    setAlertDescription(`클래스 ${id} 관리 페이지는 준비 중입니다.`);
+    setAlertOpen(true);
   };
 
   const handleViewClass = (id: number) => {
-    toast.info(`클래스 ${id} 상세 페이지 (준비중)`);
+    setAlertTitle("준비 중");
+    setAlertDescription(`클래스 ${id} 상세 페이지는 준비 중입니다.`);
+    setAlertOpen(true);
   };
 
   const handleToggleStatus = (id: number) => {
@@ -74,22 +102,22 @@ const ClassManagementPage = () => {
 
   const handleStatusConfirm = () => {
     if (selectedClassId) {
-      setClasses(classes.map((c) => {
-        if (c.id === selectedClassId) {
-          const newStatus = c.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-          toast.success(
-            newStatus === "ACTIVE"
-              ? "클래스가 활성화되었습니다"
-              : "클래스가 휴면 상태로 전환되었습니다"
-          );
-          return { ...c, status: newStatus };
-        }
-        return c;
-      }));
+      setAlertTitle("준비 중");
+      setAlertDescription("상태 변경 기능은 준비 중입니다.");
+      setAlertOpen(true);
       setStatusDialogOpen(false);
       setSelectedClassId(null);
     }
   };
+
+  const handleModalClose = () => {
+    setCreateModalOpen(false);
+    setEditingClassId(null);
+  };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="w-full">
@@ -155,10 +183,20 @@ const ClassManagementPage = () => {
         onConfirm={handleDuplicateConfirm}
       />
 
-      {/* 클래스 생성 모달 */}
+      {/* 클래스 생성/수정 모달 */}
       <CreateClassModal
         open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
+        onOpenChange={handleModalClose}
+        classId={editingClassId || undefined}
+      />
+
+      {/* 알림 다이얼로그 */}
+      <AlertNotification
+        open={alertOpen}
+        onOpenChange={setAlertOpen}
+        title={alertTitle}
+        description={alertDescription}
+        autoCloseDuration={2000}
       />
     </div>
   );
