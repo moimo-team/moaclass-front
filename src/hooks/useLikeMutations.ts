@@ -1,6 +1,19 @@
-import { cancelLike } from "@/api/like.api";
+import { cancelLike, addLike } from "@/api/like.api";
 import type { WishlistResponse } from "@/models/wishlist.model";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+// 좋아요 추가
+export const useAddLikeMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (lessonId: number) => addLike(lessonId),
+    onSuccess: () => {
+      // 위시리스트 캐시 무효화 (다음 방문 시 새로 조회)
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    },
+  });
+};
 
 // 좋아요 취소
 export const useCancelLikeMutation = () => {

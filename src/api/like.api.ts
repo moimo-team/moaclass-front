@@ -14,6 +14,17 @@ export const getWishlist = async (page = 1, limit = 8) => {
   }
 };
 
+// 좋아요 추가
+export const addLike = async (lessonId: number) => {
+  try {
+    const response = await apiClient.post(`/likes/${lessonId}`);
+    return response.data;
+  } catch (error) {
+    console.error("addLike error:", error);
+    throw error;
+  }
+};
+
 // 좋아요 취소
 export const cancelLike = async (lessonId: number) => {
   try {

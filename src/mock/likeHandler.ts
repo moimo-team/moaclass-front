@@ -37,6 +37,50 @@ const getWishlist = http.get(`${httpUrl}/likes/me`, async ({ request }) => {
   );
 });
 
+// 좋아요 추가
+const addLike = http.post(
+  `${httpUrl}/likes/:lessonId`,
+  async ({ request, params }) => {
+    await delay(500);
+
+    const token = request.headers.get("Authorization");
+    if (!token) {
+      return HttpResponse.json(
+        { message: "토큰이 없습니다." },
+        { status: 401 },
+      );
+    }
+
+    const { lessonId } = params;
+
+    WishlistLessons.push({
+      lessonId: Number(lessonId),
+      title: "새로운 클래스",
+      price: 10000,
+      category: {
+        id: 1,
+        name: "프로그래밍",
+      },
+      image: "https://example.com/image.jpg",
+      teacherNickname: "새로운 강사",
+      region: {
+        id: 1,
+        name: "서울시",
+      },
+      address: "서울시 강남구 역삼동 123-45",
+      discountRate: 0,
+      discountedPrice: 10000,
+      likes: 1,
+      rate: 5,
+    });
+
+    return HttpResponse.json(
+      { message: "위시리스트에 추가되었습니다." },
+      { status: 200 },
+    );
+  },
+);
+
 // 좋아요 취소
 const cancelLike = http.delete(
   `${httpUrl}/likes/:lessonId`,
@@ -72,4 +116,4 @@ const cancelLike = http.delete(
   },
 );
 
-export const likeHandlers = [getWishlist, cancelLike];
+export const likeHandlers = [getWishlist, addLike, cancelLike];
