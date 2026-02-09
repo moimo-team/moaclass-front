@@ -7,11 +7,14 @@ import type { ChatRoom, ChatMessage } from "@/models/chat.model";
 import { useLocation } from "react-router-dom";
 import ChatRoomListSection from "@/components/features/chattings/ChatRoomListSection";
 import ChatMessageSection from "@/components/features/chattings/ChatMessageSection";
+import LessonChatRoomListSection from "@/components/features/chattings/LessonChatRoomListSection";
+import LessonChatMessageSection from "@/components/features/chattings/LessonChatMessageSection";
 
 const Chatting = () => {
   const { userId } = useAuthStore();
   const [selectedMeeting, setSelectedMeeting] = useState<ChatRoom | null>(null);
   const [inputValue, setInputValue] = useState("");
+  const [chatType, setChatType] = useState<"meeting" | "lesson">("meeting");
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -102,23 +105,56 @@ const Chatting = () => {
   };
 
   return (
-    <div className="flex flex-row h-[calc(100vh-80px)] bg-background">
-      <ChatRoomListSection
-        chatRooms={chatRooms}
-        isLoading={isLoading}
-        onSelectRoom={setSelectedMeeting}
-        selectedMeetingId={selectedMeeting?.meetingId}
-      />
-      <ChatMessageSection
-        selectedMeeting={selectedMeeting}
-        messages={messages}
-        sendMessage={handleSendMessage}
-        inputValue={inputValue}
-        setInputValue={setInputValue}
-        onBackToList={handleBackToList}
-        scrollRef={scrollRef}
-        userId={userId}
-      />
+    <div className="flex flex-col h-[calc(100vh-80px)] bg-background">
+      <div className="flex justify-around p-4 border-b border-gray-200">
+        {/* type으로 모임과 원데이클래스 채팅을 구분 */}
+        <button
+          className={`px-4 py-2 text-lg font-semibold ${
+            chatType === "meeting"
+              ? "text-primary border-b-2 border-primary"
+              : "text-foreground"
+          }`}
+          onClick={() => setChatType("meeting")}
+        >
+          모임 채팅
+        </button>
+        <button
+          className={`px-4 py-2 text-lg font-semibold ${
+            chatType === "lesson"
+              ? "text-primary border-b-2 border-primary"
+              : "text-foreground"
+          }`}
+          onClick={() => setChatType("lesson")}
+        >
+          레슨 채팅
+        </button>
+      </div>
+
+      {chatType === "meeting" ? (
+        <div className="flex flex-row flex-grow">
+          <ChatRoomListSection
+            chatRooms={chatRooms}
+            isLoading={isLoading}
+            onSelectRoom={setSelectedMeeting}
+            selectedMeetingId={selectedMeeting?.meetingId}
+          />
+          <ChatMessageSection
+            selectedMeeting={selectedMeeting}
+            messages={messages}
+            sendMessage={handleSendMessage}
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            onBackToList={handleBackToList}
+            scrollRef={scrollRef}
+            userId={userId}
+          />
+        </div>
+      ) : (
+        <div className="flex flex-row flex-grow">
+          <LessonChatRoomListSection />
+          <LessonChatMessageSection />
+        </div>
+      )}
     </div>
   );
 };
