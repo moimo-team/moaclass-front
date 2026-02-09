@@ -11,10 +11,9 @@ import Autoplay from "embla-carousel-autoplay";
 
 export interface LessonListProps {
   lessons: Lesson[];
-  onToggleLike?: (lessonId: number, isLiked: boolean) => void;
 }
 
-const LessonList = ({ lessons, onToggleLike }: LessonListProps) => {
+const LessonList = ({ lessons }: LessonListProps) => {
   return (
     <Carousel
       opts={{
@@ -35,7 +34,7 @@ const LessonList = ({ lessons, onToggleLike }: LessonListProps) => {
             className="pl-3 md:basis-1/3 lg:basis-1/4"
           >
             <div className="p-1">
-              <LessonCard lesson={lesson} onToggleLike={onToggleLike} />
+              <LessonCard lesson={lesson} />
             </div>
           </CarouselItem>
         ))}

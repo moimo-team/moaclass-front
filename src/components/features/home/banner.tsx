@@ -10,7 +10,7 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom"; // Added Link import
+import { Link } from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -102,17 +102,17 @@ function Banner() {
           <div className="absolute bottom-16 flex flex-col items-center gap-4">
             <div className="text-center">
               <h2 className="text-xl md:text-2xl font-bold text-carrot">
-                모아클 회원가입 이벤트
+                쿠킹 클래스 찾기
               </h2>
               <p className="text-2xl md:text-3xl font-bold text-carrot">
-                지금 가입하고 특별한 혜택을 누리세요!
+                따뜻한 쿠킹으로 힐링하는 시간!
               </p>
             </div>
             <Button
               className="bg-carrot hover:bg-carrot-hover text-white"
               asChild
             >
-              <Link to="/login">회원가입</Link>
+              <Link to="/lessons?category=쿠킹">클래스 구경하기</Link>
             </Button>
           </div>
         </div>

@@ -2,7 +2,6 @@ import { useLatestLessonsQuery } from "@/hooks/useLessonsQuery";
 import { Link } from "react-router-dom";
 import LessonList from "@/components/features/lessons/LessonList";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useLessonLikeMutation } from "@/hooks/useLessonLikeMutation";
 
 interface LessonListSectionProps {
   title: string;
@@ -17,13 +16,7 @@ function LessonListSection({
 }: LessonListSectionProps) {
   const { data: lessons, isLoading, isError } = useLatestLessonsQuery();
 
-  const { mutate: toggleLike } = useLessonLikeMutation();
-
   const safeLessons = lessons || [];
-
-  const handleToggleLike = (lessonId: number, newIsLiked: boolean) => {
-    toggleLike({ lessonId, newIsLiked });
-  };
 
   if (hideIfEmpty && !isLoading && safeLessons.length === 0) {
     return null;
@@ -52,7 +45,7 @@ function LessonListSection({
         </p>
       )}
       {!isLoading && !isError && safeLessons.length > 0 && (
-        <LessonList lessons={safeLessons} onToggleLike={handleToggleLike} />
+        <LessonList lessons={safeLessons} />
       )}
       {!isLoading && !isError && safeLessons.length === 0 && (
         <p className="text-center py-16">수업이 없습니다.</p>
