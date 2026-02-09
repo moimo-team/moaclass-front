@@ -13,6 +13,7 @@ interface FormInputProps {
   suffix?: string;
   error?: string;
   className?: string;
+  onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 /**
@@ -33,6 +34,7 @@ export const FormInput = ({
   suffix,
   error,
   className = "",
+  onFocus,
 }: FormInputProps) => {
   return (
     <div className="space-y-2">
@@ -46,6 +48,7 @@ export const FormInput = ({
           placeholder={placeholder}
           className={`h-12 bg-white border-gray-200 rounded-lg focus-visible:ring-yellow-400 pr-10 ${className}`}
           maxLength={maxLength}
+          onFocus={onFocus}
         />
         {suffix && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium">

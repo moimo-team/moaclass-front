@@ -4,16 +4,21 @@ interface CreateClassButtonProps {
   onClick: () => void;
 }
 
-export function CreateClassButton({ onClick }: CreateClassButtonProps) {
+export const CreateClassButton = ({ onClick }: CreateClassButtonProps) => {
   return (
     <div
       onClick={onClick}
-      className="border-2 border-primary/50 border-muted-foreground/30 rounded-lg bg-muted/20 hover:bg-muted/40 hover:border-primary/50 transition-colors cursor-pointer flex flex-col items-center justify-center aspect[3/4] min-h-[350px]"
+      className="group relative border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/30 hover:bg-primary/5 hover:border-primary/40 transition-all duration-500 cursor-pointer flex flex-col items-center justify-center w-full aspect-[3/4.2] shadow-sm overflow-hidden"
     >
-      <Plus className="h-16 w-16 text-primary mb-4" />
-      <p className="font-nanum-bold text-lg text-primary">
-        클래스 생성하기
+      <div className="bg-white rounded-full p-5 mb-5 shadow-sm border border-gray-100 group-hover:scale-110 group-hover:bg-primary group-hover:border-primary transition-all duration-500">
+        <Plus className="h-8 w-8 text-primary group-hover:text-white transition-colors" />
+      </div>
+      <p className="font-nanum-bold text-lg text-gray-500 group-hover:text-primary transition-colors text-center px-6">
+        클래스 추가하기
       </p>
+
+      {/* 장식용 하단 바 */}
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-100/50 group-hover:bg-primary/30 transition-colors duration-500" />
     </div>
   );
-}
+};
