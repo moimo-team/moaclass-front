@@ -5,6 +5,8 @@ import PaginationComponent from "@/components/common/PaginationComponent";
 import { useWishlistQuery } from "@/hooks/useWishlistQuery";
 import { convertWishlistItemToLesson } from "@/models/wishlist.model";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { useCancelLikeMutation } from "@/hooks/useLikeMutations";
+import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -14,6 +16,8 @@ const WishList = () => {
     page,
     ITEMS_PER_PAGE,
   );
+
+  const cancelLikeMutation = useCancelLikeMutation();
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -27,16 +31,10 @@ const WishList = () => {
     );
   }
 
-  const handleToggleLike = (lessonId: number) => {
-    // 실제 API 연동 시에는 여기서 삭제 요청을 보냄
-    // setWishLessons(prev => {
-    //     const newList = prev.filter(lesson => lesson.id !== lessonId);
-    //     const newTotalPages = Math.ceil(newList.length / ITEMS_PER_PAGE);
-    //     if (page > newTotalPages && newTotalPages > 0) {
-    //         setPage(newTotalPages);
-    //     }
-    //     return newList;
-    // });
+  const handleToggleLike = async (lessonId: number, isLiked: boolean) => {
+    if (isLiked) {
+      await cancelLikeMutation.mutateAsync(lessonId);
+    }
   };
 
   return (
@@ -66,7 +64,7 @@ const WishList = () => {
             >
               <LessonCard
                 lesson={convertWishlistItemToLesson(wishLesson)}
-                onToggleLike={() => handleToggleLike(wishLesson.lessonId)}
+                onToggleLike={() => handleToggleLike(wishLesson.lessonId, true)}
               />
             </motion.div>
           ))}
