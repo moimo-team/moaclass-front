@@ -42,7 +42,7 @@ function LessonListSection({
       {isLoading && (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3 justify-items-center">
           {[...Array(4)].map((_, index) => (
-            <Skeleton key={index} className="w-full h-80 rounded-lg" />
+            <Skeleton key={index} className="w-full h-[380px] rounded-lg" />
           ))}
         </div>
       )}

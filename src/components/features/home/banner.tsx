@@ -10,6 +10,7 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom"; // Added Link import
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,24 +47,24 @@ function Banner() {
     api?.scrollTo(index);
   };
 
-  // TODO: 하드코딩된 데이터 제거
+  // TODO: 배너 데이터 API로 대체
   const bannerItems = [
     {
       id: 1,
       content: (
-        <div className="w-full h-full bg-blue-100 flex items-center justify-center relative">
+        <div className="w-full h-full bg-accent flex items-center justify-center relative">
           <div className="absolute bottom-16 flex flex-col items-center gap-4">
             <div className="text-center">
-              <h2 className="text-xl md:text-2xl font-bold text-blue-800">
+              <h2 className="text-xl md:text-2xl font-bold text-primary">
                 새해 맞이 원데이 클래스
               </h2>
-              <p className="text-2xl md:text-3xl font-bold text-blue-900">
+              <p className="text-2xl md:text-3xl font-bold text-primary">
                 10% 할인 쿠폰 증정
               </p>
             </div>
             <Button
               onClick={() => setIsModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-primary hover:bg-primary/90 text-white"
             >
               쿠폰 받기
             </Button>
@@ -74,16 +75,46 @@ function Banner() {
     {
       id: 2,
       content: (
-        <div className="w-full h-full bg-green-100 flex items-center justify-center">
-          <h2 className="text-2xl font-bold text-green-800">두 번째 배너</h2>
+        <div className="w-full h-full bg-green-100 flex items-center justify-center relative">
+          <div className="absolute bottom-16 flex flex-col items-center gap-4">
+            <div className="text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-green-800">
+                일일 모임 구경하기
+              </h2>
+              <p className="text-2xl md:text-3xl font-bold text-foreground">
+                다양한 주제의 모임으로 일상을 특별하게!
+              </p>
+            </div>
+            <Button
+              className="bg-green-600 hover:bg-green-700 text-white"
+              asChild
+            >
+              <Link to="/">구경하기</Link>
+            </Button>
+          </div>
         </div>
       ),
     },
     {
       id: 3,
       content: (
-        <div className="w-full h-full bg-yellow-100 flex items-center justify-center">
-          <h2 className="text-2xl font-bold text-yellow-800">세 번째 배너</h2>
+        <div className="w-full h-full bg-yellow-100 flex items-center justify-center relative">
+          <div className="absolute bottom-16 flex flex-col items-center gap-4">
+            <div className="text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-carrot">
+                모아클 회원가입 이벤트
+              </h2>
+              <p className="text-2xl md:text-3xl font-bold text-carrot">
+                지금 가입하고 특별한 혜택을 누리세요!
+              </p>
+            </div>
+            <Button
+              className="bg-carrot hover:bg-carrot-hover text-white"
+              asChild
+            >
+              <Link to="/login">회원가입</Link>
+            </Button>
+          </div>
         </div>
       ),
     },

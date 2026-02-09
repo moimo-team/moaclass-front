@@ -24,7 +24,7 @@ const ReviewListSection = () => {
   return (
     <div className="w-full py-8 pt-12">
       <div className="flex justify-between w-full mb-4">
-        <div className="text-xl font-bold ">"모멘티들의 따끈따끈한 후기"</div>
+        <div className="text-xl font-bold ">모멘티들의 따끈따끈한 후기</div>
       </div>
       {isLoading && (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3 justify-items-center">
