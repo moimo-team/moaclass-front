@@ -8,27 +8,26 @@ import { getDisplayAddress } from "@/utils/formatAddress";
 import defaultLessonImage from "@/assets/images/moimer-intro.png";
 import defaultProfileImage from "@/assets/images/profile.png";
 import { ClassInfoBody } from "@/components/common/ClassInfoBody";
+import { useLessonLikeMutation } from "@/hooks/useLessonLikeMutation";
 
 interface LessonCardProps {
   lesson: Lesson;
   className?: string;
-  onToggleLike?: (lessonId: number, isLiked: boolean) => void;
 }
 
-export function LessonCard({
-  lesson,
-  className,
-  onToggleLike,
-}: LessonCardProps) {
+export function LessonCard({ lesson, className }: LessonCardProps) {
   const { id, title, address, isLiked } = lesson;
   const href = `/lessons/${id}`;
+
+  const { mutate: toggleLike, isPending: isLiking } = useLessonLikeMutation([
+    ["lessons"],
+  ]);
 
   const handleLikeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (onToggleLike) {
-      onToggleLike(id, !isLiked);
-    }
+
+    toggleLike({ lessonId: id, newIsLiked: !isLiked });
   };
 
   return (
@@ -51,16 +50,21 @@ export function LessonCard({
           />
 
           {/* 좋아요 아이콘 */}
-          <div
-            className="absolute top-2 right-2 z-20 cursor-pointer"
+          <button
+            type="button"
+            className={cn(
+              "absolute top-2 right-2 z-20 cursor-pointer p-1 rounded-full hover:bg-black/10 transition-colors",
+              isLiking && "pointer-events-none opacity-70 animate-pulse",
+            )}
             onClick={handleLikeClick}
+            aria-label={isLiked ? "좋아요 취소" : "좋아요"}
           >
             {isLiked ? (
               <IoIosHeart className="text-red-500 text-3xl" />
             ) : (
               <IoIosHeartEmpty className="text-white text-3xl drop-shadow-md" />
             )}
-          </div>
+          </button>
         </div>
 
         {/* 정보 섹션 */}
@@ -69,8 +73,12 @@ export function LessonCard({
             {/* 평점, 좋아요, 지역 위치 정보 */}
             <div className="flex justify-between items-center text-[11px] text-gray-500">
               <div className="flex items-center gap-2">
-                <span className="flex items-center gap-0.5">⭐ {lesson.rate.toFixed(1)}</span>
-                <span className="flex items-center gap-0.5">❤️ {lesson.likes}</span>
+                <span className="flex items-center gap-0.5">
+                  ⭐ {lesson.rate.toFixed(1)}
+                </span>
+                <span className="flex items-center gap-0.5">
+                  ❤️ {lesson.likes}
+                </span>
               </div>
               <div className="flex items-center gap-1">
                 <IoLocationOutline className="w-3 h-3 text-primary" />
