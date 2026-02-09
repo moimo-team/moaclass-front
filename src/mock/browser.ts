@@ -12,6 +12,7 @@ import { regionHandler } from "./regionHandler";
 import { categoryHandler } from "./categoryHandler";
 import { payHandler } from "./payHandler";
 import { couponHandlers } from "./couponHandler";
+import { wishlistHandlers } from "./wishlistHandler";
 
 const handlers = [
   ...authHandler,
@@ -26,7 +27,8 @@ const handlers = [
   ...regionHandler,
   ...categoryHandler,
   ...payHandler,
-  ...couponHandlers
+  ...couponHandlers,
+  ...wishlistHandlers,
 ];
 
 export const worker = setupWorker(...handlers);
