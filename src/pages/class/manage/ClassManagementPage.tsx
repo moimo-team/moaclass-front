@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { ClassManageCard } from "@/components/features/class-manage/ClassManageCard";
-import type { ClassCardData } from "@/models/lesson.model";
 import { CreateClassButton } from "@/components/features/class-manage/CreateClassButton";
 import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
 import CreateClassModal from "@/components/features/modal/create/CreateClassModal";
 import AlertNotification from "@/components/features/modal/AlertNotification";
-import { formatClassCreateDate } from "@/utils/dateFormat";
 import { useQuery } from "@tanstack/react-query";
 import { fetchLessons } from "@/api/lesson.api";
 import { useDeleteLessonMutation } from "@/hooks/useLessonMutations";
@@ -33,18 +31,8 @@ const ClassManagementPage = () => {
 
   const { mutate: deleteLesson } = useDeleteLessonMutation();
 
-  // API 데이터를 ClassCardData 형식으로 변환
-  const classes: ClassCardData[] = lessonsResponse?.lessons.map(lesson => ({
-    id: lesson.id,
-    title: lesson.title,
-    category: lesson.classCategory?.name || "미분류",
-    thumbnailImage: lesson.representativeImage,
-    status: lesson.status,
-    createdAt: formatClassCreateDate(lesson.createdAt),
-    price: lesson.price,
-    discountRate: lesson.discountRate,
-    discountedPrice: lesson.discountedPrice,
-  })) || [];
+  // 레슨 목록
+  const lessons = lessonsResponse?.lessons || [];
 
   const handleEdit = (id: number) => {
     setEditingClassId(id);
@@ -128,22 +116,22 @@ const ClassManagementPage = () => {
         </p>
       </div>
 
-      {/* 클래스 그리드 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {/* 클래스 그리드: 320px 아래로 작아지지 않게 하여 큼직하게 유지 */}
+      <div className="grid gap-8" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 2fr))" }}>
         {/* 생성 버튼 (항상 첫 번째) */}
         <CreateClassButton onClick={() => { setCreateModalOpen(true); /**TODO: 호스트 프로필 생성 유무 판단*/ }} />
 
         {/* 클래스 카드들 (최신순) */}
-        {classes.map((classData) => (
+        {lessons.map((lesson) => (
           <ClassManageCard
-            key={classData.id}
-            classData={classData}
-            onEdit={() => handleEdit(classData.id)}
-            onDelete={() => handleDeleteClick(classData.id)}
-            onDuplicate={() => handleDuplicate(classData.id)}
-            onManage={() => handleManage(classData.id)}
-            onViewClass={() => handleViewClass(classData.id)}
-            onToggleStatus={() => handleToggleStatus(classData.id)}
+            key={lesson.id}
+            lesson={lesson}
+            onEdit={() => handleEdit(lesson.id)}
+            onDelete={() => handleDeleteClick(lesson.id)}
+            onDuplicate={() => handleDuplicate(lesson.id)}
+            onManage={() => handleManage(lesson.id)}
+            onViewClass={() => handleViewClass(lesson.id)}
+            onToggleStatus={() => handleToggleStatus(lesson.id)}
           />
         ))}
       </div>
@@ -165,7 +153,7 @@ const ClassManagementPage = () => {
         onOpenChange={setStatusDialogOpen}
         title="클래스 상태 변경"
         description={
-          selectedClassId && classes.find((c) => c.id === selectedClassId)?.status === "ACTIVE"
+          selectedClassId && lessons.find((l) => l.id === selectedClassId)?.status === "ACTIVE"
             ? "이 클래스를 휴면 상태로 전환하시겠습니까?"
             : "이 클래스를 활성화하시겠습니까?"
         }
