@@ -9,6 +9,7 @@ import { POINT_TABS } from "@/constants/tabs";
 import type { PointType } from "@/models/point.model";
 import { usePointQuery } from "@/hooks/usePointQuery";
 import { useAuthQuery } from "@/hooks/useAuthQuery";
+import { formatDateTime } from "@/utils/dateFormat";
 
 // 탭 상태 타입
 type TabStatus = (typeof POINT_TABS)[number];
@@ -104,11 +105,8 @@ const Points = () => {
             >
               <div className="flex gap-6">
                 <div className="text-sm font-medium text-black/30 mt-1 tabular-nums w-16 shrink-0">
-                  {/* 날짜 파싱 (예: 2026.01.02) */}
-                  {item.createdAt
-                    .split(" ")[0]
-                    .replace(/(\d{4})(\d{2})(\d{2})/, "$1.$2.$3")
-                    .slice(2)}
+                  {/* 날짜 파싱 (예: 26.01.02) */}
+                  {formatDateTime(item.createdAt)}
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-1 cursor-pointer">
@@ -119,7 +117,9 @@ const Points = () => {
                   </div>
                   <div className="flex items-center text-[12px] text-black/30 font-medium">
                     {/* 시간 파싱 (예: 13:00) */}
-                    <span>{item.createdAt.split(" ")[1].slice(0, 5)}</span>
+                    <span>
+                      {formatDateTime(item.createdAt, { type: "time" })}
+                    </span>
                     <div className="mx-1.5 w-px h-2 bg-black/10" />
                     {mapPointTypeToTab(item.type) === "적립" && (
                       <div className="ml-1 w-3 h-3 rounded-full bg-black/5 flex items-center justify-center">
