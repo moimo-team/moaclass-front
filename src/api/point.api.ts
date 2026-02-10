@@ -10,7 +10,9 @@ export const getUserPoints = async (): Promise<PointResponse[]> => {
     const response = await apiClient.get<PointResponse[]>("/points/me");
     return response.data;
   } catch (error) {
-    console.log("getUserPoints error:", error);
+    if (error instanceof Error) {
+      console.error("getUserPoints error:", error.message);
+    }
     throw error;
   }
 };

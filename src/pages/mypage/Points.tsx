@@ -10,6 +10,7 @@ import type { PointType } from "@/models/point.model";
 import { usePointQuery } from "@/hooks/usePointQuery";
 import { useAuthQuery } from "@/hooks/useAuthQuery";
 import { formatDateTime } from "@/utils/dateFormat";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 // 탭 상태 타입
 type TabStatus = (typeof POINT_TABS)[number];
@@ -28,25 +29,10 @@ const mapPointTypeToTab = (type: PointType): Exclude<TabStatus, "전체"> => {
   return statusMap[type];
 };
 
-// // 유저 정보
-// interface UserInfo {
-//     id: string;
-//     name: string;
-//     email: string;
-//     point: number;
-// }
-
-// const MOCK_USER_POINTS: UserInfo = {
-//     id: '1',
-//     name: 'John Doe',
-//     email: 'john.doe@example.com',
-//     point: 1500,
-// };
-
 const Points = () => {
   const [activeTab, setActiveTab] = useState<TabStatus>("전체");
   const [isChargeModalOpen, setIsChargeModalOpen] = useState(false);
-  const { data: userPoints } = usePointQuery();
+  const { data: userPoints, isLoading } = usePointQuery();
   const { data: userInfo } = useAuthQuery();
 
   // 사용 가능 포인트
@@ -93,62 +79,68 @@ const Points = () => {
 
       {/* 내역 리스트 */}
       <div className="space-y-1 mt-4 min-h-[400px]">
-        <AnimatePresence mode="popLayout">
-          {filteredHistory.map((item, index) => (
-            <motion.div
-              key={item.pointId}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              transition={{ delay: index * 0.05 }}
-              className="flex items-center justify-between py-5 border-b border-gray-50 last:border-none group hover:bg-gray-50/50 px-2 rounded-xl transition-colors"
-            >
-              <div className="flex gap-6">
-                <div className="text-sm font-medium text-black/30 mt-1 tabular-nums w-16 shrink-0">
-                  {/* 날짜 파싱 (예: 26.01.02) */}
-                  {formatDateTime(item.createdAt)}
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1 cursor-pointer">
-                    <h3 className="text-[15px] font-bold text-[#2f2f2f] line-clamp-1 group-hover:text-primary transition-colors">
-                      {item.title}
-                    </h3>
-                    <ChevronRight className="w-4 h-4 text-black/20" />
+        {isLoading ? (
+          <div className="flex justify-center items-center h-[200px]">
+            <LoadingSpinner />
+          </div>
+        ) : (
+          <AnimatePresence mode="popLayout">
+            {filteredHistory.map((item, index) => (
+              <motion.div
+                key={item.pointId}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ delay: index * 0.05 }}
+                className="flex items-center justify-between py-5 border-b border-gray-50 last:border-none group hover:bg-gray-50/50 px-2 rounded-xl transition-colors"
+              >
+                <div className="flex gap-6">
+                  <div className="text-sm font-medium text-black/30 mt-1 tabular-nums w-16 shrink-0">
+                    {/* 날짜 파싱 (예: 26.01.02) */}
+                    {formatDateTime(item.createdAt)}
                   </div>
-                  <div className="flex items-center text-[12px] text-black/30 font-medium">
-                    {/* 시간 파싱 (예: 13:00) */}
-                    <span>
-                      {formatDateTime(item.createdAt, { type: "time" })}
-                    </span>
-                    <div className="mx-1.5 w-px h-2 bg-black/10" />
-                    {mapPointTypeToTab(item.type) === "적립" && (
-                      <div className="ml-1 w-3 h-3 rounded-full bg-black/5 flex items-center justify-center">
-                        <ChevronRight className="w-2 h-2 rotate-90" />
-                      </div>
-                    )}
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1 cursor-pointer">
+                      <h3 className="text-[15px] font-bold text-[#2f2f2f] line-clamp-1 group-hover:text-primary transition-colors">
+                        {item.title}
+                      </h3>
+                      <ChevronRight className="w-4 h-4 text-black/20" />
+                    </div>
+                    <div className="flex items-center text-[12px] text-black/30 font-medium">
+                      {/* 시간 파싱 (예: 13:00) */}
+                      <span>
+                        {formatDateTime(item.createdAt, { type: "time" })}
+                      </span>
+                      <div className="mx-1.5 w-px h-2 bg-black/10" />
+                      {mapPointTypeToTab(item.type) === "적립" && (
+                        <div className="ml-1 w-3 h-3 rounded-full bg-black/5 flex items-center justify-center">
+                          <ChevronRight className="w-2 h-2 rotate-90" />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className={`text-[15px] font-black tabular-nums ${
-                    mapPointTypeToTab(item.type) === "적립"
-                      ? "text-[#4f8f6a]"
-                      : "text-[#2f2f2f]"
-                  }`}
-                >
-                  {mapPointTypeToTab(item.type) === "적립"
-                    ? `+${item.amount.toLocaleString()}`
-                    : item.amount.toLocaleString()}
-                  원
-                </span>
-                <button className="p-1 hover:bg-black/5 rounded-full transition-colors opacity-0 group-hover:opacity-100">
-                  <X className="w-3.5 h-3.5 text-black/20" />
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-[15px] font-black tabular-nums ${
+                      mapPointTypeToTab(item.type) === "적립"
+                        ? "text-[#4f8f6a]"
+                        : "text-[#2f2f2f]"
+                    }`}
+                  >
+                    {mapPointTypeToTab(item.type) === "적립"
+                      ? `+${item.amount.toLocaleString()}`
+                      : item.amount.toLocaleString()}
+                    원
+                  </span>
+                  <button className="p-1 hover:bg-black/5 rounded-full transition-colors opacity-0 group-hover:opacity-100">
+                    <X className="w-3.5 h-3.5 text-black/20" />
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        )}
       </div>
 
       <PointChargeModal

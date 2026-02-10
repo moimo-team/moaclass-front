@@ -7,6 +7,7 @@ const getUserPoints = http.get(`${httpUrl}/points/me`, async ({ request }) => {
   await delay(1000);
   const token = request.headers.get("Authorization");
   if (!token) {
+    console.error("getUserPoints mock error: 토큰이 없습니다.");
     return HttpResponse.json({ message: "토큰이 없습니다." }, { status: 401 });
   }
 
