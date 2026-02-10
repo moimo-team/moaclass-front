@@ -9,6 +9,7 @@ export const addLike = async (lessonId: number) => {
 export const cancelLike = async (lessonId: number) => {
   const response = await apiClient.delete(`/likes/${lessonId}`);
   return response.data;
+};
 
 // 위시리스트 조회
 export const getWishlist = async (page = 1, limit = 8) => {
