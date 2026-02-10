@@ -15,12 +15,14 @@ interface LessonCardProps {
   lesson: Lesson;
   className?: string;
   queryKeyToInvalidate?: QueryKey;
+  onToggleLike?: (lessonId: number, isLiked: boolean) => void;
 }
 
 export function LessonCard({
   lesson,
   className,
   queryKeyToInvalidate = ["lessons"],
+  onToggleLike,
 }: LessonCardProps) {
   const { id, title, address, isLiked } = lesson;
   const href = `/lessons/${id}`;
@@ -33,7 +35,11 @@ export function LessonCard({
     e.preventDefault();
     e.stopPropagation();
 
-    toggleLike({ lessonId: id, newIsLiked: !isLiked });
+    if (onToggleLike) {
+      onToggleLike(id, isLiked ?? false);
+    } else {
+      toggleLike({ lessonId: id, newIsLiked: !isLiked });
+    }
   };
 
   return (
