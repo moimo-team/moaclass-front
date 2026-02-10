@@ -14,8 +14,6 @@ import { payHandler } from "./payHandler";
 import { couponHandlers } from "./couponHandler";
 import { likeHandlers } from "./likeHandler";
 
-import { likeHandlers } from "./likeHandler";
-
 const handlers = [
   ...authHandler,
   getInterests,
