@@ -4,7 +4,7 @@ import {
   type QueryKey,
 } from "@tanstack/react-query";
 import { addLessonLike, removeLessonLike } from "@/api/like.api";
-import type { Lesson } from "@/models/lesson.model";
+import type { Lesson, FetchLessonsResponse } from "@/models/lesson.model";
 import { toast } from "sonner";
 
 interface ToggleLikeVariables {
@@ -48,36 +48,61 @@ export const useLessonLikeMutation = (
         previousData.push({ queryKey, data: previous });
 
         // 2. 낙관적 업데이트
-        queryClient.setQueryData<Lesson[] | Lesson>(queryKey, (oldData) => {
-          if (!oldData) return oldData;
+        queryClient.setQueryData<Lesson[] | Lesson | FetchLessonsResponse>(
+          queryKey,
+          (oldData) => {
+            if (!oldData) return oldData;
 
-          if (Array.isArray(oldData)) {
-            return oldData.map((lesson) =>
-              lesson.id === lessonId
-                ? {
-                    ...lesson,
-                    isLiked: newIsLiked,
-                    likes: newIsLiked ? lesson.likes + 1 : lesson.likes - 1,
-                  }
-                : lesson,
-            );
-          } else {
-            const lesson = oldData as Lesson;
-            if (lesson.id === lessonId) {
-              return {
-                ...lesson,
-                isLiked: newIsLiked,
-                likes: newIsLiked ? lesson.likes + 1 : lesson.likes - 1,
+            let newData: Lesson[] | Lesson | FetchLessonsResponse | undefined;
+
+            // oldData가 FetchLessonsResponse 타입인 경우
+            if ("lessons" in oldData && Array.isArray(oldData.lessons)) {
+              newData = {
+                ...oldData,
+                lessons: oldData.lessons.map((lesson) =>
+                  lesson.id === lessonId
+                    ? {
+                        ...lesson,
+                        isLiked: newIsLiked,
+                        likes: newIsLiked ? lesson.likes + 1 : lesson.likes - 1,
+                      }
+                    : lesson,
+                ),
               };
             }
-            return oldData;
-          }
-        });
+            // oldData가 Lesson 배열 타입인 경우 (useLatestLessonsQuery, useParticipationQuery 등)
+            else if (Array.isArray(oldData)) {
+              newData = oldData.map((lesson) =>
+                lesson.id === lessonId
+                  ? {
+                      ...lesson,
+                      isLiked: newIsLiked,
+                      likes: newIsLiked ? lesson.likes + 1 : lesson.likes - 1,
+                    }
+                  : lesson,
+              );
+            }
+            // oldData가 단일 Lesson 객체 타입인 경우 (예: useLessonQuery)
+            else {
+              const lesson = oldData as Lesson;
+              if (lesson.id === lessonId) {
+                newData = {
+                  ...lesson,
+                  isLiked: newIsLiked,
+                  likes: newIsLiked ? lesson.likes + 1 : lesson.likes - 1,
+                };
+              } else {
+                newData = oldData;
+              }
+            }
+            return newData;
+          },
+        );
       }
 
       return { previousData };
     },
-    onError: (err, __, context) => {
+    onError: (_, __, context) => {
       toast.error("좋아요 토글 실패.");
       // 3. 에러 발생 시 이전 데이터로 롤백
       if (context?.previousData) {

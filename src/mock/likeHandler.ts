@@ -15,10 +15,6 @@ export const likeHandlers = [
 
     if (!mockLikedLessons.includes(lessonId)) {
       mockLikedLessons.push(lessonId);
-      console.log(
-        `Mock: Liked lesson ${lessonId}. Current likes:`,
-        mockLikedLessons,
-      );
       return HttpResponse.json(
         { message: `Lesson ${lessonId} liked successfully` },
         { status: 201 },
@@ -45,10 +41,6 @@ export const likeHandlers = [
     mockLikedLessons = mockLikedLessons.filter((id) => id !== lessonId);
 
     if (mockLikedLessons.length < initialLength) {
-      console.log(
-        `Mock: Unliked lesson ${lessonId}. Current likes:`,
-        mockLikedLessons,
-      );
       return HttpResponse.json(
         { message: `Lesson ${lessonId} unliked successfully` },
         { status: 200 },

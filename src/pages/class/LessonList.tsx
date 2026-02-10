@@ -6,13 +6,15 @@ import PaginationComponent from "@/components/common/PaginationComponent";
 import { useLessonsQuery } from "@/hooks/useLessonsQuery";
 import { useFilterStore } from "@/store/filterStore";
 import type { Lesson } from "@/models/lesson.model";
+import type { QueryKey } from "@tanstack/react-query";
 
 const LessonListDisplay: React.FC<{
   lessons: Lesson[];
   isLoading: boolean;
   isError: boolean;
   emptyMessage: string;
-}> = ({ lessons, isLoading, isError, emptyMessage }) => {
+  queryKeyToInvalidate: QueryKey;
+}> = ({ lessons, isLoading, isError, emptyMessage, queryKeyToInvalidate }) => {
   if (isLoading) return <div className="text-center p-8">로딩 중...</div>;
   if (isError)
     return (
@@ -26,7 +28,11 @@ const LessonListDisplay: React.FC<{
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
       {lessons.map((lesson) => (
-        <LessonCard key={lesson.id} lesson={lesson} />
+        <LessonCard
+          key={lesson.id}
+          lesson={lesson}
+          queryKeyToInvalidate={queryKeyToInvalidate}
+        />
       ))}
     </div>
   );
@@ -62,42 +68,56 @@ const LessonListPage: React.FC = () => {
   const currentPage = Number(searchParams.get("page")) || 1;
   const itemsPerPage = 12;
 
-  const queryParams = {
-    page: currentPage,
-    limit: itemsPerPage,
-    categories:
-      parsedParams.selectedCategories.length > 0
-        ? parsedParams.selectedCategories
+  const queryParams = React.useMemo(() => {
+    return {
+      page: currentPage,
+      limit: itemsPerPage,
+      categories:
+        parsedParams.selectedCategories.length > 0
+          ? parsedParams.selectedCategories
+          : undefined,
+      regions:
+        parsedParams.selectedRegions.length > 0
+          ? parsedParams.selectedRegions
+          : undefined,
+      days:
+        parsedParams.selectedDays.length > 0
+          ? parsedParams.selectedDays
+          : undefined,
+      difficulty:
+        parsedParams.selectedDifficulty.length > 0
+          ? parsedParams.selectedDifficulty
+          : undefined,
+      personnel: parsedParams.selectedPersonnel
+        ? Number(parsedParams.selectedPersonnel.replace(/\D/g, ""))
         : undefined,
-    regions:
-      parsedParams.selectedRegions.length > 0
-        ? parsedParams.selectedRegions
-        : undefined,
-    days:
-      parsedParams.selectedDays.length > 0
-        ? parsedParams.selectedDays
-        : undefined,
-    difficulty:
-      parsedParams.selectedDifficulty.length > 0
-        ? parsedParams.selectedDifficulty
-        : undefined,
-    personnel: parsedParams.selectedPersonnel
-      ? Number(parsedParams.selectedPersonnel.replace(/\D/g, ""))
-      : undefined,
-    minTime:
-      parsedParams.timeRange[0] > 0 ? parsedParams.timeRange[0] : undefined,
-    maxTime:
-      parsedParams.timeRange[1] < 24 ? parsedParams.timeRange[1] : undefined,
-    minPrice:
-      parsedParams.priceRange[0] > 0 ? parsedParams.priceRange[0] : undefined,
-    maxPrice:
-      parsedParams.priceRange[1] < 500000
-        ? parsedParams.priceRange[1]
-        : undefined,
-    keyword: searchParams.get("keyword") || undefined,
-  };
+      minTime:
+        parsedParams.timeRange[0] > 0 ? parsedParams.timeRange[0] : undefined,
+      maxTime:
+        parsedParams.timeRange[1] < 24 ? parsedParams.timeRange[1] : undefined,
+      minPrice:
+        parsedParams.priceRange[0] > 0 ? parsedParams.priceRange[0] : undefined,
+      maxPrice:
+        parsedParams.priceRange[1] < 500000
+          ? parsedParams.priceRange[1]
+          : undefined,
+      keyword: searchParams.get("keyword") || undefined,
+    };
+  }, [
+    currentPage,
+    itemsPerPage,
+    parsedParams.selectedCategories,
+    parsedParams.selectedRegions,
+    parsedParams.selectedDays,
+    parsedParams.selectedDifficulty,
+    parsedParams.selectedPersonnel,
+    parsedParams.timeRange,
+    parsedParams.priceRange,
+    searchParams,
+  ]);
 
   const { data, isLoading, isError } = useLessonsQuery(queryParams, 0);
+  const lessonsQueryKey: QueryKey = ["lessons", queryParams, 0];
   const { totalPages } = { totalPages: data?.totalPages || 0 };
 
   const handlePageChange = (page: number) => {
@@ -164,6 +184,7 @@ const LessonListPage: React.FC = () => {
           isLoading={isLoading}
           isError={isError}
           emptyMessage="조건에 맞는 클래스가 없습니다."
+          queryKeyToInvalidate={lessonsQueryKey}
         />
       </div>
 
