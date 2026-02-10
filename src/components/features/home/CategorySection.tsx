@@ -2,8 +2,8 @@ import { cn } from "@/lib/utils";
 import FilterDropdown, {
   type FilterDropdownItem,
 } from "@/components/common/FilterDropdown";
-import { interestCategories } from "@/mock/mockData/mockData";
 import { REGIONS } from "@/constants/regions";
+import { useCategoryQuery } from "@/hooks/useCategoryQuery";
 
 interface CategorySectionProps {
   className?: string;
@@ -17,14 +17,16 @@ const CategorySection = ({ className }: CategorySectionProps) => {
     //href: `/meetings?region=${region}`,
   }));
 
-  // TODO: 카테고리 API 적용
-  const categoryItems: FilterDropdownItem[] = interestCategories.map(
-    (category) => ({
-      key: category.id,
-      label: category.name,
-      //href: `/meetings?category=${category.name}`,
-    }),
-  );
+  const { data: categories, isLoading: isCategoriesLoading } =
+    useCategoryQuery();
+
+  const categoryItems: FilterDropdownItem[] = isCategoriesLoading
+    ? []
+    : (categories || []).map((category) => ({
+        key: category.id,
+        label: category.name,
+        //href: `/meetings?category=${category.name}`,
+      }));
 
   return (
     <section className={cn("w-full py-12", className)}>

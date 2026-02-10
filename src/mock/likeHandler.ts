@@ -52,6 +52,18 @@ const addLike = http.post(
     }
 
     const { lessonId } = params;
+    const targetId = Number(lessonId);
+    
+    const exists = WishlistLessons.some(
+      (lesson) => lesson.lessonId === targetId
+    );
+
+    if (exists) {
+      return HttpResponse.json(
+        { message: "이미 위시리스트에 존재하는 클래스입니다." },
+        { status: 409 },
+      );
+    }
 
     WishlistLessons.push({
       lessonId: Number(lessonId),
@@ -117,3 +129,6 @@ const cancelLike = http.delete(
 );
 
 export const likeHandlers = [getWishlist, addLike, cancelLike];
+
+export const isLessonLiked = (lessonId: number) =>
+  WishlistLessons.some((lesson) => lesson.lessonId === lessonId);

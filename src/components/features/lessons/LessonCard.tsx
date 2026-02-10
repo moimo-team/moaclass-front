@@ -8,26 +8,37 @@ import { getDisplayAddress } from "@/utils/formatAddress";
 import defaultLessonImage from "@/assets/images/moimer-intro.png";
 import defaultProfileImage from "@/assets/images/profile.png";
 import { ClassInfoBody } from "@/components/common/ClassInfoBody";
+import { useLessonLikeMutation } from "@/hooks/useLessonLikeMutation";
+import type { QueryKey } from "@tanstack/react-query";
 
 interface LessonCardProps {
   lesson: Lesson;
   className?: string;
+  queryKeyToInvalidate?: QueryKey;
   onToggleLike?: (lessonId: number, isLiked: boolean) => void;
 }
 
 export function LessonCard({
   lesson,
   className,
+  queryKeyToInvalidate = ["lessons"],
   onToggleLike,
 }: LessonCardProps) {
   const { id, title, address, isLiked } = lesson;
   const href = `/lessons/${id}`;
 
+  const { mutate: toggleLike, isPending: isLiking } = useLessonLikeMutation([
+    queryKeyToInvalidate,
+  ]);
+
   const handleLikeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
     if (onToggleLike) {
-      onToggleLike(id, !isLiked);
+      onToggleLike(id, isLiked ?? false);
+    } else {
+      toggleLike({ lessonId: id, newIsLiked: !isLiked });
     }
   };
 
@@ -51,16 +62,21 @@ export function LessonCard({
           />
 
           {/* 좋아요 아이콘 */}
-          <div
-            className="absolute top-2.5 right-2.5 z-20 cursor-pointer active:scale-90 transition-transform"
+          <button
+            type="button"
+            className={cn(
+              "absolute top-2 right-2 z-20 cursor-pointer p-1 rounded-full hover:bg-black/10 transition-colors",
+              isLiking && "pointer-events-none opacity-70 animate-pulse",
+            )}
             onClick={handleLikeClick}
+            aria-label={isLiked ? "좋아요 취소" : "좋아요"}
           >
             {isLiked ? (
               <IoIosHeart className="text-red-500 text-2xl drop-shadow-sm" />
             ) : (
               <IoIosHeartEmpty className="text-white text-2xl drop-shadow-lg" />
             )}
-          </div>
+          </button>
         </div>
 
         {/* 정보 섹션 - 표준 패딩 복구 (가독성 중심) */}
@@ -69,8 +85,12 @@ export function LessonCard({
             {/* 평점, 좋아요, 지역 위치 정보 */}
             <div className="flex justify-between items-center text-[10px] text-gray-500 font-medium">
               <div className="flex items-center gap-2">
-                <span className="flex items-center gap-0.5">⭐ {lesson.rate.toFixed(1)}</span>
-                <span className="flex items-center gap-0.5">❤️ {lesson.likes}</span>
+                <span className="flex items-center gap-0.5">
+                  ⭐ {lesson.rate.toFixed(1)}
+                </span>
+                <span className="flex items-center gap-0.5">
+                  ❤️ {lesson.likes}
+                </span>
               </div>
               <div className="flex items-center gap-0.5">
                 <IoLocationOutline className="w-3 h-3 text-primary/60" />
