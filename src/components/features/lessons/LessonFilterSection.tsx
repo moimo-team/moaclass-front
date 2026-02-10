@@ -37,7 +37,6 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
   onReset,
 }) => {
   const {
-    // 상태
     selectedRegions,
     selectedPersonnel,
     timeRange,
@@ -47,8 +46,6 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
     selectedCategories,
     activeMainCategoryId,
     selectedMainCategory,
-
-    // 액션
     toggleRegion,
     setSelectedPersonnel,
     setTimeRange,
@@ -60,8 +57,6 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
     removeCategoryBadge,
     resetFilters,
   } = useFilterStore();
-
-  // 렌더링 함수
 
   const getRegionButtonText = () => {
     if (!selectedRegions.length) return "지역을 선택하세요";
@@ -79,15 +74,14 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
     return mainCategory;
   };
 
-  // 소분류 목록 계산 (Memoization은 store 내부에서 처리하거나 여기서 처리)
   const currentSubCategories = activeMainCategoryId
     ? LESSON_SUB_CATEGORIES.filter(
-      (subCat) => subCat.category_id === activeMainCategoryId,
-    ).map((subCat) => ({
-      id: subCat.id,
-      name: subCat.name,
-      categoryId: subCat.category_id,
-    }))
+        (subCat) => subCat.category_id === activeMainCategoryId,
+      ).map((subCat) => ({
+        id: subCat.id,
+        name: subCat.name,
+        categoryId: subCat.category_id,
+      }))
     : [];
 
   return (

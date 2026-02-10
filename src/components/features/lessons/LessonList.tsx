@@ -8,13 +8,14 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import type { QueryKey } from "@tanstack/react-query";
 
 export interface LessonListProps {
   lessons: Lesson[];
-  onToggleLike?: (lessonId: number, isLiked: boolean) => void;
+  queryKeyToInvalidate?: QueryKey;
 }
 
-const LessonList = ({ lessons, onToggleLike }: LessonListProps) => {
+const LessonList = ({ lessons, queryKeyToInvalidate }: LessonListProps) => {
   return (
     <Carousel
       opts={{
@@ -34,8 +35,11 @@ const LessonList = ({ lessons, onToggleLike }: LessonListProps) => {
             key={lesson.id}
             className="pl-3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
           >
-            <div className="p-1 h-full">
-              <LessonCard lesson={lesson} onToggleLike={onToggleLike} />
+            <div className="p-1">
+              <LessonCard
+                lesson={lesson}
+                queryKeyToInvalidate={queryKeyToInvalidate}
+              />
             </div>
           </CarouselItem>
         ))}

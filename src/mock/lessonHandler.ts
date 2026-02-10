@@ -3,12 +3,21 @@ import { httpUrl, mockLessons, mockReviews } from "@/mock/mockData/mockData";
 import { LESSON_CATEGORIES, LESSON_SUB_CATEGORIES } from "@/mock/mockData/categoryMock";
 import type { Level, Lesson } from "@/models/lesson.model";
 import type { FetchLessonsResponse } from "@/models/lesson.model";
+import { isLessonLiked } from "./likeHandler";
+
+const applyLikeStatus = (lessons: Lesson[]): Lesson[] => {
+  return lessons.map((lesson) => ({
+    ...lesson,
+    isLiked: isLessonLiked(lesson.id),
+  }));
+};
 
 export const lessonHandlers = [
   // TODO: URL 확정되면 수정
   http.get(`${httpUrl}/lessons/latest`, async () => {
     await delay(500);
-    return HttpResponse.json(mockLessons.slice(0, 5), { status: 200 });
+    const lessonsWithStatus = applyLikeStatus(mockLessons.slice(0, 5));
+    return HttpResponse.json(lessonsWithStatus, { status: 200 });
   }),
 
   http.get(`${httpUrl}/lessons`, async ({ request }) => {
@@ -38,7 +47,6 @@ export const lessonHandlers = [
       .map((d) => difficultyMap[d])
       .filter((d): d is Level => d !== undefined);
 
-    // 필터 적용
     if (categories.length > 0) {
       filteredLessons = filteredLessons.filter((lesson) => {
         const categoryName = LESSON_CATEGORIES.find(
@@ -92,9 +100,11 @@ export const lessonHandlers = [
       page * limit,
     );
 
+    const paginatedLessonsWithStatus = applyLikeStatus(paginatedLessons);
+
     return HttpResponse.json(
       {
-        lessons: paginatedLessons,
+        lessons: paginatedLessonsWithStatus,
         totalCount,
         totalPages,
       } as FetchLessonsResponse,
@@ -102,14 +112,17 @@ export const lessonHandlers = [
     );
   }),
 
-  // 클래스 1개 정보
   http.get(`${httpUrl}/lessons/:lessonId`, async ({ params }) => {
     await delay(500);
     const lessonId = Number(params.lessonId);
     const lesson = mockLessons.find((l) => l.id === lessonId);
 
     if (lesson) {
-      return HttpResponse.json(lesson, { status: 200 });
+      const lessonWithStatus = {
+        ...lesson,
+        isLiked: isLessonLiked(lesson.id),
+      };
+      return HttpResponse.json(lessonWithStatus, { status: 200 });
     } else {
       return HttpResponse.json(
         { message: "레슨을 찾을 수 없습니다." },
