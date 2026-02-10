@@ -13,7 +13,7 @@ function NewLessonList() {
       lessons={safeLessons}
       isLoading={isLoading}
       isError={isError}
-      queryKeyToInvalidate={["latestLessons"]}
+      queryKeyToInvalidate={["lessons", "latest"]}
     />
   );
 }

@@ -8,7 +8,7 @@ import type {
 
 export const useLatestLessonsQuery = () => {
   return useQuery<Lesson[], Error>({
-    queryKey: ["latestLessons"],
+    queryKey: ["lessons", "latest"],
     queryFn: fetchLatestLessons,
     staleTime: 1000 * 60 * 5,
     retry: 1,
