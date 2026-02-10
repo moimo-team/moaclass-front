@@ -17,24 +17,10 @@ const getPayPreview = http.get(
 
     try {
       const url = new URL(request.url);
-      const lessonId = url.searchParams.get("lessonId");
-      const scheduleId = url.searchParams.get("scheduleId");
+      const scheduleId = Number(url.searchParams.get("scheduleId"));
       const quantity = Number(url.searchParams.get("quantity")) || 1; // 기본값 1
 
-      // 가격 계산 로직
-      const unitPrice = payPreviewMock.lesson.discountedPrice;
-      const subtotal = unitPrice * quantity;
-
-      const responseData = {
-        ...payPreviewMock,
-        price: {
-          quantity: quantity,
-          subtotal: subtotal,
-          total: subtotal,
-        },
-      };
-
-      return HttpResponse.json(responseData, { status: 200 });
+      return HttpResponse.json(payPreviewMock, { status: 200 });
     } catch (error) {
       return HttpResponse.json(
         { message: "잘못된 요청입니다." },
@@ -53,11 +39,8 @@ const createPayment = http.post(`${httpUrl}/payments`, async ({ request }) => {
   }
 
   try {
-    const { userId, lessonId, scheduleId, amount, couponId } =
-      (await request.json()) as any;
+    const { scheduleId, amount, couponId } = (await request.json()) as any;
     console.log("Creating payment with body:", {
-      userId,
-      lessonId,
       scheduleId,
       amount,
       couponId,
