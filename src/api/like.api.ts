@@ -12,7 +12,10 @@ export const cancelLike = async (lessonId: number) => {
 };
 
 // 위시리스트 조회
-export const getWishlist = async (page = 1, limit = 8) => {
+export const getWishlist = async (
+  page = 1,
+  limit = 8,
+): Promise<WishlistResponse> => {
   try {
     const response = await apiClient.get<WishlistResponse>(
       `/likes/me?page=${page}&limit=${limit}`,
