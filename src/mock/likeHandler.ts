@@ -1,62 +1,134 @@
-import { http, HttpResponse } from "msw";
+import { http, HttpResponse, delay } from "msw";
+import { WishlistLessons } from "./mockData/wishlistMock";
+import { httpUrl } from "./mockData/mockData";
 
-let mockLikedLessons: number[] = [];
+// 위시리스트 조회
+const getWishlist = http.get(`${httpUrl}/likes/me`, async ({ request }) => {
+  await delay(500);
+  const token = request.headers.get("Authorization");
+  if (!token) {
+    return HttpResponse.json({ message: "토큰이 없습니다." }, { status: 401 });
+  }
 
-export const likeHandlers = [
-  http.post("/api/likes", async ({ request }) => {
-    const { lessonId } = (await request.json()) as { lessonId: number };
+  const url = new URL(request.url);
+  const page = Number(url.searchParams.get("page") || "1");
+  const limit = Number(url.searchParams.get("limit") || "8");
 
-    if (!lessonId) {
+  const filteredLessons = WishlistLessons;
+
+  const totalCount = filteredLessons.length;
+  const totalPages = Math.ceil(totalCount / limit);
+  const paginatedLessons = filteredLessons.slice(
+    (page - 1) * limit,
+    page * limit,
+  );
+
+  return HttpResponse.json(
+    {
+      data: paginatedLessons,
+      meta: {
+        totalCount,
+        page,
+        limit,
+        totalPages,
+      },
+    },
+    { status: 200 },
+  );
+});
+
+// 좋아요 추가
+const addLike = http.post(
+  `${httpUrl}/likes/:lessonId`,
+  async ({ request, params }) => {
+    await delay(500);
+
+    const token = request.headers.get("Authorization");
+    if (!token) {
       return HttpResponse.json(
-        { message: "Lesson ID is required" },
-        { status: 400 },
+        { message: "토큰이 없습니다." },
+        { status: 401 },
       );
     }
 
-    if (!mockLikedLessons.includes(lessonId)) {
-      mockLikedLessons.push(lessonId);
-      return HttpResponse.json(
-        { message: `Lesson ${lessonId} liked successfully` },
-        { status: 201 },
-      );
-    } else {
-      return HttpResponse.json(
-        { message: `Lesson ${lessonId} already liked` },
-        { status: 200 },
-      );
-    }
-  }),
+    const { lessonId } = params;
+    const targetId = Number(lessonId);
+    
+    const exists = WishlistLessons.some(
+      (lesson) => lesson.lessonId === targetId
+    );
 
-  http.delete("/api/likes/:lessonId", ({ params }) => {
-    const lessonId = Number(params.lessonId);
-
-    if (isNaN(lessonId)) {
+    if (exists) {
       return HttpResponse.json(
-        { message: "Invalid Lesson ID" },
-        { status: 400 },
+        { message: "이미 위시리스트에 존재하는 클래스입니다." },
+        { status: 409 },
       );
     }
 
-    const initialLength = mockLikedLessons.length;
-    mockLikedLessons = mockLikedLessons.filter((id) => id !== lessonId);
+    WishlistLessons.push({
+      lessonId: Number(lessonId),
+      title: "새로운 클래스",
+      price: 10000,
+      category: {
+        id: 1,
+        name: "프로그래밍",
+      },
+      image: "https://example.com/image.jpg",
+      teacherNickname: "새로운 강사",
+      region: {
+        id: 1,
+        name: "서울시",
+      },
+      address: "서울시 강남구 역삼동 123-45",
+      discountRate: 0,
+      discountedPrice: 10000,
+      likes: 1,
+      rate: 5,
+    });
 
-    if (mockLikedLessons.length < initialLength) {
+    return HttpResponse.json(
+      { message: "위시리스트에 추가되었습니다." },
+      { status: 200 },
+    );
+  },
+);
+
+// 좋아요 취소
+const cancelLike = http.delete(
+  `${httpUrl}/likes/:lessonId`,
+  async ({ request, params }) => {
+    await delay(500);
+
+    const token = request.headers.get("Authorization");
+    if (!token) {
       return HttpResponse.json(
-        { message: `Lesson ${lessonId} unliked successfully` },
-        { status: 200 },
-      );
-    } else {
-      return HttpResponse.json(
-        { message: `Lesson ${lessonId} was not liked` },
-        { status: 204 },
+        { message: "토큰이 없습니다." },
+        { status: 401 },
       );
     }
-  }),
 
-  http.get("/api/likes", () => {
-    return HttpResponse.json(mockLikedLessons, { status: 200 });
-  }),
-];
+    const { lessonId } = params;
+    const index = WishlistLessons.findIndex(
+      (lesson) => lesson.lessonId === Number(lessonId),
+    );
+
+    if (index === -1) {
+      return HttpResponse.json(
+        { message: "위시리스트에 없는 클래스입니다." },
+        { status: 404 },
+      );
+    }
+
+    WishlistLessons.splice(index, 1);
+
+    return HttpResponse.json(
+      { message: "위시리스트에서 삭제되었습니다." },
+      { status: 200 },
+    );
+  },
+);
+
+export const likeHandlers = [getWishlist, addLike, cancelLike];
 
 export const isLessonLiked = (lessonId: number) =>
-  mockLikedLessons.includes(lessonId);
+  WishlistLessons.some((lesson) => lesson.lessonId === lessonId);
