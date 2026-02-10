@@ -2,7 +2,10 @@ import { apiClient } from "./client";
 import type { WishlistResponse } from "@/models/wishlist.model";
 
 // 위시리스트 조회
-export const getWishlist = async (page = 1, limit = 8) => {
+export const getWishlist = async (
+  page = 1,
+  limit = 8,
+): Promise<WishlistResponse> => {
   try {
     const response = await apiClient.get<WishlistResponse>(
       `/likes/me?page=${page}&limit=${limit}`,
@@ -15,7 +18,7 @@ export const getWishlist = async (page = 1, limit = 8) => {
 };
 
 // 좋아요 추가
-export const addLike = async (lessonId: number) => {
+export const addLike = async (lessonId: number): Promise<void> => {
   try {
     const response = await apiClient.post(`/likes/${lessonId}`);
     return response.data;
@@ -26,7 +29,7 @@ export const addLike = async (lessonId: number) => {
 };
 
 // 좋아요 취소
-export const cancelLike = async (lessonId: number) => {
+export const cancelLike = async (lessonId: number): Promise<void> => {
   try {
     const response = await apiClient.delete(`/likes/${lessonId}`);
     return response.data;
