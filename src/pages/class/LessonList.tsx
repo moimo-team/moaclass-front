@@ -1,15 +1,12 @@
 import React, { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-
 import { LessonFilterSection } from "@/components/features/lessons/LessonFilterSection";
 import { LessonCard } from "@/components/features/lessons/LessonCard";
 import PaginationComponent from "@/components/common/PaginationComponent";
-
 import { useLessonsQuery } from "@/hooks/useLessonsQuery";
 import { useFilterStore } from "@/store/filterStore";
 import type { Lesson } from "@/models/lesson.model";
 
-// 리스트 표시용 컴포넌트
 const LessonListDisplay: React.FC<{
   lessons: Lesson[];
   isLoading: boolean;
@@ -39,7 +36,6 @@ const LessonListPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { setAllFilters, resetFilters } = useFilterStore();
 
-  // useMemo 사용
   const parsedParams = React.useMemo(() => {
     return {
       selectedCategories: searchParams.get("categories")?.split(",") || [],
@@ -57,7 +53,7 @@ const LessonListPage: React.FC = () => {
       ] as [number, number],
       // TODO: keyword도 필요하다면 여기서 파싱
     };
-  }, [searchParams]); // 쿼리 스트링 문자열이 바뀔 때만 재계산
+  }, [searchParams]);
 
   useEffect(() => {
     setAllFilters(parsedParams);

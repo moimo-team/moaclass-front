@@ -77,7 +77,7 @@ export const useLessonLikeMutation = (
 
       return { previousData };
     },
-    onError: (_, __, context) => {
+    onError: (err, __, context) => {
       toast.error("좋아요 토글 실패.");
       // 3. 에러 발생 시 이전 데이터로 롤백
       if (context?.previousData) {

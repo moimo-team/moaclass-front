@@ -15,11 +15,14 @@ export const useLatestLessonsQuery = () => {
   });
 };
 
-export const useLessonsQuery = (params: FetchLessonsParams, searchTrigger: number) => {
+export const useLessonsQuery = (
+  params: FetchLessonsParams,
+  searchTrigger: number,
+) => {
   return useQuery<FetchLessonsResponse, Error>({
     queryKey: ["lessons", params, searchTrigger],
     queryFn: () => fetchLessons(params),
-    staleTime: 1000 * 60 * 1,
+    staleTime: 1000 * 60 * 5,
     retry: 1,
   });
 };

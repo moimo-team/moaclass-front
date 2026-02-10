@@ -9,18 +9,24 @@ import defaultLessonImage from "@/assets/images/moimer-intro.png";
 import defaultProfileImage from "@/assets/images/profile.png";
 import { ClassInfoBody } from "@/components/common/ClassInfoBody";
 import { useLessonLikeMutation } from "@/hooks/useLessonLikeMutation";
+import type { QueryKey } from "@tanstack/react-query";
 
 interface LessonCardProps {
   lesson: Lesson;
   className?: string;
+  queryKeyToInvalidate?: QueryKey;
 }
 
-export function LessonCard({ lesson, className }: LessonCardProps) {
+export function LessonCard({
+  lesson,
+  className,
+  queryKeyToInvalidate = ["lessons"],
+}: LessonCardProps) {
   const { id, title, address, isLiked } = lesson;
   const href = `/lessons/${id}`;
 
   const { mutate: toggleLike, isPending: isLiking } = useLessonLikeMutation([
-    ["lessons"],
+    queryKeyToInvalidate,
   ]);
 
   const handleLikeClick = (e: React.MouseEvent) => {

@@ -1,24 +1,29 @@
-import { useLatestLessonsQuery } from "@/hooks/useLessonsQuery";
 import { Link } from "react-router-dom";
 import LessonList from "@/components/features/lessons/LessonList";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { Lesson } from "@/models/lesson.model";
+import type { QueryKey } from "@tanstack/react-query";
 
 interface LessonListSectionProps {
   title: string;
   seeMoreHref?: string;
   hideIfEmpty?: boolean;
+  lessons: Lesson[];
+  isLoading: boolean;
+  isError: boolean;
+  queryKeyToInvalidate?: QueryKey;
 }
 
 function LessonListSection({
   title,
   seeMoreHref,
   hideIfEmpty = false,
+  lessons,
+  isLoading,
+  isError,
+  queryKeyToInvalidate,
 }: LessonListSectionProps) {
-  const { data: lessons, isLoading, isError } = useLatestLessonsQuery();
-
-  const safeLessons = lessons || [];
-
-  if (hideIfEmpty && !isLoading && safeLessons.length === 0) {
+  if (hideIfEmpty && !isLoading && lessons.length === 0) {
     return null;
   }
 
@@ -44,10 +49,10 @@ function LessonListSection({
           수업 목록을 불러오는 중 에러가 발생했습니다.
         </p>
       )}
-      {!isLoading && !isError && safeLessons.length > 0 && (
-        <LessonList lessons={safeLessons} />
+      {!isLoading && !isError && lessons.length > 0 && (
+        <LessonList lessons={lessons} queryKeyToInvalidate={queryKeyToInvalidate} />
       )}
-      {!isLoading && !isError && safeLessons.length === 0 && (
+      {!isLoading && !isError && lessons.length === 0 && (
         <p className="text-center py-16">수업이 없습니다.</p>
       )}
     </div>

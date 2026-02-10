@@ -3,7 +3,7 @@ import { http, HttpResponse } from "msw";
 let mockLikedLessons: number[] = [];
 
 export const likeHandlers = [
-  http.post("/likes", async ({ request }) => {
+  http.post("/api/likes", async ({ request }) => {
     const { lessonId } = (await request.json()) as { lessonId: number };
 
     if (!lessonId) {
@@ -31,7 +31,7 @@ export const likeHandlers = [
     }
   }),
 
-  http.delete("/likes/:lessonId", ({ params }) => {
+  http.delete("/api/likes/:lessonId", ({ params }) => {
     const lessonId = Number(params.lessonId);
 
     if (isNaN(lessonId)) {
@@ -61,7 +61,7 @@ export const likeHandlers = [
     }
   }),
 
-  http.get("/likes", () => {
+  http.get("/api/likes", () => {
     return HttpResponse.json(mockLikedLessons, { status: 200 });
   }),
 ];
