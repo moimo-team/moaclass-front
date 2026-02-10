@@ -1,6 +1,10 @@
 import { delay, http, HttpResponse } from "msw";
 import { httpUrl } from "./mockData/mockData";
 import { MOCK_POINT_HISTORY } from "./mockData/pointMock";
+import { userStore } from "./mockData/userMock";
+
+// 포인트 내역 상태 관리 (메모리)
+let pointHistory = [...MOCK_POINT_HISTORY];
 
 // 유저 포인트 내역 조회
 const getUserPoints = http.get(`${httpUrl}/points/me`, async ({ request }) => {
@@ -11,7 +15,59 @@ const getUserPoints = http.get(`${httpUrl}/points/me`, async ({ request }) => {
     return HttpResponse.json({ message: "토큰이 없습니다." }, { status: 401 });
   }
 
-  return HttpResponse.json(MOCK_POINT_HISTORY, { status: 200 });
+  // 최신 순으로 정렬하여 반환 (createdAt 기준 내림차순)
+  const sortedHistory = [...pointHistory].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+
+  return HttpResponse.json(sortedHistory, { status: 200 });
 });
 
-export const pointHandlers = [getUserPoints];
+// 포인트 충전
+const chargePoint = http.post(
+  `${httpUrl}/points/charge`,
+  async ({ request }) => {
+    await delay(1000);
+    const token = request.headers.get("Authorization");
+    if (!token) {
+      console.error("chargePoint mock error: 토큰이 없습니다.");
+      return HttpResponse.json(
+        { message: "토큰이 없습니다." },
+        { status: 401 },
+      );
+    }
+
+    try {
+      const { amount } = (await request.json()) as any;
+      console.log("Charging points with body:", { amount });
+
+      // Mock Data 업데이트 (유저 포인트)
+      userStore.updatePoint(amount);
+
+      // Mock Data 업데이트 (포인트 내역 추가)
+      const newPointHistory = {
+        pointId: Math.floor(Math.random() * 1000000).toString(),
+        type: "CHARGE" as const,
+        title: "포인트 충전",
+        amount: amount,
+        createdAt: new Date().toISOString(), // 현재 시간
+      };
+      pointHistory.push(newPointHistory);
+
+      return HttpResponse.json(
+        {
+          message: "포인트가 성공적으로 충전되었습니다.",
+          ...newPointHistory,
+        },
+        { status: 201 },
+      );
+    } catch (error) {
+      return HttpResponse.json(
+        { message: "포인트 충전 중 오류가 발생했습니다." },
+        { status: 500 },
+      );
+    }
+  },
+);
+
+export const pointHandlers = [getUserPoints, chargePoint];

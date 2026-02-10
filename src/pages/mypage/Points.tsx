@@ -11,6 +11,7 @@ import { usePointQuery } from "@/hooks/usePointQuery";
 import { useAuthQuery } from "@/hooks/useAuthQuery";
 import { formatDateTime } from "@/utils/dateFormat";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { useChargePointMutation } from "@/hooks/usePointMutations";
 
 // 탭 상태 타입
 type TabStatus = (typeof POINT_TABS)[number];
@@ -34,13 +35,14 @@ const Points = () => {
   const [isChargeModalOpen, setIsChargeModalOpen] = useState(false);
   const { data: userPoints, isLoading } = usePointQuery();
   const { data: userInfo } = useAuthQuery();
+  const { mutateAsync: chargePoint } = useChargePointMutation();
 
   // 사용 가능 포인트
   const totalPoints = userInfo?.point || 0;
 
   // 포인트 충전
-  const handleCharge = (amount: number) => {
-    // TO DO : 실제 구현에서는 Mutation을 사용해야 함
+  const handleCharge = async (amount: number) => {
+    await chargePoint(amount);
     toast.success(`${amount.toLocaleString()}포인트가 충전되었습니다.`);
   };
 

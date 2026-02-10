@@ -16,3 +16,19 @@ export const getUserPoints = async (): Promise<PointResponse[]> => {
     throw error;
   }
 };
+
+/**
+ * 포인트 충전
+ * @returns
+ */
+export const chargePoint = async (amount: number) => {
+  try {
+    const response = await apiClient.post("/points/charge", { amount });
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("chargePoint error:", error.message);
+    }
+    throw error;
+  }
+};
