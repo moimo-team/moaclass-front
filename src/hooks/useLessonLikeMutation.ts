@@ -3,7 +3,7 @@ import {
   useQueryClient,
   type QueryKey,
 } from "@tanstack/react-query";
-import { addLessonLike, removeLessonLike } from "@/api/like.api";
+import { addLike, cancelLike } from "@/api/like.api";
 import type { Lesson, FetchLessonsResponse } from "@/models/lesson.model";
 import { toast } from "sonner";
 
@@ -32,9 +32,9 @@ export const useLessonLikeMutation = (
   >({
     mutationFn: async ({ lessonId, newIsLiked }: ToggleLikeVariables) => {
       if (newIsLiked) {
-        return addLessonLike(lessonId);
+        return addLike(lessonId);
       } else {
-        return removeLessonLike(lessonId);
+        return cancelLike(lessonId);
       }
     },
     onMutate: async ({ lessonId, newIsLiked }) => {
