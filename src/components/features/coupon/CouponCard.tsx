@@ -1,5 +1,5 @@
 import type { CouponInfo } from "@/models/coupon.model";
-import { combineDateAndTime, formatClassCreateDate } from "@/utils/dateFormat";
+import { formatFullDateTime } from "@/utils/dateFormat";
 
 // export interface Coupon {
 //     id: string;
@@ -78,7 +78,7 @@ export const CouponCard = ({
       <div className="flex flex-col h-full justify-between gap-3 pl-2">
         <div className="space-y-1">
           <div className="text-[12px] text-slate-400 font-medium">
-            {formatClassCreateDate(coupon.validUntil || "")} 까지
+            {formatFullDateTime(coupon.validUntil || "")} 까지
           </div>
           <h3
             className={`text-[15px] font-bold leading-tight break-keep pr-8 ${

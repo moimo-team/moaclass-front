@@ -1,5 +1,5 @@
 import { PaySectionCard } from "./PaySectionCard";
-import { formatClassCreateDate, formatDateSeparator } from "@/utils/dateFormat";
+import { formatFullDateTime } from "@/utils/dateFormat";
 import type { PayPreviewResponse } from "@/models/pay.model";
 
 interface TicketSectionProps {
@@ -26,7 +26,7 @@ export const TicketSection = ({ lesson }: TicketSectionProps) => {
           </div>
           <div>
             <p className="text-muted-foreground font-semibold mb-0.5">일시</p>
-            <p>{formatClassCreateDate(lesson.schedule.startAt)}</p>
+            <p>{formatFullDateTime(lesson.schedule.startAt)}</p>
           </div>
           <div>
             <p className="text-muted-foreground font-semibold mb-0.5">장소</p>
