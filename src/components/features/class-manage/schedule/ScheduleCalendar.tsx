@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { addMonths, subMonths, isSameDay } from "date-fns";
+import { isSameDay } from "date-fns";
 import { ScheduleCalendarHeader } from "./ScheduleCalendarHeader";
 import { ScheduleDateCell } from "./ScheduleDateCell";
 import { cn } from "@/lib/utils";
@@ -7,6 +6,13 @@ import { getCalendarDays, isInCurrentMonth, formatDateKey } from "@/utils/schedu
 import type { SchedulesByDate } from "@/models/schedule.model";
 
 interface ScheduleCalendarProps {
+  currentMonth: Date;
+  onPrevMonth: () => void;
+  onNextMonth: () => void;
+  onToday: () => void;
+  onSelectWeekdays: () => void;
+  onSelectWeekends: () => void;
+  onDeselectAll: () => void;
   schedulesByDate: SchedulesByDate;
   selectedDates: Date[];
   onDateClick: (date: Date) => void;
@@ -15,25 +21,30 @@ interface ScheduleCalendarProps {
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
 export const ScheduleCalendar = ({
+  currentMonth,
+  onPrevMonth,
+  onNextMonth,
+  onToday,
+  onSelectWeekdays,
+  onSelectWeekends,
+  onDeselectAll,
   schedulesByDate,
   selectedDates,
   onDateClick,
 }: ScheduleCalendarProps) => {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-
   const days = getCalendarDays(currentMonth);
-
-  const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
-  const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
-  const handleToday = () => setCurrentMonth(new Date());
 
   return (
     <div className="flex flex-col h-full">
       <ScheduleCalendarHeader
         currentMonth={currentMonth}
-        onPrevMonth={handlePrevMonth}
-        onNextMonth={handleNextMonth}
-        onToday={handleToday}
+        onPrevMonth={onPrevMonth}
+        onNextMonth={onNextMonth}
+        onToday={onToday}
+        onSelectWeekdays={onSelectWeekdays}
+        onSelectWeekends={onSelectWeekends}
+        onDeselectAll={onDeselectAll}
+        hasSelectedDates={selectedDates.length > 0}
       />
 
       <div className="flex-1 bg-white border-r border-b rounded-lg overflow-hidden shadow-sm">
@@ -53,7 +64,7 @@ export const ScheduleCalendar = ({
           ))}
         </div>
 
-        <div className="grid grid-cols-7 group">
+        <div className="grid grid-cols-7">
           {days.map((date) => {
             const dateKey = formatDateKey(date);
             const isSelected = selectedDates.some((d) => isSameDay(d, date));

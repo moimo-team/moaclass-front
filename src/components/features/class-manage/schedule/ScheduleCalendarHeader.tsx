@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 
@@ -7,6 +7,10 @@ interface ScheduleCalendarHeaderProps {
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onToday: () => void;
+  onSelectWeekdays: () => void;
+  onSelectWeekends: () => void;
+  onDeselectAll: () => void;
+  hasSelectedDates: boolean;
 }
 
 export const ScheduleCalendarHeader = ({
@@ -14,6 +18,10 @@ export const ScheduleCalendarHeader = ({
   onPrevMonth,
   onNextMonth,
   onToday,
+  onSelectWeekdays,
+  onSelectWeekends,
+  onDeselectAll,
+  hasSelectedDates,
 }: ScheduleCalendarHeaderProps) => {
   return (
     <div className="flex items-center justify-between mb-6">
@@ -21,29 +29,61 @@ export const ScheduleCalendarHeader = ({
         <h2 className="text-xl font-bold text-gray-900">
           {format(currentMonth, "yyyy년 M월")}
         </h2>
-        <div className="flex border rounded-lg overflow-hidden bg-white shadow-sm">
+
+        <div className="flex items-center border rounded-lg overflow-hidden bg-white shadow-sm h-10">
           <button
             onClick={onPrevMonth}
-            className="p-1.5 hover:bg-gray-50 border-r transition-colors"
+            className="px-3 h-full hover:bg-gray-50 border-r transition-colors"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+            <ChevronLeft className="w-4 h-4 text-gray-600" />
+          </button>
+          <button
+            onClick={onToday}
+            className="px-4 h-full text-xs font-bold text-gray-600 hover:bg-gray-50 border-r transition-colors"
+          >
+            오늘
           </button>
           <button
             onClick={onNextMonth}
-            className="p-1.5 hover:bg-gray-50 transition-colors"
+            className="px-3 h-full hover:bg-gray-50 transition-colors"
           >
-            <ChevronRight className="w-5 h-5 text-gray-600" />
+            <ChevronRight className="w-4 h-4 text-gray-600" />
           </button>
         </div>
       </div>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onToday}
-        className="font-medium text-gray-600 border-gray-300 hover:bg-gray-50"
-      >
-        오늘
-      </Button>
+
+      <div className="flex items-center gap-2">
+        <div className="flex bg-gray-100/50 p-1 rounded-xl border">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onSelectWeekdays}
+            className="h-8 text-xs font-bold px-3 hover:bg-white hover:shadow-sm"
+          >
+            평일
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onSelectWeekends}
+            className="h-8 text-xs font-bold px-3 hover:bg-white hover:shadow-sm"
+          >
+            주말
+          </Button>
+        </div>
+
+        {hasSelectedDates && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onDeselectAll}
+            className="h-10 px-4 rounded-xl border-red-100 text-red-500 hover:bg-red-50 hover:text-red-600 font-bold gap-1.5 transition-all animate-in fade-in zoom-in duration-200"
+          >
+            <X className="w-3.5 h-3.5" />
+            선택취소
+          </Button>
+        )}
+      </div>
     </div>
   );
 };
