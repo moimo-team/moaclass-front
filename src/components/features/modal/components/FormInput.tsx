@@ -16,6 +16,7 @@ interface FormInputProps {
   error?: string;
   readOnly?: boolean;
   disabled?: boolean;
+  type?: string;
   className?: string;
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
@@ -42,6 +43,7 @@ export const FormInput = ({
   error,
   readOnly = false,
   disabled = false,
+  type = "text",
   className = "",
   onFocus,
 }: FormInputProps) => {
@@ -64,6 +66,7 @@ export const FormInput = ({
         ) : (
           <Input
             id={id}
+            type={type}
             {...register}
             value={value}
             onChange={onChange}
