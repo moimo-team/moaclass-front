@@ -1,9 +1,13 @@
-import { Trash2, Clock } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { Clock, CheckCircle2, Calendar as CalendarIcon, Trash2, CalendarRange } from "lucide-react";
 import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
-import { extractTimeFromISO, formatDisplayDate } from "@/utils/scheduleHelpers";
+import { Button } from "@/components/ui/button";
+import { extractTimeFromISO } from "@/utils/scheduleHelpers";
 import type { LessonSchedule } from "@/models/schedule.model";
-import { useDeleteScheduleMutation } from "@/hooks/useScheduleMutations";
+import { useDeleteSchedulesMutation } from "@/hooks/useScheduleMutations";
+import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
 
 interface ScheduleSidebarProps {
   lessonId: number;
@@ -16,74 +20,220 @@ export const ScheduleSidebar = ({
   selectedDates,
   schedulesByDate,
 }: ScheduleSidebarProps) => {
-  const { mutate: deleteSchedule } = useDeleteScheduleMutation(lessonId);
+  const { mutate: deleteSchedules } = useDeleteSchedulesMutation(lessonId);
+  const [selectedScheduleIds, setSelectedScheduleIds] = useState<number[]>([]);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  // 선택된 날짜가 바뀌면 선택 상태 초기화
+  useEffect(() => {
+    setSelectedScheduleIds([]);
+  }, [selectedDates]);
 
   const dateKeys = selectedDates.map((d) => format(d, "yyyy-MM-dd"));
 
-  const selectedSchedules = dateKeys
-    .flatMap((key) => schedulesByDate[key] || [])
-    .sort((a, b) => a.startAt.localeCompare(b.startAt));
+  const allSelectedSchedules = useMemo(() => {
+    return dateKeys
+      .flatMap((key) => schedulesByDate[key] || [])
+      .sort((a, b) => a.startAt.localeCompare(b.startAt));
+  }, [dateKeys, schedulesByDate]);
+
+  const withParticipants = allSelectedSchedules.filter(s => s.currentParticipants > 0);
+  const withoutParticipants = allSelectedSchedules.filter(s => s.currentParticipants === 0);
+
+  const toggleScheduleSelection = (id: number) => {
+    setSelectedScheduleIds(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAllWithoutParticipants = () => {
+    const isAllSelected = withoutParticipants.length > 0 &&
+      withoutParticipants.every(s => selectedScheduleIds.includes(s.id));
+
+    if (isAllSelected) {
+      setSelectedScheduleIds([]);
+    } else {
+      setSelectedScheduleIds(withoutParticipants.map(s => s.id));
+    }
+  };
+
+  const handleDeleteClick = () => {
+    if (selectedScheduleIds.length === 0) return;
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    deleteSchedules(selectedScheduleIds, {
+      onSuccess: () => {
+        setSelectedScheduleIds([]);
+        setIsDeleteDialogOpen(false);
+      }
+    });
+  };
 
   if (selectedDates.length === 0) {
     return (
-      <div className="bg-gray-50 rounded-2xl p-10 text-center border-2 border-dashed border-gray-200">
-        <p className="text-gray-400 text-sm font-medium leading-relaxed">
-          캘린더에서 날짜를 선택하여<br />일정을 확인하거나 등록하세요.
-        </p>
+      <div className="bg-gray-50/50 rounded-2xl p-8 text-center border-2 border-dashed border-gray-100 h-[600px] flex flex-col items-center justify-center">
+        <div className="bg-white w-14 h-14 rounded-full flex items-center justify-center mb-5 shadow-sm border border-gray-100">
+          <CalendarRange className="w-7 h-7 text-gray-200" />
+        </div>
+        <div className="space-y-1">
+          <p className="text-gray-500 text-sm font-extrabold">선택된 날짜 없음</p>
+          <p className="text-gray-400 text-xs font-medium leading-relaxed">
+            캘린더에서 날짜를 클릭하여<br />일정을 관리해 보세요.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="font-bold text-gray-900">
-          {selectedDates.length === 1
-            ? formatDisplayDate(selectedDates[0])
-            : `${selectedDates.length}개 날짜 선택됨`}
-        </h3>
-        <Badge variant="secondary" className="bg-blue-50 text-blue-600 border-none px-3 py-1">
-          총 {selectedSchedules.length}건
-        </Badge>
+    <div className="flex flex-col h-full max-h-[800px]">
+      <div className="pb-6">
+        <div className="flex items-center justify-between border-b pb-4">
+          <div className="flex items-center gap-2">
+            <div className="bg-primary/10 p-2 rounded-lg">
+              <CalendarIcon className="w-5 h-5 text-primary" />
+            </div>
+            <h2 className="text-xl font-black text-gray-900 tracking-tight">상세 일정 관리</h2>
+          </div>
+          <Badge className="bg-primary/10 text-primary border-none hover:bg-primary/20 px-3 py-1 font-black shadow-sm shrink-0">
+            총 {allSelectedSchedules.length}건
+          </Badge>
+        </div>
       </div>
 
-      <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-        {selectedSchedules.length > 0 ? (
-          selectedSchedules.map((schedule) => (
-            <div
-              key={schedule.id}
-              className="group p-4 bg-white border rounded-xl hover:border-primary/30 hover:shadow-sm transition-all"
-            >
-              <div className="flex items-start justify-between">
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2 text-sm font-bold text-gray-800">
-                    <Clock className="w-3.5 h-3.5 text-primary" />
-                    {extractTimeFromISO(schedule.startAt)} - {extractTimeFromISO(schedule.endAt)}
-                  </div>
-                  <div className="text-[13px] text-gray-500 font-medium">
-                    신청 인원: <span className={schedule.currentParticipants > 0 ? "text-primary font-bold" : ""}>
-                      {schedule.currentParticipants}
-                    </span> / {schedule.maxParticipants}명
-                  </div>
-                </div>
+      {allSelectedSchedules.length === 0 ? (
+        <div className="py-20 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-100">
+          <p className="text-gray-400 text-xs font-bold">등록된 상세 일정이 없습니다.</p>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto scrollbar-hide space-y-8 pr-0.5">
 
-                {schedule.currentParticipants === 0 && (
-                  <button
-                    onClick={() => deleteSchedule(schedule.id)}
-                    className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all md:opacity-0 md:group-hover:opacity-100"
-                    title="상세 일정이 없는 경우에만 삭제 가능"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
+          {/* 섹션 1: 모멘티 O */}
+          {withParticipants.length > 0 && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 px-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest">모멘티 O</h4>
+              </div>
+              <div className="grid gap-2.5">
+                {withParticipants.map((schedule) => (
+                  <ScheduleCard
+                    key={schedule.id}
+                    schedule={schedule}
+                    isWithParticipants
+                  />
+                ))}
               </div>
             </div>
-          ))
-        ) : (
-          <div className="py-12 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
-            <p className="text-gray-400 text-sm font-medium">등록된 일정이 없습니다.</p>
+          )}
+
+          {/* 섹션 2: 모멘티 X */}
+          {withoutParticipants.length > 0 && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+                  <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest">모멘티 X</h4>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {selectedScheduleIds.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleDeleteClick}
+                      className="h-7 text-red-500 hover:text-red-700 hover:bg-red-50 text-[11px] font-black px-2 rounded-lg transition-all animate-in slide-in-from-right-2"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 mr-1" />
+                      삭제({selectedScheduleIds.length})
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleSelectAllWithoutParticipants}
+                    className="h-7 text-[11px] font-black text-gray-500 hover:bg-gray-100 px-2 rounded-lg"
+                  >
+                    {withoutParticipants.every(s => selectedScheduleIds.includes(s.id)) ? "해제" : "전체"}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid gap-2.5">
+                {withoutParticipants.map((schedule) => (
+                  <ScheduleCard
+                    key={schedule.id}
+                    schedule={schedule}
+                    isSelected={selectedScheduleIds.includes(schedule.id)}
+                    onClick={() => toggleScheduleSelection(schedule.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="h-4" />
+        </div>
+      )}
+
+      {/* 🚀 브라우저 기본 confirm 대신 ConfirmDialog 사용 */}
+      <ConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="일정 삭제 확인"
+        description={`선택한 ${selectedScheduleIds.length}개의 일정을 삭제하시겠습니까?\n삭제된 일정은 복구할 수 없습니다.`}
+        confirmText="삭제하기"
+        onConfirm={handleConfirmDelete}
+        variant="destructive"
+      />
+    </div>
+  );
+};
+
+const ScheduleCard = ({
+  schedule,
+  isWithParticipants = false,
+  isSelected = false,
+  onClick
+}: {
+  schedule: LessonSchedule;
+  isWithParticipants?: boolean;
+  isSelected?: boolean;
+  onClick?: () => void;
+}) => {
+  return (
+    <div
+      onClick={!isWithParticipants ? onClick : undefined}
+      className={`relative p-4 border rounded-xl transition-all duration-300 cursor-pointer ${isWithParticipants
+          ? "bg-gray-50/30 border-gray-100 cursor-default"
+          : isSelected
+            ? "bg-white border-primary shadow-md ring-4 ring-primary/5"
+            : "bg-white border-gray-100 hover:border-gray-300 hover:shadow-sm"
+        }`}
+    >
+      <div className="flex flex-col gap-2.5">
+        <div className="flex items-center justify-between">
+          <div className={`flex items-center gap-1.5 text-[14px] font-black tracking-tight ${isSelected ? "text-primary" : "text-gray-800"}`}>
+            {format(new Date(schedule.startAt), "yyyy년 MM월 dd일 (eee)", { locale: ko })}
           </div>
-        )}
+          {isSelected && (
+            <div className="bg-primary text-white rounded-full p-0.5 shadow-sm animate-in zoom-in duration-300">
+              <CheckCircle2 className="w-3 h-3" />
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between bg-gray-50/50 p-2 rounded-lg">
+          <div className={`flex items-center gap-2 text-[13px] font-bold ${isSelected ? "text-gray-800" : "text-gray-500"}`}>
+            <Clock className={`w-3.5 h-3.5 ${isWithParticipants ? "text-primary/60" : isSelected ? "text-primary" : "text-gray-300"}`} />
+            {extractTimeFromISO(schedule.startAt)} - {extractTimeFromISO(schedule.endAt)}
+          </div>
+
+          <div className={`text-[12px] font-black ${isWithParticipants ? "text-primary" : isSelected ? "text-primary/80" : "text-gray-400"}`}>
+            {schedule.currentParticipants} / {schedule.maxParticipants}명
+          </div>
+        </div>
       </div>
     </div>
   );
