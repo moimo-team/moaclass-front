@@ -25,6 +25,7 @@ const handlers = [
   ...chatHandler,
   ...participationHandlers,
   ...notificationHandlers,
+  ...scheduleHandlers, 
   ...lessonHandlers,
   ...regionHandler,
   ...categoryHandler,
@@ -32,7 +33,6 @@ const handlers = [
   ...couponHandlers,
   ...likeHandlers,
   ...pointHandlers,
-  ...scheduleHandlers,
 ];
 
 export const worker = setupWorker(...handlers);

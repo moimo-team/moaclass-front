@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw';
+import { httpUrl } from './mockData/mockData';
 import type { LessonSchedule } from '@/models/schedule.model';
 
 let mockSchedules: LessonSchedule[] = [
@@ -32,38 +33,39 @@ let mockSchedules: LessonSchedule[] = [
 ];
 
 export const scheduleHandlers = [
-  http.get('/api/lessons/:lessonId/schedules', ({ params }) => {
+  http.get(`${httpUrl}/lessons/:lessonId/schedules`, ({ params }) => {
     const { lessonId } = params;
     const filtered = mockSchedules.filter(
       (s) => s.lessonId === Number(lessonId),
     );
-
     return HttpResponse.json(filtered);
   }),
 
-  http.post('/api/lessons/:lessonId/schedules', async ({ request, params }) => {
-    const { lessonId } = params;
-    const body = (await request.json()) as Array<{
-      startAt: string;
-      endAt: string;
-    }>;
+  http.post(
+    `${httpUrl}/lessons/:lessonId/schedules`,
+    async ({ request, params }) => {
+      const { lessonId } = params;
+      const body = (await request.json()) as Array<{
+        startAt: string;
+        endAt: string;
+      }>;
 
-    const newSchedules = body.map((item, index) => ({
-      id: mockSchedules.length + index + 1,
-      lessonId: Number(lessonId),
-      startAt: item.startAt,
-      endAt: item.endAt,
-      currentParticipants: 0,
-      maxParticipants: 4,
-      createdAt: new Date().toISOString(),
-    }));
+      const newSchedules = body.map((item, index) => ({
+        id: mockSchedules.length + index + 100,
+        lessonId: Number(lessonId),
+        startAt: item.startAt,
+        endAt: item.endAt,
+        currentParticipants: 0,
+        maxParticipants: 4,
+        createdAt: new Date().toISOString(),
+      }));
 
-    mockSchedules = [...mockSchedules, ...newSchedules];
+      mockSchedules = [...mockSchedules, ...newSchedules];
+      return HttpResponse.json({ message: '등록 성공' }, { status: 201 });
+    },
+  ),
 
-    return HttpResponse.json({ message: '등록 성공' }, { status: 201 });
-  }),
-
-  http.delete('/api/lessons/schedules/:scheduleId', ({ params }) => {
+  http.delete(`${httpUrl}/lessons/schedules/:scheduleId`, ({ params }) => {
     const { scheduleId } = params;
     const schedule = mockSchedules.find((s) => s.id === Number(scheduleId));
 
@@ -85,10 +87,16 @@ export const scheduleHandlers = [
     return new HttpResponse(null, { status: 204 });
   }),
 
-  http.delete('/api/lessons/schedules', async ({ request }) => {
+  http.delete(`${httpUrl}/lessons/schedules`, async ({ request }) => {
     const { scheduleIds } = (await request.json()) as { scheduleIds: number[] };
 
-    // 신청자가 있는 일정이 포함되어 있는지 확인
+    if (!scheduleIds || !Array.isArray(scheduleIds)) {
+      return HttpResponse.json(
+        { message: '잘못된 요청입니다.' },
+        { status: 400 },
+      );
+    }
+
     const hasParticipants = mockSchedules.some(
       (s) => scheduleIds.includes(s.id) && s.currentParticipants > 0,
     );
