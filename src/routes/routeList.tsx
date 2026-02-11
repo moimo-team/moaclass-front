@@ -113,12 +113,11 @@ export const routeList = [
       },
       {
         path: "/mypage",
-        element: <MypageSession />,
-        // (
-        //   <ProtectedRoute>
-        //     <MypageSession />,
-        //   </ProtectedRoute>
-        // ),
+        element: (
+          <ProtectedRoute>
+            <MypageSession />
+          </ProtectedRoute>
+        ),
         children: [
           {
             index: true,

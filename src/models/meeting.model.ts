@@ -1,3 +1,5 @@
+import type { PaginationMeta } from "./pagination.model";
+
 // 위치 정보
 export interface Location {
   address: string;
@@ -56,16 +58,9 @@ export interface MeetingDetail {
   };
 }
 
-export interface MeetingMeta {
-  totalCount: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
 export interface MeetingListResponse {
   data: Meeting[];
-  meta: MeetingMeta;
+  meta: PaginationMeta;
 }
 
 // 모임 생성 API 요청 타입
