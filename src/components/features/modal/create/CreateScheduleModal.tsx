@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Plus, Trash2, Calendar as CalendarIcon } from "lucide-react";
 import { format, eachDayOfInterval } from "date-fns";
@@ -26,6 +26,12 @@ export const CreateScheduleModal = ({
 }: CreateScheduleModalProps) => {
   const { mutate: createSchedules, isPending } = useCreateSchedulesMutation(lessonId);
   const [activeTab, setActiveTab] = useState("single");
+
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(selectedDates.length > 0 ? "single" : "recurring");
+    }
+  }, [isOpen, selectedDates.length]);
 
   const singleForm = useForm({
     defaultValues: {
@@ -104,10 +110,12 @@ export const CreateScheduleModal = ({
       containerClassName="max-w-md"
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-2 p-1 bg-gray-100/50 rounded-xl mb-6">
-          <TabsTrigger value="single" className="rounded-lg font-bold py-2.5">
-            개별 등록
-          </TabsTrigger>
+        <TabsList className={`grid p-1 bg-gray-100/50 rounded-xl mb-6 ${selectedDates.length > 0 ? "grid-cols-2" : "grid-cols-1"}`}>
+          {selectedDates.length > 0 && (
+            <TabsTrigger value="single" className="rounded-lg font-bold py-2.5">
+              개별 등록
+            </TabsTrigger>
+          )}
           <TabsTrigger value="recurring" className="rounded-lg font-bold py-2.5">
             반복 등록
           </TabsTrigger>
@@ -131,49 +139,51 @@ export const CreateScheduleModal = ({
             </div>
 
             <form onSubmit={singleForm.handleSubmit(onSingleSubmit)} className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <Label className="text-sm font-bold text-gray-700">시간 설정</Label>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => append({ startTime: "09:00", endTime: "10:00" })}
-                    className="h-8 text-primary font-bold gap-1 hover:bg-primary/5 px-2"
-                  >
-                    <Plus className="w-4 h-4" /> 슬롯 추가
-                  </Button>
-                </div>
+              {selectedDates.length > 0 && (
+                <div className="space-y-4 animate-in fade-in duration-300">
+                  <div className="flex justify-between items-center">
+                    <Label className="text-sm font-bold text-gray-700">시간 설정</Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => append({ startTime: "09:00", endTime: "10:00" })}
+                      className="h-8 text-primary font-bold gap-1 hover:bg-primary/5 px-2"
+                    >
+                      <Plus className="w-4 h-4" /> 슬롯 추가
+                    </Button>
+                  </div>
 
-                <div className="space-y-3">
-                  {fields.map((field, index) => (
-                    <div key={field.id} className="flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                      <FormInput
-                        id={`start-${index}`}
-                        type="time"
-                        register={singleForm.register(`timeSlots.${index}.startTime` as const)}
-                      />
-                      <span className="text-gray-400 font-bold self-center mt-2">~</span>
-                      <FormInput
-                        id={`end-${index}`}
-                        type="time"
-                        register={singleForm.register(`timeSlots.${index}.endTime` as const)}
-                      />
-                      {fields.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => remove(index)}
-                          className="h-12 w-12 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg shrink-0 mt-2 transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
+                  <div className="space-y-3">
+                    {fields.map((field, index) => (
+                      <div key={field.id} className="flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                        <FormInput
+                          id={`start-${index}`}
+                          type="time"
+                          register={singleForm.register(`timeSlots.${index}.startTime` as const)}
+                        />
+                        <span className="text-gray-400 font-bold self-center mt-2">~</span>
+                        <FormInput
+                          id={`end-${index}`}
+                          type="time"
+                          register={singleForm.register(`timeSlots.${index}.endTime` as const)}
+                        />
+                        {fields.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => remove(index)}
+                            className="h-12 w-12 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg shrink-0 mt-2 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <Button
                 type="submit"
