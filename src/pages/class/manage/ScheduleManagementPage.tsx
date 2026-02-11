@@ -1,67 +1,134 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
+import {
+  isSameDay,
+  addMonths,
+  subMonths,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isWeekend as isDateWeekend
+} from "date-fns";
 import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { ScheduleCalendar } from "@/components/features/class-manage/schedule/ScheduleCalendar";
+import { ScheduleSidebar } from "@/components/features/class-manage/schedule/ScheduleSidebar";
+import { CreateScheduleModal } from "@/components/features/modal/create/CreateScheduleModal";
 import { useScheduleQuery } from "@/hooks/useScheduleQuery";
 
 export default function ScheduleManagementPage() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
 
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
   const { data, isLoading, isError } = useScheduleQuery(Number(lessonId));
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
+  const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
+  const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
+  const handleToday = () => setCurrentMonth(new Date());
+
+  const handleDateClick = (date: Date) => {
+    setSelectedDates((prev) => {
+      const isAlreadySelected = prev.some((d) => isSameDay(d, date));
+      if (isAlreadySelected) {
+        return prev.filter((d) => !isSameDay(d, date));
+      }
+      return [...prev, date];
+    });
+  };
+
+  const toggleDatesByType = (isWeekend: boolean) => {
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(currentMonth);
+    const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+    const targetDates = daysInMonth.filter(date => isDateWeekend(date) === isWeekend);
+
+    setSelectedDates(prev => {
+      const allTargetsSelected = targetDates.every(target =>
+        prev.some(p => isSameDay(p, target))
+      );
+
+      if (allTargetsSelected) {
+        return prev.filter(p => !targetDates.some(target => isSameDay(p, target)));
+      } else {
+        const otherDates = prev.filter(p => !targetDates.some(target => isSameDay(p, target)));
+        return [...otherDates, ...targetDates];
+      }
+    });
+  };
+
+  if (isLoading) return <LoadingSpinner />;
 
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-        <p className="text-red-500">일정을 불러올 수 없습니다.</p>
-        <Button onClick={() => navigate(-1)}>돌아가기</Button>
+        <p className="text-red-500 font-medium">일정을 불러올 수 없습니다.</p>
+        <Button onClick={() => navigate(-1)} variant="outline">돌아가기</Button>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 max-w-7xl">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 text-gray-600" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold">일정 및 예약 관리</h1>
-            <p className="text-sm text-gray-500 mt-1">클래스 ID: {lessonId}</p>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">일정 및 예약 관리</h1>
+            <p className="text-sm text-gray-500 mt-1 font-medium">클래스 {lessonId}의 일정을 관리합니다.</p>
           </div>
         </div>
 
-        <Button>일정 등록</Button>
+        <Button
+          onClick={() => setIsRegisterModalOpen(true)}
+          className="font-bold gap-2 rounded-xl h-11 px-6 shadow-sm hover:shadow transition-all"
+        >
+          <Plus className="w-5 h-5" />
+          일정 등록
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-lg border p-6">
-          <h2 className="text-lg font-semibold mb-4">캘린더</h2>
-          <div className="bg-gray-50 rounded-lg p-8 text-center text-gray-400">
-            캘린더 컴포넌트 (Phase 2에서 구현 예정)
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="lg:col-span-8 overflow-hidden">
+          <ScheduleCalendar
+            currentMonth={currentMonth}
+            onPrevMonth={handlePrevMonth}
+            onNextMonth={handleNextMonth}
+            onToday={handleToday}
+            onSelectWeekdays={() => toggleDatesByType(false)}
+            onSelectWeekends={() => toggleDatesByType(true)}
+            onDeselectAll={() => setSelectedDates([])}
+            schedulesByDate={data?.byDate || {}}
+            selectedDates={selectedDates}
+            onDateClick={handleDateClick}
+          />
         </div>
 
-        <div className="bg-white rounded-lg border p-6">
-          <h2 className="text-lg font-semibold mb-4">선택한 날짜의 일정</h2>
-          <div className="bg-gray-50 rounded-lg p-8 text-center text-gray-400">
-            일정 목록 (Phase 3에서 구현 예정)
-          </div>
-
-          <div className="mt-4 p-4 bg-blue-50 rounded text-xs">
-            <p className="font-semibold mb-2">불러온 일정 수:</p>
-            <p>{data?.raw.length || 0}개</p>
-          </div>
+        <div className="lg:col-span-4 bg-white rounded-2xl border shadow-sm p-6 sticky top-8">
+          <ScheduleSidebar
+            lessonId={Number(lessonId)}
+            selectedDates={selectedDates}
+            schedulesByDate={data?.byDate || {}}
+          />
         </div>
       </div>
+
+      <CreateScheduleModal
+        isOpen={isRegisterModalOpen}
+        onClose={() => setIsRegisterModalOpen(false)}
+        lessonId={Number(lessonId)}
+        selectedDates={selectedDates}
+      />
     </div>
   );
 }
