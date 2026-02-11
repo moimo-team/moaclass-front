@@ -14,7 +14,6 @@ export const useOrderlistQuery = (
   const queryResult = useQuery({
     queryKey: ["orderlist", userId, status, page, limit],
     queryFn: () => getOrderList(status, page, limit),
-    staleTime: 0,
     enabled: !!userId,
   });
 
