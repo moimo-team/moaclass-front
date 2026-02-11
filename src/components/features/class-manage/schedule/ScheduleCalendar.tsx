@@ -67,8 +67,10 @@ export const ScheduleCalendar = ({
         <div className="grid grid-cols-7">
           {days.map((date) => {
             const dateKey = formatDateKey(date);
+            const daySchedules = schedulesByDate[dateKey] || [];
             const isSelected = selectedDates.some((d) => isSameDay(d, date));
-            const hasSchedules = !!schedulesByDate[dateKey] && schedulesByDate[dateKey].length > 0;
+            const hasSchedules = daySchedules.length > 0;
+            const hasParticipants = daySchedules.some((s) => s.currentParticipants > 0);
 
             return (
               <ScheduleDateCell
@@ -77,6 +79,7 @@ export const ScheduleCalendar = ({
                 isCurrentMonth={isInCurrentMonth(date, currentMonth)}
                 isSelected={isSelected}
                 hasSchedules={hasSchedules}
+                hasParticipants={hasParticipants}
                 onClick={onDateClick}
               />
             );

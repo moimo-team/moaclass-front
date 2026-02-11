@@ -6,6 +6,7 @@ interface ScheduleDateCellProps {
   isCurrentMonth: boolean;
   isSelected: boolean;
   hasSchedules: boolean;
+  hasParticipants?: boolean;
   onClick: (date: Date) => void;
 }
 
@@ -14,6 +15,7 @@ export const ScheduleDateCell = ({
   isCurrentMonth,
   isSelected,
   hasSchedules,
+  hasParticipants = false,
   onClick,
 }: ScheduleDateCellProps) => {
   const isToday = isDateToday(date);
@@ -41,20 +43,28 @@ export const ScheduleDateCell = ({
           {day}
         </span>
 
+        <div className="flex gap-1">
+          {hasSchedules && (
+            <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
+          )}
+          {hasParticipants && (
+            <div className="w-1.5 h-1.5 rounded-full bg-carrot animate-pulse" />
+          )}
+        </div>
+      </div>
+
+      <div className="mt-2 space-y-1 overflow-hidden">
         {hasSchedules && (
-          <div className="flex gap-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+          <div className={cn(
+            "px-1.5 py-0.5 text-[10px] rounded truncate font-medium",
+            hasParticipants
+              ? "bg-carrot/10 text-carrot border border-carrot/20"
+              : "bg-primary/5 text-primary border border-primary/10"
+          )}>
+            {hasParticipants ? "신청자 있음" : "일정 있음"}
           </div>
         )}
       </div>
-
-      {hasSchedules && (
-        <div className="mt-2 space-y-1 overflow-hidden">
-          <div className="px-1.5 py-0.5 bg-blue-100 text-[10px] text-blue-700 rounded truncate font-medium">
-            등록된 일정 있음
-          </div>
-        </div>
-      )}
     </div>
   );
 };
