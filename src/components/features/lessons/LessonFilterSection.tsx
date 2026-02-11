@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -22,11 +22,13 @@ import { FilterToggleGroup } from "@/components/common/FilterToggleGroup";
 import { FilterBadges } from "@/components/features/lessons/FilterBadges";
 
 import { useFilterStore } from "@/store/filterStore";
+import { useCategoryQuery } from "@/hooks/useCategoryQuery";
+import type { FetchLessonsParams } from "@/models/lesson.model";
 
 interface LessonFilterSectionProps {
   onClose?: () => void;
   showCloseButton?: boolean;
-  onSearch?: () => void;
+  onSearch?: (mappedParams: FetchLessonsParams) => void;
   onReset?: () => void;
 }
 
@@ -46,6 +48,8 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
     selectedCategories,
     activeMainCategoryId,
     selectedMainCategory,
+    selectedStatus,
+    toggleStatus,
     toggleRegion,
     setSelectedPersonnel,
     setTimeRange,
@@ -56,9 +60,32 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
     toggleSubCategory,
     removeCategoryBadge,
     resetFilters,
+    getFetchLessonsParams,
+    setRegionIdMap,
+    setCategoryIdMap,
   } = useFilterStore();
 
-  const { data: regions, isLoading } = useRegionQuery();
+  const { data: regions, isLoading: isRegionsLoading } = useRegionQuery();
+  const { data: lessonCategories, isLoading: isCategoriesLoading } =
+    useCategoryQuery();
+
+  useEffect(() => {
+    if (regions && !isRegionsLoading) {
+      const newRegionMap = new Map(
+        regions.map((region) => [region.name, region.id]),
+      );
+      setRegionIdMap(newRegionMap);
+    }
+  }, [regions, isRegionsLoading, setRegionIdMap]);
+
+  useEffect(() => {
+    if (lessonCategories && !isCategoriesLoading) {
+      const newCategoryMap = new Map(
+        lessonCategories.map((category) => [category.name, category.id]),
+      );
+      setCategoryIdMap(newCategoryMap);
+    }
+  }, [lessonCategories, isCategoriesLoading, setCategoryIdMap]);
 
   const getRegionButtonText = () => {
     if (!selectedRegions.length) return "지역을 선택하세요";
@@ -99,7 +126,7 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
                     </label>
                   </div>
                   {/* 개별 지역 */}
-                  {isLoading
+                  {isRegionsLoading
                     ? Array.from({ length: 6 }).map((_, i) => (
                         <Skeleton key={i} className="h-6 w-full" />
                       ))
@@ -154,7 +181,29 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 
         {/* 오른쪽 열 */}
         <div className="flex flex-col gap-2">
-          {/* 5. 인원 필터 */}
+          {/* 5. 상태 필터 */}
+          <div className="p-2 border rounded-md bg-white flex flex-row items-center gap-6">
+            <label className="block text-lg font-bold text-gray-700 min-w-[70px]">
+              상태
+            </label>
+            <Select
+              value={selectedStatus || "ALL_STATUSES"}
+              onValueChange={(value) =>
+                toggleStatus(value === "ALL_STATUSES" ? null : value)
+              }
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="상태를 선택하세요" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL_STATUSES">전체</SelectItem>
+                <SelectItem value="운영중">모집중</SelectItem>
+                <SelectItem value="휴면 상태">모집 종료</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 6. 인원 필터 */}
           <div className="p-2 border rounded-md bg-white flex flex-row items-center gap-6">
             <label className="block text-lg font-bold text-gray-700 min-w-[70px]">
               인원
@@ -172,16 +221,16 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
                     {num}명
                   </SelectItem>
                 ))}
-                <SelectItem value="10+">10명 이상</SelectItem>
-                <SelectItem value="20+">20명 이상</SelectItem>
-                <SelectItem value="30+">30명 이상</SelectItem>
-                <SelectItem value="40+">40명 이상</SelectItem>
-                <SelectItem value="50+">50명 이상</SelectItem>
+                <SelectItem value="10">10명 이상</SelectItem>
+                <SelectItem value="20">20명 이상</SelectItem>
+                <SelectItem value="30">30명 이상</SelectItem>
+                <SelectItem value="40">40명 이상</SelectItem>
+                <SelectItem value="50">50명 이상</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* 6. 시간 필터 */}
+          {/* 7. 시간 필터 */}
           <div className="p-2 border rounded-md bg-white flex flex-row items-center gap-6">
             <label className="block text-lg font-bold text-gray-700 min-w-[70px]">
               시간
@@ -197,7 +246,7 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
             />
           </div>
 
-          {/* 7. 금액 필터 */}
+          {/* 8. 금액 필터 */}
           <div className="p-2 border rounded-md bg-white flex flex-row items-center gap-6">
             <label className="block text-lg font-bold text-gray-700 min-w-[70px]">
               금액
@@ -237,7 +286,10 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
         >
           초기화
         </Button>
-        <Button onClick={onSearch} className="px-8 font-bold">
+        <Button
+          onClick={() => onSearch?.(getFetchLessonsParams())}
+          className="px-8 font-bold"
+        >
           검색
         </Button>
       </div>

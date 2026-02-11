@@ -1,6 +1,9 @@
 import { create } from "zustand";
+import { REVERSE_LEVEL_MAP } from "@/constants/lessonConstants";
+import { DAYS_MAP } from "@/constants/dayConstants";
+import { STATUS_MAP } from "@/constants/statusConstants";
+import type { FetchLessonsParams } from "@/models/lesson.model";
 
-// 상태 타입 정의
 interface FilterState {
   selectedPersonnel: string;
   timeRange: [number, number];
@@ -8,12 +11,11 @@ interface FilterState {
   selectedRegions: string[];
   selectedDays: string[];
   selectedDifficulty: string[];
-  // 카테고리 관련
+  selectedStatus: string | null;
   selectedCategories: string[];
   activeMainCategoryId: number | null;
   selectedMainCategory: string | null;
 
-  // Setter
   setSelectedPersonnel: (value: string) => void;
   setTimeRange: (value: [number, number]) => void;
   setPriceRange: (value: [number, number]) => void;
@@ -21,13 +23,12 @@ interface FilterState {
   setSelectedDays: (days: string[]) => void;
   setSelectedDifficulty: (difficulty: string[]) => void;
 
-  // 토글
   toggleRegion: (region: string) => void;
   toggleDay: (days: string[]) => void;
   toggleDifficulty: (difficulty: string[]) => void;
   toggleFilterArray: (key: keyof FilterState, value: string) => void;
+  toggleStatus: (status: string | null) => void;
 
-  // 카테고리 로직 통합
   selectMainCategory: (category: { id: number; name: string }) => void;
   toggleSubCategory: (subCategory: string) => void;
   removeCategoryBadge: (category: string) => void;
@@ -35,6 +36,11 @@ interface FilterState {
   resetCategories: () => void;
   resetFilters: () => void;
   setAllFilters: (filters: Partial<FilterState>) => void;
+  regionIdMap: Map<string, number>;
+  categoryIdMap: Map<string, number>;
+  setRegionIdMap: (map: Map<string, number>) => void;
+  setCategoryIdMap: (map: Map<string, number>) => void;
+  getFetchLessonsParams: () => FetchLessonsParams;
 }
 
 const INITIAL_STATE = {
@@ -44,17 +50,22 @@ const INITIAL_STATE = {
   selectedRegions: [],
   selectedDays: [],
   selectedDifficulty: [],
+  selectedStatus: null,
   selectedCategories: [],
   activeMainCategoryId: null,
   selectedMainCategory: null,
+  regionIdMap: new Map(),
+  categoryIdMap: new Map(),
 };
 
-export const useFilterStore = create<FilterState>((set) => ({
+export const useFilterStore = create<FilterState>((set, get) => ({
   ...INITIAL_STATE,
 
   setSelectedPersonnel: (value) => set({ selectedPersonnel: value }),
   setTimeRange: (value) => set({ timeRange: value }),
   setPriceRange: (value) => set({ priceRange: value }),
+  setRegionIdMap: (map) => set({ regionIdMap: map }),
+  setCategoryIdMap: (map) => set({ categoryIdMap: map }),
   setSelectedRegions: (regions) => set({ selectedRegions: regions }),
   setSelectedDays: (days) => set({ selectedDays: days }),
   setSelectedDifficulty: (difficulty) =>
@@ -136,6 +147,14 @@ export const useFilterStore = create<FilterState>((set) => ({
       };
     }),
 
+  toggleStatus: (status) =>
+    set((state) => {
+      if (state.selectedStatus === status) {
+        return { selectedStatus: null };
+      }
+      return { selectedStatus: status };
+    }),
+
   resetCategories: () =>
     set({
       selectedCategories: INITIAL_STATE.selectedCategories,
@@ -145,4 +164,68 @@ export const useFilterStore = create<FilterState>((set) => ({
 
   resetFilters: () => set(INITIAL_STATE),
   setAllFilters: (filters) => set((state) => ({ ...state, ...filters })),
+
+  getFetchLessonsParams: () => {
+    const state = get();
+    const params: FetchLessonsParams = {};
+
+    if (
+      state.selectedRegions.length > 0 &&
+      !state.selectedRegions.includes("전체")
+    ) {
+      const regionIds = state.selectedRegions
+        .map((name) => state.regionIdMap.get(name))
+        .filter((id) => id !== undefined);
+      if (regionIds.length > 0) {
+        params.regionId = regionIds;
+      }
+    }
+
+    if (state.activeMainCategoryId) {
+      params.categoryId = state.activeMainCategoryId;
+    } else if (state.selectedCategories.length > 0) {
+      // 만약 세분화된 카테고리 ID가 필요하다면 이 로직을 수정해야 함
+      // 현재는 activeMainCategoryId만 사용
+    }
+
+    if (state.selectedDifficulty.length > 0) {
+      params.level = state.selectedDifficulty
+        .map((d) => REVERSE_LEVEL_MAP[d])
+        .filter(Boolean);
+    }
+
+    if (state.selectedDays.length > 0) {
+      params.days = state.selectedDays.map((d) => DAYS_MAP[d]).filter(Boolean);
+    }
+
+    if (state.timeRange[0] !== 0 || state.timeRange[1] !== 24) {
+      params.timeRange = `${state.timeRange[0].toString().padStart(2, "0")}-${state.timeRange[1].toString().padStart(2, "0")}`;
+    }
+
+    if (state.priceRange[0] !== 0) {
+      params.minPrice = state.priceRange[0];
+    }
+    if (state.priceRange[1] !== 500000) {
+      params.maxPrice = state.priceRange[1];
+    }
+
+    if (state.selectedStatus !== null) {
+      params.status =
+        STATUS_MAP[state.selectedStatus as keyof typeof STATUS_MAP];
+    }
+
+    if (
+      state.selectedPersonnel &&
+      state.selectedPersonnel !== INITIAL_STATE.selectedPersonnel
+    ) {
+      const personnelValueStr = state.selectedPersonnel.replace(/[^0-9]/g, "");
+      const maxParticipantsNum = parseInt(personnelValueStr);
+
+      if (!isNaN(maxParticipantsNum)) {
+        params.maxParticipants = maxParticipantsNum;
+      }
+    }
+
+    return params;
+  },
 }));

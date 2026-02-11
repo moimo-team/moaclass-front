@@ -1,6 +1,5 @@
 import { apiClient } from "./client";
 import type {
-  FetchLessonsParams,
   FetchLessonsResponse,
   Lesson,
 } from "@/models/lesson.model";
@@ -13,14 +12,15 @@ export const fetchLatestLessons = async (): Promise<Lesson[]> => {
 };
 
 export const fetchLessons = async (
-  params: FetchLessonsParams,
+  mappedParams: Record<string, any>,
 ): Promise<FetchLessonsResponse> => {
   try {
     const queryParams = new URLSearchParams();
 
-    Object.entries(params).forEach(([key, value]) => {
+    Object.entries(mappedParams).forEach(([key, value]) => {
       if (value === undefined || value === null) return;
 
+      // 배열인 경우 각 요소를 개별 쿼리 파라미터로 추가
       if (Array.isArray(value)) {
         value.forEach((item) => queryParams.append(key, String(item)));
       } else {
