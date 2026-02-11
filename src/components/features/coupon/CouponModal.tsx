@@ -32,7 +32,7 @@ export const CouponModal = ({
     }
   }, [isOpen, selectedId]);
 
-  const handleApply = async () => {
+  const handleApply = () => {
     const selected = availableCoupons.find((c) => c.id === selectedCouponId);
     if (selected) {
       onApply(selected);
