@@ -89,13 +89,20 @@ export default function ScheduleManagementPage() {
           </div>
         </div>
 
-        <Button
-          onClick={() => setIsRegisterModalOpen(true)}
-          className="font-bold gap-2 rounded-xl h-11 px-6 shadow-sm hover:shadow transition-all"
-        >
-          <Plus className="w-5 h-5" />
-          일정 등록
-        </Button>
+        <div className="flex items-center gap-4">
+          {selectedDates.length > 0 && (
+            <p className="text-sm font-bold text-primary animate-in fade-in slide-in-from-right-2">
+              {selectedDates.length}개 날짜 선택됨
+            </p>
+          )}
+          <Button
+            onClick={() => setIsRegisterModalOpen(true)}
+            className="font-bold gap-2 rounded-xl h-11 px-6 shadow-sm hover:shadow transition-all"
+          >
+            <Plus className="w-5 h-5" />
+            일정 등록
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
