@@ -7,8 +7,13 @@ export const getOrderList = async (
   page = 1,
   limit = 6,
 ): Promise<OrderListResponse> => {
-  const response = await apiClient.get<OrderListResponse>(
-    `/enrollments/me?status=${status}&page=${page}&limit=${limit}`,
-  );
-  return response.data;
+  try {
+    const response = await apiClient.get<OrderListResponse>(
+      `/enrollments/me?status=${status}&page=${page}&limit=${limit}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("getOrderList error:", error);
+    throw error;
+  }
 };
