@@ -2,6 +2,7 @@ import { apiClient } from './client';
 import type {
   LessonSchedule,
   CreateScheduleRequest,
+  ScheduleParticipant,
 } from '@/models/schedule.model';
 
 export const fetchLessonSchedules = async (
@@ -28,4 +29,14 @@ export const deleteSchedule = async (scheduleId: number): Promise<void> => {
 
 export const deleteSchedules = async (scheduleIds: number[]): Promise<void> => {
   await apiClient.delete('/lessons/schedules', { data: { scheduleIds } });
+};
+
+// 특정 일정의 신청자 목록 조회
+export const fetchScheduleParticipants = async (
+  scheduleId: number,
+): Promise<ScheduleParticipant[]> => {
+  const { data } = await apiClient.get<ScheduleParticipant[]>(
+    `/lessons/schedules/${scheduleId}/participants`,
+  );
+  return data;
 };

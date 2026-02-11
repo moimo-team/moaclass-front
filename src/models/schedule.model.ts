@@ -13,9 +13,7 @@ export interface CreateScheduleRequest {
   endAt: string;
 }
 
-export interface SchedulesByDate {
-  [date: string]: LessonSchedule[]; // "2026-02-10": [...]
-}
+export type SchedulesByDate = Record<string, LessonSchedule[]>;
 
 export interface RecurringScheduleFormData {
   startDate: Date;
@@ -27,4 +25,10 @@ export interface RecurringScheduleFormData {
 export interface TimeSlot {
   startTime: string;
   endTime: string;
+}
+
+export interface ScheduleParticipant {
+  userId: number;
+  nickname: string;
+  profileImage: string | null;
 }

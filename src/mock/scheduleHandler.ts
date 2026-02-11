@@ -1,6 +1,9 @@
 import { http, HttpResponse } from 'msw';
 import { httpUrl } from './mockData/mockData';
-import type { LessonSchedule } from '@/models/schedule.model';
+import type {
+  LessonSchedule,
+  ScheduleParticipant,
+} from '@/models/schedule.model';
 
 let mockSchedules: LessonSchedule[] = [
   {
@@ -32,6 +35,28 @@ let mockSchedules: LessonSchedule[] = [
   },
 ];
 
+const mockParticipantsBySchedule: Record<number, ScheduleParticipant[]> = {
+  1: [
+    {
+      userId: 101,
+      nickname: '김모아',
+      profileImage: null,
+    },
+    {
+      userId: 102,
+      nickname: '이클래스',
+      profileImage: null,
+    },
+  ],
+  3: [
+    {
+      userId: 103,
+      nickname: '박지용',
+      profileImage: null,
+    },
+  ],
+};
+
 export const scheduleHandlers = [
   http.get(`${httpUrl}/lessons/:lessonId/schedules`, ({ params }) => {
     const { lessonId } = params;
@@ -62,6 +87,15 @@ export const scheduleHandlers = [
 
       mockSchedules = [...mockSchedules, ...newSchedules];
       return HttpResponse.json({ message: '등록 성공' }, { status: 201 });
+    },
+  ),
+
+  http.get(
+    `${httpUrl}/lessons/schedules/:scheduleId/participants`,
+    ({ params }) => {
+      const { scheduleId } = params;
+      const participants = mockParticipantsBySchedule[Number(scheduleId)] || [];
+      return HttpResponse.json(participants);
     },
   ),
 
