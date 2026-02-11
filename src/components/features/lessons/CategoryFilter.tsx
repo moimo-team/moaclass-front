@@ -7,8 +7,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { LESSON_CATEGORIES } from "@/mock/mockData/categoryMock";
-import type { LessonCategory, LessonSubCategory } from "@/models/lesson.model";
+import {
+  useCategoryQuery,
+  useSubCategoryQuery,
+} from "@/hooks/useCategoryQuery";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { LessonCategory } from "@/models/lesson.model";
 
 interface CategoryFilterProps {
   selectedCategories: string[];
@@ -16,8 +20,6 @@ interface CategoryFilterProps {
   selectedMainCategory: string | null;
   handleMainCategoryClick: (category: LessonCategory) => void;
   handleSubCategoryCheckedChange: (subCategoryName: string) => void;
-  getCategoryButtonText: (mainCategory: string | null) => string;
-  currentSubCategories: LessonSubCategory[];
 }
 
 export const CategoryFilter: React.FC<CategoryFilterProps> = ({
@@ -26,9 +28,20 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
   selectedMainCategory,
   handleMainCategoryClick,
   handleSubCategoryCheckedChange,
-  getCategoryButtonText,
-  currentSubCategories,
 }) => {
+  const { data: lessonCategories = [], isLoading: isCategoriesLoading } =
+    useCategoryQuery();
+  const { data: subCategoriesData = [], isLoading: isSubCategoriesLoading } =
+    useSubCategoryQuery(activeMainCategoryId || 0);
+
+  const getCategoryButtonText = (mainCategory: string | null) => {
+    if (!mainCategory) return "카테고리를 선택하세요";
+    const subSelectionsCount = Math.max(0, selectedCategories.length - 1);
+    if (subSelectionsCount > 0)
+      return `${mainCategory} 외 ${subSelectionsCount}개`;
+    return mainCategory;
+  };
+
   return (
     <div className="p-2 border rounded-md bg-white flex flex-row items-center gap-6">
       <span className="block text-lg font-bold text-gray-700 min-w-[70px]">
@@ -53,30 +66,36 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
               대분류
             </h4>
             <div className="space-y-1">
-              {LESSON_CATEGORIES.map((category) => (
-                <div
-                  key={category.id}
-                  className={cn(
-                    "flex items-center space-x-2 p-2 cursor-pointer rounded-md transition-colors hover:bg-gray-50",
-                    activeMainCategoryId === category.id &&
-                    "bg-gray-100 font-medium",
-                  )}
-                  onClick={() => handleMainCategoryClick(category)}
-                >
-                  <Checkbox
-                    id={`main-cat-${category.id}`}
-                    checked={selectedMainCategory === category.name}
-                    onCheckedChange={() => handleMainCategoryClick(category)}
-                    className="shrink-0"
-                  />
-                  <label
-                    htmlFor={`main-cat-${category.id}`}
-                    className="text-sm leading-none cursor-pointer flex-grow truncate"
-                  >
-                    {category.name}
-                  </label>
-                </div>
-              ))}
+              {isCategoriesLoading
+                ? Array.from({ length: 7 }).map((_, i) => (
+                    <Skeleton key={i} className="h-8 w-full rounded-md" />
+                  ))
+                : lessonCategories.map((category) => (
+                    <div
+                      key={category.id}
+                      className={cn(
+                        "flex items-center space-x-2 p-2 cursor-pointer rounded-md transition-colors hover:bg-gray-50",
+                        activeMainCategoryId === category.id &&
+                          "bg-gray-100 font-medium",
+                      )}
+                      onClick={() => handleMainCategoryClick(category)}
+                    >
+                      <Checkbox
+                        id={`main-cat-${category.id}`}
+                        checked={selectedMainCategory === category.name}
+                        onCheckedChange={() =>
+                          handleMainCategoryClick(category)
+                        }
+                        className="shrink-0"
+                      />
+                      <label
+                        htmlFor={`main-cat-${category.id}`}
+                        className="text-sm leading-none cursor-pointer flex-grow truncate"
+                      >
+                        {category.name}
+                      </label>
+                    </div>
+                  ))}
             </div>
           </div>
 
@@ -90,10 +109,14 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
                 <p className="text-sm text-gray-500 p-2">
                   대분류를 선택해주세요.
                 </p>
-              ) : currentSubCategories.length === 0 ? (
+              ) : isSubCategoriesLoading ? (
+                Array.from({ length: 7 }).map((_, i) => (
+                  <Skeleton key={i} className="h-8 w-full rounded-md" />
+                ))
+              ) : subCategoriesData.length === 0 ? (
                 <p className="text-sm text-gray-500 p-2">소분류가 없습니다.</p>
               ) : (
-                currentSubCategories.map((subCat) => (
+                subCategoriesData.map((subCat) => (
                   <div
                     key={subCat.id}
                     className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded-md"

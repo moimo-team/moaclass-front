@@ -14,14 +14,14 @@ import {
 } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DualRangeSlider } from "@/components/common/DualRangeSlider";
-import { REGIONS } from "@/constants/regions";
+import { useRegionQuery } from "@/hooks/useRegionQuery";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { CategoryFilter } from "@/components/features/lessons/CategoryFilter";
 import { FilterToggleGroup } from "@/components/common/FilterToggleGroup";
 import { FilterBadges } from "@/components/features/lessons/FilterBadges";
 
 import { useFilterStore } from "@/store/filterStore";
-import { LESSON_SUB_CATEGORIES } from "@/mock/mockData/categoryMock";
 
 interface LessonFilterSectionProps {
   onClose?: () => void;
@@ -58,6 +58,8 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
     resetFilters,
   } = useFilterStore();
 
+  const { data: regions, isLoading } = useRegionQuery();
+
   const getRegionButtonText = () => {
     if (!selectedRegions.length) return "지역을 선택하세요";
     if (selectedRegions.includes("전체")) return "전체 지역";
@@ -65,24 +67,6 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
       return `지역 (${selectedRegions.length}개 선택됨)`;
     return selectedRegions.join(", ");
   };
-
-  const getCategoryButtonText = (mainCategory: string | null) => {
-    if (!mainCategory) return "카테고리를 선택하세요";
-    const subSelectionsCount = Math.max(0, selectedCategories.length - 1);
-    if (subSelectionsCount > 0)
-      return `${mainCategory} 외 ${subSelectionsCount}개`;
-    return mainCategory;
-  };
-
-  const currentSubCategories = activeMainCategoryId
-    ? LESSON_SUB_CATEGORIES.filter(
-        (subCat) => subCat.category_id === activeMainCategoryId,
-      ).map((subCat) => ({
-        id: subCat.id,
-        name: subCat.name,
-        categoryId: subCat.category_id,
-      }))
-    : [];
 
   return (
     <section className="w-full py-8 px-4 md:px-8">
@@ -115,24 +99,28 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
                     </label>
                   </div>
                   {/* 개별 지역 */}
-                  {REGIONS.map((region) => (
-                    <div
-                      key={region.id}
-                      className="flex items-center space-x-2"
-                    >
-                      <Checkbox
-                        id={`region-${region.id}`}
-                        checked={selectedRegions.includes(region.name)}
-                        onCheckedChange={() => toggleRegion(region.name)}
-                      />
-                      <label
-                        htmlFor={`region-${region.id}`}
-                        className="text-sm font-medium"
-                      >
-                        {region.name}
-                      </label>
-                    </div>
-                  ))}
+                  {isLoading
+                    ? Array.from({ length: 6 }).map((_, i) => (
+                        <Skeleton key={i} className="h-6 w-full" />
+                      ))
+                    : regions?.map((region) => (
+                        <div
+                          key={region.id}
+                          className="flex items-center space-x-2"
+                        >
+                          <Checkbox
+                            id={`region-${region.id}`}
+                            checked={selectedRegions.includes(region.name)}
+                            onCheckedChange={() => toggleRegion(region.name)}
+                          />
+                          <label
+                            htmlFor={`region-${region.id}`}
+                            className="text-sm font-medium"
+                          >
+                            {region.name}
+                          </label>
+                        </div>
+                      ))}
                 </div>
               </PopoverContent>
             </Popover>
@@ -145,8 +133,6 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
             selectedMainCategory={selectedMainCategory}
             handleMainCategoryClick={selectMainCategory}
             handleSubCategoryCheckedChange={toggleSubCategory}
-            getCategoryButtonText={getCategoryButtonText}
-            currentSubCategories={currentSubCategories}
           />
 
           {/* 3. 요일 필터 */}

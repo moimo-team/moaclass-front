@@ -17,17 +17,22 @@ interface FilterState {
   setSelectedPersonnel: (value: string) => void;
   setTimeRange: (value: [number, number]) => void;
   setPriceRange: (value: [number, number]) => void;
+  setSelectedRegions: (regions: string[]) => void;
+  setSelectedDays: (days: string[]) => void;
+  setSelectedDifficulty: (difficulty: string[]) => void;
 
   // 토글
   toggleRegion: (region: string) => void;
   toggleDay: (days: string[]) => void;
   toggleDifficulty: (difficulty: string[]) => void;
+  toggleFilterArray: (key: keyof FilterState, value: string) => void;
 
   // 카테고리 로직 통합
   selectMainCategory: (category: { id: number; name: string }) => void;
   toggleSubCategory: (subCategory: string) => void;
   removeCategoryBadge: (category: string) => void;
 
+  resetCategories: () => void;
   resetFilters: () => void;
   setAllFilters: (filters: Partial<FilterState>) => void;
 }
@@ -50,8 +55,11 @@ export const useFilterStore = create<FilterState>((set) => ({
   setSelectedPersonnel: (value) => set({ selectedPersonnel: value }),
   setTimeRange: (value) => set({ timeRange: value }),
   setPriceRange: (value) => set({ priceRange: value }),
+  setSelectedRegions: (regions) => set({ selectedRegions: regions }),
+  setSelectedDays: (days) => set({ selectedDays: days }),
+  setSelectedDifficulty: (difficulty) =>
+    set({ selectedDifficulty: difficulty }),
 
-  // 지역 토글 로직
   toggleRegion: (region) =>
     set((state) => {
       const current = state.selectedRegions;
@@ -68,7 +76,19 @@ export const useFilterStore = create<FilterState>((set) => ({
   toggleDay: (days) => set({ selectedDays: days }),
   toggleDifficulty: (difficulty) => set({ selectedDifficulty: difficulty }),
 
-  // 카테고리 로직
+  toggleFilterArray: (key, value) =>
+    set((state) => {
+      const currentSelection = state[key] as string[];
+      if (value === "전체") {
+        return { [key]: currentSelection.includes("전체") ? [] : ["전체"] };
+      }
+      const withoutAll = currentSelection.filter((item) => item !== "전체");
+      if (withoutAll.includes(value)) {
+        return { [key]: withoutAll.filter((item) => item !== value) };
+      }
+      return { [key]: [...withoutAll, value] };
+    }),
+
   selectMainCategory: (category) =>
     set((state) => {
       if (state.selectedMainCategory === category.name) {
@@ -114,6 +134,13 @@ export const useFilterStore = create<FilterState>((set) => ({
           (c) => c !== category,
         ),
       };
+    }),
+
+  resetCategories: () =>
+    set({
+      selectedCategories: INITIAL_STATE.selectedCategories,
+      activeMainCategoryId: INITIAL_STATE.activeMainCategoryId,
+      selectedMainCategory: INITIAL_STATE.selectedMainCategory,
     }),
 
   resetFilters: () => set(INITIAL_STATE),
