@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { X } from "lucide-react";
 import { PaySectionCard } from "./PaySectionCard";
 import { Button } from "@/components/ui/button";
@@ -6,12 +6,12 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { CouponModal } from "../coupon/CouponModal";
 import type { CouponInfo } from "@/models/coupon.model";
-import { useAvailableCouponsQuery } from "@/hooks/useCouponQuery";
 import { usePayMutation } from "@/hooks/usePayMutations";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import type { PayPreviewResponse } from "@/models/pay.model";
 import { FormInput } from "../modal/components/FormInput";
+import { usePayCalculation } from "@/hooks/usePayQuery";
 
 interface PayInfoSectionProps {
   payPreview: PayPreviewResponse;
@@ -31,32 +31,41 @@ export const PayInfoSection = ({
     subtotal,
     availableCoupons,
     userPoints,
-    canPay,
+    canPay: initialCanPay,
   } = payPreview;
   const navigate = useNavigate();
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<CouponInfo | null>(null);
-  const { data: userCoupons } = useAvailableCouponsQuery();
+
   const { mutateAsync: createPayment } = usePayMutation();
+
+  // 쿠폰 계산 데이터 메모이제이션
+  const calculationParams = useMemo(() => {
+    if (!appliedCoupon) return null;
+    return {
+      scheduleId,
+      quantity,
+      couponId: appliedCoupon.id!,
+    };
+  }, [appliedCoupon, scheduleId, quantity]);
+
+  // 쿠폰 적용 시 실시간 계산 조회
+  const { data: calculationResult } = usePayCalculation(calculationParams);
 
   const handleApplyCoupon = (coupon: CouponInfo) => {
     setAppliedCoupon(coupon);
   };
 
-  const getDiscountAmount = () => {
-    if (!appliedCoupon) return 0;
-    const value = appliedCoupon.discountValue || 0;
-    if (appliedCoupon.discountType === "PERCENT") {
-      return (subtotal * value) / 100;
-    }
-    if (appliedCoupon.discountType === "FIXED") {
-      return value;
-    }
-    return 0;
-  };
-
-  const discountAmount = getDiscountAmount();
-  const finalPrice = subtotal - discountAmount;
+  // 서버에서 계산된 값 우선 사용, 쿠폰 없을 시 초기값 사용
+  const discountAmount = appliedCoupon
+    ? (calculationResult?.couponDiscount ?? 0)
+    : 0;
+  const finalPrice = appliedCoupon
+    ? (calculationResult?.finalPrice ?? subtotal)
+    : subtotal;
+  const canPay = appliedCoupon
+    ? (calculationResult?.canPay ?? initialCanPay)
+    : initialCanPay;
 
   // 결제하기
   const handlePay = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -148,7 +157,8 @@ export const PayInfoSection = ({
           onClose={() => setIsCouponModalOpen(false)}
           onApply={handleApplyCoupon}
           selectedId={appliedCoupon?.id}
-          availableCoupons={userCoupons || []} // API에서 불러온 쿠폰 목록 전달
+          // availableCoupons={userCoupons || []} // API에서 불러온 쿠폰 목록 전달
+          availableCoupons={availableCoupons || []}
         />
 
         <Separator className="bg-border/60" />

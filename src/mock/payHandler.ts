@@ -30,6 +30,44 @@ const getPayPreview = http.get(
   },
 );
 
+// 쿠폰 선택 계산
+const calculateCouponDiscount = http.post(
+  `${httpUrl}/payments/calculate`,
+  async ({ request }) => {
+    await delay(500);
+    const token = request.headers.get("Authorization");
+    if (!token) {
+      return HttpResponse.json(
+        { message: "토큰이 없습니다." },
+        { status: 401 },
+      );
+    }
+
+    try {
+      // const { scheduleId, quantity, couponId } = (await request.json()) as any;
+
+      // TODO: 실제 쿠폰 계산 로직 구현
+      // 현재는 성공 응답만 반환
+      return HttpResponse.json(
+        {
+          message: "쿠폰이 적용되었습니다.",
+          subtotal: 10000,
+          couponDiscount: 1000,
+          finalPrice: 9000,
+          userPoints: 8000,
+          canPay: false,
+        },
+        { status: 200 },
+      );
+    } catch (error) {
+      return HttpResponse.json(
+        { message: "쿠폰 계산 중 오류가 발생했습니다." },
+        { status: 500 },
+      );
+    }
+  },
+);
+
 // 결제 생성
 const createPayment = http.post(`${httpUrl}/payments`, async ({ request }) => {
   await delay(500);
@@ -64,4 +102,8 @@ const createPayment = http.post(`${httpUrl}/payments`, async ({ request }) => {
   }
 });
 
-export const payHandler = [getPayPreview, createPayment];
+export const payHandler = [
+  getPayPreview,
+  createPayment,
+  calculateCouponDiscount,
+];

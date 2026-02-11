@@ -19,3 +19,11 @@ export interface PayPreviewResponse {
   userPoints: number;
   canPay: boolean;
 }
+
+export interface CouponCalculateResponse {
+  subtotal: number;
+  couponDiscount: number;
+  finalPrice: number;
+  userPoints: number;
+  canPay: boolean;
+}

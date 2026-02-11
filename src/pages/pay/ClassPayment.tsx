@@ -7,12 +7,13 @@ import { ContactSection } from "@/components/features/pay/ContactSection";
 import { PayInfoSection } from "@/components/features/pay/PayInfoSection";
 import { RefundRuleSection } from "@/components/features/pay/RefundRuleSection";
 import { useSearchParams } from "react-router-dom";
-import { usePayPreviewQuery } from "@/hooks/usePayPreviewQuery";
+import { usePayPreviewQuery } from "@/hooks/usePayQuery";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { useAuthStore } from "@/store/authStore";
 
 const ClassPayment = () => {
   const [searchParams] = useSearchParams();
+  // TODO: 실서버 연결 및 링크 연결 후 테스트 값 지울 것
   const scheduleId = Number(searchParams.get("scheduleId") || "1");
   const quantity = Number(searchParams.get("quantity") || "1");
   const { userId, email, nickname } = useAuthStore();
