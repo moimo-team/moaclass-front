@@ -83,13 +83,13 @@ const createEnrollment = http.post(
     }
 
     try {
-      const { scheduleId, paidAmount, couponId } =
+      const { scheduleId, finalPrice, couponId } =
         (await request.json()) as any;
 
       const currentPoints = userStore.userInfo.point || 0;
 
       // 포인트 부족 체크
-      if (currentPoints < paidAmount) {
+      if (currentPoints < finalPrice) {
         return HttpResponse.json(
           {
             canPay: false,
@@ -97,7 +97,7 @@ const createEnrollment = http.post(
               code: "INSUFFICIENT_POINTS",
               message: "보유 포인트가 부족하여 결제를 진행할 수 없습니다.",
             },
-            requiredPoints: paidAmount,
+            requiredPoints: finalPrice,
             userPoints: currentPoints,
           },
           { status: 400 },
@@ -105,7 +105,7 @@ const createEnrollment = http.post(
       }
 
       // 결제 처리 (포인트 차감)
-      userStore.updatePoint(-paidAmount);
+      userStore.updatePoint(-finalPrice);
       const remainingPoints = userStore.userInfo.point || 0;
 
       return HttpResponse.json(
@@ -114,7 +114,7 @@ const createEnrollment = http.post(
           status: "ACCEPTED",
           transaction: {
             id: Math.floor(Math.random() * 1000) + 1,
-            amount: paidAmount,
+            amount: finalPrice,
             type: "USE",
             status: "COMPLETED",
           },

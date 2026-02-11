@@ -94,7 +94,7 @@ export const PayInfoSection = ({
     try {
       const payResult = await createPayment({
         scheduleId,
-        paidAmount: finalPrice,
+        finalPrice: finalPrice,
         couponId: appliedCoupon?.id || null,
       });
 
