@@ -1,8 +1,11 @@
 import { apiClient } from "@/api/client";
+import type { ParticipationStatus } from "@/models/participation.model";
 import type {
   CouponCalculateResponse,
   PayPreviewResponse,
+  PayStatus,
 } from "@/models/pay.model";
+import type { PointType } from "@/models/point.model";
 
 export interface GetPayPreviewParams {
   scheduleId: number;
@@ -35,12 +38,26 @@ export const calculateCouponDiscount = async (
 
 export interface PayInfoValues {
   scheduleId: number;
-  amount: number;
+  paidAmount: number;
   couponId: number | null;
 }
 
-// 결제하기
-export const createPayment = async (data: PayInfoValues) => {
-  const response = await apiClient.post("/payments", data);
+export interface CreatePaymentResponse {
+  enrollmentId: number;
+  status: ParticipationStatus; // 참여상태
+  transaction: {
+    id: number;
+    amount: number;
+    type: PointType; // USE / CHARGE / REFUND
+    status: PayStatus; // 결제 상태
+  };
+  remainingPoints: number;
+}
+
+// 결제(수강생 등록)
+export const createEnrollment = async (
+  data: PayInfoValues,
+): Promise<CreatePaymentResponse> => {
+  const response = await apiClient.post("/enrollments", data);
   return response.data;
 };

@@ -29,6 +29,6 @@ export const payPreviewMock = {
       validUntil: "2026-01-31T23:59:59",
     },
   ],
-  userPoints: 8000,
-  canPay: false,
+  userPoints: 42000,
+  canPay: true,
 };

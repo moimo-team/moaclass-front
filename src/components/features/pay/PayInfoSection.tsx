@@ -12,6 +12,15 @@ import { useNavigate } from "react-router-dom";
 import type { PayPreviewResponse } from "@/models/pay.model";
 import { FormInput } from "../modal/components/FormInput";
 import { usePayCalculation } from "@/hooks/usePayQuery";
+import { AxiosError } from "axios";
+import type { PayErrorResponse } from "@/models/pay.model";
+import AlertNotification from "../modal/AlertNotification";
+import type { CreatePaymentResponse } from "@/api/pay.api";
+
+const PAY_ERROR_MESSAGES: Record<string, string> = {
+  INSUFFICIENT_POINTS: "보유 포인트가 부족하여 결제를 진행할 수 없습니다.",
+  DEFAULT: "결제에 실패했습니다. 다시 시도해주세요.",
+};
 
 interface PayInfoSectionProps {
   payPreview: PayPreviewResponse;
@@ -36,6 +45,12 @@ export const PayInfoSection = ({
   const navigate = useNavigate();
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<CouponInfo | null>(null);
+  const [successData, setSuccessData] = useState<CreatePaymentResponse | null>(
+    null,
+  );
+  const [errorData, setErrorData] = useState<PayErrorResponse | null>(null);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [alertType, setAlertType] = useState<"SUCCESS" | "ERROR" | null>(null);
 
   const { mutateAsync: createPayment } = usePayMutation();
 
@@ -77,16 +92,23 @@ export const PayInfoSection = ({
     }
 
     try {
-      await createPayment({
+      const payResult = await createPayment({
         scheduleId,
-        amount: finalPrice,
+        paidAmount: finalPrice,
         couponId: appliedCoupon?.id || null,
       });
-      toast.success("결제가 완료되었습니다.");
-      navigate("/mypage/class/orders", { replace: true });
+
+      // 결제하기 성공 알림창
+      setSuccessData(payResult);
+      setAlertType("SUCCESS");
+      setIsAlertOpen(true);
     } catch (error) {
       console.error("handlePay error:", error);
-      toast.error("결제에 실패했습니다. 다시 시도해주세요.");
+      setAlertType("ERROR");
+      if (error instanceof AxiosError) {
+        setErrorData(error.response?.data as PayErrorResponse);
+      }
+      setIsAlertOpen(true);
     }
   };
 
@@ -159,6 +181,74 @@ export const PayInfoSection = ({
           selectedId={appliedCoupon?.id}
           // availableCoupons={userCoupons || []} // API에서 불러온 쿠폰 목록 전달
           availableCoupons={availableCoupons || []}
+        />
+
+        {/* 결제 성공/실패 알림창 */}
+        <AlertNotification
+          open={isAlertOpen}
+          onOpenChange={(open) => {
+            setIsAlertOpen(open);
+            if (!open && alertType === "SUCCESS") {
+              navigate("/mypage/class/orders", { replace: true });
+            }
+          }}
+          title={
+            alertType === "SUCCESS"
+              ? "결제가 완료되었습니다."
+              : "결제에 실패했습니다."
+          }
+          description={
+            alertType === "SUCCESS" && successData ? (
+              <div className="space-y-3 py-4">
+                <div className="flex justify-between items-center text-sm border-b border-border/40 pb-2">
+                  <span className="text-muted-foreground">등록 번호</span>
+                  <span className="font-semibold text-foreground">
+                    {successData.enrollmentId}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-sm border-b border-border/40 pb-2">
+                  <span className="text-muted-foreground">결제 금액</span>
+                  <span className="font-bold text-carrot">
+                    {successData.transaction.amount.toLocaleString()} 원
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">포인트 잔액</span>
+                  <span className="font-bold text-blue-600">
+                    {successData.remainingPoints.toLocaleString()} 원
+                  </span>
+                </div>
+              </div>
+            ) : alertType === "ERROR" ? (
+              <div className="space-y-3 py-4 text-left">
+                <p className="text-sm font-medium text-destructive text-center mb-2">
+                  {errorData
+                    ? PAY_ERROR_MESSAGES[errorData.error.code] ||
+                      PAY_ERROR_MESSAGES.DEFAULT
+                    : PAY_ERROR_MESSAGES.DEFAULT}
+                </p>
+                {errorData?.requiredPoints && (
+                  <div className="flex justify-between items-center text-xs border-t border-border/40 pt-2 text-muted-foreground">
+                    <span>필요 포인트</span>
+                    <span className="font-semibold text-foreground">
+                      {errorData.requiredPoints.toLocaleString()} 원
+                    </span>
+                  </div>
+                )}
+                {errorData?.userPoints !== undefined && (
+                  <div className="flex justify-between items-center text-xs text-muted-foreground">
+                    <span>보유 포인트</span>
+                    <span className="font-semibold text-foreground">
+                      {errorData.userPoints.toLocaleString()} 원
+                    </span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              ""
+            )
+          }
+          hasButton={true}
         />
 
         <Separator className="bg-border/60" />
