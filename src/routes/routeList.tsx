@@ -28,6 +28,7 @@ import CancelClass from "@/pages/mypage/CancelClass";
 import ClassDashboardPage from "@/pages/class/ClassDashboardPage";
 import LessonListPage from "@/pages/class/LessonList";
 import LessonDetail from "@/pages/class/LessonDetail";
+import ScheduleManagementPage from "@/pages/class/manage/ScheduleManagementPage";
 
 export const routeList = [
   {
@@ -90,6 +91,14 @@ export const routeList = [
       {
         path: "lessons/:lessonId",
         element: <LessonDetail />,
+      },
+      {
+        path: "/lessons/:lessonId/schedule",
+        element: (
+          <ProtectedRoute>
+            <ScheduleManagementPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/classes-manage",
