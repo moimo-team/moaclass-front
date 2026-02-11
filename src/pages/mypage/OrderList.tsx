@@ -59,6 +59,11 @@ const OrderList = () => {
           <div className="flex justify-center py-20">
             <LoadingSpinner />
           </div>
+        ) : isError ? (
+          <div className="text-center py-20 bg-red-50 text-red-700 rounded-lg border border-dashed border-red-200">
+            <p>데이터를 불러오는 중 오류가 발생했습니다.</p>
+            {error && <p className="text-sm text-red-600">{error.message}</p>}
+          </div>
         ) : orderlist.length > 0 ? (
           orderlist.map((order) => (
             <OrderClassCard
