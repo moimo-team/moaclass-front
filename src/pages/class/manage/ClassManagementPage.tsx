@@ -3,11 +3,11 @@ import { ClassManageCard } from "@/components/features/class-manage/ClassManageC
 import { CreateClassButton } from "@/components/features/class-manage/CreateClassButton";
 import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
 import CreateClassModal from "@/components/features/modal/create/CreateClassModal";
-import AlertNotification from "@/components/features/modal/AlertNotification";
 import { useQuery } from "@tanstack/react-query";
 import { fetchLessons } from "@/api/lesson.api";
 import { useDeleteLessonMutation } from "@/hooks/useLessonMutations";
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { toast } from "sonner";
 
 const ClassManagementPage = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -17,16 +17,10 @@ const ClassManagementPage = () => {
   const [editingClassId, setEditingClassId] = useState<number | null>(null);
   const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
 
-  // 알림 다이얼로그 상태
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertTitle, setAlertTitle] = useState("");
-  const [alertDescription, setAlertDescription] = useState("");
-
   // 레슨 목록 조회
   const { data: lessonsResponse, isLoading } = useQuery({
     queryKey: ["lessons"],
     queryFn: () => fetchLessons({}),
-    staleTime: 1000 * 60,
   });
 
   const { mutate: deleteLesson } = useDeleteLessonMutation();
@@ -63,24 +57,18 @@ const ClassManagementPage = () => {
 
   const handleDuplicateConfirm = () => {
     if (selectedClassId) {
-      setAlertTitle("준비 중");
-      setAlertDescription("클래스 복제 기능은 준비 중입니다.");
-      setAlertOpen(true);
+      toast.info("클래스 복제 기능은 준비 중입니다.");
       setDuplicateDialogOpen(false);
       setSelectedClassId(null);
     }
   };
 
   const handleManage = (id: number) => {
-    setAlertTitle("준비 중");
-    setAlertDescription(`클래스 ${id} 관리 페이지는 준비 중입니다.`);
-    setAlertOpen(true);
+    toast.info(`클래스 ${id} 관리 페이지는 준비 중입니다.`);
   };
 
   const handleViewClass = (id: number) => {
-    setAlertTitle("준비 중");
-    setAlertDescription(`클래스 ${id} 상세 페이지는 준비 중입니다.`);
-    setAlertOpen(true);
+    toast.info(`클래스 ${id} 상세 페이지는 준비 중입니다.`);
   };
 
   const handleToggleStatus = (id: number) => {
@@ -90,9 +78,7 @@ const ClassManagementPage = () => {
 
   const handleStatusConfirm = () => {
     if (selectedClassId) {
-      setAlertTitle("준비 중");
-      setAlertDescription("상태 변경 기능은 준비 중입니다.");
-      setAlertOpen(true);
+      toast.info("상태 변경 기능은 준비 중입니다.");
       setStatusDialogOpen(false);
       setSelectedClassId(null);
     }
@@ -178,14 +164,6 @@ const ClassManagementPage = () => {
         classId={editingClassId || undefined}
       />
 
-      {/* 알림 다이얼로그 */}
-      <AlertNotification
-        open={alertOpen}
-        onOpenChange={setAlertOpen}
-        title={alertTitle}
-        description={alertDescription}
-        autoCloseDuration={2000}
-      />
     </div>
   );
 };

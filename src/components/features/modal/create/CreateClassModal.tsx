@@ -20,7 +20,7 @@ import {
 } from "@/hooks/useLessonMutations";
 import { useLessonQuery } from "@/hooks/useLessonQuery";
 import { useCategoryQuery, useSubCategoryQuery } from "@/hooks/useCategoryQuery";
-import AlertNotification from "@/components/features/modal/AlertNotification";
+import { toast } from "sonner";
 
 // Zod 스키마 정의
 const classSchema = z.object({
@@ -63,12 +63,6 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
   const prevCategoryIdRef = useRef<number | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [additionalImages, setAdditionalImages] = useState<string[]>([]);
-  const [isFormReady, setIsFormReady] = useState(false);
-
-  // 알림 다이얼로그 상태
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertTitle, setAlertTitle] = useState("");
-  const [alertDescription, setAlertDescription] = useState("");
 
   const { mutateAsync: createLessonMutation } = useCreateLessonMutation();
   const { mutateAsync: updateLessonMutation } = useUpdateLessonMutation();
@@ -112,6 +106,9 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
   const { data: categories } = useCategoryQuery();
   const { data: subCategories, isLoading: isSubCategoriesLoading } = useSubCategoryQuery(selectedCategoryId);
 
+
+  const isFormReady = open && selectedCategoryId > 0 && !isSubCategoriesLoading && !!subCategories;
+
   const selectedSubCategoryIds = watch("subCategoryIds");
   const selectedLevel = watch("level");
   const duration = watch("duration");
@@ -122,18 +119,9 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
 
   useEffect(() => {
     if (open) {
-      // 먼저 폼 준비 상태를 false로 설정
-      setIsFormReady(false);
-
       if (classId && existingLesson) {
         // 수정 모드 - 기존 데이터로 폼 채우기
         const subCategoryIds = existingLesson.subClassCategories?.map(sub => sub.id) || [];
-
-        console.log("📝 수정 모드 데이터 로드:", {
-          classCategoryId: existingLesson.classCategoryId,
-          subClassCategories: existingLesson.subClassCategories,
-          subCategoryIds,
-        });
 
         reset({
           title: existingLesson.title,
@@ -162,7 +150,6 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
         }
 
         prevCategoryIdRef.current = existingLesson.classCategoryId;
-        // isFormReady는 소분류 데이터 로드 후 설정됨
       } else {
         // 생성 모드 - 테스트용 기본값으로 이후에 수정할 예정입니다
         reset({
@@ -187,20 +174,9 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
         setPreviewImage(null);
         setAdditionalImages([]);
         prevCategoryIdRef.current = 1; // 핸드메이드로 설정하여 소분류 초기화 방지
-        // isFormReady는 소분류 데이터 로드 후 설정됨
       }
     }
   }, [open, classId, existingLesson, reset]);
-
-  // 소분류 데이터가 로드된 후 폼 준비 완료
-  useEffect(() => {
-    if (open && selectedCategoryId > 0 && !isSubCategoriesLoading && subCategories) {
-      // 소분류 데이터가 로드되면 폼 준비 완료
-      setTimeout(() => {
-        setIsFormReady(true);
-      }, 0);
-    }
-  }, [open, selectedCategoryId, isSubCategoriesLoading, subCategories]);
 
   // 대분류 카테고리가 실제로 변경되었을 때만 소분류 초기화
   useEffect(() => {
@@ -256,14 +232,6 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
   const onSubmit = async (data: ClassFormValues) => {
     try {
       const formData = new FormData();
-
-      console.log("📤 전송할 폼 데이터:", {
-        classCategoryId: data.classCategoryId,
-        subCategoryIds: data.subCategoryIds,
-        title: data.title,
-      });
-
-      // 1. 기본 텍스트 데이터 추가
       formData.append("title", data.title);
       formData.append("description", data.description);
       formData.append("curriculum", data.curriculum);
@@ -283,13 +251,11 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
       formData.append("directionsText", data.directionsText || "");
       formData.append("reservationLeadDays", data.reservationLeadDays.toString());
 
-      // 2. 대표 이미지(썸네일) 파일 추가
       const repFile = representativeImageRef.current?.files?.[0];
       if (repFile) {
         formData.append("representativeImage", repFile);
       }
 
-      // 3. 추가 이미지 파일들 추가
       const addFiles = additionalImagesRef.current?.files;
       if (addFiles && addFiles.length > 0) {
         for (let i = 0; i < addFiles.length; i++) {
@@ -297,38 +263,30 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
         }
       }
 
-      console.log("📦 FormData 내용:", Object.fromEntries(formData));
-
       if (classId) {
-        // 수정 모드
         await updateLessonMutation({ lessonId: classId, formData });
-        setAlertTitle("클래스 수정 완료");
-        setAlertDescription("클래스가 성공적으로 수정되었습니다!");
-        setAlertOpen(true);
+        toast.success("클래스 수정 완료", {
+          description: "클래스가 성공적으로 수정되었습니다!",
+        });
       } else {
-        // 생성 모드
         await createLessonMutation(formData);
-        setAlertTitle("클래스 생성 완료");
-        setAlertDescription("클래스가 성공적으로 생성되었습니다!");
-        setAlertOpen(true);
+        toast.success("클래스 생성 완료", {
+          description: "클래스가 성공적으로 생성되었습니다!",
+        });
       }
 
-      // 알림이 표시되는 동안 잠시 대기 후 모달 닫기
-      setTimeout(() => {
-        onOpenChange(false);
-      }, 700); // AlertNotification의 autoCloseDuration(500ms)보다 약간 길게
+      onOpenChange(false);
     } catch (error) {
       console.error("클래스 처리 실패:", error);
-      setAlertTitle("오류 발생");
-      setAlertDescription("클래스 처리 중 오류가 발생했습니다.");
-      setAlertOpen(true);
+      toast.error("오류 발생", {
+        description: "클래스 처리 중 오류가 발생했습니다.",
+      });
     }
   };
 
   const discountedPrice = Math.round(price * (1 - discountRate / 100));
 
   return (
-    <>
       <FormModal
         isOpen={open}
         onClose={() => onOpenChange(false)}
@@ -623,15 +581,6 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
         </FormField>
       </FormModal>
 
-      {/* 알림 다이얼로그 */}
-      <AlertNotification
-        open={alertOpen}
-        onOpenChange={setAlertOpen}
-        title={alertTitle}
-        description={alertDescription}
-        autoCloseDuration={2000}
-      />
-    </>
   );
 }
 
