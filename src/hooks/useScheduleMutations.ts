@@ -1,7 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
-import { createSchedules, deleteSchedule } from '@/api/schedule.api';
+import {
+  createSchedules,
+  deleteSchedule,
+  deleteSchedules,
+} from '@/api/schedule.api';
 import type { CreateScheduleRequest } from '@/models/schedule.model';
 
 export const useCreateSchedulesMutation = (lessonId: number) => {
@@ -33,6 +37,25 @@ export const useDeleteScheduleMutation = (lessonId: number) => {
     onError: (error: AxiosError) => {
       if (error.response?.status === 400) {
         toast.error('신청자가 있어 삭제할 수 없습니다.');
+      } else {
+        toast.error('일정 삭제 중 오류가 발생했습니다.');
+      }
+    },
+  });
+};
+
+export const useDeleteSchedulesMutation = (lessonId: number) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteSchedules,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['schedules', lessonId] });
+      toast.success('선택한 일정이 모두 삭제되었습니다.');
+    },
+    onError: (error: AxiosError) => {
+      if (error.response?.status === 400) {
+        toast.error('신청자가 있는 일정은 삭제할 수 없습니다.');
       } else {
         toast.error('일정 삭제 중 오류가 발생했습니다.');
       }

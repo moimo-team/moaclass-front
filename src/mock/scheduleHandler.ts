@@ -74,15 +74,6 @@ export const scheduleHandlers = [
       );
     }
 
-    // TODO: 실제로는 로그인한 사용자와 클래스 소유자 비교 필요
-    // Mock에서는 scheduleId가 999일 때 권한 없음으로 가정
-    if (Number(scheduleId) === 999) {
-      return HttpResponse.json(
-        { message: '본인이 개설한 클래스가 아닙니다.' },
-        { status: 403 },
-      );
-    }
-
     if (schedule.currentParticipants > 0) {
       return HttpResponse.json(
         { message: '신청자가 있어 삭제할 수 없습니다.' },
@@ -90,6 +81,26 @@ export const scheduleHandlers = [
       );
     }
 
+    mockSchedules = mockSchedules.filter((s) => s.id !== Number(scheduleId));
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.delete('/api/lessons/schedules', async ({ request }) => {
+    const { scheduleIds } = (await request.json()) as { scheduleIds: number[] };
+
+    // 신청자가 있는 일정이 포함되어 있는지 확인
+    const hasParticipants = mockSchedules.some(
+      (s) => scheduleIds.includes(s.id) && s.currentParticipants > 0,
+    );
+
+    if (hasParticipants) {
+      return HttpResponse.json(
+        { message: '신청자가 있는 일정은 삭제할 수 없습니다.' },
+        { status: 400 },
+      );
+    }
+
+    mockSchedules = mockSchedules.filter((s) => !scheduleIds.includes(s.id));
     return new HttpResponse(null, { status: 204 });
   }),
 ];

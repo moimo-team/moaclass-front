@@ -25,3 +25,7 @@ export const createSchedules = async (
 export const deleteSchedule = async (scheduleId: number): Promise<void> => {
   await apiClient.delete(`/lessons/schedules/${scheduleId}`);
 };
+
+export const deleteSchedules = async (scheduleIds: number[]): Promise<void> => {
+  await apiClient.delete('/lessons/schedules', { data: { scheduleIds } });
+};
