@@ -14,9 +14,8 @@ export const useCreateSchedulesMutation = (lessonId: number) => {
       queryClient.invalidateQueries({ queryKey: ['schedules', lessonId] });
       toast.success('일정이 등록되었습니다!');
     },
-    onError: (error: Error) => {
+    onError: () => {
       toast.error('일정 등록 중 오류가 발생했습니다.');
-      console.error('Create schedules error:', error);
     },
   });
 };
@@ -37,7 +36,6 @@ export const useDeleteScheduleMutation = (lessonId: number) => {
       } else {
         toast.error('일정 삭제 중 오류가 발생했습니다.');
       }
-      console.error('Delete schedule error:', error);
     },
   });
 };
