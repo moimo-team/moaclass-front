@@ -1,4 +1,4 @@
-import { getOrderList } from "@/api/order.api";
+import { getCancelClass, getOrderList } from "@/api/order.api";
 import { useAuthStore } from "@/store/authStore";
 import { useQuery } from "@tanstack/react-query";
 import { usePagination } from "./usePagination";
@@ -32,4 +32,12 @@ export const useOrderlistQuery = (
     isFirstPage,
     isLastPage,
   };
+};
+
+// 수강취소 내역 조회
+export const useCancelClassQuery = (id: number) => {
+  return useQuery({
+    queryKey: ["cancelClass", id],
+    queryFn: () => getCancelClass(id),
+  });
 };
