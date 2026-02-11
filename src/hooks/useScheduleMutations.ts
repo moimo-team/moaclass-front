@@ -1,13 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { AxiosError } from 'axios';
+import { toast } from 'sonner';
 import { createSchedules, deleteSchedule } from '@/api/schedule.api';
 import type { CreateScheduleRequest } from '@/models/schedule.model';
-import { toast } from 'sonner';
-import type { AxiosError } from 'axios';
 
-/**
- * 일정 일괄 등록 Mutation
- * 개별/반복 등록 모두 배열로 전송
- */
 export const useCreateSchedulesMutation = (lessonId: number) => {
   const queryClient = useQueryClient();
 
@@ -25,10 +21,7 @@ export const useCreateSchedulesMutation = (lessonId: number) => {
   });
 };
 
-/**
- * 일정 삭제 Mutation
- * 신청자가 있으면 400 에러 처리
- */
+// 신청자가 있으면 400 에러로 삭제 불가 안내
 export const useDeleteScheduleMutation = (lessonId: number) => {
   const queryClient = useQueryClient();
 
