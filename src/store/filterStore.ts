@@ -2,9 +2,10 @@ import { create } from "zustand";
 import { REVERSE_LEVEL_MAP } from "@/constants/lessonConstants";
 import { DAYS_MAP } from "@/constants/dayConstants";
 import { STATUS_MAP } from "@/constants/statusConstants";
+import type { SortEnum } from "@/constants/sortConstants";
 import type { FetchLessonsParams } from "@/models/lesson.model";
 
-interface FilterState {
+export interface FilterState {
   selectedPersonnel: string;
   timeRange: [number, number];
   priceRange: [number, number];
@@ -12,6 +13,7 @@ interface FilterState {
   selectedDays: string[];
   selectedDifficulty: string[];
   selectedStatus: string | null;
+  selectedSort: SortEnum | null;
   selectedCategories: string[];
   activeMainCategoryId: number | null;
   selectedMainCategory: string | null;
@@ -28,6 +30,7 @@ interface FilterState {
   toggleDifficulty: (difficulty: string[]) => void;
   toggleFilterArray: (key: keyof FilterState, value: string) => void;
   toggleStatus: (status: string | null) => void;
+  setSelectedSort: (sort: SortEnum | null) => void;
 
   selectMainCategory: (category: { id: number; name: string }) => void;
   toggleSubCategory: (subCategory: string) => void;
@@ -51,6 +54,7 @@ const INITIAL_STATE = {
   selectedDays: [],
   selectedDifficulty: [],
   selectedStatus: null,
+  selectedSort: null,
   selectedCategories: [],
   activeMainCategoryId: null,
   selectedMainCategory: null,
@@ -70,6 +74,7 @@ export const useFilterStore = create<FilterState>((set, get) => ({
   setSelectedDays: (days) => set({ selectedDays: days }),
   setSelectedDifficulty: (difficulty) =>
     set({ selectedDifficulty: difficulty }),
+  setSelectedSort: (sort) => set({ selectedSort: sort }),
 
   toggleRegion: (region) =>
     set((state) => {
@@ -184,7 +189,7 @@ export const useFilterStore = create<FilterState>((set, get) => ({
     if (state.activeMainCategoryId) {
       params.categoryId = state.activeMainCategoryId;
     } else if (state.selectedCategories.length > 0) {
-      // 만약 세분화된 카테고리 ID가 필요하다면 이 로직을 수정해야 함
+      // TODO: 만약 세분화된 카테고리 ID가 필요하다면 이 로직을 수정해야 함
       // 현재는 activeMainCategoryId만 사용
     }
 
@@ -224,6 +229,10 @@ export const useFilterStore = create<FilterState>((set, get) => ({
       if (!isNaN(maxParticipantsNum)) {
         params.maxParticipants = maxParticipantsNum;
       }
+    }
+
+    if (state.selectedSort !== null) {
+      params.sort = state.selectedSort;
     }
 
     return params;
