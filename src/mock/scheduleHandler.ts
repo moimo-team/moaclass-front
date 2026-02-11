@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import type { LessonSchedule } from '@/models/schedule.model';
 
-const mockSchedules: LessonSchedule[] = [
+let mockSchedules: LessonSchedule[] = [
   {
     id: 1,
     lessonId: 1,
@@ -48,7 +48,17 @@ export const scheduleHandlers = [
       endAt: string;
     }>;
 
-    console.log(`[Mock] ${body.length}개 일정 등록 (lessonId: ${lessonId})`);
+    const newSchedules = body.map((item, index) => ({
+      id: mockSchedules.length + index + 1,
+      lessonId: Number(lessonId),
+      startAt: item.startAt,
+      endAt: item.endAt,
+      currentParticipants: 0,
+      maxParticipants: 4,
+      createdAt: new Date().toISOString(),
+    }));
+
+    mockSchedules = [...mockSchedules, ...newSchedules];
 
     return HttpResponse.json({ message: '등록 성공' }, { status: 201 });
   }),
@@ -80,7 +90,6 @@ export const scheduleHandlers = [
       );
     }
 
-    console.log(`[Mock] 일정 ${scheduleId} 삭제 성공`);
     return new HttpResponse(null, { status: 204 });
   }),
 ];
