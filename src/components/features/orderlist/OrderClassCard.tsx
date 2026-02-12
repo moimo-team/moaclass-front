@@ -7,7 +7,7 @@ import { FileText, Pencil, MessageCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReviewModal from "@/components/features/review/SetReviewModal";
 import type { Order, OrderStatus } from "@/models/order.model";
-import { formatClassCreateDate, formatTime } from "@/utils/dateFormat";
+import { formatFullDateTime } from "@/utils/dateFormat";
 
 interface OrderClassCardProps {
   order: Order;
@@ -16,34 +16,21 @@ interface OrderClassCardProps {
 
 const getStatusBadgeVariant = (status: OrderStatus) => {
   switch (status) {
-    case "ACCEPTED":
+    case "수강예정":
       return "default";
-    case "COMPLETED":
+    case "수강완료":
       return "secondary";
-    case "CANCEL":
+    case "수강취소":
       return "carrot";
     default:
       return "outline";
   }
 };
 
-const getStatusBadgeText = (status: OrderStatus) => {
-  switch (status) {
-    case "ACCEPTED":
-      return "수강예정";
-    case "COMPLETED":
-      return "수강완료";
-    case "CANCEL":
-      return "수강취소";
-    default:
-      return status;
-  }
-};
-
 const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
   const navigate = useNavigate();
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const isInactive = order.status === "COMPLETED" || order.status === "CANCEL";
+  const isInactive = order.status === "수강완료" || order.status === "수강취소";
 
   return (
     <Card
@@ -63,7 +50,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
             onClick={() => navigate(`/lessons/${order.lessonId}`)}
           >
             <img
-              src={order.representativeImage}
+              src={order.image}
               alt={order.title}
               className="w-full h-full object-cover transition-transform hover:scale-105"
             />
@@ -76,7 +63,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
           >
             <div className="flex items-center gap-2 mb-2">
               <Badge variant={getStatusBadgeVariant(order.status)}>
-                {getStatusBadgeText(order.status)}
+                {order.status}
               </Badge>
               <h3
                 className={cn(
@@ -88,7 +75,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
               </h3>
             </div>
             <p className="text-muted-foreground text-sm">
-              {formatClassCreateDate(order.startAt)} ~{formatTime(order.endAt)}
+              {formatFullDateTime(order.date)}
             </p>
           </div>
 
@@ -116,7 +103,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
                     fill="currentColor"
                   />
                 }
-                disabled={order.status !== "COMPLETED"}
+                disabled={order.status !== "수강완료"}
                 className="w-full"
                 onClick={() => setIsReviewModalOpen(true)}
               />
@@ -132,10 +119,10 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
                 label="수강 취소"
                 theme="destructive"
                 icon={<X className="w-3.5 h-3.5" />}
-                disabled={order.status !== "ACCEPTED"}
+                disabled={order.status !== "수강예정"}
                 className="w-full"
                 onClick={() =>
-                  navigate(`/mypage/class/orders/${order.id}/cancel`)
+                  navigate(`/mypage/class/orders/${order.enrollmentId}/cancel`)
                 }
               />
             </div>
@@ -145,7 +132,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
       <ReviewModal
         open={isReviewModalOpen}
         onOpenChange={setIsReviewModalOpen}
-        orderId={order.id}
+        orderId={order.enrollmentId}
       />
     </Card>
   );
