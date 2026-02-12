@@ -99,7 +99,7 @@ const Points = () => {
                 <div className="flex gap-6">
                   <div className="text-sm font-medium text-black/30 mt-1 tabular-nums w-16 shrink-0">
                     {/* 날짜 파싱 (예: 26.01.02) */}
-                    {formatDateTime(item.createdAt)}
+                    {formatDateTime(item.createdAt, { type: "date" })}
                   </div>
                   <div className="space-y-1">
                     <div className="flex items-center gap-1 cursor-pointer">

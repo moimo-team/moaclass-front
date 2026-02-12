@@ -1,4 +1,5 @@
 import type { PaginationMeta } from "./pagination.model";
+import type { PayStatus } from "./pay.model";
 
 // "전체" | "수강예정" | "수강취소" | "수강완료";
 export type OrderStatus = "수강예정" | "수강취소" | "수강완료";
@@ -48,7 +49,7 @@ export interface OrderDetailResponse {
   discountedAmount: number;
   amount: number;
   paymentDate: string;
-  status: OrderStatus;
+  status: PayStatus;
   reason?: string;
   detailReason?: string;
   refundAmount?: number;
