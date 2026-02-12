@@ -1,13 +1,11 @@
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import type { Order } from "../OrderClassCard";
 import { OrderClassInfo } from "./OrderClassInfo";
+import { useOrderDetailQuery } from "@/hooks/useOrderlistQuery";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { formatDateTime } from "@/utils/dateFormat";
+import type { Order } from "@/models/order.model";
+import { FormModal } from "@/components/features/modal/components/FormModal";
 
 interface OrderDetailModalProps {
     isOpen: boolean;
@@ -15,112 +13,183 @@ interface OrderDetailModalProps {
     order: Order | null;
 }
 
-const OrderDetailModal = ({ isOpen, onClose, order }: OrderDetailModalProps) => {
+const OrderDetailModal = ({
+    isOpen,
+    onClose,
+    order,
+}: OrderDetailModalProps) => {
+    const {
+        data: detail,
+        isLoading,
+        isError,
+    } = useOrderDetailQuery(order?.pointTransactionId ?? 0);
+
     if (!order) return null;
 
-    const isCanceled = order.status === "예약취소";
-
-    // 모달을 위해 필요한 추가 데이터 (실제 데이터 연동 시에는 API에서 받아올 정보들)
-    const mockDetail = {
-        orderNumber: "12414324",
-        instructor: "강사명",
-        price: 33000,
-        discount: 8250,
-        totalPrice: 24750,
-        paymentTime: "2025. 08. 04. 16:04 (Asia/Seoul)",
-        cancelReason: "개인 사정으로 인한 취소",
-        detailReason: "갑작스러운 일정 변경으로 인해 수강이 어렵게 되었습니다. 다음에 꼭 다시 신청하겠습니다.",
-        refundAmount: 24750,
-        deductionAmount: 8250,
-    };
+    const isCanceled = order.status === "수강취소";
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-md p-6 rounded-[24px]">
-                <DialogHeader className="space-y-1 mb-4">
-                    <DialogTitle className="text-xl font-bold text-[#2D3A3A]">결제 내역 상세</DialogTitle>
-                    <p className="text-muted-foreground text-sm">주문번호 : {mockDetail.orderNumber}</p>
-                </DialogHeader>
-
-                <div className="space-y-4">
-                    {/* 클래스 정보 섹션 */}
-                    <OrderClassInfo order={order} instructor={mockDetail.instructor} />
-
-                    {/* 수강취소사유 (조건부) - 개선된 디자인 */}
-                    {isCanceled && (
-                        <div className="border border-[#4A5D4A] rounded-[16px] p-5 space-y-2 bg-[#FDFEFC]">
-                            <div className="flex items-center gap-2">
-                                <span className="font-bold text-sm text-[#4A5D4A]">수강취소사유</span>
-                                <Badge variant="outline" className="text-[10px] h-5 border-[#4A5D4A] text-[#4A5D4A]">
-                                    {mockDetail.cancelReason}
-                                </Badge>
-                            </div>
-                            <p className="text-[#667085] text-sm leading-relaxed bg-white/50 p-3 rounded-lg border border-dashed border-[#4A5D4A]/20">
-                                {mockDetail.detailReason}
+        <FormModal
+            isOpen={isOpen}
+            onClose={onClose}
+            title="결제 내역 상세"
+            containerClassName="max-w-md"
+            showFooter={false}
+            isLoading={isLoading}
+            loadingComponent={
+                <div className="flex justify-center py-20">
+                    <LoadingSpinner />
+                </div>
+            }
+        >
+            <div className="space-y-4">
+                {isError ? (
+                    <div className="text-center py-10 bg-red-50 text-red-700 rounded-lg border border-dashed border-red-200">
+                        <p>상세 데이터를 불러올 수 없습니다.</p>
+                    </div>
+                ) : detail ? (
+                    <>
+                        {/* 주문 번호 표시 (FormModal 상단) */}
+                        <div className="mb-2">
+                            <p className="text-muted-foreground text-sm font-medium">
+                                주문번호 : {detail.orderId}
                             </p>
                         </div>
-                    )}
 
-                    <div className="space-y-4">
-                        {/* 결제 금액 요약 섹션 */}
-                        <div className="bg-[#F8F9F8] rounded-[20px] p-6 space-y-4">
-                            <div className="flex justify-between items-center">
-                                <span className="font-bold text-[#2D3A3A]">총 결제 금액</span>
-                                <span className="font-bold text-xl text-[#2D3A3A]">{mockDetail.totalPrice.toLocaleString()}원</span>
-                            </div>
+                        {/* 클래스 정보 섹션 */}
+                        <OrderClassInfo
+                            title={detail.title}
+                            teacherName={detail.teacherName}
+                            price={detail.originPrice}
+                        />
 
-                            <div className="space-y-2 text-sm text-muted-foreground pt-2 border-t border-gray-100">
-                                <div className="flex justify-between">
-                                    <span>강의 금액</span>
-                                    <span>{mockDetail.price.toLocaleString()}원</span>
+                        {/* 수강취소사유 (조건부) */}
+                        {isCanceled && detail.reason && (
+                            <div className="border border-[#4A5D4A] rounded-[16px] p-5 space-y-2 bg-[#FDFEFC]">
+                                <div className="flex items-center gap-2">
+                                    <span className="font-bold text-sm text-[#4A5D4A]">
+                                        수강취소사유
+                                    </span>
+                                    <Badge
+                                        variant="outline"
+                                        className="text-[10px] h-5 border-[#4A5D4A] text-[#4A5D4A]"
+                                    >
+                                        {detail.reason}
+                                    </Badge>
                                 </div>
-                                <div className="flex justify-between items-center">
-                                    <span>할인 금액</span>
-                                    <span className="text-gray-400">-{mockDetail.discount.toLocaleString()}원</span>
-                                </div>
+                                {detail.detailReason && (
+                                    <p className="text-[#667085] text-sm leading-relaxed bg-white/50 p-3 rounded-lg border border-dashed border-[#4A5D4A]/20">
+                                        {detail.detailReason}
+                                    </p>
+                                )}
                             </div>
-                        </div>
+                        )}
 
-                        {/* 환불 금액 요약 섹션 (조건부) */}
-                        {isCanceled && (
+                        <div className="space-y-4">
+                            {/* 결제 금액 요약 섹션 */}
                             <div className="bg-[#F8F9F8] rounded-[20px] p-6 space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <span className="font-bold text-[#2D3A3A]">총 환불 금액</span>
-                                    <span className="font-bold text-xl text-[#2D3A3A]">{mockDetail.refundAmount.toLocaleString()}원</span>
+                                    <span className="font-bold text-[#2D3A3A]">
+                                        총 결제 금액
+                                    </span>
+                                    <span className="font-bold text-xl text-[#2D3A3A]">
+                                        {detail.amount.toLocaleString()}원
+                                    </span>
                                 </div>
 
                                 <div className="space-y-2 text-sm text-muted-foreground pt-2 border-t border-gray-100">
                                     <div className="flex justify-between">
                                         <span>강의 금액</span>
-                                        <span>{mockDetail.price.toLocaleString()}원</span>
+                                        <span>
+                                            {detail.originPrice.toLocaleString()}
+                                            원
+                                        </span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="font-bold text-[#2D3A3A]">차감 금액</span>
-                                        <span className="text-gray-400">-{mockDetail.deductionAmount.toLocaleString()}원</span>
+                                        <span>할인 금액</span>
+                                        <span className="text-gray-400">
+                                            -
+                                            {detail.discountedAmount.toLocaleString()}
+                                            원
+                                        </span>
                                     </div>
                                 </div>
                             </div>
-                        )}
 
-                        {/* 하단 상세 정보 - 스타일 통일 (회색 박스) */}
-                        <div className="bg-[#F8F9F8] rounded-[20px] p-6 space-y-4">
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm font-medium text-gray-500">상태</span>
-                                <Badge variant="default" className={cn(
-                                    "font-medium px-2 py-0.5 rounded-[4px] text-[11px]"
-                                )}>
-                                    {isCanceled ? "결제 취소" : "결제 완료"}
-                                </Badge>
-                            </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-gray-500 font-medium">{isCanceled ? "환불 시각" : "결제 시각"}</span>
-                                <span className="text-[#2D3A3A] font-bold">{mockDetail.paymentTime}</span>
+                            {/* 환불 금액 요약 섹션 (조건부) */}
+                            {isCanceled &&
+                                detail.refundAmount !== undefined && (
+                                    <div className="bg-[#F8F9F8] rounded-[20px] p-6 space-y-4">
+                                        <div className="flex justify-between items-center">
+                                            <span className="font-bold text-[#2D3A3A]">
+                                                총 환불 금액
+                                            </span>
+                                            <span className="font-bold text-xl text-[#2D3A3A]">
+                                                {detail.refundAmount.toLocaleString()}
+                                                원
+                                            </span>
+                                        </div>
+
+                                        <div className="space-y-2 text-sm text-muted-foreground pt-2 border-t border-gray-100">
+                                            <div className="flex justify-between">
+                                                <span>강의 금액</span>
+                                                <span>
+                                                    {detail.originPrice.toLocaleString()}
+                                                    원
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="font-bold text-[#2D3A3A]">
+                                                    차감 금액
+                                                </span>
+                                                <span className="text-gray-400">
+                                                    -
+                                                    {(
+                                                        detail.amount -
+                                                        detail.refundAmount
+                                                    ).toLocaleString()}
+                                                    원
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                            {/* 하단 상세 정보 */}
+                            <div className="bg-[#F8F9F8] rounded-[20px] p-6 space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm font-medium text-gray-500">
+                                        상태
+                                    </span>
+                                    <Badge
+                                        variant={
+                                            isCanceled ? "carrot" : "default"
+                                        }
+                                        className={cn(
+                                            "font-medium px-2 py-0.5 rounded-[4px] text-[11px]",
+                                        )}
+                                    >
+                                        {isCanceled ? "결제 취소" : "결제 완료"}
+                                    </Badge>
+                                </div>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-500 font-medium">
+                                        {isCanceled ? "환불 시각" : "결제 시각"}
+                                    </span>
+                                    <span className="text-[#2D3A3A] font-bold">
+                                        {formatDateTime(
+                                            isCanceled && detail.refundDate
+                                                ? detail.refundDate
+                                                : detail.paymentDate,
+                                        )}
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
+                    </>
+                ) : null}
+            </div>
+        </FormModal>
     );
 };
 

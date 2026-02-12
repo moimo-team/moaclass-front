@@ -67,7 +67,7 @@ const OrderList = () => {
         ) : orderlist.length > 0 ? (
           orderlist.map((order) => (
             <OrderClassCard
-              key={order.id}
+              key={order.enrollmentId}
               order={order}
               onDetailClick={handleDetailClick}
             />
