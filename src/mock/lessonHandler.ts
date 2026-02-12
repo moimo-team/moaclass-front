@@ -35,6 +35,7 @@ export const lessonHandlers = [
     const maxTime = Number(url.searchParams.get("maxTime") || "24");
     const minPrice = Number(url.searchParams.get("minPrice") || "0");
     const maxPrice = Number(url.searchParams.get("maxPrice") || "500000");
+    const sort = url.searchParams.get("sort") || "LATEST"; // 'LATEST'를 기본값으로 설정
 
     let filteredLessons = mockLessons;
 
@@ -47,6 +48,7 @@ export const lessonHandlers = [
       .map((d) => difficultyMap[d])
       .filter((d): d is Level => d !== undefined);
 
+    // 필터링 로직
     if (categories.length > 0) {
       filteredLessons = filteredLessons.filter((lesson) => {
         const categoryName = LESSON_CATEGORIES.find(
@@ -92,6 +94,27 @@ export const lessonHandlers = [
           lesson.discountedPrice <= maxPrice,
       );
     }
+
+    // 정렬 로직 적용
+    filteredLessons.sort((a, b) => {
+      switch (sort) {
+        case "PRICE_ASC":
+          return a.discountedPrice - b.discountedPrice;
+        case "PRICE_DESC":
+          return b.discountedPrice - a.discountedPrice;
+        case "DEADLINE": // reservationLeadDays가 낮을수록 마감일이 빠르다고 가정
+          return a.reservationLeadDays - b.reservationLeadDays;
+        case "UPDATE":
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+        case "RATE":
+          return b.rate - a.rate;
+        case "LIKES":
+          return b.likes - a.likes;
+        case "LATEST": // 기본값: 생성일 최신순
+        default:
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+    });
 
     const totalCount = filteredLessons.length;
     const totalPages = Math.ceil(totalCount / limit);

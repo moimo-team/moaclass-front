@@ -1,6 +1,6 @@
 import { useState, useLayoutEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { formatClassCreateDate } from "@/utils/dateFormat";
+import { formatFullDateTime } from "@/utils/dateFormat";
 import { useAuthStore } from "@/store/authStore";
 import LoginRequiredDialog from "@/components/features/login/LoginRequiredDialog";
 import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
@@ -187,7 +187,7 @@ export const LessonDetail = () => {
         open={showConfirmApply}
         onOpenChange={setShowConfirmApply}
         title="클래스 신청 확인"
-        description={`선택하신 날짜(${tempSelectedDate ? formatClassCreateDate(tempSelectedDate) : "날짜 미선택"})에 ${tempHeadcount}명으로 클래스를 신청하시겠습니까?`}
+        description={`선택하신 날짜(${tempSelectedDate ? formatFullDateTime(tempSelectedDate) : "날짜 미선택"})에 ${tempHeadcount}명으로 클래스를 신청하시겠습니까?`}
         confirmText="신청하기"
         cancelText="취소"
         onConfirm={confirmApplyAction}

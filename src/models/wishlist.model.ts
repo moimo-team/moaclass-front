@@ -1,4 +1,5 @@
 import type { Lesson, LessonCategory, TeacherProfile } from "./lesson.model";
+import type { PaginationMeta } from "./pagination.model";
 import type { Region } from "./region.model";
 
 // // 위시리스트 클래스 아이템
@@ -31,12 +32,7 @@ export type WishlistLessonItem = {
 // 위시리스트 목록 조회 response
 export interface WishlistResponse {
   data: WishlistLessonItem[];
-  meta: {
-    totalCount: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
+  meta: PaginationMeta;
 }
 
 /**

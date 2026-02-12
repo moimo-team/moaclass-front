@@ -113,7 +113,7 @@ export const routeList = [
         element: <Interests />,
       },
       {
-        path: "/pay-class/:lessonId/:scheduleId/:quantity",
+        path: "/payments/preview",
         element: (
           <ProtectedRoute>
             <ClassPayment />
@@ -122,12 +122,11 @@ export const routeList = [
       },
       {
         path: "/mypage",
-        element: <MypageSession />,
-        // (
-        //   <ProtectedRoute>
-        //     <MypageSession />,
-        //   </ProtectedRoute>
-        // ),
+        element: (
+          <ProtectedRoute>
+            <MypageSession />
+          </ProtectedRoute>
+        ),
         children: [
           {
             index: true,

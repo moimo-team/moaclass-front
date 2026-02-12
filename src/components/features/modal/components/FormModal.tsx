@@ -44,7 +44,7 @@ export const FormModal = ({
   const content = (
     <>
       {/* 스크롤바 */}
-      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 custom-scrollbar">
         {children}
       </div>
 
@@ -65,10 +65,12 @@ export const FormModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={cn(
-        "p-0 bg-white rounded-2xl flex flex-col max-h-[90vh]",
-        containerClassName
-      )}>
+      <DialogContent
+        className={cn(
+          "p-0 bg-white rounded-2xl flex flex-col max-h-[90vh]",
+          containerClassName,
+        )}
+      >
         {/* 고정된 헤더 */}
         <DialogHeader className="px-6 pt-6 pb-4 border-b">
           <DialogTitle className="text-2xl font-bold text-center text-[#1A2B4B]">
@@ -79,13 +81,14 @@ export const FormModal = ({
         {isLoading && loadingComponent ? (
           <div className="px-6 py-6">{loadingComponent}</div>
         ) : onSubmit ? (
-          <form onSubmit={onSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <form
+            onSubmit={onSubmit}
+            className="flex flex-col flex-1 overflow-hidden"
+          >
             {content}
           </form>
         ) : (
-          <div className="flex flex-col flex-1 overflow-hidden">
-            {content}
-          </div>
+          <div className="flex flex-col flex-1 overflow-hidden">{content}</div>
         )}
       </DialogContent>
     </Dialog>

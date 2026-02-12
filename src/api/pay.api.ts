@@ -1,46 +1,64 @@
 import { apiClient } from "@/api/client";
-import type { PayPreviewResponse } from "@/models/pay.model";
+import type { ParticipationStatus } from "@/models/participation.model";
+import type {
+  CouponCalculateResponse,
+  PayPreviewResponse,
+  PayStatus,
+} from "@/models/pay.model";
+import type { PointType } from "@/models/point.model";
 
 export interface GetPayPreviewParams {
-    lessonId?: number;
-    scheduleId?: number;
-    quantity?: number;
+  scheduleId: number;
+  quantity: number;
 }
 
 // 결제 프리뷰 조회
-export const getPayPreview = async (params: GetPayPreviewParams): Promise<PayPreviewResponse> => {
-    try {
-        const queryParams = new URLSearchParams();
-        Object.entries(params).forEach(([key, value]) => {
-            if (value === undefined || value === null) return;
-            queryParams.append(key, String(value));
-        });
-        const queryString = queryParams.toString();
-        const url = queryString ? `/payments/preview?${queryString}` : "/payments/preview";
-        const response = await apiClient.get(url);
-        return response.data;
-    } catch (error) {
-        console.error("getPayPreview error:", error);
-        throw error;
-    }
-}
-
-export interface PayInfoValues {
-    userId: number;
-    lessonId: number;
-    scheduleId: number;
-    amount: number;
-    couponId: number | null;
+export const getPayPreview = async (
+  params: GetPayPreviewParams,
+): Promise<PayPreviewResponse> => {
+  const response = await apiClient.get(
+    `/payments/preview?scheduleId=${params.scheduleId}&quantity=${params.quantity}`,
+  );
+  return response.data;
 };
 
-// 결제하기
-export const createPayment = async (data: PayInfoValues) => {
-    try {
-        const response = await apiClient.post("/payments", data);
-        return response.data;
-    } catch (error) {
-        console.error("createPayment error:", error);
-        throw error;
-    }
+export interface CouponCalculateValues {
+  scheduleId: number;
+  quantity: number;
+  couponId: number;
 }
 
+// 쿠폰 선택 계산
+export const calculateCouponDiscount = async (
+  data: CouponCalculateValues,
+): Promise<CouponCalculateResponse> => {
+  const response = await apiClient.post(`/payments/calculate`, data);
+  return response.data;
+};
+
+export interface PayInfoValues {
+  quantity: number;
+  scheduleId: number;
+  finalPrice: number;
+  couponId: number | null;
+}
+
+export interface CreatePaymentResponse {
+  enrollmentId: number;
+  status: ParticipationStatus; // 참여상태
+  transaction: {
+    id: number;
+    amount: number;
+    type: PointType; // USE / CHARGE / REFUND
+    status: PayStatus; // 결제 상태
+  };
+  remainingPoints: number;
+}
+
+// 결제(수강생 등록)
+export const createEnrollment = async (
+  data: PayInfoValues,
+): Promise<CreatePaymentResponse> => {
+  const response = await apiClient.post("/enrollments", data);
+  return response.data;
+};
