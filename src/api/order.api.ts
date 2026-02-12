@@ -1,6 +1,7 @@
 import type {
   CancelClassRequest,
   CancelClassResponse,
+  OrderDetailResponse,
   OrderListResponse,
 } from "@/models/order.model";
 import { apiClient } from "./client";
@@ -46,6 +47,21 @@ export const cancelClass = async (
     await apiClient.post(`/enrollments/${id}/cancel`, data);
   } catch (error) {
     console.error("cancelClass error:", error);
+    throw error;
+  }
+};
+
+// 결제상세 조회
+export const getOrderDetail = async (
+  pointTransactionId: number,
+): Promise<OrderDetailResponse> => {
+  try {
+    const response = await apiClient.get<OrderDetailResponse>(
+      `/payments/detail/${pointTransactionId}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("getOrderDetail error:", error);
     throw error;
   }
 };

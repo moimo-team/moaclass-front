@@ -4,7 +4,7 @@ import ActionButton from "@/components/common/ActionButton";
 import { ChevronLeft, CheckCircle2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { RefundRuleSection } from "@/components/features/pay/RefundRuleSection";
-import { CANCEL_REASONS } from "@/constants/cancelClass";
+import { CANCEL_REASONS } from "@/constants/cancelReasons";
 import { useCancelClassQuery } from "@/hooks/useOrderlistQuery";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -94,7 +94,11 @@ const CancelClass = () => {
         {/* Class Info Section */}
         <section>
           <h2 className="text-sm font-bold mb-3 text-gray-800">클래스 정보</h2>
-          <OrderClassInfo classInfo={cancelClassInfo} />
+          <OrderClassInfo
+            title={cancelClassInfo.title}
+            teacherName={cancelClassInfo.teacherNickname || "강사명"}
+            price={cancelClassInfo.payments.totalAmount}
+          />
         </section>
 
         {/* Refund Reason Section */}

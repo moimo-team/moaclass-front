@@ -1,19 +1,19 @@
 import type { PaginationMeta } from "./pagination.model";
+import type { PayStatus } from "./pay.model";
 
 // "전체" | "수강예정" | "수강취소" | "수강완료";
-export type OrderStatus = "ACCEPTED" | "CANCEL" | "COMPLETED";
+export type OrderStatus = "수강예정" | "수강취소" | "수강완료";
 
 export interface Order {
-  id: number;
+  enrollmentId: number;
   lessonId: number;
+  scheduleId: number;
+  pointTransactionId: number;
   title: string;
-  startAt: string;
-  endAt: string;
+  date: string;
+  image: string;
   status: OrderStatus;
-  representativeImage: string;
-  price: number;
-  teacherNickname: string;
-  isCompleted: boolean;
+  transactionStatus: string;
 }
 
 export interface OrderListResponse {
@@ -22,6 +22,7 @@ export interface OrderListResponse {
 }
 
 export interface CancelClassResponse extends Order {
+  teacherNickname: string;
   payments: {
     totalAmount: number;
     couponAmount: number;
@@ -39,4 +40,19 @@ export interface CancelClassResponse extends Order {
 export interface CancelClassRequest {
   reason: string;
   detailReason: string;
+}
+
+export interface OrderDetailResponse {
+  orderId: number;
+  title: string;
+  teacherName: string;
+  originPrice: number;
+  discountedAmount: number;
+  amount: number;
+  paymentDate: string;
+  status: PayStatus;
+  reason?: string;
+  detailReason?: string;
+  refundAmount?: number;
+  refundDate?: string;
 }

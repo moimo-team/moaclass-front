@@ -12,7 +12,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import type { UserInfo } from "@/models/user.model";
 import defaultProfile from "@/assets/images/profile.png";
-import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RegionSelect } from "@/components/common/RegionSelect";
 import { REGIONS } from "@/constants/regions";
@@ -139,11 +138,9 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
       }
 
       await userUpdateMutation.mutateAsync(formData);
-      toast.success("프로필 수정이 완료되었습니다.");
       onClose();
     } catch (error) {
       console.error("Profile update failed:", error);
-      toast.error("프로필 수정에 실패했습니다.");
     }
   };
 
