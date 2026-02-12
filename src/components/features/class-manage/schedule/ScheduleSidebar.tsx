@@ -1,13 +1,17 @@
 import { useState, useMemo, useEffect } from "react";
-import { Clock, CheckCircle2, Calendar as CalendarIcon, Trash2, CalendarRange } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Clock, CheckCircle2, Calendar as CalendarIcon, Trash2, CalendarRange } from "lucide-react";
+
+import { useDeleteSchedulesMutation } from "@/hooks/useScheduleMutations";
 import { extractTimeFromISO } from "@/utils/scheduleHelpers";
 import type { LessonSchedule } from "@/models/schedule.model";
-import { useDeleteSchedulesMutation } from "@/hooks/useScheduleMutations";
+
 import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+import { ScheduleParticipantModal } from "./ScheduleParticipantModal";
 
 interface ScheduleSidebarProps {
   lessonId: number;
@@ -23,6 +27,12 @@ export const ScheduleSidebar = ({
   const { mutate: deleteSchedules } = useDeleteSchedulesMutation(lessonId);
   const [selectedScheduleIds, setSelectedScheduleIds] = useState<number[]>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const [participantModalInfo, setParticipantModalInfo] = useState<{
+    scheduleId: number;
+    dateStr: string;
+    timeStr: string;
+  } | null>(null);
 
   // 선택된 날짜가 바뀌면 선택 상태 초기화
   useEffect(() => {
@@ -71,6 +81,14 @@ export const ScheduleSidebar = ({
     });
   };
 
+  const handleViewParticipants = (schedule: LessonSchedule) => {
+    setParticipantModalInfo({
+      scheduleId: schedule.id,
+      dateStr: format(new Date(schedule.startAt), "yyyy년 MM월 dd일 (eee)", { locale: ko }),
+      timeStr: `${extractTimeFromISO(schedule.startAt)} - ${extractTimeFromISO(schedule.endAt)}`
+    });
+  };
+
   if (selectedDates.length === 0) {
     return (
       <div className="bg-gray-50/50 rounded-2xl p-8 text-center border-2 border-dashed border-gray-100 h-[600px] flex flex-col items-center justify-center">
@@ -114,7 +132,7 @@ export const ScheduleSidebar = ({
           {withParticipants.length > 0 && (
             <div className="space-y-4">
               <div className="flex items-center gap-2 px-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                <div className="w-1.5 h-1.5 rounded-full bg-carrot" />
                 <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest">모멘티 O</h4>
               </div>
               <div className="grid gap-2.5">
@@ -123,6 +141,7 @@ export const ScheduleSidebar = ({
                     key={schedule.id}
                     schedule={schedule}
                     isWithParticipants
+                    onViewParticipants={() => handleViewParticipants(schedule)}
                   />
                 ))}
               </div>
@@ -134,7 +153,7 @@ export const ScheduleSidebar = ({
             <div className="space-y-4">
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
                   <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest">모멘티 X</h4>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -177,7 +196,6 @@ export const ScheduleSidebar = ({
         </div>
       )}
 
-      {/* 🚀 브라우저 기본 confirm 대신 ConfirmDialog 사용 */}
       <ConfirmDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
@@ -187,6 +205,14 @@ export const ScheduleSidebar = ({
         onConfirm={handleConfirmDelete}
         variant="destructive"
       />
+
+      <ScheduleParticipantModal
+        isOpen={!!participantModalInfo}
+        onClose={() => setParticipantModalInfo(null)}
+        scheduleId={participantModalInfo?.scheduleId ?? null}
+        dateStr={participantModalInfo?.dateStr}
+        timeStr={participantModalInfo?.timeStr}
+      />
     </div>
   );
 };
@@ -195,21 +221,23 @@ const ScheduleCard = ({
   schedule,
   isWithParticipants = false,
   isSelected = false,
-  onClick
+  onClick,
+  onViewParticipants
 }: {
   schedule: LessonSchedule;
   isWithParticipants?: boolean;
   isSelected?: boolean;
   onClick?: () => void;
+  onViewParticipants?: () => void;
 }) => {
   return (
     <div
       onClick={!isWithParticipants ? onClick : undefined}
-      className={`relative p-4 border rounded-xl transition-all duration-300 cursor-pointer ${isWithParticipants
-          ? "bg-gray-50/30 border-gray-100 cursor-default"
-          : isSelected
-            ? "bg-white border-primary shadow-md ring-4 ring-primary/5"
-            : "bg-white border-gray-100 hover:border-gray-300 hover:shadow-sm"
+      className={`relative p-4 border rounded-xl transition-all duration-300 group ${isWithParticipants
+        ? "bg-gray-50/30 border-gray-100 cursor-default"
+        : isSelected
+          ? "font-black bg-white border-primary shadow-md ring-4 ring-primary/5"
+          : "bg-white border-gray-100 hover:border-gray-300 hover:shadow-sm"
         }`}
     >
       <div className="flex flex-col gap-2.5">
@@ -222,15 +250,28 @@ const ScheduleCard = ({
               <CheckCircle2 className="w-3 h-3" />
             </div>
           )}
+          {isWithParticipants && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewParticipants?.();
+              }}
+              className="h-7 text-[10px] font-black border-carrot/30 text-carrot hover:bg-carrot hover:text-white transition-all rounded-lg"
+            >
+              모멘티 정보
+            </Button>
+          )}
         </div>
 
         <div className="flex items-center justify-between bg-gray-50/50 p-2 rounded-lg">
           <div className={`flex items-center gap-2 text-[13px] font-bold ${isSelected ? "text-gray-800" : "text-gray-500"}`}>
-            <Clock className={`w-3.5 h-3.5 ${isWithParticipants ? "text-primary/60" : isSelected ? "text-primary" : "text-gray-300"}`} />
+            <Clock className={`w-3.5 h-3.5 ${isWithParticipants ? "text-carrot/80" : isSelected ? "text-primary" : "text-primary/30"}`} />
             {extractTimeFromISO(schedule.startAt)} - {extractTimeFromISO(schedule.endAt)}
           </div>
 
-          <div className={`text-[12px] font-black ${isWithParticipants ? "text-primary" : isSelected ? "text-primary/80" : "text-gray-400"}`}>
+          <div className={`text-[12px] font-black ${isWithParticipants ? "text-carrot" : isSelected ? "text-primary/80" : "text-primary/40"}`}>
             {schedule.currentParticipants} / {schedule.maxParticipants}명
           </div>
         </div>
