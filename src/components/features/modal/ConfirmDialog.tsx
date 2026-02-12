@@ -19,6 +19,7 @@ interface ConfirmDialogProps {
   onConfirm: () => void;
   onCancel?: () => void;
   variant?: "default" | "destructive"; // 삭제 등 위험한 액션용
+  showCancel?: boolean; // 취소 버튼 표시 여부
   children?: React.ReactNode;
 }
 
@@ -32,6 +33,7 @@ function ConfirmDialog({
   onConfirm,
   onCancel,
   variant = "default",
+  showCancel = true,
   children,
 }: ConfirmDialogProps) {
   const handleConfirm = () => {
@@ -59,9 +61,11 @@ function ConfirmDialog({
         </AlertDialogHeader>
         {children}
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancel}>
-            {cancelText}
-          </AlertDialogCancel>
+          {showCancel && (
+            <AlertDialogCancel onClick={handleCancel}>
+              {cancelText}
+            </AlertDialogCancel>
+          )}
           <AlertDialogAction
             onClick={handleConfirm}
             className={

@@ -3,7 +3,7 @@
  * @param dateString - ISO 형식의 날짜 문자열
  * @returns 포맷된 날짜 문자열 (예: "2026. 1. 19 (일) 14:30")
  */
-export function formatClassCreateDate(dateString: string): string {
+export function formatFullDateTime(dateString: string): string {
   const date = new Date(dateString);
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
