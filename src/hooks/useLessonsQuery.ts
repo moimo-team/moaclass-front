@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { fetchLatestLessons, fetchLessons } from '@/api/lesson.api';
+import { useQuery } from "@tanstack/react-query";
+import { fetchLatestLessons, fetchLessons } from "@/api/lesson.api";
 import type {
   Lesson,
   FetchLessonsResponse,
@@ -8,17 +8,24 @@ import type {
 
 export const useLatestLessonsQuery = () => {
   return useQuery<Lesson[], Error>({
-    queryKey: ['lessons', 'latest'],
+    queryKey: ["lessons", "latest"],
     queryFn: fetchLatestLessons,
   });
 };
 
 export const useLessonsQuery = (
   params: FetchLessonsParams,
-  searchTrigger: number,
+  page: number,
+  enabled: boolean,
 ) => {
-  return useQuery<FetchLessonsResponse, Error>({
-    queryKey: ['lessons', params, searchTrigger],
-    queryFn: () => fetchLessons(params),
+  const queryParams = { ...params, page };
+  const queryKey = ["lessons", queryParams];
+
+  const queryResult = useQuery<FetchLessonsResponse, Error>({
+    queryKey,
+    queryFn: () => fetchLessons(queryParams),
+    enabled,
   });
+
+  return { ...queryResult, queryKey };
 };

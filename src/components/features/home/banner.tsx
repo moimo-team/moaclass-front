@@ -47,7 +47,6 @@ function Banner() {
     api?.scrollTo(index);
   };
 
-  // TODO: 배너 데이터 API로 대체
   const bannerItems = [
     {
       id: 1,

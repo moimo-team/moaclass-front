@@ -13,8 +13,7 @@ const CategorySection = ({ className }: CategorySectionProps) => {
   const regionItems: FilterDropdownItem[] = REGIONS.map((region) => ({
     key: region.id,
     label: region.name,
-    // TODO: 주소 확정되면 수정
-    //href: `/meetings?region=${region}`,
+    href: `/lessons?regionId=${region.id}`,
   }));
 
   const { data: categories, isLoading: isCategoriesLoading } =
@@ -25,7 +24,8 @@ const CategorySection = ({ className }: CategorySectionProps) => {
     : (categories || []).map((category) => ({
         key: category.id,
         label: category.name,
-        //href: `/meetings?category=${category.name}`,
+        // TODO: 소분류 카테고리 추가되면 주소 수정
+        href: `/lessons?categoryId=${category.id}`,
       }));
 
   return (

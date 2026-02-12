@@ -23,7 +23,7 @@ interface FilterDropdownProps {
 const FilterDropdown: React.FC<FilterDropdownProps> = ({
   title,
   items,
-  allOptionHref = "/meetings",
+  allOptionHref = "/lessons",
 }) => {
   return (
     <DropdownMenu>

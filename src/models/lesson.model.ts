@@ -1,3 +1,5 @@
+import type { PaginationMeta } from "@/models/pagination.model";
+
 export type Level = "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
 
 // 클래스 상태 타입
@@ -9,30 +11,40 @@ export type LessonStatus =
   | "DUPLICATED";
 export type LessonScheduleStatus = "RECRUITING" | "CLOSED" | "COMPLETED";
 
+// GET /lessons 응답의 schedule 정보
+export interface Schedule {
+  id: number;
+  startAt: string;
+  endAt: string;
+  status: LessonScheduleStatus;
+  currentParticipants: number;
+}
+
 // 클래스
 export interface Lesson {
   id: number;
-  teacherId: number; // 선생님 ID
-  classCategoryId: number; // 대분류 ID
+  userId: number;
+  lessonCategoryId: number;
+  lessonCategoryName: string;
 
   title: string;
   description: string; // 클래스 상세내용
-  curriculum: string; // 커리큘럼 (40자~600자)
 
   level: Level; // 난이도
   durationMin: number; // 소요 시간(분 단위)
+  curriculum: string; // 커리큘럼 (40자~600자)
 
   status: LessonStatus; // 클래스 상태
   price: number;
   discountRate: number; // 할인율
   discountedPrice: number; // 할인된 가격
-  maxParticipants?: number;
-  currentParticipants: number;
+  maxParticipants: number;
 
   representativeImage: string; // 클래스 대표 이미지
-  likes: number;
+  likeCount: number;
 
   regionId: number; // 지역 참조값
+  regionName: string;
   address: string;
   latitude: number;
   longitude: number;
@@ -43,10 +55,23 @@ export interface Lesson {
 
   rate: number; // 리뷰 점수 평균
 
-  reviewAiSummary?: string; // 리뷰 AI 요약
-  deletedAt?: string; // 삭제 일시
+  deletedAt: string | null;
+  reviewAiSummary: string | null;
+
   createdAt: string;
   updatedAt: string;
+
+  teacher: {
+    id: number;
+    nickname: string;
+  };
+
+  subCategories: {
+    id: number;
+    name: string;
+  }[];
+
+  schedules: Schedule[];
 
   // 관계 데이터 (optional)
   isLiked?: boolean; // 프론트 전용
@@ -110,9 +135,8 @@ export interface FetchLessonsParams {
 }
 
 export interface FetchLessonsResponse {
-  lessons: Lesson[];
-  totalCount: number;
-  totalPages: number;
+  data: Lesson[];
+  meta: PaginationMeta;
 }
 
 // --- 클래스 등록 관련 Request 인터페이스 ---

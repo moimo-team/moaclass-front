@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { LessonFilterSection } from "@/components/features/lessons/LessonFilterSection";
 import { LessonCard } from "@/components/features/lessons/LessonCard";
@@ -50,6 +50,7 @@ const LessonListDisplay: React.FC<{
 
 const LessonListPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isInitialized, setIsInitialized] = useState(false);
   const {
     setAllFilters,
     resetFilters,
@@ -60,38 +61,39 @@ const LessonListPage: React.FC = () => {
 
   useEffect(() => {
     const filtersFromUrl: Partial<FilterState> = {
-      selectedCategories: searchParams.get("categories")?.split(",") || [],
-      selectedRegions: searchParams.get("regions")?.split(",") || [],
+      selectedCategories: searchParams.get("categoryId")?.split(",") || [],
+      selectedRegions: searchParams.get("regionId")?.split(",") || [],
       selectedDays: searchParams.get("days")?.split(",") || [],
-      selectedDifficulty: searchParams.get("difficulty")?.split(",") || [],
-      selectedPersonnel: searchParams.get("personnel") || "",
+      selectedDifficulty: searchParams.get("level")?.split(",") || [],
+      selectedPersonnel: searchParams.get("maxParticipants") || "",
       selectedStatus: searchParams.get("status") || null,
       selectedSort: (searchParams.get("sort") as SortEnum) || null,
-      timeRange: [
-        Number(searchParams.get("minTime")) || 0,
-        Number(searchParams.get("maxTime")) || 24,
-      ] as [number, number],
+      timeRange: searchParams.get("timeRange")
+        ? (searchParams.get("timeRange")?.split("-").map(Number) as [
+            number,
+            number,
+          ])
+        : [0, 24],
       priceRange: [
         Number(searchParams.get("minPrice")) || 0,
         Number(searchParams.get("maxPrice")) || 500000,
       ] as [number, number],
     };
     setAllFilters(filtersFromUrl);
+    setIsInitialized(true);
   }, [searchParams, setAllFilters]);
 
   const currentPage = Number(searchParams.get("page")) || 1;
   //const itemsPerPage = 12; // TODO: 한 페이지에 보여줄 아이템 수 정의 필요
 
-  const { data, isLoading, isError } = useLessonsQuery(
-    getFetchLessonsParams(),
-    currentPage,
-  );
-  const lessonsQueryKey: QueryKey = [
-    "lessons",
-    getFetchLessonsParams(),
-    currentPage,
-  ];
-  const { totalPages } = { totalPages: data?.totalPages || 0 };
+  const {
+    data,
+    isLoading,
+    isError,
+    queryKey: lessonsQueryKey,
+  } = useLessonsQuery(getFetchLessonsParams(), currentPage, isInitialized);
+
+  const { totalPages } = { totalPages: data?.meta?.totalPages || 0 };
 
   const handlePageChange = (page: number) => {
     searchParams.set("page", String(page));
@@ -156,7 +158,7 @@ const LessonListPage: React.FC = () => {
 
       <div className="my-8">
         <LessonListDisplay
-          lessons={data?.lessons || []}
+          lessons={data?.data || []}
           isLoading={isLoading}
           isError={isError}
           emptyMessage="조건에 맞는 클래스가 없습니다."

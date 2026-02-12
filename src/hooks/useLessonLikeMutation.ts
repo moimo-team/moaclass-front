@@ -56,15 +56,17 @@ export const useLessonLikeMutation = (
             let newData: Lesson[] | Lesson | FetchLessonsResponse | undefined;
 
             // oldData가 FetchLessonsResponse 타입인 경우
-            if ("lessons" in oldData && Array.isArray(oldData.lessons)) {
+            if ("data" in oldData && Array.isArray(oldData.data)) {
               newData = {
                 ...oldData,
-                lessons: oldData.lessons.map((lesson) =>
+                data: oldData.data.map((lesson) =>
                   lesson.id === lessonId
                     ? {
                         ...lesson,
                         isLiked: newIsLiked,
-                        likes: newIsLiked ? lesson.likes + 1 : lesson.likes - 1,
+                        likeCount: newIsLiked
+                          ? lesson.likeCount + 1
+                          : lesson.likeCount - 1,
                       }
                     : lesson,
                 ),
@@ -77,7 +79,9 @@ export const useLessonLikeMutation = (
                   ? {
                       ...lesson,
                       isLiked: newIsLiked,
-                      likes: newIsLiked ? lesson.likes + 1 : lesson.likes - 1,
+                      likeCount: newIsLiked
+                        ? lesson.likeCount + 1
+                        : lesson.likeCount - 1,
                     }
                   : lesson,
               );
@@ -89,7 +93,9 @@ export const useLessonLikeMutation = (
                 newData = {
                   ...lesson,
                   isLiked: newIsLiked,
-                  likes: newIsLiked ? lesson.likes + 1 : lesson.likes - 1,
+                  likeCount: newIsLiked
+                    ? lesson.likeCount + 1
+                    : lesson.likeCount - 1,
                 };
               } else {
                 newData = oldData;
