@@ -93,6 +93,7 @@ export const PayInfoSection = ({
 
     try {
       const payResult = await createPayment({
+        quantity,
         scheduleId,
         finalPrice: finalPrice,
         couponId: appliedCoupon?.id || null,

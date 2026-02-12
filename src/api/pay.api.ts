@@ -37,6 +37,7 @@ export const calculateCouponDiscount = async (
 };
 
 export interface PayInfoValues {
+  quantity: number;
   scheduleId: number;
   finalPrice: number;
   couponId: number | null;

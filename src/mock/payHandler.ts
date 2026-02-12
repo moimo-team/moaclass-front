@@ -83,7 +83,7 @@ const createEnrollment = http.post(
     }
 
     try {
-      const { scheduleId, finalPrice, couponId } =
+      const { quantity, scheduleId, finalPrice, couponId } =
         (await request.json()) as any;
 
       const currentPoints = userStore.userInfo.point || 0;
