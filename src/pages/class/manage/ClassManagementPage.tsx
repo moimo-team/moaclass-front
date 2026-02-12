@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ClassManageCard } from "@/components/features/class-manage/ClassManageCard";
 import { CreateClassButton } from "@/components/features/class-manage/CreateClassButton";
 import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
@@ -10,6 +11,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { toast } from "sonner";
 
 const ClassManagementPage = () => {
+  const navigate = useNavigate();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
@@ -17,7 +19,6 @@ const ClassManagementPage = () => {
   const [editingClassId, setEditingClassId] = useState<number | null>(null);
   const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
 
-  // 레슨 목록 조회
   const { data: lessonsResponse, isLoading } = useQuery({
     queryKey: ["lessons"],
     queryFn: () => fetchLessons({}),
@@ -25,7 +26,6 @@ const ClassManagementPage = () => {
 
   const { mutate: deleteLesson } = useDeleteLessonMutation();
 
-  // 레슨 목록
   const lessons = lessonsResponse?.lessons || [];
 
   const handleEdit = (id: number) => {
@@ -49,7 +49,6 @@ const ClassManagementPage = () => {
     }
   };
 
-
   const handleDuplicate = (id: number) => {
     setSelectedClassId(id);
     setDuplicateDialogOpen(true);
@@ -64,7 +63,7 @@ const ClassManagementPage = () => {
   };
 
   const handleManage = (id: number) => {
-    toast.info(`클래스 ${id} 관리 페이지는 준비 중입니다.`);
+    navigate(`/lessons/${id}/schedule`);
   };
 
   const handleViewClass = (id: number) => {
@@ -104,10 +103,8 @@ const ClassManagementPage = () => {
 
       {/* 클래스 그리드: 320px 아래로 작아지지 않게 하여 큼직하게 유지 */}
       <div className="grid gap-8" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 2fr))" }}>
-        {/* 생성 버튼 (항상 첫 번째) */}
         <CreateClassButton onClick={() => { setCreateModalOpen(true); /**TODO: 호스트 프로필 생성 유무 판단*/ }} />
 
-        {/* 클래스 카드들 (최신순) */}
         {lessons.map((lesson) => (
           <ClassManageCard
             key={lesson.id}
