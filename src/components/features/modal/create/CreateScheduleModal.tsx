@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import { Plus, Trash2, Calendar as CalendarIcon } from "lucide-react";
 import { format, eachDayOfInterval } from "date-fns";
+import { Plus, Trash2, Calendar as CalendarIcon } from "lucide-react";
+import { toast } from "sonner";
+import { useCreateSchedulesMutation } from "@/hooks/useScheduleMutations";
+import { combineDateAndTime, isEndTimeAfterStartTime } from "@/utils/scheduleHelpers";
 import { FormModal } from "@/components/features/modal/components/FormModal";
 import { FormInput } from "@/components/features/modal/components/FormInput";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useCreateSchedulesMutation } from "@/hooks/useScheduleMutations";
-import { combineDateAndTime, isEndTimeAfterStartTime } from "@/utils/scheduleHelpers";
-import { toast } from "sonner";
 
 interface CreateScheduleModalProps {
   isOpen: boolean;
@@ -50,26 +50,37 @@ export const CreateScheduleModal = ({
       return;
     }
 
-    const schedules = selectedDates.flatMap((date) =>
-      data.timeSlots.map((slot) => {
-        if (!isEndTimeAfterStartTime(slot.startTime, slot.endTime)) {
-          throw new Error(`${format(date, "MM/dd")}의 시간이 올바르지 않습니다.`);
-        }
-        return {
-          startAt: combineDateAndTime(date, slot.startTime),
-          endAt: combineDateAndTime(date, slot.endTime),
-        };
-      })
-    );
-
     try {
+      const schedules = selectedDates.flatMap((date) =>
+        data.timeSlots.map((slot) => {
+          if (!isEndTimeAfterStartTime(slot.startTime, slot.endTime)) {
+            throw new Error(` 시작 시간과 종료 시간을 다시 확인해 주세요.`);
+          }
+          return {
+            startAt: combineDateAndTime(date, slot.startTime),
+            endAt: combineDateAndTime(date, slot.endTime),
+          };
+        })
+      );
+
       createSchedules(schedules, { onSuccess: onClose });
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e) {
+      if (e instanceof Error) {
+        toast.error(e.message);
+      } else {
+        toast.error("알 수 없는 오류가 발생했습니다.");
+      }
     }
   };
 
-  const recurringForm = useForm({
+  interface RecurringFormData {
+    startDate: string;
+    endDate: string;
+    startTime: string;
+    endTime: string;
+  }
+
+  const recurringForm = useForm<RecurringFormData>({
     defaultValues: {
       startDate: format(new Date(), "yyyy-MM-dd"),
       endDate: format(new Date(), "yyyy-MM-dd"),
@@ -78,7 +89,7 @@ export const CreateScheduleModal = ({
     },
   });
 
-  const onRecurringSubmit = (data: any) => {
+  const onRecurringSubmit = (data: RecurringFormData) => {
     const start = new Date(data.startDate);
     const end = new Date(data.endDate);
 
@@ -88,7 +99,7 @@ export const CreateScheduleModal = ({
     }
 
     if (!isEndTimeAfterStartTime(data.startTime, data.endTime)) {
-      toast.error("종료 시간이 시작 시간보다 빨라야 합니다.");
+      toast.error("종료 시간이 시작 시간보다 늦어야 합니다. 시간을 다시 확인해 주세요.");
       return;
     }
 
