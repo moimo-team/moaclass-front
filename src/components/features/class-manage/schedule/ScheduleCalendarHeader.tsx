@@ -31,24 +31,30 @@ export const ScheduleCalendarHeader = ({
         </h2>
 
         <div className="flex items-center border rounded-lg overflow-hidden bg-white shadow-sm h-10">
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onPrevMonth}
-            className="px-3 h-full hover:bg-gray-50 border-r transition-colors"
+            className="px-3 h-full hover:bg-gray-50 border-r rounded-none transition-colors"
           >
             <ChevronLeft className="w-4 h-4 text-gray-600" />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onToday}
-            className="px-4 h-full text-xs font-bold text-gray-600 hover:bg-gray-50 border-r transition-colors"
+            className="px-4 h-full text-xs font-bold text-gray-600 hover:bg-gray-50 border-r rounded-none transition-colors"
           >
             오늘
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onNextMonth}
-            className="px-3 h-full hover:bg-gray-50 transition-colors"
+            className="px-3 h-full hover:bg-gray-50 rounded-none transition-colors"
           >
             <ChevronRight className="w-4 h-4 text-gray-600" />
-          </button>
+          </Button>
         </div>
       </div>
 
