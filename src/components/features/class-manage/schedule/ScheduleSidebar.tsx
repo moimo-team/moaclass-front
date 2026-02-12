@@ -1,10 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
-import { format } from "date-fns";
-import { ko } from "date-fns/locale";
 import { Clock, CheckCircle2, Calendar as CalendarIcon, Trash2, CalendarRange } from "lucide-react";
 
 import { useDeleteSchedulesMutation } from "@/hooks/useScheduleMutations";
 import { extractTimeFromISO } from "@/utils/scheduleHelpers";
+import { formatScheduleFullDate, toYYYYMMDD } from "@/utils/dateFormat";
 import type { LessonSchedule } from "@/models/schedule.model";
 
 import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
@@ -39,7 +38,7 @@ export const ScheduleSidebar = ({
     setSelectedScheduleIds([]);
   }, [selectedDates]);
 
-  const dateKeys = selectedDates.map((d) => format(d, "yyyy-MM-dd"));
+  const dateKeys = selectedDates.map((d) => toYYYYMMDD(d.toISOString()));
 
   const allSelectedSchedules = useMemo(() => {
     return dateKeys
@@ -84,7 +83,7 @@ export const ScheduleSidebar = ({
   const handleViewParticipants = (schedule: LessonSchedule) => {
     setParticipantModalInfo({
       scheduleId: schedule.id,
-      dateStr: format(new Date(schedule.startAt), "yyyy년 MM월 dd일 (eee)", { locale: ko }),
+      dateStr: formatScheduleFullDate(schedule.startAt),
       timeStr: `${extractTimeFromISO(schedule.startAt)} - ${extractTimeFromISO(schedule.endAt)}`
     });
   };
@@ -243,7 +242,7 @@ const ScheduleCard = ({
       <div className="flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
           <div className={`flex items-center gap-1.5 text-[14px] font-black tracking-tight ${isSelected ? "text-primary" : "text-gray-800"}`}>
-            {format(new Date(schedule.startAt), "yyyy년 MM월 dd일 (eee)", { locale: ko })}
+            {formatScheduleFullDate(schedule.startAt)}
           </div>
           {isSelected && (
             <div className="bg-primary text-white rounded-full p-0.5 shadow-sm animate-in zoom-in duration-300">
