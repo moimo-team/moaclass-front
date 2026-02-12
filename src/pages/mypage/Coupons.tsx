@@ -74,27 +74,33 @@ const Coupons = () => {
           <LoadingSpinner />
         ) : (
           <AnimatePresence mode="popLayout">
-            {filteredCoupons.map((coupon, index) => (
+            {filteredCoupons.length === 0 ? (
               <motion.div
-                key={coupon.id}
+                key="empty"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ delay: index * 0.05 }}
-                className="h-full"
+                exit={{ opacity: 0, x: -10 }}
+                className="flex col-span-2 justify-center items-center h-[200px] text-gray-400"
               >
-                <CouponCard coupon={coupon} />
+                <p>해당되는 쿠폰이 없습니다.</p>
               </motion.div>
-            ))}
+            ) : (
+              filteredCoupons.map((coupon, index) => (
+                <motion.div
+                  key={coupon.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="h-full"
+                >
+                  <CouponCard coupon={coupon} />
+                </motion.div>
+              ))
+            )}
           </AnimatePresence>
         )}
       </div>
-
-      {!isLoading && filteredCoupons.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-          <p className="text-lg font-medium">해당되는 쿠폰이 없습니다.</p>
-        </div>
-      )}
     </div>
   );
 };
