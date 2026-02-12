@@ -1,14 +1,15 @@
 export const MOCK_ORDERS = Array.from({ length: 15 }, (_, i) => ({
-  id: i + 1,
+  enrollmentId: i + 1,
   lessonId: i + 1, // 테스트를 위해 ID와 동일하게 설정
+  scheduleId: i + 1, // 테스트를 위해 ID와 동일하게 설정
+  pointTransactionId: i + 1, // 테스트를 위해 ID와 동일하게 설정
   title: `클래스명${i + 1}`,
-  startAt: "2026-01-29 12:00",
-  endAt: "2026-01-29 15:00",
-  representativeImage: `https://picsum.photos/seed/${i + 100}/200/120`,
-  price: 33000,
-  teacherNickname: `강사${i + 1}`,
-  status: i % 3 === 0 ? "ACCEPTED" : i % 3 === 1 ? "CANCEL" : "COMPLETED",
-  isCompleted: i % 3 === 2,
+  date: "2026-02-14T01:02:00.000Z",
+  image: `https://picsum.photos/seed/${i + 100}/200/120`,
+  // status: i % 3 === 0 ? "ACCEPTED" : i % 3 === 1 ? "CANCEL" : "COMPLETED",
+  status: i % 3 === 0 ? "수강예정" : i % 3 === 1 ? "수강취소" : "수강완료",
+  transactionStatus:
+    i % 3 === 0 ? "CANCELLED" : i % 3 === 1 ? "FAILED" : "COMPLETED",
 }));
 
 // 수강취소 페이지용 Mock Data

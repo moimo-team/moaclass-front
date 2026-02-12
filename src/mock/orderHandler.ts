@@ -26,15 +26,13 @@ const getOrderList = http.get(
     if (status !== "all") {
       if (status === "cancel") {
         // 수강취소
-        filteredOrders = filteredOrders.filter((o) => o.status === "CANCEL");
+        filteredOrders = filteredOrders.filter((o) => o.status === "수강취소");
       } else if (status === "accepted") {
         // 수강예정
-        filteredOrders = filteredOrders.filter(
-          (o) => o.status === "ACCEPTED" && !o.isCompleted,
-        );
+        filteredOrders = filteredOrders.filter((o) => o.status === "수강예정");
       } else if (status === "completed") {
         // 수강완료
-        filteredOrders = filteredOrders.filter((o) => o.isCompleted);
+        filteredOrders = filteredOrders.filter((o) => o.status === "수강완료");
       }
     }
 
@@ -75,7 +73,7 @@ const getCancelClass = http.get(
     }
 
     const { id } = params;
-    const order = MOCK_ORDERS.find((o) => o.id === Number(id));
+    const order = MOCK_ORDERS.find((o) => o.enrollmentId === Number(id));
     if (!order) {
       return HttpResponse.json(
         { message: "해당 주문 내역을 찾을 수 없습니다." },
@@ -84,7 +82,7 @@ const getCancelClass = http.get(
     }
 
     const cancelOrder =
-      MOCK_CANCEL_ORDERS.find((o) => o.id === Number(id)) ||
+      MOCK_CANCEL_ORDERS.find((o) => o.enrollmentId === Number(id)) ||
       MOCK_CANCEL_ORDERS[0];
     return HttpResponse.json(cancelOrder, { status: 200 });
   },
@@ -104,7 +102,7 @@ const cancelClass = http.post(
     }
 
     const { id } = params;
-    const order = MOCK_ORDERS.find((o) => o.id === Number(id));
+    const order = MOCK_ORDERS.find((o) => o.enrollmentId === Number(id));
     if (!order) {
       return HttpResponse.json(
         { message: "해당 주문 내역을 찾을 수 없습니다." },

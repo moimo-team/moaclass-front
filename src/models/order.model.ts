@@ -1,19 +1,18 @@
 import type { PaginationMeta } from "./pagination.model";
 
 // "전체" | "수강예정" | "수강취소" | "수강완료";
-export type OrderStatus = "ACCEPTED" | "CANCEL" | "COMPLETED";
+export type OrderStatus = "수강예정" | "수강취소" | "수강완료";
 
 export interface Order {
-  id: number;
+  enrollmentId: number;
   lessonId: number;
+  scheduleId: number;
+  pointTransactionId: number;
   title: string;
-  startAt: string;
-  endAt: string;
+  date: string;
+  image: string;
   status: OrderStatus;
-  representativeImage: string;
-  price: number;
-  teacherNickname: string;
-  isCompleted: boolean;
+  transactionStatus: string;
 }
 
 export interface OrderListResponse {
