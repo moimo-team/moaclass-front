@@ -1,112 +1,103 @@
 import { useState } from "react";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import PaginationComponent from "@/components/common/PaginationComponent";
-import OrderClassCard, { type Order } from "@/components/features/orderlist/OrderClassCard";
+import OrderClassCard from "@/components/features/orderlist/OrderClassCard";
 import OrderDetailModal from "@/components/features/orderlist/orderDetail/OrderDetailModal";
-
-// Mock Data
-const MOCK_ORDERS = Array.from({ length: 15 }, (_, i) => ({
-    id: i + 1,
-    className: `클래스명${i + 1}`,
-    date: "2026.01.29(목)",
-    startTime: "오후 12:00",
-    endTime: "오후 15:00",
-    status: i % 3 === 0 ? "수강예정" : i % 3 === 1 ? "수강취소" : "수강완료",
-    imageUrl: `https://picsum.photos/seed/${i + 100}/200/120`,
-    price: 33000,
-}));
-
-type OrderStatus = "전체" | "수강예정" | "수강취소" | "수강완료";
+import type { Order } from "@/models/order.model";
+import { useOrderlistQuery } from "@/hooks/useOrderlistQuery";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const OrderList = () => {
-    const [filterStatus, setFilterStatus] = useState<OrderStatus>("전체");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const itemsPerPage = 5;
+  const [filter, setFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { orderlist, totalPages, isLoading, isError, error } =
+    useOrderlistQuery(filter, page);
 
-    // Filter Logic
-    const filteredOrders = MOCK_ORDERS.filter((order) =>
-        filterStatus === "전체" || order.status === filterStatus
-    );
+  const handleDetailClick = (order: Order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
 
-    // Pagination Logic
-    const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
-    const currentOrders = filteredOrders.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
+  return (
+    <div className="max-w-6xl mx-auto w-full py-8 px-4">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold text-foreground">
+          내가 신청한 클래스
+        </h1>
 
-    const handleFilterChange = (value: string) => {
-        setFilterStatus(value as OrderStatus);
-        setCurrentPage(1);
-    };
-
-    const handleDetailClick = (order: Order) => {
-        setSelectedOrder(order);
-        setIsModalOpen(true);
-    };
-
-
-    return (
-        <div className="max-w-6xl mx-auto w-full py-8 px-4">
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-2xl font-bold text-foreground">내가 신청한 클래스</h1>
-
-                <div className="w-32">
-                    <Select value={filterStatus} onValueChange={handleFilterChange}>
-                        <SelectTrigger className="bg-white border-primary/20">
-                            <SelectValue placeholder="전체" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="전체">전체</SelectItem>
-                            <SelectItem value="수강예정">수강예정</SelectItem>
-                            <SelectItem value="수강취소">수강취소</SelectItem>
-                            <SelectItem value="수강완료">수강완료</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
-
-            <div className="space-y-4 mb-10">
-                {currentOrders.length > 0 ? (
-                    currentOrders.map((order) => (
-                        <OrderClassCard
-                            key={order.id}
-                            order={order}
-                            onDetailClick={handleDetailClick}
-                        />
-                    ))
-                ) : (
-                    <div className="text-center py-20 bg-muted/30 rounded-lg border border-dashed border-primary/20">
-                        <p className="text-muted-foreground">신청한 클래스 내역이 없습니다.</p>
-                    </div>
-                )}
-            </div>
-
-            {totalPages > 1 && (
-                <div className="mt-8">
-                    <PaginationComponent
-                        totalPages={totalPages}
-                        page={currentPage}
-                        setPage={setCurrentPage}
-                    />
-                </div>
-            )}
-
-            <OrderDetailModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                order={selectedOrder}
-            />
+        <div className="w-32">
+          <Select
+            value={filter}
+            onValueChange={(value) => {
+              setFilter(value);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="bg-white border-primary/20">
+              <SelectValue placeholder="전체" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">전체</SelectItem>
+              <SelectItem value="accepted">수강예정</SelectItem>
+              <SelectItem value="cancel">수강취소</SelectItem>
+              <SelectItem value="completed">수강완료</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-    );
+      </div>
+
+      <div className="space-y-4 mb-10">
+        {isLoading ? (
+          <div className="flex justify-center py-20">
+            <LoadingSpinner />
+          </div>
+        ) : isError ? (
+          <div className="text-center py-20 bg-red-50 text-red-700 rounded-lg border border-dashed border-red-200">
+            <p>데이터를 불러오는 중 오류가 발생했습니다.</p>
+            {error && <p className="text-sm text-red-600">{error.message}</p>}
+          </div>
+        ) : orderlist.length > 0 ? (
+          orderlist.map((order) => (
+            <OrderClassCard
+              key={order.id}
+              order={order}
+              onDetailClick={handleDetailClick}
+            />
+          ))
+        ) : (
+          <div className="text-center py-20 bg-muted/30 rounded-lg border border-dashed border-primary/20">
+            <p className="text-muted-foreground">
+              신청한 클래스 내역이 없습니다.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="mt-8">
+          <PaginationComponent
+            totalPages={totalPages}
+            page={page}
+            setPage={setPage}
+          />
+        </div>
+      )}
+
+      <OrderDetailModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        order={selectedOrder}
+      />
+    </div>
+  );
 };
 
 export default OrderList;
