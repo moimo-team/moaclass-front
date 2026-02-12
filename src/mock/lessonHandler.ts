@@ -74,26 +74,28 @@ export const lessonHandlers = [
         );
       });
 
-    // 정렬 로직
-    const sortedLessons = [...filteredLessons].sort((a, b) => {
+    const lessonsWithTimestamp = filteredLessons.map((lesson) => {
+      if (lesson.schedules.length === 0) {
+        return { ...lesson, earliestTimestamp: Infinity }; // 스케줄이 없으면 무한대로 설정
+      }
+      const earliestSchedule = lesson.schedules.reduce((min, s) =>
+        new Date(s.startAt) < new Date(min.startAt) ? s : min,
+      );
+      return {
+        ...lesson,
+        earliestTimestamp: new Date(earliestSchedule.startAt).getTime(),
+      };
+    });
+
+    // 정렬 전 타임스탬프를 미리 계산한 후 미리 계산된 값으로 정렬
+    const sortedLessons = [...lessonsWithTimestamp].sort((a, b) => {
       switch (sort) {
         case "PRICE_ASC":
           return a.discountedPrice - b.discountedPrice;
         case "PRICE_DESC":
           return b.discountedPrice - a.discountedPrice;
-        case "DEADLINE": {
-          // 가장 빠른 스케줄의 startAt 기준으로 정렬
-          const aEarliestSchedule = a.schedules.reduce((min, s) =>
-            new Date(s.startAt) < new Date(min.startAt) ? s : min,
-          );
-          const bEarliestSchedule = b.schedules.reduce((min, s) =>
-            new Date(s.startAt) < new Date(min.startAt) ? s : min,
-          );
-          return (
-            new Date(aEarliestSchedule.startAt).getTime() -
-            new Date(bEarliestSchedule.startAt).getTime()
-          );
-        }
+        case "DEADLINE":
+          return a.earliestTimestamp - b.earliestTimestamp;
         case "UPDATE":
           return (
             new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()

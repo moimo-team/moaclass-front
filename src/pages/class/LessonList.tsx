@@ -69,10 +69,10 @@ const LessonListPage: React.FC = () => {
       selectedStatus: searchParams.get("status") || null,
       selectedSort: (searchParams.get("sort") as SortEnum) || null,
       timeRange: searchParams.get("timeRange")
-        ? (searchParams
-            .get("timeRange")
-            ?.split("-")
-            .map(Number) as [number, number])
+        ? (searchParams.get("timeRange")?.split("-").map(Number) as [
+            number,
+            number,
+          ])
         : [0, 24],
       priceRange: [
         Number(searchParams.get("minPrice")) || 0,
@@ -86,16 +86,13 @@ const LessonListPage: React.FC = () => {
   const currentPage = Number(searchParams.get("page")) || 1;
   //const itemsPerPage = 12; // TODO: 한 페이지에 보여줄 아이템 수 정의 필요
 
-  const { data, isLoading, isError } = useLessonsQuery(
-    getFetchLessonsParams(),
-    currentPage,
-    isInitialized,
-  );
-  const lessonsQueryKey: QueryKey = [
-    "lessons",
-    getFetchLessonsParams(),
-    currentPage,
-  ];
+  const {
+    data,
+    isLoading,
+    isError,
+    queryKey: lessonsQueryKey,
+  } = useLessonsQuery(getFetchLessonsParams(), currentPage, isInitialized);
+
   const { totalPages } = { totalPages: data?.meta?.totalPages || 0 };
 
   const handlePageChange = (page: number) => {

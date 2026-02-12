@@ -19,10 +19,13 @@ export const useLessonsQuery = (
   enabled: boolean,
 ) => {
   const queryParams = { ...params, page };
+  const queryKey = ["lessons", queryParams];
 
-  return useQuery<FetchLessonsResponse, Error>({
-    queryKey: ["lessons", queryParams],
+  const queryResult = useQuery<FetchLessonsResponse, Error>({
+    queryKey,
     queryFn: () => fetchLessons(queryParams),
-    enabled, // 필터 상태 초기화가 완료된 이후에 사용 가능하도록 수정
+    enabled,
   });
+
+  return { ...queryResult, queryKey };
 };
