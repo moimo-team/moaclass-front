@@ -15,24 +15,26 @@ import { couponHandlers } from './couponHandler';
 import { likeHandlers } from './likeHandler';
 import { pointHandlers } from './pointHandler';
 import { scheduleHandlers } from './scheduleHandler';
+import { orderHandler } from './orderHandler';
 
 const handlers = [
-  ...authHandler,
-  getInterests,
-  getMyMeetings,
-  ...userInfoHandler,
-  ...meetingHandler,
-  ...chatHandler,
-  ...participationHandlers,
-  ...notificationHandlers,
-  ...scheduleHandlers, 
-  ...lessonHandlers,
-  ...regionHandler,
-  ...categoryHandler,
-  ...payHandler,
-  ...couponHandlers,
-  ...likeHandlers,
-  ...pointHandlers,
+	...authHandler,
+	getInterests,
+	getMyMeetings,
+	...userInfoHandler,
+	...meetingHandler,
+	...chatHandler,
+	...participationHandlers,
+	...notificationHandlers,
+	...scheduleHandlers,
+	...lessonHandlers,
+	...regionHandler,
+	...categoryHandler,
+	...payHandler,
+	...couponHandlers,
+	...likeHandlers,
+	...pointHandlers,
+	...orderHandler,
 ];
 
 export const worker = setupWorker(...handlers);
