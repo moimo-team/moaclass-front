@@ -138,7 +138,7 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
   const selectedClassCategory = faker.helpers.arrayElement(LESSON_CATEGORIES);
 
   const relevantSubCategories = LESSON_SUB_CATEGORIES.filter(
-    (sub) => sub.category_id === selectedClassCategory.id,
+    (sub) => sub.categoryId === selectedClassCategory.id,
   );
 
   const numberOfSubCategories = faker.number.int({ min: 0, max: 3 });
@@ -146,7 +146,7 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
     .arrayElements(relevantSubCategories, numberOfSubCategories)
     .map((sub) => ({
       id: sub.id,
-      categoryId: sub.category_id,
+      categoryId: sub.categoryId,
       name: sub.name,
     })) as LessonSubCategory[];
 

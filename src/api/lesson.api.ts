@@ -4,7 +4,7 @@ import type { FetchLessonsResponse, Lesson } from "@/models/lesson.model";
 // --- 클래스 조회(GET) 관련 ---
 
 export const fetchLatestLessons = async (): Promise<Lesson[]> => {
-  const response = await apiClient.get<Lesson[]>("/lessons?sort=latest");
+  const response = await apiClient.get<Lesson[]>("/lessons/latest");
   return response.data;
 };
 

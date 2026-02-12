@@ -16,9 +16,10 @@ const applyLikeStatus = (lessons: Lesson[]): Lesson[] => {
 };
 
 export const lessonHandlers = [
-  http.get(`${httpUrl}/lessons?sort=latest`, async () => {
+  http.get(`${httpUrl}/lessons/latest`, async () => {
     await delay(500);
-    const lessonsWithStatus = applyLikeStatus(mockLessons.slice(0, 5));
+    const latestLessons = mockLessons.slice(0, 5);
+    const lessonsWithStatus = applyLikeStatus(latestLessons);
     return HttpResponse.json(lessonsWithStatus, { status: 200 });
   }),
 
@@ -28,83 +29,66 @@ export const lessonHandlers = [
     const url = new URL(request.url);
     const page = Number(url.searchParams.get("page") || "1");
     const limit = Number(url.searchParams.get("limit") || "12");
-    const categories = url.searchParams.getAll("categories");
-    const regions = url.searchParams.getAll("regions");
-    //const days = url.searchParams.getAll("days");
-    const difficulty = url.searchParams.getAll("difficulty");
-    const personnel = Number(url.searchParams.get("personnel") || "0");
-    const minTime = Number(url.searchParams.get("minTime") || "0");
-    const maxTime = Number(url.searchParams.get("maxTime") || "24");
+
+    // 클라이언트(filterStore)에서 보내는 파라미터 키와 일치시킴
+    const categoryId = Number(url.searchParams.get("categoryId") || "0");
+    const regionIds = url.searchParams.getAll("regionId").map(Number);
+    const levels = url.searchParams.getAll("level") as Level[];
+    const timeRange = url.searchParams.get("timeRange");
     const minPrice = Number(url.searchParams.get("minPrice") || "0");
     const maxPrice = Number(url.searchParams.get("maxPrice") || "500000");
-    const sort = url.searchParams.get("sort") || "LATEST"; // 'LATEST'를 기본값으로 설정
+    const maxParticipants = Number(
+      url.searchParams.get("maxParticipants") || "0",
+    );
+    const sort = url.searchParams.get("sort") || "LATEST";
 
-    let filteredLessons = mockLessons;
-
-    const difficultyMap: Record<string, Level> = {
-      입문: "BEGINNER",
-      중급: "INTERMEDIATE",
-      고급: "ADVANCED",
-    };
-    const mappedDifficulty: Level[] = difficulty
-      .map((d) => difficultyMap[d])
-      .filter((d): d is Level => d !== undefined);
-
-    // 필터링 로직
-    if (categories.length > 0) {
-      filteredLessons = filteredLessons.filter((lesson) => {
-        const categoryName = LESSON_CATEGORIES.find(
-          (cat) => cat.id === lesson.classCategoryId,
-        )?.name;
-        categoryName && categories.includes(categoryName);
-        return categoryName && categories.includes(categoryName);
-      });
-    }
-
-    if (regions.length > 0) {
-      filteredLessons = filteredLessons.filter((lesson) =>
-        regions.some((region) => lesson.address.includes(region)),
-      );
-    }
-
-    if (mappedDifficulty.length > 0) {
-      filteredLessons = filteredLessons.filter((lesson) =>
-        mappedDifficulty.includes(lesson.level),
-      );
-    }
-
-    if (personnel > 0) {
-      filteredLessons = filteredLessons.filter(
-        (lesson) =>
-          lesson.maxParticipants && lesson.maxParticipants >= personnel,
-      );
-    }
-
-    if (minTime > 0 || maxTime < 24) {
-      filteredLessons = filteredLessons.filter(
-        (lesson) =>
-          lesson.durationMin &&
-          lesson.durationMin >= minTime * 60 &&
-          lesson.durationMin <= maxTime * 60,
-      );
-    }
-
-    if (minPrice > 0 || maxPrice < 500000) {
-      filteredLessons = filteredLessons.filter(
-        (lesson) =>
+    const filteredLessons = mockLessons
+      .filter((lesson) => {
+        // 1. 카테고리 필터
+        if (!categoryId) return true;
+        return lesson.classCategoryId === categoryId;
+      })
+      .filter((lesson) => {
+        // 2. 지역 필터
+        if (regionIds.length === 0) return true;
+        return regionIds.includes(lesson.regionId);
+      })
+      .filter((lesson) => {
+        // 3. 난이도 필터
+        if (levels.length === 0) return true;
+        return levels.includes(lesson.level);
+      })
+      .filter((lesson) => {
+        // 4. 인원 필터
+        if (!maxParticipants) return true;
+        return (
+          lesson.maxParticipants && lesson.maxParticipants >= maxParticipants
+        );
+      })
+      .filter((lesson) => {
+        // 5. 시간 필터
+        if (!timeRange) return true;
+        const [min, max] = timeRange.split("-").map(Number);
+        const lessonTime = lesson.durationMin / 60;
+        return lessonTime >= min && lessonTime <= max;
+      })
+      .filter((lesson) => {
+        // 6. 가격 필터
+        if (minPrice === 0 && maxPrice === 500000) return true;
+        return (
           lesson.discountedPrice >= minPrice &&
-          lesson.discountedPrice <= maxPrice,
-      );
-    }
+          lesson.discountedPrice <= maxPrice
+        );
+      });
 
     // 정렬 로직 적용
-    filteredLessons.sort((a, b) => {
+    const sortedLessons = [...filteredLessons].sort((a, b) => {
       switch (sort) {
         case "PRICE_ASC":
           return a.discountedPrice - b.discountedPrice;
         case "PRICE_DESC":
           return b.discountedPrice - a.discountedPrice;
-        case "DEADLINE": // reservationLeadDays가 낮을수록 마감일이 빠르다고 가정
+        case "DEADLINE":
           return a.reservationLeadDays - b.reservationLeadDays;
         case "UPDATE":
           return (
@@ -114,7 +98,7 @@ export const lessonHandlers = [
           return b.rate - a.rate;
         case "LIKES":
           return b.likes - a.likes;
-        case "LATEST": // 기본값: 생성일 최신순
+        case "LATEST":
         default:
           return (
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -122,9 +106,9 @@ export const lessonHandlers = [
       }
     });
 
-    const totalCount = filteredLessons.length;
+    const totalCount = sortedLessons.length;
     const totalPages = Math.ceil(totalCount / limit);
-    const paginatedLessons = filteredLessons.slice(
+    const paginatedLessons = sortedLessons.slice(
       (page - 1) * limit,
       page * limit,
     );

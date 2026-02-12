@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { LessonFilterSection } from "@/components/features/lessons/LessonFilterSection";
 import { LessonCard } from "@/components/features/lessons/LessonCard";
@@ -50,6 +50,7 @@ const LessonListDisplay: React.FC<{
 
 const LessonListPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isInitialized, setIsInitialized] = useState(false);
   const {
     setAllFilters,
     resetFilters,
@@ -60,23 +61,26 @@ const LessonListPage: React.FC = () => {
 
   useEffect(() => {
     const filtersFromUrl: Partial<FilterState> = {
-      selectedCategories: searchParams.get("categories")?.split(",") || [],
-      selectedRegions: searchParams.get("regions")?.split(",") || [],
+      selectedCategories: searchParams.get("categoryId")?.split(",") || [],
+      selectedRegions: searchParams.get("regionId")?.split(",") || [],
       selectedDays: searchParams.get("days")?.split(",") || [],
-      selectedDifficulty: searchParams.get("difficulty")?.split(",") || [],
-      selectedPersonnel: searchParams.get("personnel") || "",
+      selectedDifficulty: searchParams.get("level")?.split(",") || [],
+      selectedPersonnel: searchParams.get("maxParticipants") || "",
       selectedStatus: searchParams.get("status") || null,
       selectedSort: (searchParams.get("sort") as SortEnum) || null,
-      timeRange: [
-        Number(searchParams.get("minTime")) || 0,
-        Number(searchParams.get("maxTime")) || 24,
-      ] as [number, number],
+      timeRange: searchParams.get("timeRange")
+        ? (searchParams
+            .get("timeRange")
+            ?.split("-")
+            .map(Number) as [number, number])
+        : [0, 24],
       priceRange: [
         Number(searchParams.get("minPrice")) || 0,
         Number(searchParams.get("maxPrice")) || 500000,
       ] as [number, number],
     };
     setAllFilters(filtersFromUrl);
+    setIsInitialized(true);
   }, [searchParams, setAllFilters]);
 
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -85,6 +89,7 @@ const LessonListPage: React.FC = () => {
   const { data, isLoading, isError } = useLessonsQuery(
     getFetchLessonsParams(),
     currentPage,
+    isInitialized,
   );
   const lessonsQueryKey: QueryKey = [
     "lessons",
