@@ -7,7 +7,7 @@ import type {
   ParticipationStatus,
 } from "@/models/participation.model";
 import { interestImageMap } from "@/utils/interestImageMap";
-import type { Lesson, Level, LessonSubCategory } from "@/models/lesson.model";
+import type { Lesson, Level } from "@/models/lesson.model";
 import {
   LESSON_CATEGORIES,
   LESSON_SUB_CATEGORIES,
@@ -136,28 +136,56 @@ export const mockMeetings: Meeting[] = Array.from({ length: 25 }, (_, i) => {
 // Mock 원데이클래스 데이터
 export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
   const selectedClassCategory = faker.helpers.arrayElement(LESSON_CATEGORIES);
+  const selectedRegion = faker.location.county();
 
-  const relevantSubCategories = LESSON_SUB_CATEGORIES.filter(
-    (sub) => sub.categoryId === selectedClassCategory.id,
-  );
+  const teacherProfile = {
+    id: faker.number.int({ min: 1, max: 100 }),
+    nickname: faker.person.fullName(),
+  };
 
   const numberOfSubCategories = faker.number.int({ min: 0, max: 3 });
   const selectedSubCategories = faker.helpers
-    .arrayElements(relevantSubCategories, numberOfSubCategories)
+    .arrayElements(
+      LESSON_SUB_CATEGORIES.filter(
+        (sub) => sub.categoryId === selectedClassCategory.id,
+      ),
+      numberOfSubCategories,
+    )
     .map((sub) => ({
       id: sub.id,
-      categoryId: sub.categoryId,
       name: sub.name,
-    })) as LessonSubCategory[];
+    }));
 
   const lessonLevels: Level[] = ["BEGINNER", "INTERMEDIATE", "ADVANCED"];
   const basePrice = faker.number.int({ min: 30000, max: 100000 });
   const discountRate = faker.number.int({ min: 0, max: 30 });
 
+  const schedules = Array.from(
+    { length: faker.number.int({ min: 1, max: 3 }) },
+    () => {
+      const start = faker.date.soon({ days: 30 });
+      const end = new Date(
+        start.getTime() + faker.number.int({ min: 60, max: 240 }) * 60 * 1000,
+      );
+      return {
+        id: faker.number.int({ min: 1, max: 1000 }),
+        startAt: start.toISOString(),
+        endAt: end.toISOString(),
+        status: faker.helpers.arrayElement([
+          "RECRUITING",
+          "CLOSED",
+          "COMPLETED",
+        ]),
+        currentParticipants: faker.number.int({ min: 0, max: 5 }),
+      };
+    },
+  );
+
   return {
     id: i + 1,
-    teacherId: faker.number.int({ min: 1, max: 100 }),
-    classCategoryId: selectedClassCategory.id,
+    userId: teacherProfile.id,
+    lessonCategoryId: selectedClassCategory.id,
+    lessonCategoryName: selectedClassCategory.name,
 
     title: `${selectedClassCategory.name} 원데이 클래스 ${i + 1}`,
     description: faker.lorem.paragraph(),
@@ -171,15 +199,15 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
     discountRate: discountRate,
     discountedPrice: Math.floor(basePrice * (1 - discountRate / 100)),
     maxParticipants: faker.number.int({ min: 5, max: 20 }),
-    currentParticipants: faker.number.int({ min: 0, max: 4 }),
 
     representativeImage:
       interestImageMap[selectedClassCategory.name] ||
       faker.image.urlLoremFlickr({ category: "class" }),
-    likes: faker.number.int({ min: 0, max: 500 }),
+    likeCount: faker.number.int({ min: 0, max: 500 }),
 
     regionId: faker.number.int({ min: 1, max: 10 }),
-    address: `서울시 ${faker.location.county()} ${faker.location.city()} ${faker.location.streetAddress()}`,
+    regionName: selectedRegion,
+    address: `서울시 ${selectedRegion} ${faker.location.city()} ${faker.location.streetAddress()}`,
     latitude: faker.location.latitude(),
     longitude: faker.location.longitude(),
     detailAddress: `${faker.number.int({ min: 1, max: 20 })}층 ${faker.number.int({ min: 101, max: 999 })}호`,
@@ -189,36 +217,16 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
 
     rate: faker.number.float({ min: 3.0, max: 5.0, fractionDigits: 1 }),
 
-    reviewAiSummary: faker.datatype.boolean()
-      ? faker.lorem.sentence()
-      : undefined,
+    reviewAiSummary: faker.datatype.boolean() ? faker.lorem.sentence() : null,
+    deletedAt: null, // null로 명시
     createdAt: faker.date.recent().toISOString(),
     updatedAt: faker.date.recent().toISOString(),
 
-    isLiked: faker.datatype.boolean(),
-    classCategory: {
-      id: selectedClassCategory.id,
-      name: selectedClassCategory.name,
-    },
-    subClassCategories: selectedSubCategories,
-    teacherProfile: {
-      id: faker.number.int({ min: 1, max: 100 }),
-      userId: faker.number.int({ min: 100, max: 200 }),
-      nickname: faker.person.fullName(),
-      image: faker.image.avatar(),
-      introduction: faker.lorem.sentence(),
-      createdAt: faker.date.recent().toISOString(),
-      updatedAt: faker.date.recent().toISOString(),
-    },
-    lessonImages: Array.from(
-      { length: faker.number.int({ min: 1, max: 4 }) },
-      (_, idx) => ({
-        id: faker.number.int({ min: 1, max: 1000 }),
-        lessonId: i + 1,
-        image: faker.image.urlLoremFlickr({ category: "class" }),
-        sequence: idx + 1,
-      }),
-    ),
+    teacher: teacherProfile,
+    subCategories: selectedSubCategories,
+    schedules: schedules,
+
+    isLiked: faker.datatype.boolean(), // 프론트 전용
   };
 });
 

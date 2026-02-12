@@ -89,7 +89,7 @@ export function LessonCard({
                   ⭐ {lesson.rate.toFixed(1)}
                 </span>
                 <span className="flex items-center gap-0.5">
-                  ❤️ {lesson.likes}
+                  ❤️ {lesson.likeCount}
                 </span>
               </div>
               <div className="flex items-center gap-0.5">

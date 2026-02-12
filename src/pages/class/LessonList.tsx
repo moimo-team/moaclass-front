@@ -96,7 +96,7 @@ const LessonListPage: React.FC = () => {
     getFetchLessonsParams(),
     currentPage,
   ];
-  const { totalPages } = { totalPages: data?.totalPages || 0 };
+  const { totalPages } = { totalPages: data?.meta?.totalPages || 0 };
 
   const handlePageChange = (page: number) => {
     searchParams.set("page", String(page));
@@ -161,7 +161,7 @@ const LessonListPage: React.FC = () => {
 
       <div className="my-8">
         <LessonListDisplay
-          lessons={data?.lessons || []}
+          lessons={data?.data || []}
           isLoading={isLoading}
           isError={isError}
           emptyMessage="조건에 맞는 클래스가 없습니다."

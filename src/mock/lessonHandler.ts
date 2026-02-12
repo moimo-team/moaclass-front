@@ -1,9 +1,6 @@
 import { http, HttpResponse, delay } from "msw";
 import { httpUrl, mockLessons, mockReviews } from "@/mock/mockData/mockData";
-import {
-  LESSON_CATEGORIES,
-  LESSON_SUB_CATEGORIES,
-} from "@/mock/mockData/categoryMock";
+import { LESSON_SUB_CATEGORIES } from "@/mock/mockData/categoryMock";
 import type { Level, Lesson } from "@/models/lesson.model";
 import type { FetchLessonsResponse } from "@/models/lesson.model";
 import { isLessonLiked } from "./likeHandler";
@@ -44,36 +41,32 @@ export const lessonHandlers = [
 
     const filteredLessons = mockLessons
       .filter((lesson) => {
-        // 1. 카테고리 필터
         if (!categoryId) return true;
-        return lesson.classCategoryId === categoryId;
+        return lesson.lessonCategoryId === categoryId;
       })
       .filter((lesson) => {
-        // 2. 지역 필터
         if (regionIds.length === 0) return true;
         return regionIds.includes(lesson.regionId);
       })
       .filter((lesson) => {
-        // 3. 난이도 필터
         if (levels.length === 0) return true;
         return levels.includes(lesson.level);
       })
       .filter((lesson) => {
-        // 4. 인원 필터
         if (!maxParticipants) return true;
-        return (
-          lesson.maxParticipants && lesson.maxParticipants >= maxParticipants
-        );
+        return lesson.maxParticipants >= maxParticipants;
       })
       .filter((lesson) => {
-        // 5. 시간 필터
         if (!timeRange) return true;
         const [min, max] = timeRange.split("-").map(Number);
-        const lessonTime = lesson.durationMin / 60;
-        return lessonTime >= min && lessonTime <= max;
+        // 스케줄의 시작/종료 시간을 기준으로 필터링
+        return lesson.schedules.some((schedule) => {
+          const scheduleStartHour = new Date(schedule.startAt).getHours();
+          const scheduleEndHour = new Date(schedule.endAt).getHours();
+          return scheduleStartHour >= min && scheduleEndHour <= max;
+        });
       })
       .filter((lesson) => {
-        // 6. 가격 필터
         if (minPrice === 0 && maxPrice === 500000) return true;
         return (
           lesson.discountedPrice >= minPrice &&
@@ -81,15 +74,26 @@ export const lessonHandlers = [
         );
       });
 
-    // 정렬 로직 적용
+    // 정렬 로직
     const sortedLessons = [...filteredLessons].sort((a, b) => {
       switch (sort) {
         case "PRICE_ASC":
           return a.discountedPrice - b.discountedPrice;
         case "PRICE_DESC":
           return b.discountedPrice - a.discountedPrice;
-        case "DEADLINE":
-          return a.reservationLeadDays - b.reservationLeadDays;
+        case "DEADLINE": {
+          // 가장 빠른 스케줄의 startAt 기준으로 정렬
+          const aEarliestSchedule = a.schedules.reduce((min, s) =>
+            new Date(s.startAt) < new Date(min.startAt) ? s : min,
+          );
+          const bEarliestSchedule = b.schedules.reduce((min, s) =>
+            new Date(s.startAt) < new Date(min.startAt) ? s : min,
+          );
+          return (
+            new Date(aEarliestSchedule.startAt).getTime() -
+            new Date(bEarliestSchedule.startAt).getTime()
+          );
+        }
         case "UPDATE":
           return (
             new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
@@ -97,7 +101,7 @@ export const lessonHandlers = [
         case "RATE":
           return b.rate - a.rate;
         case "LIKES":
-          return b.likes - a.likes;
+          return b.likeCount - a.likeCount;
         case "LATEST":
         default:
           return (
@@ -117,9 +121,13 @@ export const lessonHandlers = [
 
     return HttpResponse.json(
       {
-        lessons: paginatedLessonsWithStatus,
-        totalCount,
-        totalPages,
+        data: paginatedLessonsWithStatus,
+        meta: {
+          totalCount,
+          page,
+          limit,
+          totalPages,
+        },
       } as FetchLessonsResponse,
       { status: 200 },
     );
@@ -160,14 +168,18 @@ export const lessonHandlers = [
     await delay(1000);
     const formData = await request.formData();
 
-    // FormData에서 데이터 추출
+    // FormData에서 데이터 추출 (새로운 Lesson 타입에 맞춤)
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const curriculum = formData.get("curriculum") as string;
     const lessonCategoryId = Number(formData.get("lessonCategoryId"));
+    const lessonCategoryName = formData.get("lessonCategoryName") as string; // 추가
     const subCategoryIdsStr = formData.get("subCategoryIds") as string;
-    const subCategoryIds = subCategoryIdsStr
-      ? JSON.parse(subCategoryIdsStr)
+    const subCategories = subCategoryIdsStr
+      ? JSON.parse(subCategoryIdsStr).map((id: number) => {
+          const sub = LESSON_SUB_CATEGORIES.find((s) => s.id === id);
+          return sub ? { id: sub.id, name: sub.name } : undefined;
+        })
       : [];
     const level = formData.get("level") as Level;
     const durationMin = Number(formData.get("durationMin"));
@@ -176,39 +188,27 @@ export const lessonHandlers = [
     const discountedPrice = Number(formData.get("discountedPrice"));
     const maxParticipants = Number(formData.get("maxParticipants"));
     const regionId = Number(formData.get("regionId"));
+    const regionName = formData.get("regionName") as string; // 추가
     const address = formData.get("address") as string;
     const latitude = Number(formData.get("latitude"));
     const longitude = Number(formData.get("longitude"));
     const detailAddress = (formData.get("detailAddress") as string) || "";
     const directionsText = (formData.get("directionsText") as string) || "";
     const reservationLeadDays = Number(formData.get("reservationLeadDays"));
+    const teacherId = Number(formData.get("userId")); // userId로 변경
+    const teacherNickname = formData.get("teacherNickname") as string; // 추가
+    const schedulesStr = formData.get("schedules") as string; // 스케줄 추가
+    const schedules = schedulesStr ? JSON.parse(schedulesStr) : [];
 
     // 새 클래스 ID 생성
     const newId = Math.max(...mockLessons.map((l) => l.id), 0) + 1;
 
-    // 카테고리 정보 찾기
-    const category = LESSON_CATEGORIES.find((c) => c.id === lessonCategoryId);
-
-    // 소분류 카테고리 찾기
-    const subCategories = LESSON_SUB_CATEGORIES.filter((sub: any) =>
-      subCategoryIds.includes(sub.id),
-    ).map((sub: any) => ({
-      id: sub.id,
-      categoryId: sub.categoryId || sub.category_id,
-      name: sub.name,
-    }));
-
-    console.log("📦 생성할 클래스 데이터:", {
-      lessonCategoryId,
-      subCategoryIds,
-      subCategories,
-    });
-
     // 새 클래스 객체 생성
     const newLesson: Lesson = {
       id: newId,
-      teacherId: 1,
-      classCategoryId: lessonCategoryId,
+      userId: teacherId,
+      lessonCategoryId: lessonCategoryId,
+      lessonCategoryName: lessonCategoryName,
       title,
       description,
       curriculum,
@@ -219,10 +219,10 @@ export const lessonHandlers = [
       discountRate,
       discountedPrice,
       maxParticipants,
-      currentParticipants: 0,
       representativeImage: "https://placehold.co/600x400?text=New+Class",
-      likes: 0,
+      likeCount: 0, // likes 대신 likeCount 사용
       regionId,
+      regionName,
       address,
       latitude,
       longitude,
@@ -230,12 +230,13 @@ export const lessonHandlers = [
       directionsText,
       reservationLeadDays,
       rate: 0,
+      deletedAt: null,
+      reviewAiSummary: null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      classCategory: category
-        ? { id: category.id, name: category.name }
-        : undefined,
-      subClassCategories: subCategories,
+      teacher: { id: teacherId, nickname: teacherNickname },
+      subCategories: subCategories,
+      schedules: schedules,
     };
 
     // mockLessons 배열 맨 앞에 추가
@@ -259,14 +260,18 @@ export const lessonHandlers = [
     const lessonId = Number(params.lessonId);
     const formData = await request.formData();
 
-    // FormData에서 데이터 추출
+    // FormData에서 데이터 추출 (새로운 Lesson 타입에 맞춤)
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const curriculum = formData.get("curriculum") as string;
     const lessonCategoryId = Number(formData.get("lessonCategoryId"));
+    const lessonCategoryName = formData.get("lessonCategoryName") as string; // 추가
     const subCategoryIdsStr = formData.get("subCategoryIds") as string;
-    const subCategoryIds = subCategoryIdsStr
-      ? JSON.parse(subCategoryIdsStr)
+    const subCategories = subCategoryIdsStr
+      ? JSON.parse(subCategoryIdsStr).map((id: number) => {
+          const sub = LESSON_SUB_CATEGORIES.find((s) => s.id === id);
+          return sub ? { id: sub.id, name: sub.name } : undefined;
+        })
       : [];
     const level = formData.get("level") as Level;
     const durationMin = Number(formData.get("durationMin"));
@@ -275,42 +280,31 @@ export const lessonHandlers = [
     const discountedPrice = Number(formData.get("discountedPrice"));
     const maxParticipants = Number(formData.get("maxParticipants"));
     const regionId = Number(formData.get("regionId"));
+    const regionName = formData.get("regionName") as string; // 추가
     const address = formData.get("address") as string;
     const latitude = Number(formData.get("latitude"));
     const longitude = Number(formData.get("longitude"));
     const detailAddress = (formData.get("detailAddress") as string) || "";
     const directionsText = (formData.get("directionsText") as string) || "";
     const reservationLeadDays = Number(formData.get("reservationLeadDays"));
+    const teacherId = Number(formData.get("userId")); // userId로 변경
+    const teacherNickname = formData.get("teacherNickname") as string; // 추가
+    const schedulesStr = formData.get("schedules") as string; // 스케줄 추가
+    const schedules = schedulesStr ? JSON.parse(schedulesStr) : [];
 
     // 기존 클래스 찾기
     const lessonIndex = mockLessons.findIndex((l) => l.id === lessonId);
 
     if (lessonIndex !== -1) {
-      const category = LESSON_CATEGORIES.find((c) => c.id === lessonCategoryId);
-
-      // 소분류 카테고리 찾기
-      const subCategories = LESSON_SUB_CATEGORIES.filter((sub: any) =>
-        subCategoryIds.includes(sub.id),
-      ).map((sub: any) => ({
-        id: sub.id,
-        categoryId: sub.categoryId || sub.category_id,
-        name: sub.name,
-      }));
-
-      console.log("📦 수정할 클래스 데이터:", {
-        lessonId,
-        lessonCategoryId,
-        subCategoryIds,
-        subCategories,
-      });
-
       // 클래스 업데이트
       mockLessons[lessonIndex] = {
         ...mockLessons[lessonIndex],
+        userId: teacherId,
+        lessonCategoryId,
+        lessonCategoryName,
         title,
         description,
         curriculum,
-        classCategoryId: lessonCategoryId,
         level,
         durationMin,
         price,
@@ -318,6 +312,7 @@ export const lessonHandlers = [
         discountedPrice,
         maxParticipants,
         regionId,
+        regionName,
         address,
         latitude,
         longitude,
@@ -325,10 +320,9 @@ export const lessonHandlers = [
         directionsText,
         reservationLeadDays,
         updatedAt: new Date().toISOString(),
-        classCategory: category
-          ? { id: category.id, name: category.name }
-          : undefined,
-        subClassCategories: subCategories,
+        teacher: { id: teacherId, nickname: teacherNickname },
+        subCategories: subCategories,
+        schedules: schedules,
       };
 
       console.log("✅ Mock Lesson Updated:", mockLessons[lessonIndex]);
