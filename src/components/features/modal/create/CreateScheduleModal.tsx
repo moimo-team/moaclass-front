@@ -54,7 +54,7 @@ export const CreateScheduleModal = ({
       const schedules = selectedDates.flatMap((date) =>
         data.timeSlots.map((slot) => {
           if (!isEndTimeAfterStartTime(slot.startTime, slot.endTime)) {
-            throw new Error(` 시작 시간과 종료 시간을 다시 확인해 주세요.`);
+            throw new Error(`종료 시간은 시작 시간보다 늦어야 합니다.`);
           }
           return {
             startAt: combineDateAndTime(date, slot.startTime),
