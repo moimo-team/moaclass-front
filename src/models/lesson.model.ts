@@ -95,20 +95,18 @@ export interface TeacherProfileRequest {
   introduction: string;
 }
 
-
-// 클래스 목록 조회 params & response
+// 클래스 목록 조회 params & response (백엔드 호환)
 export interface FetchLessonsParams {
-  page?: number;
-  limit?: number;
-  categories?: string[];
-  regions?: string[];
+  regionId?: number[];
+  categoryId?: number;
+  level?: string[];
   days?: string[];
-  difficulty?: string[];
-  personnel?: number;
-  minTime?: number;
-  maxTime?: number;
+  timeRange?: string; // "HH-HH"
   minPrice?: number;
   maxPrice?: number;
+  sort?: string;
+  maxParticipants?: number; // 최대 인원 필터 (단일 사용)
+  status?: string;
 }
 
 export interface FetchLessonsResponse {

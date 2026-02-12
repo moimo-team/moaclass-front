@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -14,19 +14,21 @@ import {
 } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DualRangeSlider } from "@/components/common/DualRangeSlider";
-import { REGIONS } from "@/constants/regions";
+import { useRegionQuery } from "@/hooks/useRegionQuery";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { CategoryFilter } from "@/components/features/lessons/CategoryFilter";
 import { FilterToggleGroup } from "@/components/common/FilterToggleGroup";
 import { FilterBadges } from "@/components/features/lessons/FilterBadges";
 
 import { useFilterStore } from "@/store/filterStore";
-import { LESSON_SUB_CATEGORIES } from "@/mock/mockData/categoryMock";
+import { useCategoryQuery } from "@/hooks/useCategoryQuery";
+import type { FetchLessonsParams } from "@/models/lesson.model";
 
 interface LessonFilterSectionProps {
   onClose?: () => void;
   showCloseButton?: boolean;
-  onSearch?: () => void;
+  onSearch?: (mappedParams: FetchLessonsParams) => void;
   onReset?: () => void;
 }
 
@@ -46,6 +48,8 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
     selectedCategories,
     activeMainCategoryId,
     selectedMainCategory,
+    selectedStatus,
+    toggleStatus,
     toggleRegion,
     setSelectedPersonnel,
     setTimeRange,
@@ -56,7 +60,32 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
     toggleSubCategory,
     removeCategoryBadge,
     resetFilters,
+    getFetchLessonsParams,
+    setRegionIdMap,
+    setCategoryIdMap,
   } = useFilterStore();
+
+  const { data: regions, isLoading: isRegionsLoading } = useRegionQuery();
+  const { data: lessonCategories, isLoading: isCategoriesLoading } =
+    useCategoryQuery();
+
+  useEffect(() => {
+    if (regions && !isRegionsLoading) {
+      const newRegionMap = new Map(
+        regions.map((region) => [region.name, region.id]),
+      );
+      setRegionIdMap(newRegionMap);
+    }
+  }, [regions, isRegionsLoading, setRegionIdMap]);
+
+  useEffect(() => {
+    if (lessonCategories && !isCategoriesLoading) {
+      const newCategoryMap = new Map(
+        lessonCategories.map((category) => [category.name, category.id]),
+      );
+      setCategoryIdMap(newCategoryMap);
+    }
+  }, [lessonCategories, isCategoriesLoading, setCategoryIdMap]);
 
   const getRegionButtonText = () => {
     if (!selectedRegions.length) return "지역을 선택하세요";
@@ -65,24 +94,6 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
       return `지역 (${selectedRegions.length}개 선택됨)`;
     return selectedRegions.join(", ");
   };
-
-  const getCategoryButtonText = (mainCategory: string | null) => {
-    if (!mainCategory) return "카테고리를 선택하세요";
-    const subSelectionsCount = Math.max(0, selectedCategories.length - 1);
-    if (subSelectionsCount > 0)
-      return `${mainCategory} 외 ${subSelectionsCount}개`;
-    return mainCategory;
-  };
-
-  const currentSubCategories = activeMainCategoryId
-    ? LESSON_SUB_CATEGORIES.filter(
-        (subCat) => subCat.category_id === activeMainCategoryId,
-      ).map((subCat) => ({
-        id: subCat.id,
-        name: subCat.name,
-        categoryId: subCat.category_id,
-      }))
-    : [];
 
   return (
     <section className="w-full py-8 px-4 md:px-8">
@@ -115,24 +126,28 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
                     </label>
                   </div>
                   {/* 개별 지역 */}
-                  {REGIONS.map((region) => (
-                    <div
-                      key={region.id}
-                      className="flex items-center space-x-2"
-                    >
-                      <Checkbox
-                        id={`region-${region.id}`}
-                        checked={selectedRegions.includes(region.name)}
-                        onCheckedChange={() => toggleRegion(region.name)}
-                      />
-                      <label
-                        htmlFor={`region-${region.id}`}
-                        className="text-sm font-medium"
-                      >
-                        {region.name}
-                      </label>
-                    </div>
-                  ))}
+                  {isRegionsLoading
+                    ? Array.from({ length: 6 }).map((_, i) => (
+                        <Skeleton key={i} className="h-6 w-full" />
+                      ))
+                    : regions?.map((region) => (
+                        <div
+                          key={region.id}
+                          className="flex items-center space-x-2"
+                        >
+                          <Checkbox
+                            id={`region-${region.id}`}
+                            checked={selectedRegions.includes(region.name)}
+                            onCheckedChange={() => toggleRegion(region.name)}
+                          />
+                          <label
+                            htmlFor={`region-${region.id}`}
+                            className="text-sm font-medium"
+                          >
+                            {region.name}
+                          </label>
+                        </div>
+                      ))}
                 </div>
               </PopoverContent>
             </Popover>
@@ -145,8 +160,6 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
             selectedMainCategory={selectedMainCategory}
             handleMainCategoryClick={selectMainCategory}
             handleSubCategoryCheckedChange={toggleSubCategory}
-            getCategoryButtonText={getCategoryButtonText}
-            currentSubCategories={currentSubCategories}
           />
 
           {/* 3. 요일 필터 */}
@@ -168,7 +181,29 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 
         {/* 오른쪽 열 */}
         <div className="flex flex-col gap-2">
-          {/* 5. 인원 필터 */}
+          {/* 5. 상태 필터 */}
+          <div className="p-2 border rounded-md bg-white flex flex-row items-center gap-6">
+            <label className="block text-lg font-bold text-gray-700 min-w-[70px]">
+              상태
+            </label>
+            <Select
+              value={selectedStatus || "ALL_STATUSES"}
+              onValueChange={(value) =>
+                toggleStatus(value === "ALL_STATUSES" ? null : value)
+              }
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="상태를 선택하세요" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL_STATUSES">전체</SelectItem>
+                <SelectItem value="운영중">모집중</SelectItem>
+                <SelectItem value="휴면 상태">모집 종료</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 6. 인원 필터 */}
           <div className="p-2 border rounded-md bg-white flex flex-row items-center gap-6">
             <label className="block text-lg font-bold text-gray-700 min-w-[70px]">
               인원
@@ -186,16 +221,16 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
                     {num}명
                   </SelectItem>
                 ))}
-                <SelectItem value="10+">10명 이상</SelectItem>
-                <SelectItem value="20+">20명 이상</SelectItem>
-                <SelectItem value="30+">30명 이상</SelectItem>
-                <SelectItem value="40+">40명 이상</SelectItem>
-                <SelectItem value="50+">50명 이상</SelectItem>
+                <SelectItem value="10">10명 이상</SelectItem>
+                <SelectItem value="20">20명 이상</SelectItem>
+                <SelectItem value="30">30명 이상</SelectItem>
+                <SelectItem value="40">40명 이상</SelectItem>
+                <SelectItem value="50">50명 이상</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* 6. 시간 필터 */}
+          {/* 7. 시간 필터 */}
           <div className="p-2 border rounded-md bg-white flex flex-row items-center gap-6">
             <label className="block text-lg font-bold text-gray-700 min-w-[70px]">
               시간
@@ -211,7 +246,7 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
             />
           </div>
 
-          {/* 7. 금액 필터 */}
+          {/* 8. 금액 필터 */}
           <div className="p-2 border rounded-md bg-white flex flex-row items-center gap-6">
             <label className="block text-lg font-bold text-gray-700 min-w-[70px]">
               금액
@@ -251,7 +286,10 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
         >
           초기화
         </Button>
-        <Button onClick={onSearch} className="px-8 font-bold">
+        <Button
+          onClick={() => onSearch?.(getFetchLessonsParams())}
+          className="px-8 font-bold"
+        >
           검색
         </Button>
       </div>

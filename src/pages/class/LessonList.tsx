@@ -5,8 +5,18 @@ import { LessonCard } from "@/components/features/lessons/LessonCard";
 import PaginationComponent from "@/components/common/PaginationComponent";
 import { useLessonsQuery } from "@/hooks/useLessonsQuery";
 import { useFilterStore } from "@/store/filterStore";
-import type { Lesson } from "@/models/lesson.model";
+import type { Lesson, FetchLessonsParams } from "@/models/lesson.model";
 import type { QueryKey } from "@tanstack/react-query";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { REVERSE_SORT_MAP, type SortEnum } from "@/constants/sortConstants";
+import type { FilterState } from "@/store/filterStore";
 
 const LessonListDisplay: React.FC<{
   lessons: Lesson[];
@@ -40,15 +50,23 @@ const LessonListDisplay: React.FC<{
 
 const LessonListPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { setAllFilters, resetFilters } = useFilterStore();
+  const {
+    setAllFilters,
+    resetFilters,
+    getFetchLessonsParams,
+    selectedSort,
+    setSelectedSort,
+  } = useFilterStore();
 
-  const parsedParams = React.useMemo(() => {
-    return {
+  useEffect(() => {
+    const filtersFromUrl: Partial<FilterState> = {
       selectedCategories: searchParams.get("categories")?.split(",") || [],
       selectedRegions: searchParams.get("regions")?.split(",") || [],
       selectedDays: searchParams.get("days")?.split(",") || [],
       selectedDifficulty: searchParams.get("difficulty")?.split(",") || [],
       selectedPersonnel: searchParams.get("personnel") || "",
+      selectedStatus: searchParams.get("status") || null,
+      selectedSort: (searchParams.get("sort") as SortEnum) || null,
       timeRange: [
         Number(searchParams.get("minTime")) || 0,
         Number(searchParams.get("maxTime")) || 24,
@@ -57,67 +75,22 @@ const LessonListPage: React.FC = () => {
         Number(searchParams.get("minPrice")) || 0,
         Number(searchParams.get("maxPrice")) || 500000,
       ] as [number, number],
-      // TODO: keyword도 필요하다면 여기서 파싱
     };
-  }, [searchParams]);
-
-  useEffect(() => {
-    setAllFilters(parsedParams);
-  }, [parsedParams, setAllFilters]);
+    setAllFilters(filtersFromUrl);
+  }, [searchParams, setAllFilters]);
 
   const currentPage = Number(searchParams.get("page")) || 1;
-  const itemsPerPage = 12;
+  //const itemsPerPage = 12; // TODO: 한 페이지에 보여줄 아이템 수 정의 필요
 
-  const queryParams = React.useMemo(() => {
-    return {
-      page: currentPage,
-      limit: itemsPerPage,
-      categories:
-        parsedParams.selectedCategories.length > 0
-          ? parsedParams.selectedCategories
-          : undefined,
-      regions:
-        parsedParams.selectedRegions.length > 0
-          ? parsedParams.selectedRegions
-          : undefined,
-      days:
-        parsedParams.selectedDays.length > 0
-          ? parsedParams.selectedDays
-          : undefined,
-      difficulty:
-        parsedParams.selectedDifficulty.length > 0
-          ? parsedParams.selectedDifficulty
-          : undefined,
-      personnel: parsedParams.selectedPersonnel
-        ? Number(parsedParams.selectedPersonnel.replace(/\D/g, ""))
-        : undefined,
-      minTime:
-        parsedParams.timeRange[0] > 0 ? parsedParams.timeRange[0] : undefined,
-      maxTime:
-        parsedParams.timeRange[1] < 24 ? parsedParams.timeRange[1] : undefined,
-      minPrice:
-        parsedParams.priceRange[0] > 0 ? parsedParams.priceRange[0] : undefined,
-      maxPrice:
-        parsedParams.priceRange[1] < 500000
-          ? parsedParams.priceRange[1]
-          : undefined,
-      keyword: searchParams.get("keyword") || undefined,
-    };
-  }, [
+  const { data, isLoading, isError } = useLessonsQuery(
+    getFetchLessonsParams(),
     currentPage,
-    itemsPerPage,
-    parsedParams.selectedCategories,
-    parsedParams.selectedRegions,
-    parsedParams.selectedDays,
-    parsedParams.selectedDifficulty,
-    parsedParams.selectedPersonnel,
-    parsedParams.timeRange,
-    parsedParams.priceRange,
-    searchParams,
-  ]);
-
-  const { data, isLoading, isError } = useLessonsQuery(queryParams, 0);
-  const lessonsQueryKey: QueryKey = ["lessons", queryParams, 0];
+  );
+  const lessonsQueryKey: QueryKey = [
+    "lessons",
+    getFetchLessonsParams(),
+    currentPage,
+  ];
   const { totalPages } = { totalPages: data?.totalPages || 0 };
 
   const handlePageChange = (page: number) => {
@@ -126,39 +99,17 @@ const LessonListPage: React.FC = () => {
     window.scrollTo(0, 0);
   };
 
-  const filterStore = useFilterStore();
-
-  const handleSearchClick = () => {
+  const handleSearchClick = (mappedParams: FetchLessonsParams) => {
     const params = new URLSearchParams();
-
-    if (
-      filterStore.selectedRegions.length > 0 &&
-      !filterStore.selectedRegions.includes("전체")
-    ) {
-      params.append("regions", filterStore.selectedRegions.join(","));
-    }
-    if (filterStore.selectedCategories.length > 0) {
-      params.append("categories", filterStore.selectedCategories.join(","));
-    }
-    if (filterStore.selectedDays.length > 0) {
-      params.append("days", filterStore.selectedDays.join(","));
-    }
-    if (filterStore.selectedDifficulty.length > 0) {
-      params.append("difficulty", filterStore.selectedDifficulty.join(","));
-    }
-    if (filterStore.selectedPersonnel) {
-      params.append("personnel", filterStore.selectedPersonnel);
-    }
-    if (filterStore.timeRange[0] > 0 || filterStore.timeRange[1] < 24) {
-      params.append("minTime", String(filterStore.timeRange[0]));
-      params.append("maxTime", String(filterStore.timeRange[1]));
-    }
-    if (filterStore.priceRange[0] > 0 || filterStore.priceRange[1] < 500000) {
-      params.append("minPrice", String(filterStore.priceRange[0]));
-      params.append("maxPrice", String(filterStore.priceRange[1]));
-    }
-
-    params.set("page", "1");
+    Object.entries(mappedParams).forEach(([key, value]) => {
+      if (value === undefined || value === null) return;
+      if (Array.isArray(value)) {
+        value.forEach((item) => params.append(key, String(item)));
+      } else {
+        params.append(key, String(value));
+      }
+    });
+    params.set("page", "1"); // 검색 시 페이지 1로 초기화
     setSearchParams(params);
   };
 
@@ -177,6 +128,31 @@ const LessonListPage: React.FC = () => {
         onSearch={handleSearchClick}
         onReset={handleResetAllFilters}
       />
+
+      <div className="my-8 flex justify-end">
+        <Select
+          value={selectedSort || "LATEST"}
+          onValueChange={(value: string) => setSelectedSort(value as SortEnum)}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="정렬 기준" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="LATEST">생성일 최신순</SelectItem>{" "}
+            {Object.entries(REVERSE_SORT_MAP).map(
+              ([backendValue, frontendName]) =>
+                backendValue !== "LATEST" && (
+                  <SelectItem
+                    key={backendValue}
+                    value={backendValue as SortEnum}
+                  >
+                    {frontendName}
+                  </SelectItem>
+                ),
+            )}
+          </SelectContent>
+        </Select>
+      </div>
 
       <div className="my-8">
         <LessonListDisplay
