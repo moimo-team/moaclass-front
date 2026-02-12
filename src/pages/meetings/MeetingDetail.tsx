@@ -14,11 +14,11 @@ import { useJoinMeetingMutation } from "@/hooks/useMeetingMutations";
 import { useMeetingQuery } from "@/hooks/useMeetingQuery";
 import { useMeQuery } from "@/hooks/useMeQuery";
 import MeetingActionButtons from "@/components/features/meetings/MeetingActionButtons";
-import { formatClassCreateDate } from "@/utils/dateFormat";
+import { formatFullDateTime } from "@/utils/dateFormat";
 import { useNavigate } from "react-router-dom";
 import { useDeleteMeetingDialog } from "@/hooks/useDeleteMeetingDialog";
 import { useInterestQuery } from "@/hooks/useInterestQuery";
-import LoadingSpinner from '@/components/common/LoadingSpinner';
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { MeetingParticipantsCard } from "@/components/features/meetings/MeetingParticipantsCard";
 import { isMeetingClosed } from "@/utils/meetingUtils";
 import { cn } from "@/lib/utils";
@@ -31,7 +31,11 @@ function MeetingDetailPage() {
     window.scrollTo(0, 0);
   }, []);
 
-  const { data: meetingDetail, isLoading, error } = useMeetingQuery(Number(meetingId));
+  const {
+    data: meetingDetail,
+    isLoading,
+    error,
+  } = useMeetingQuery(Number(meetingId));
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [showExpandButton, setShowExpandButton] = useState(false);
   const descriptionRef = useRef<HTMLDivElement>(null);
@@ -49,12 +53,24 @@ function MeetingDetailPage() {
 
   // 모임 삭제
   const { handleDeleteMeeting, DeleteConfirmDialog } = useDeleteMeetingDialog({
-    onSuccess: () => navigate("/mypage/meetings/hosting")
+    onSuccess: () => navigate("/mypage/meetings/hosting"),
   });
 
   // 내가 신청한/참가한 모임 목록 조회
-  const { meetings: pendingMeetings, isLoading: isPendingLoading } = useMeQuery("joined", "pending", 1, 50, { enabled: isLoggedIn });
-  const { meetings: joinedMeetings, isLoading: isJoinedLoading } = useMeQuery("joined", "accepted", 1, 50, { enabled: isLoggedIn });
+  const { meetings: pendingMeetings, isLoading: isPendingLoading } = useMeQuery(
+    "joined",
+    "pending",
+    1,
+    50,
+    { enabled: isLoggedIn },
+  );
+  const { meetings: joinedMeetings, isLoading: isJoinedLoading } = useMeQuery(
+    "joined",
+    "accepted",
+    1,
+    50,
+    { enabled: isLoggedIn },
+  );
 
   // 카테고리 목록 조회 (이름 매핑용)
   const { data: interests } = useInterestQuery();
@@ -64,13 +80,17 @@ function MeetingDetailPage() {
 
   // 마감 여부 확인
   const isClosed = meetingDetail
-    ? isMeetingClosed(meetingDetail.currentParticipants, meetingDetail.maxParticipants, meetingDetail.meetingDate)
+    ? isMeetingClosed(
+        meetingDetail.currentParticipants,
+        meetingDetail.maxParticipants,
+        meetingDetail.meetingDate,
+      )
     : false;
 
   useEffect(() => {
     if (meetingId && pendingMeetings) {
       const isAlreadyApplied = pendingMeetings.some(
-        (meeting) => meeting.meetingId === Number(meetingId)
+        (meeting) => meeting.meetingId === Number(meetingId),
       );
       setIsPending(isAlreadyApplied);
     }
@@ -81,12 +101,15 @@ function MeetingDetailPage() {
   const hasNotifiedRef = useRef(false);
 
   useEffect(() => {
-    if (isHost && participations?.some(p => p.status === 'PENDING') && !hasNotifiedRef.current) {
+    if (
+      isHost &&
+      participations?.some((p) => p.status === "PENDING") &&
+      !hasNotifiedRef.current
+    ) {
       toast.info("새로운 모이미가 승인 요청 중입니다!");
       hasNotifiedRef.current = true;
     }
   }, [isHost, participations]);
-
 
   // 설명 텍스트 높이 확인
   useEffect(() => {
@@ -111,11 +134,14 @@ function MeetingDetailPage() {
     try {
       await joinMeetingMutation.mutateAsync(Number(meetingId));
       setIsPending(true);
-      toast.success("모임 신청이 완료되었습니다. 모이머의 승인을 기다려주세요!");
+      toast.success(
+        "모임 신청이 완료되었습니다. 모이머의 승인을 기다려주세요!",
+      );
       setShowJoinConfirm(false);
     } catch (error: any) {
       console.error("모임 신청 에러:", error);
-      const errorMessage = error.response?.data?.message || error.response?.data?.error;
+      const errorMessage =
+        error.response?.data?.message || error.response?.data?.error;
 
       if (error.response?.status === 400) {
         toast.error(errorMessage || "모임 신청에 실패했습니다");
@@ -134,9 +160,7 @@ function MeetingDetailPage() {
   const isMeInfoLoading = isLoggedIn && (isPendingLoading || isJoinedLoading);
 
   if (isLoading || isMeInfoLoading) {
-    return (
-      <LoadingSpinner />
-    );
+    return <LoadingSpinner />;
   }
 
   if (error || !meetingDetail) {
@@ -149,12 +173,8 @@ function MeetingDetailPage() {
     );
   }
 
-
   return (
     <div className="flex flex-col min-h-screen bg-background pt-12">
-
-
-
       <div className="flex-1 w-full max-w-5xl mx-auto pb-8 space-y-8 px-4 md:px-0">
         <div className="flex flex-col md:flex-row gap-8 md:gap-12">
           {/* 이미지 */}
@@ -172,7 +192,7 @@ function MeetingDetailPage() {
                 alt={meetingDetail.title}
                 className={cn(
                   "w-full h-full object-cover",
-                  isClosed && "grayscale-[0.5]"
+                  isClosed && "grayscale-[0.5]",
                 )}
               />
             ) : (
@@ -181,7 +201,7 @@ function MeetingDetailPage() {
                 alt={meetingDetail.title}
                 className={cn(
                   "w-full h-full object-cover",
-                  isClosed && "grayscale-[0.5]"
+                  isClosed && "grayscale-[0.5]",
                 )}
               />
             )}
@@ -193,7 +213,10 @@ function MeetingDetailPage() {
               <div className="flex items-start justify-between pb-8">
                 <div className="flex items-center gap-2 mb-2">
                   <Badge className="bg-primary/10 text-primary hover:bg-primary/20 text-base px-3 py-1.5 font-medium border-primary/20">
-                    {(meetingDetail.interestName || interests?.find(i => i.id === meetingDetail.interestId)?.name) || "카테고리 없음"}
+                    {meetingDetail.interestName ||
+                      interests?.find((i) => i.id === meetingDetail.interestId)
+                        ?.name ||
+                      "카테고리 없음"}
                   </Badge>
                 </div>
                 {/* 수정/삭제 버튼 - 호스트일 때만 표시 */}
@@ -222,13 +245,18 @@ function MeetingDetailPage() {
 
                 <div className="flex items-center gap-3 text-lg text-foreground/80">
                   <Calendar className="w-5 h-5 text-primary shrink-0" />
-                  <span>{formatClassCreateDate(meetingDetail.meetingDate)}</span>
+                  <span>
+                    <span>{formatFullDateTime(meetingDetail.meetingDate)}</span>
+                  </span>
                 </div>
 
                 {meetingDetail.maxParticipants && (
                   <div className="flex items-center gap-3 text-lg text-foreground/80">
                     <Users className="w-5 h-5 text-primary shrink-0" />
-                    <span>{meetingDetail.currentParticipants || 1}명 / {meetingDetail.maxParticipants}명</span>
+                    <span>
+                      {meetingDetail.currentParticipants || 1}명 /{" "}
+                      {meetingDetail.maxParticipants}명
+                    </span>
                   </div>
                 )}
               </div>
@@ -240,11 +268,17 @@ function MeetingDetailPage() {
                 role={isHost ? "host" : "participant"}
                 location="detail-mid"
                 isPending={isPending}
-                isJoined={joinedMeetings?.some((m) => m.meetingId === Number(meetingId))}
+                isJoined={joinedMeetings?.some(
+                  (m) => m.meetingId === Number(meetingId),
+                )}
                 isLoggedIn={isLoggedIn}
                 isClosed={isClosed}
                 onJoin={handleJoinMeeting}
-                onChat={() => navigate("/chats", { state: { meetingId: Number(meetingId) } })}
+                onChat={() =>
+                  navigate("/chats", {
+                    state: { meetingId: Number(meetingId) },
+                  })
+                }
               />
             </div>
           </div>
@@ -252,13 +286,16 @@ function MeetingDetailPage() {
         {/* 설명 */}
         <Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
           <CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
-            <CardTitle className="text-xl font-bold">우리 모임은요...</CardTitle>
+            <CardTitle className="text-xl font-bold">
+              우리 모임은요...
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             <div
               ref={descriptionRef}
-              className={`text-base text-foreground whitespace-pre-wrap leading-relaxed transition-all duration-300 ${isDescriptionExpanded ? "" : "max-h-48 overflow-hidden"
-                }`}
+              className={`text-base text-foreground whitespace-pre-wrap leading-relaxed transition-all duration-300 ${
+                isDescriptionExpanded ? "" : "max-h-48 overflow-hidden"
+              }`}
             >
               {meetingDetail.description}
             </div>
@@ -267,7 +304,7 @@ function MeetingDetailPage() {
                 onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
                 className="mt-4 text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
               >
-                {isDescriptionExpanded ? '접기' : '더보기'}
+                {isDescriptionExpanded ? "접기" : "더보기"}
               </button>
             )}
           </CardContent>
@@ -284,7 +321,9 @@ function MeetingDetailPage() {
         {/* 지도 */}
         <Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
           <CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
-            <CardTitle className="text-xl font-bold">여기에서 만나요!</CardTitle>
+            <CardTitle className="text-xl font-bold">
+              여기에서 만나요!
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="w-full h-96 bg-muted">
@@ -309,14 +348,17 @@ function MeetingDetailPage() {
         role={isHost ? "host" : "participant"}
         location="detail-bottom"
         isPending={isPending}
-        isJoined={joinedMeetings?.some((m) => m.meetingId === Number(meetingId))}
+        isJoined={joinedMeetings?.some(
+          (m) => m.meetingId === Number(meetingId),
+        )}
         isLoggedIn={isLoggedIn}
         isClosed={isClosed}
         onJoin={handleJoinMeeting}
-        onChat={() => navigate("/chats", { state: { meetingId: Number(meetingId) } })}
+        onChat={() =>
+          navigate("/chats", { state: { meetingId: Number(meetingId) } })
+        }
       />
       <DeleteConfirmDialog />
-
 
       <LoginRequiredDialog
         open={showLoginPrompt}
@@ -344,7 +386,6 @@ function MeetingDetailPage() {
       />
 
       {/* 삭제 확인 모달 */}
-
     </div>
   );
 }

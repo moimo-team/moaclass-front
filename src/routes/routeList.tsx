@@ -104,7 +104,7 @@ export const routeList = [
         element: <Interests />,
       },
       {
-        path: "/pay-class/:lessonId/:scheduleId/:quantity",
+        path: "/payments/preview",
         element: (
           <ProtectedRoute>
             <ClassPayment />

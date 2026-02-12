@@ -5,10 +5,11 @@ interface StoreState {
   isLoggedIn: boolean;
   userId: number | null;
   nickname: string | null;
+  email: string | null;
   accessToken: string | null;
   storeLogin: (
-    user: { id: number; nickname: string },
-    accessToken: string
+    user: { id: number; nickname: string; email: string },
+    accessToken: string,
   ) => void;
   storeLogout: () => void;
   setAccessToken: (token: string) => void;
@@ -31,15 +32,17 @@ export const useAuthStore = create<StoreState>()(
       isLoggedIn: false,
       userId: null,
       nickname: null,
+      email: null,
       accessToken: null,
       storeLogin: (
-        user: { id: number; nickname: string },
-        accessToken: string
+        user: { id: number; nickname: string; email: string },
+        accessToken: string,
       ) =>
         set({
           isLoggedIn: true,
           userId: user.id,
           nickname: user.nickname,
+          email: user.email,
           accessToken,
         }),
       storeLogout: () =>
@@ -47,6 +50,7 @@ export const useAuthStore = create<StoreState>()(
           isLoggedIn: false,
           userId: null,
           nickname: null,
+          email: null,
           accessToken: null,
         }),
       setAccessToken: (accessToken: string) => {
@@ -55,6 +59,6 @@ export const useAuthStore = create<StoreState>()(
     }),
     {
       name: "auth-storage",
-    }
-  )
+    },
+  ),
 );

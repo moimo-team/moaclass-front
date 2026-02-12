@@ -4,7 +4,7 @@ export const userStore = {
     email: "moimo@email.com",
     nickname: "테스터",
     bio: "소개글입니다",
-    point: 1000,
+    point: 42000,
     // regionId: 1,
     region: {
       id: 1,
