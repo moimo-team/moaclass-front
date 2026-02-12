@@ -21,6 +21,8 @@ const ReviewListSection = () => {
     setSelectedReview(null);
   };
 
+  const REVIEWS = 6;
+
   return (
     <div className="w-full py-8 pt-12">
       <div className="flex justify-between w-full mb-4">
@@ -39,9 +41,8 @@ const ReviewListSection = () => {
         </p>
       )}
       {!isLoading && !isError && reviews.length > 0 && (
-        // TODO: 하드코딩된 리뷰 개수 상수화
         <ReviewList
-          reviews={reviews.slice(0, 6)}
+          reviews={reviews.slice(0, REVIEWS)}
           onReviewClick={handleReviewClick}
         />
       )}
