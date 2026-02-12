@@ -5,7 +5,8 @@ export const MOCK_ORDERS = Array.from({ length: 15 }, (_, i) => ({
   scheduleId: i + 1, // 테스트를 위해 ID와 동일하게 설정
   pointTransactionId: i + 1, // 테스트를 위해 ID와 동일하게 설정
   title: `클래스명${i + 1}`,
-  date: "2026-02-14T01:02:00.000Z",
+  startAt: "2026-02-14T01:02:00.000Z",
+  endAt: "2026-02-14T03:02:00.000Z",
   image: `https://picsum.photos/seed/${i + 100}/200/120`,
   // status: i % 3 === 0 ? "ACCEPTED" : i % 3 === 1 ? "CANCEL" : "COMPLETED",
   status: i % 3 === 0 ? "수강예정" : i % 3 === 1 ? "수강취소" : "수강완료",
