@@ -39,3 +39,18 @@ export interface CancelClassRequest {
   reason: string;
   detailReason: string;
 }
+
+export interface OrderDetailResponse {
+  orderId: number;
+  title: string;
+  teacherName: string;
+  originPrice: number;
+  discountedAmount: number;
+  amount: number;
+  paymentDate: string;
+  status: OrderStatus;
+  reason?: string;
+  detailReason?: string;
+  refundAmount?: number;
+  refundDate?: string;
+}

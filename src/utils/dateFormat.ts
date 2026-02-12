@@ -162,30 +162,36 @@ export function parseToTimeComponents(dateString: string): {
  * DB에서 반환된 날짜 문자열(예: "YYYY-MM-DD HH:mm:ss")을 파싱하여 포맷팅
  * @param dateString - DB 날짜 문자열 (날것의 데이터도 최대한 수용)
  * @param options - 포맷팅 옵션
- * @param options.type - 'date' | 'time' (기본값: 'date')
- * @param options.separator - 구분자 (기본값: date는 ".", time은 ":")
- * @returns 포맷된 문자열 (예: "24.01.01" 또는 "13:30")
+ * @param options.type - 'date' | 'time' | 'full' (기본값: 'full')
+ * @param options.separator - 구분자 (기본값: date는 ".", time은 ":", full은 '-', ':')
+ * @returns 포맷된 문자열 (예: "2024-01-01 13:30:00", "24.01.01" 또는 "13:30")
  */
 export function formatDateTime(
   dateString: string,
   options?: {
-    type?: "date" | "time";
+    type?: "date" | "time" | "full";
     separator?: string;
   },
 ): string {
   if (!dateString) return "";
 
-  const { type = "date", separator } = options || {};
-
-  // 공백이나 T로 구분하여 날짜/시간 부분 분리
-  const parts = dateString.split(/[ T]/);
-  const partIndex = type === "date" ? 0 : 1;
-  const targetPart = parts[partIndex];
-
-  if (!targetPart) return "";
+  const { type = "full", separator } = options || {};
 
   // 숫자가 아닌 문자를 제거하여 순수 숫자만 추출
-  const numbers = targetPart.replace(/\D/g, "");
+  const numbers = dateString.replace(/\D/g, "");
+
+  if (type === "full") {
+    if (numbers.length >= 14) {
+      return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6, 8)} ${numbers.slice(8, 10)}:${numbers.slice(10, 12)}:${numbers.slice(12, 14)}`;
+    }
+    if (numbers.length >= 12) {
+      return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6, 8)} ${numbers.slice(8, 10)}:${numbers.slice(10, 12)}`;
+    }
+    if (numbers.length >= 8) {
+      return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6, 8)}`;
+    }
+    return dateString;
+  }
 
   // 구분자 설정 (기본값: 날짜는 '.', 시간은 ':')
   const sep = separator ?? (type === "date" ? "." : ":");
@@ -193,14 +199,22 @@ export function formatDateTime(
   if (type === "date") {
     // 8자리(YYYYMMDD)인 경우 YY{sep}MM{sep}DD 형식으로 변환
     if (numbers.length >= 8) {
-      return `${numbers.slice(2, 4)}${sep}${numbers.slice(4, 6)}${sep}${numbers.slice(6, 8)}`;
+      // 뒤에서부터 8자리를 기준으로 처리하거나 앞에서부터 처리
+      // 보통 YYYYMMDD 형식이므로 마지막 8자리를 가져옴 (시각이 포함된 경우 대비)
+      const datePart = numbers.slice(0, 8);
+      return `${datePart.slice(2, 4)}${sep}${datePart.slice(4, 6)}${sep}${datePart.slice(6, 8)}`;
     }
-  } else {
-    // 4자리 이상(HHMM...)인 경우 HH{sep}MM 형식으로 변환
+  } else if (type === "time") {
+    // 시간 부분 추출 (보통 날짜 뒤에 오므로 numbers가 12자리 이상이면 시각은 8번째부터)
+    if (numbers.length >= 12) {
+      const timePart = numbers.slice(8, 12);
+      return `${timePart.slice(0, 2)}${sep}${timePart.slice(2, 4)}`;
+    }
+    // 4자리만 있는 경우 바로 처리
     if (numbers.length >= 4) {
       return `${numbers.slice(0, 2)}${sep}${numbers.slice(2, 4)}`;
     }
   }
 
-  return targetPart;
+  return dateString;
 }

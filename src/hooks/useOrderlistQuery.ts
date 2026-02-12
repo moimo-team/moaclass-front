@@ -1,4 +1,4 @@
-import { getCancelClass, getOrderList } from "@/api/order.api";
+import { getCancelClass, getOrderDetail, getOrderList } from "@/api/order.api";
 import { useAuthStore } from "@/store/authStore";
 import { useQuery } from "@tanstack/react-query";
 import { usePagination } from "./usePagination";
@@ -39,5 +39,13 @@ export const useCancelClassQuery = (id: number) => {
   return useQuery({
     queryKey: ["cancelClass", id],
     queryFn: () => getCancelClass(id),
+  });
+};
+
+// 결제상세 조회
+export const useOrderDetailQuery = (pointTransactionId: number) => {
+  return useQuery({
+    queryKey: ["orderDetail", pointTransactionId],
+    queryFn: () => getOrderDetail(pointTransactionId),
   });
 };
