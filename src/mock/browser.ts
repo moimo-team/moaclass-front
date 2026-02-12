@@ -14,6 +14,7 @@ import { payHandler } from "./payHandler";
 import { couponHandlers } from "./couponHandler";
 import { likeHandlers } from "./likeHandler";
 import { pointHandlers } from "./pointHandler";
+import { orderHandler } from "./orderHandler";
 
 const handlers = [
   ...authHandler,
@@ -31,6 +32,7 @@ const handlers = [
   ...couponHandlers,
   ...likeHandlers,
   ...pointHandlers,
+  ...orderHandler,
 ];
 
 export const worker = setupWorker(...handlers);
