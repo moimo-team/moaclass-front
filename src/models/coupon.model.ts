@@ -12,6 +12,8 @@ export interface Coupons {
   currentUsage: number; // 현재 사용 횟수
   validFrom: string; // 유효 시작일
   validUntil: string; // 유효 종료일
+  createdAt: string;
+  updatedAt: string;
 }
 
 // 유저 쿠폰
@@ -24,7 +26,7 @@ export interface userCoupons {
   issuedAt: string; // 발급 일시
 }
 
-export type CouponInfo = Partial<Coupons> & {
-  name?: string;
-  status?: CouponStatus;
-};
+export type CouponInfo = Partial<Coupons> &
+  Partial<userCoupons> & {
+    status?: CouponStatus;
+  };
