@@ -22,6 +22,7 @@ export interface OrderListResponse {
 }
 
 export interface CancelClassResponse extends Order {
+  teacherNickname: string;
   payments: {
     totalAmount: number;
     couponAmount: number;

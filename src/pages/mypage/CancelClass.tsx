@@ -96,7 +96,7 @@ const CancelClass = () => {
           <h2 className="text-sm font-bold mb-3 text-gray-800">클래스 정보</h2>
           <OrderClassInfo
             title={cancelClassInfo.title}
-            teacherName={(cancelClassInfo as any).teacherNickname || "강사명"}
+            teacherName={cancelClassInfo.teacherNickname || "강사명"}
             price={cancelClassInfo.payments.totalAmount}
           />
         </section>

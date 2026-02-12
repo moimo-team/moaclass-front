@@ -39,6 +39,7 @@ export const useCancelClassQuery = (id: number) => {
   return useQuery({
     queryKey: ["cancelClass", id],
     queryFn: () => getCancelClass(id),
+    enabled: !!id,
   });
 };
 
@@ -47,5 +48,6 @@ export const useOrderDetailQuery = (pointTransactionId: number) => {
   return useQuery({
     queryKey: ["orderDetail", pointTransactionId],
     queryFn: () => getOrderDetail(pointTransactionId),
+    enabled: !!pointTransactionId,
   });
 };

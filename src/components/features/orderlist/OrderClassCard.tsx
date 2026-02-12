@@ -7,7 +7,7 @@ import { FileText, Pencil, MessageCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReviewModal from "@/components/features/review/SetReviewModal";
 import type { Order, OrderStatus } from "@/models/order.model";
-import { formatFullDateTime, formatTime } from "@/utils/dateFormat";
+import { formatFullDateTime } from "@/utils/dateFormat";
 
 interface OrderClassCardProps {
   order: Order;
@@ -26,19 +26,6 @@ const getStatusBadgeVariant = (status: OrderStatus) => {
       return "outline";
   }
 };
-
-// const getStatusBadgeText = (status: OrderStatus) => {
-//   switch (status) {
-//     case "ACCEPTED":
-//       return "수강예정";
-//     case "COMPLETED":
-//       return "수강완료";
-//     case "CANCEL":
-//       return "수강취소";
-//     default:
-//       return status;
-//   }
-// };
 
 const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
   const navigate = useNavigate();
