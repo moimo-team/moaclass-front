@@ -1,6 +1,6 @@
 import { http, HttpResponse, delay } from "msw";
 import { httpUrl } from "./mockData/mockData";
-import { MOCK_ORDERS } from "./mockData/orderMock";
+import { MOCK_CANCEL_ORDERS, MOCK_ORDERS } from "./mockData/orderMock";
 
 // 결제내역 조회
 const getOrderList = http.get(
@@ -61,4 +61,74 @@ const getOrderList = http.get(
   },
 );
 
-export const orderHandler = [getOrderList];
+// 수강취소 내역 조회
+const getCancelClass = http.get(
+  `${httpUrl}/enrollments/:id/cancel`,
+  async ({ request, params }) => {
+    await delay(500);
+    const token = request.headers.get("Authorization");
+    if (!token) {
+      return HttpResponse.json(
+        { message: "토큰이 없습니다." },
+        { status: 401 },
+      );
+    }
+
+    const { id } = params;
+    const order = MOCK_ORDERS.find((o) => o.id === Number(id));
+    if (!order) {
+      return HttpResponse.json(
+        { message: "해당 주문 내역을 찾을 수 없습니다." },
+        { status: 404 },
+      );
+    }
+
+    const cancelOrder =
+      MOCK_CANCEL_ORDERS.find((o) => o.id === Number(id)) ||
+      MOCK_CANCEL_ORDERS[0];
+    return HttpResponse.json(cancelOrder, { status: 200 });
+  },
+);
+
+// 수강취소하기
+const cancelClass = http.post(
+  `${httpUrl}/enrollments/:id/cancel`,
+  async ({ request, params }) => {
+    await delay(500);
+    const token = request.headers.get("Authorization");
+    if (!token) {
+      return HttpResponse.json(
+        { message: "토큰이 없습니다." },
+        { status: 401 },
+      );
+    }
+
+    const { id } = params;
+    const order = MOCK_ORDERS.find((o) => o.id === Number(id));
+    if (!order) {
+      return HttpResponse.json(
+        { message: "해당 주문 내역을 찾을 수 없습니다." },
+        { status: 404 },
+      );
+    }
+
+    try {
+      const { reason, detailReason } = (await request.json()) as any;
+
+      console.log("reason", reason);
+      console.log("detailReason", detailReason);
+
+      return HttpResponse.json(
+        { message: "환불 신청이 완료되었습니다." },
+        { status: 200 },
+      );
+    } catch (error) {
+      return HttpResponse.json(
+        { message: "요청 데이터를 찾을 수 없습니다." },
+        { status: 400 },
+      );
+    }
+  },
+);
+
+export const orderHandler = [getOrderList, getCancelClass, cancelClass];

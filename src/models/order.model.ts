@@ -11,10 +11,32 @@ export interface Order {
   endAt: string;
   status: OrderStatus;
   representativeImage: string;
-  price?: number;
+  price: number;
+  teacherNickname: string;
+  isCompleted: boolean;
 }
 
 export interface OrderListResponse {
   data: Order[];
   meta: PaginationMeta;
+}
+
+export interface CancelClassResponse extends Order {
+  payments: {
+    totalAmount: number;
+    couponAmount: number;
+    pointAmount: number;
+    finalAmount: number;
+  };
+  refunds: {
+    totalAmount: number;
+    couponAmount: number;
+    pointAmount: number;
+    finalAmount: number;
+  };
+}
+
+export interface CancelClassRequest {
+  reason: string;
+  detailReason: string;
 }
