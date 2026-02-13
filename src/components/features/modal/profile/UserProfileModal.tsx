@@ -17,7 +17,6 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { REGIONS } from '@/constants/regions';
 import { useCategoryQuery } from '@/hooks/useCategoryQuery';
-import { useInterestQuery } from '@/hooks/useInterestQuery';
 import { useUserUpdateMutation } from '@/hooks/useUserInfoMutations';
 import { useUserInfoByIdQuery } from '@/hooks/useUserInfoQuery';
 import { cn } from '@/lib/utils';
@@ -66,7 +65,6 @@ const ProfileSkeleton = () => (
 );
 
 const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: ProfileModalProps) => {
-	const { data: allInterests } = useInterestQuery();
 	const { data: allCategories } = useCategoryQuery();
 
 	const { data: fetchedUser, isLoading: isUserLoading } = useUserInfoByIdQuery(userId || 0);

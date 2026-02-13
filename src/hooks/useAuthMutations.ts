@@ -31,7 +31,14 @@ export const useLoginMutation = () => {
 		},
 		onSuccess: (data) => {
 			// 로그인 성공 시 전역 상태 업데이트
-			storeLogin({ id: data.user.id, nickname: data.user.nickname }, data.accessToken);
+			storeLogin(
+				{
+					id: data.user.id,
+					nickname: data.user.nickname,
+					email: data.user.email,
+				},
+				data.accessToken,
+			);
 			// 인증 상태 쿼리 초기화
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
 		},
@@ -51,7 +58,14 @@ export const useGoogleLoginMutation = () => {
 			return await googleLogin(data);
 		},
 		onSuccess: (data) => {
-			storeLogin({ id: data.user.id, nickname: data.user.nickname }, data.accessToken);
+			storeLogin(
+				{
+					id: data.user.id,
+					nickname: data.user.nickname,
+					email: data.user.email,
+				},
+				data.accessToken,
+			);
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
 		},
 		onError: (error: AxiosError<{ message: string }>) => {
@@ -70,7 +84,14 @@ export const useKakaoLoginMutation = () => {
 			return await kakaoLogin(data);
 		},
 		onSuccess: (data) => {
-			storeLogin({ id: data.user.id, nickname: data.user.nickname }, data.accessToken);
+			storeLogin(
+				{
+					id: data.user.id,
+					nickname: data.user.nickname,
+					email: data.user.email,
+				},
+				data.accessToken,
+			);
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
 		},
 		onError: (error: AxiosError<{ message: string }>) => {
@@ -110,7 +131,14 @@ export const useJoinMutation = () => {
 		onSuccess: (data) => {
 			const { storeLogin } = useAuthStore.getState();
 			if (data.accessToken) {
-				storeLogin({ id: data.user.id, nickname: data.user.nickname }, data.accessToken);
+				storeLogin(
+					{
+						id: data.user.id,
+						nickname: data.user.nickname,
+						email: data.user.email,
+					},
+					data.accessToken,
+				);
 				queryClient.invalidateQueries({ queryKey: ['authUser'] });
 			}
 		},
