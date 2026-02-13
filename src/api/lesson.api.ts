@@ -21,9 +21,9 @@ export const fetchLessons = async (
   Object.entries(mappedParams).forEach(([key, value]) => {
     if (value === undefined || value === null) return;
 
-    // 배열인 경우 각 요소를 개별 쿼리 파라미터로 추가
+    // 배열인 경우 쉼표로 구분된 하나의 쿼리 파라미터로 추가
     if (Array.isArray(value)) {
-      value.forEach((item) => queryParams.append(key, String(item)));
+      queryParams.append(key, value.map(String).join(','));
     } else {
       queryParams.append(key, String(value));
     }
@@ -65,7 +65,7 @@ export const updateLesson = async (lessonId: number, formData: FormData) => {
 
 // 3. 레슨 삭제
 export const deleteLesson = async (lessonId: number) => {
-  const response = await apiClient.delete(`/lessons/${lessonId}`);
+  const response = await apiClient.delete(`/likes/${lessonId}`);
   return response.data;
 };
 

@@ -53,7 +53,7 @@ export function LessonCard({
           className,
         )}
       >
-        {/* 상단: 클래스 사진 - 높이를 줄여 전체 카드를 컴팩트하게 조절 */}
+        {/* 상단: 클래스 사진  */}
         <div className="relative w-full aspect-[4/2.8] overflow-hidden bg-muted">
           <img
             src={lesson.representativeImage || defaultLessonImage}
@@ -79,7 +79,7 @@ export function LessonCard({
           </button>
         </div>
 
-        {/* 정보 섹션 - 표준 패딩 복구 (가독성 중심) */}
+        {/* 정보 섹션 */}
         <div className="p-3 flex flex-col gap-2.5 flex-1">
           <div className="space-y-1.5">
             {/* 평점, 좋아요, 지역 위치 정보 */}
@@ -114,13 +114,13 @@ export function LessonCard({
           <div className="flex items-center gap-2 pt-3 border-t border-gray-50 mt-auto">
             <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-100 shrink-0">
               <img
-                src={lesson.teacherProfile?.image || defaultProfileImage}
-                alt={lesson.teacherProfile?.nickname || "모멘토"}
+                src={lesson.teacher.image || defaultProfileImage}
+                alt={lesson.teacher.nickname || "모멘토"}
                 className="w-full h-full object-cover"
               />
             </div>
             <span className="text-xs font-medium text-gray-600 truncate">
-              {lesson.teacherProfile?.nickname || "모멘토"}
+              {lesson.teacher.nickname || "모멘토"}
             </span>
           </div>
         </div>

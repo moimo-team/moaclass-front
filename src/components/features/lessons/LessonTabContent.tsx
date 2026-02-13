@@ -17,7 +17,7 @@ interface LessonTabContentProps {
   curriculum: string;
   teacher:
     | {
-        userId: number;
+        id: number;
         nickname: string;
         image: string;
         introduction: string;
@@ -117,9 +117,7 @@ export const LessonTabContent = ({
                     <Button
                       variant="link"
                       className="p-0 h-auto text-primary text-sm hover:underline"
-                      onClick={() =>
-                        navigate(`/mypage/profile/${teacher.userId}`)
-                      }
+                      onClick={() => navigate(`/mypage/profile/${teacher.id}`)}
                     >
                       모멘토 페이지 바로가기
                     </Button>
