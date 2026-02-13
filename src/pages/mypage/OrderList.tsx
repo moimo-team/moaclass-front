@@ -14,7 +14,7 @@ import { useOrderlistQuery } from "@/hooks/useOrderlistQuery";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const OrderList = () => {
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState("전체");
   const [page, setPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,10 +45,10 @@ const OrderList = () => {
               <SelectValue placeholder="전체" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">전체</SelectItem>
-              <SelectItem value="accepted">수강예정</SelectItem>
-              <SelectItem value="cancel">수강취소</SelectItem>
-              <SelectItem value="completed">수강완료</SelectItem>
+              <SelectItem value="전체">전체</SelectItem>
+              <SelectItem value="수강예정">수강예정</SelectItem>
+              <SelectItem value="수강취소">수강취소</SelectItem>
+              <SelectItem value="수강완료">수강완료</SelectItem>
             </SelectContent>
           </Select>
         </div>

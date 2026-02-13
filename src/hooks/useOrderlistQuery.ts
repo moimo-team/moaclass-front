@@ -5,15 +5,15 @@ import { usePagination } from "./usePagination";
 
 // 내 클래스 결제내역 조회
 export const useOrderlistQuery = (
-  status: string = "all",
+  filter: string,
   page: number = 1,
   limit: number = 6,
 ) => {
   const { userId } = useAuthStore();
 
   const queryResult = useQuery({
-    queryKey: ["orderlist", userId, status, page, limit],
-    queryFn: () => getOrderList(status, page, limit),
+    queryKey: ["orderlist", userId, filter, page, limit],
+    queryFn: () => getOrderList(filter, page, limit),
     enabled: !!userId,
   });
 

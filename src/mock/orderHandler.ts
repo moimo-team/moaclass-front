@@ -21,24 +21,15 @@ const getOrderList = http.get(
     }
 
     const url = new URL(request.url);
-    const status = url.searchParams.get("status") || "all";
+    const filter = url.searchParams.get("filter") || "전체";
     const page = Number(url.searchParams.get("page") || "1");
     const limit = Number(url.searchParams.get("limit") || "8");
 
     let filteredOrders = MOCK_ORDERS;
 
     // 상태 필터링
-    if (status !== "all") {
-      if (status === "cancel") {
-        // 수강취소
-        filteredOrders = filteredOrders.filter((o) => o.status === "수강취소");
-      } else if (status === "accepted") {
-        // 수강예정
-        filteredOrders = filteredOrders.filter((o) => o.status === "수강예정");
-      } else if (status === "completed") {
-        // 수강완료
-        filteredOrders = filteredOrders.filter((o) => o.status === "수강완료");
-      }
+    if (filter && filter !== "전체") {
+      filteredOrders = filteredOrders.filter((o) => o.status === filter);
     }
 
     // 페이지네이션 로직
