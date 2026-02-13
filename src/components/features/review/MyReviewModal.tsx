@@ -1,16 +1,17 @@
 import React, { useCallback, useRef } from 'react';
-import { useForm, Controller, useWatch, type Control } from 'react-hook-form';
+import { useEffect } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, Controller, useWatch, type Control } from 'react-hook-form';
 import { z } from 'zod';
 
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import StarRating from '@/components/common/StarRating';
 import { FormImageUpload } from '@/components/features/modal/components/FormImageUpload';
 import { FormModal } from '@/components/features/modal/components/FormModal';
 import { Textarea } from '@/components/ui/textarea';
-import { useReviewMutation, useUpdateReviewMutation } from '@/hooks/useReviewMutations';
 import { useMyReviewQuery } from '@/hooks/useMyReviewQuery';
-import { useEffect } from 'react';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { useReviewMutation, useUpdateReviewMutation } from '@/hooks/useReviewMutations';
 
 /**
  * 리뷰 작성을 위한 Zod 스키마
@@ -127,10 +128,35 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 		}
 	}, [existingReview, reset, open]);
 
-	// 이미지 삭제 콜백 (리렌더링 방지를 위해 getValues 사용)
+	// 이미지 상태 감시 (성능 최적화 및 커스텀 핸들링 위해)
+	const images = useWatch({ control, name: 'images' });
+
+	// 이미지 변경 핸들러: images(미리보기)와 imageFiles(실제 파일) 동시 업데이트
+	const handleImagesChange = (dataUrls: string[], newFiles: File[]) => {
+		setValue('images', dataUrls, { shouldValidate: true });
+		const currentFiles = getValues('imageFiles') || [];
+		setValue('imageFiles', [...currentFiles, ...newFiles], { shouldValidate: true });
+	};
+
+	// 이미지 삭제 콜백 (images와 imageFiles의 동기화 보장)
 	const handleRemoveImage = useCallback(
 		(index: number) => {
 			const currentImages = getValues('images');
+			const currentFiles = getValues('imageFiles');
+
+			// 기존 이미지와 신규 파일이 섞여 있을 때를 대비한 동기화 로직
+			// 신규 파일은 항상 currentImages 배열의 끝에 추가됨
+			const firstNewFileIndex = currentImages.length - currentFiles.length;
+
+			if (index >= firstNewFileIndex) {
+				const fileIndex = index - firstNewFileIndex;
+				setValue(
+					'imageFiles',
+					currentFiles.filter((_, i) => i !== fileIndex),
+					{ shouldValidate: true },
+				);
+			}
+
 			setValue(
 				'images',
 				currentImages.filter((_, i) => i !== index),
@@ -229,29 +255,23 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 
 				{/* 하단: 파일 첨부 섹션 */}
 				<div className="w-full space-y-4">
-					<Controller
-						name="images"
-						control={control}
-						render={({ field }) => (
-							<FormImageUpload
-								ref={fileInputRef}
-								variant="multiple"
-								previewImages={field.value}
-								onImagesChange={field.onChange}
-								onRemoveImage={handleRemoveImage}
-								maxImages={8}
-								enableDragAndDrop={true}
-								dragDropHintText={
-									<p>
-										첨부하면{' '}
-										<span className="text-emerald-500 font-bold">
-											같은 카테고리 클래스 할인 쿠폰 발급!
-										</span>
-									</p>
-								}
-								label="이미지 첨부"
-							/>
-						)}
+					<FormImageUpload
+						ref={fileInputRef}
+						variant="multiple"
+						previewImages={images}
+						onImagesChange={handleImagesChange}
+						onRemoveImage={handleRemoveImage}
+						maxImages={8}
+						enableDragAndDrop={true}
+						dragDropHintText={
+							<p>
+								첨부하면{' '}
+								<span className="text-emerald-500 font-bold">
+									같은 카테고리 클래스 할인 쿠폰 발급!
+								</span>
+							</p>
+						}
+						label="이미지 첨부"
 					/>
 
 					{/* 포인트 적립 안내 문구 */}
