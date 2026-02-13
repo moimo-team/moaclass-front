@@ -1,0 +1,20 @@
+{
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	// ✅ 수정된 부분만 포맷팅 (파일 전체가 바뀌어서 PR이 더러워지는 것을 방지)
+	"editor.formatOnSaveMode": "modifications",
+	// 💡 만약 파일 전체를 포맷팅하고 싶다면 위 설정을 주석 처리하고 아래 주석을 해제하세요.
+	// "editor.formatOnSaveMode": "file",
+
+	"editor.codeActionsOnSave": {
+		// ✅ 저장 시 ESLint 에러(Import 순서 등) 자동 수정
+		"source.fixAll.eslint": "always"
+	},
+	"eslint.validate": [
+		"javascript",
+		"javascriptreact",
+		"typescript",
+		"typescriptreact"
+	],
+	"eslint.useFlatConfig": true
+}
