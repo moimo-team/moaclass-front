@@ -1,3 +1,4 @@
+import type { CouponInfo } from "./coupon.model";
 import type { PaginationMeta } from "./pagination.model";
 import type { PayStatus } from "./pay.model";
 
@@ -22,25 +23,37 @@ export interface OrderListResponse {
   meta: PaginationMeta;
 }
 
-export interface CancelClassResponse extends Order {
-  teacherNickname: string;
-  payments: {
-    totalAmount: number;
-    couponAmount: number;
-    pointAmount: number;
-    finalAmount: number;
+export interface CancelClassResponse {
+  classInfo: {
+    title: string;
+    teacherName: string;
+    startAt: string;
+    endAt: string;
   };
-  refunds: {
-    totalAmount: number;
-    couponAmount: number;
-    pointAmount: number;
-    finalAmount: number;
+  paymentInfo: {
+    originPrice: number;
+    discountAmount: number;
+    finalPrice: number;
+    quantity: number;
+    coupon: CouponInfo;
+  };
+  refundInfo: {
+    refundRate: number;
+    refundDiscountAmount: number;
+    refundFinalAmount: number;
   };
 }
 
 export interface CancelClassRequest {
   reason: string;
   detailReason: string;
+}
+
+export interface RefundResponse {
+  enrollmentId: number;
+  status: string;
+  refundAmount: number;
+  remainingPoints: number;
 }
 
 export interface OrderDetailResponse {

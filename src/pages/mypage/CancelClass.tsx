@@ -2,6 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { OrderClassInfo } from "@/components/features/orderlist/orderDetail/OrderClassInfo";
 import ActionButton from "@/components/common/ActionButton";
 import { ChevronLeft, CheckCircle2 } from "lucide-react";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Separator } from "@/components/ui/separator";
 import { RefundRuleSection } from "@/components/features/pay/RefundRuleSection";
 import { CANCEL_REASONS } from "@/constants/cancelReasons";
@@ -11,7 +12,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { FormTextarea } from "@/components/features/modal/components/FormTextarea";
 import FormField from "@/components/common/FormField";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useCancelClassMutation } from "@/hooks/useOrderMutations";
 
@@ -29,9 +29,11 @@ const cancelSchema = z.object({
 export type CancelFormValues = z.infer<typeof cancelSchema>;
 
 const CancelClass = () => {
-  const { id } = useParams();
+  const { enrollmentId } = useParams();
   const navigate = useNavigate();
-  const { data: cancelClassInfo } = useCancelClassQuery(Number(id));
+  const { data: cancelClassInfo, isLoading } = useCancelClassQuery(
+    Number(enrollmentId),
+  );
   const { mutateAsync: cancelClass } = useCancelClassMutation();
 
   const {
@@ -52,13 +54,21 @@ const CancelClass = () => {
 
   const watchDetailReason = watch("detailReason");
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   if (!cancelClassInfo) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <p className="text-gray-500 mb-4">해당 주문 내역을 찾을 수 없습니다.</p>
         <ActionButton
           label="목록으로 돌아가기"
-          onClick={() => navigate("/mypage/orderlist")}
+          onClick={() => navigate("/mypage/class/orders")}
         />
       </div>
     );
@@ -67,14 +77,9 @@ const CancelClass = () => {
   // 수강 취소 핸들러
   const onSubmit = async (data: CancelFormValues) => {
     await cancelClass({
-      id: Number(id),
-      data: {
-        reason: data.reason,
-        detailReason: data.detailReason,
-      },
+      enrollmentId: Number(enrollmentId),
+      data,
     });
-    toast.success("환불 신청이 완료되었습니다.");
-    navigate("/mypage/class/orders");
   };
 
   return (
@@ -93,12 +98,13 @@ const CancelClass = () => {
       <div className="p-5 space-y-8">
         {/* Class Info Section */}
         <section>
-          <h2 className="text-sm font-bold mb-3 text-gray-800">클래스 정보</h2>
-          <OrderClassInfo
-            title={cancelClassInfo.title}
-            teacherName={cancelClassInfo.teacherNickname || "강사명"}
-            price={cancelClassInfo.payments.totalAmount}
-          />
+          <FormField label="클래스 정보">
+            <OrderClassInfo
+              title={cancelClassInfo.classInfo.title}
+              teacherName={cancelClassInfo.classInfo.teacherName}
+              price={cancelClassInfo.paymentInfo.originPrice}
+            />
+          </FormField>
         </section>
 
         {/* Refund Reason Section */}
@@ -163,63 +169,82 @@ const CancelClass = () => {
 
         {/* Refund Guide Section */}
         <section className="space-y-6">
-          <h2 className="text-sm font-bold text-gray-800">환불 안내</h2>
+          <FormField label="환불 안내">
+            {/* Payment Info */}
+            <div className="space-y-3 p-4">
+              <div className="flex justify-between items-center">
+                <span className="font-bold text-gray-600">결제 금액</span>
+                <span className="font-bold text-gray-900">
+                  {cancelClassInfo.paymentInfo.finalPrice.toLocaleString()}원
+                </span>
+              </div>
+              <div className="pl-4 space-y-2 text-sm text-gray-500">
+                <div className="flex justify-between">
+                  <span>ㄴ 상품 금액</span>
+                  <span>
+                    {cancelClassInfo.paymentInfo.originPrice.toLocaleString()}원
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>ㄴ 쿠폰</span>
+                  <span>
+                    -
+                    {cancelClassInfo.paymentInfo.discountAmount.toLocaleString()}
+                    원
+                  </span>
+                </div>
+                <div className="flex justify-between font-medium">
+                  <span>ㄴ 실 결제 금액</span>
+                  <span>
+                    {cancelClassInfo.paymentInfo.finalPrice.toLocaleString()}원
+                  </span>
+                </div>
+              </div>
+            </div>
 
-          {/* Payment Info */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-gray-800">결제 금액</span>
-              <span className="font-bold text-gray-900">
-                {cancelClassInfo.payments.totalAmount.toLocaleString()}원
-              </span>
-            </div>
-            <div className="pl-4 space-y-2 text-sm text-gray-500">
-              <div className="flex justify-between">
-                <span>ㄴ 쿠폰</span>
-                <span>
-                  -{cancelClassInfo.payments.couponAmount.toLocaleString()}원
-                </span>
-              </div>
-              <div className="flex justify-between font-medium">
-                <span>ㄴ 실 결제 금액</span>
-                <span>
-                  {cancelClassInfo.payments.finalAmount.toLocaleString()}원
-                </span>
-              </div>
-            </div>
-          </div>
+            <Separator className="bg-gray-50" />
 
-          <Separator className="bg-gray-50" />
-
-          {/* Refund Info */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-gray-800">환불 금액</span>
-              <span className="font-bold text-gray-900">
-                {cancelClassInfo.refunds.totalAmount.toLocaleString()}원
-              </span>
-            </div>
-            <div className="pl-4 space-y-2 text-sm text-gray-500">
-              <div className="flex justify-between">
-                <span>ㄴ 쿠폰</span>
-                <span>
-                  -{cancelClassInfo.refunds.couponAmount.toLocaleString()}원
+            {/* Refund Info */}
+            <div className="space-y-3 p-4">
+              <div className="flex justify-between items-center">
+                <span className="font-bold text-gray-600">환불 금액</span>
+                <span className="font-bold text-gray-900">
+                  {cancelClassInfo.refundInfo.refundFinalAmount.toLocaleString()}
+                  원
                 </span>
               </div>
-              <div className="flex justify-between font-medium">
-                <span>ㄴ 실 환불 금액</span>
-                <span>
-                  {cancelClassInfo.refunds.finalAmount.toLocaleString()}원
-                </span>
+              <div className="pl-4 space-y-2 text-sm text-gray-500">
+                <div className="flex justify-between">
+                  <span>ㄴ 실 결제 금액</span>
+                  <span>
+                    {cancelClassInfo.paymentInfo.finalPrice.toLocaleString()}원
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>ㄴ 환불 차감액</span>
+                  <span>
+                    -
+                    {cancelClassInfo.refundInfo.refundDiscountAmount.toLocaleString()}
+                    원
+                  </span>
+                </div>
+                <div className="flex justify-between font-medium">
+                  <span>ㄴ 실 환불 금액</span>
+                  <span>
+                    {cancelClassInfo.refundInfo.refundFinalAmount.toLocaleString()}
+                    원
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          </FormField>
         </section>
 
         {/* 환불 규정 */}
         <section className="space-y-4">
-          <h2 className="text-sm font-bold text-gray-800">환불 규정</h2>
-          <RefundRuleSection />
+          <FormField label="환불 규정">
+            <RefundRuleSection />
+          </FormField>
         </section>
 
         {/* Agreement and Submit Section */}

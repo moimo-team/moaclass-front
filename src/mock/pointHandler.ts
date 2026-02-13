@@ -47,7 +47,6 @@ const chargePoint = http.post(
 
     try {
       const { amount } = (await request.json()) as { amount: number };
-      console.log("Charging points with body:", { amount });
 
       // Mock Data 업데이트 (유저 포인트)
       userStore.updatePoint(amount);
@@ -68,12 +67,12 @@ const chargePoint = http.post(
         {
           transaction: {
             id: 44,
-            amount: 10000,
+            amount: amount,
             type: "CHARGE",
             status: "COMPLETED",
             createdAt: "2026-02-11T21:54:31.586Z",
           },
-          userPoints: 99902001,
+          userPoints: userStore.userInfo.point,
         },
         { status: 201 },
       );

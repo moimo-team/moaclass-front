@@ -35,11 +35,11 @@ export const useOrderlistQuery = (
 };
 
 // 수강취소 내역 조회
-export const useCancelClassQuery = (id: number) => {
+export const useCancelClassQuery = (enrollmentId: number) => {
   return useQuery({
-    queryKey: ["cancelClass", id],
-    queryFn: () => getCancelClass(id),
-    enabled: !!id,
+    queryKey: ["cancelClass", enrollmentId],
+    queryFn: () => getCancelClass(enrollmentId),
+    enabled: !!enrollmentId,
   });
 };
 

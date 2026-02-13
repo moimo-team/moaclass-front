@@ -153,7 +153,7 @@ export const routeList = [
             element: <OrderList />,
           },
           {
-            path: "class/orders/:id/cancel",
+            path: "class/orders/:enrollmentId/cancel-info",
             element: <CancelClass />,
           },
           {

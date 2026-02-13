@@ -1,11 +1,12 @@
 import { http, HttpResponse, delay } from "msw";
 import { httpUrl } from "./mockData/mockData";
 import {
-  MOCK_CANCEL_ORDERS,
+  MOCK_CANCEL_ORDER,
   MOCK_ORDER_CANCEL_DETAIL,
   MOCK_ORDER_DETAIL,
   MOCK_ORDERS,
 } from "./mockData/orderMock";
+import type { CancelClassRequest } from "@/models/order.model";
 
 // 결제내역 조회
 const getOrderList = http.get(
@@ -57,7 +58,7 @@ const getOrderList = http.get(
 
 // 수강취소 내역 조회
 const getCancelClass = http.get(
-  `${httpUrl}/enrollments/:id/cancel`,
+  `${httpUrl}/enrollments/:enrollmentId/cancel-info`,
   async ({ request, params }) => {
     await delay(500);
     const token = request.headers.get("Authorization");
@@ -68,25 +69,15 @@ const getCancelClass = http.get(
       );
     }
 
-    const { id } = params;
-    const order = MOCK_ORDERS.find((o) => o.enrollmentId === Number(id));
-    if (!order) {
-      return HttpResponse.json(
-        { message: "해당 주문 내역을 찾을 수 없습니다." },
-        { status: 404 },
-      );
-    }
+    const { enrollmentId } = params;
 
-    const cancelOrder =
-      MOCK_CANCEL_ORDERS.find((o) => o.enrollmentId === Number(id)) ||
-      MOCK_CANCEL_ORDERS[0];
-    return HttpResponse.json(cancelOrder, { status: 200 });
+    return HttpResponse.json(MOCK_CANCEL_ORDER, { status: 200 });
   },
 );
 
 // 수강취소하기
-const cancelClass = http.post(
-  `${httpUrl}/enrollments/:id/cancel`,
+const cancelClass = http.put(
+  `${httpUrl}/enrollments/:enrollmentId/cancel`,
   async ({ request, params }) => {
     await delay(500);
     const token = request.headers.get("Authorization");
@@ -97,23 +88,22 @@ const cancelClass = http.post(
       );
     }
 
-    const { id } = params;
-    const order = MOCK_ORDERS.find((o) => o.enrollmentId === Number(id));
-    if (!order) {
-      return HttpResponse.json(
-        { message: "해당 주문 내역을 찾을 수 없습니다." },
-        { status: 404 },
-      );
-    }
+    const { enrollmentId } = params;
 
     try {
-      const { reason, detailReason } = (await request.json()) as any;
+      const { reason, detailReason } =
+        (await request.json()) as CancelClassRequest;
 
       console.log("reason", reason);
       console.log("detailReason", detailReason);
 
       return HttpResponse.json(
-        { message: "환불 신청이 완료되었습니다." },
+        {
+          enrollmentId: Number(enrollmentId),
+          status: "CANCELED",
+          refundAmount: 5000,
+          remainingPoints: 10000,
+        },
         { status: 200 },
       );
     } catch (error) {

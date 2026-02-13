@@ -123,7 +123,9 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
                 disabled={order.status !== "수강예정"}
                 className="w-full"
                 onClick={() =>
-                  navigate(`/mypage/class/orders/${order.enrollmentId}/cancel`)
+                  navigate(
+                    `/mypage/class/orders/${order.enrollmentId}/cancel-info`,
+                  )
                 }
               />
             </div>

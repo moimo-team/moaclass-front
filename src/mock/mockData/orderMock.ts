@@ -15,21 +15,31 @@ export const MOCK_ORDERS = Array.from({ length: 15 }, (_, i) => ({
 }));
 
 // 수강취소 페이지용 Mock Data
-export const MOCK_CANCEL_ORDERS = Array.from({ length: 15 }, (_, i) => ({
-  ...MOCK_ORDERS[0],
-  payments: {
-    totalAmount: 33000,
-    couponAmount: 0,
-    pointAmount: 0,
-    finalAmount: 33000,
+export const MOCK_CANCEL_ORDER = {
+  classInfo: {
+    title: "국어 강의",
+    teacherName: "선생닉네임",
+    startAt: "2026-02-22T01:02:00.000Z",
+    endAt: "2026-02-22T02:03:00.000Z",
   },
-  refunds: {
-    totalAmount: 33000,
-    couponAmount: 0,
-    pointAmount: 0,
-    finalAmount: 33000,
+  paymentInfo: {
+    originPrice: 60000,
+    discountAmount: 6000,
+    finalPrice: 54000,
+    quantity: 2,
+    coupon: {
+      id: 1,
+      name: "가입 10% 할인 쿠폰",
+      discountType: "PERCENT",
+      discountValue: 10,
+    },
   },
-}));
+  refundInfo: {
+    refundRate: 1,
+    refundDiscountAmount: 0,
+    refundFinalAmount: 54000,
+  },
+};
 
 // 결제 상세 조회 데이터
 export const MOCK_ORDER_DETAIL = {
