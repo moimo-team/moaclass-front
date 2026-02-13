@@ -3,44 +3,41 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import moimoMeeting from "@/assets/images/moimo-meetings.png";
+import type { LessonImage } from "@/models/lesson.model";
 
 interface LessonGalleryProps {
   title: string;
-  lessonImages: Array<{ id: number; image: string }> | undefined;
+  images: LessonImage[] | undefined;
 }
 
-export const LessonGallery = ({
-  title,
-  lessonImages,
-}: LessonGalleryProps) => {
+export const LessonGallery = ({ title, images }: LessonGalleryProps) => {
   const [activeIndex, setActiveIndex] = useState(() => {
-    const hasImages = lessonImages && lessonImages.length > 0;
+    const hasImages = images && images.length > 0;
     return hasImages ? 0 : -1;
   });
 
   const currentMainImage = useMemo(() => {
-    return lessonImages &&
-      lessonImages.length > 0 &&
+    return images &&
+      images.length > 0 &&
       activeIndex !== -1 &&
-      activeIndex < lessonImages.length
-      ? lessonImages[activeIndex].image
+      activeIndex < images.length
+      ? images[activeIndex].image
       : moimoMeeting;
-  }, [lessonImages, activeIndex]);
-
+  }, [images, activeIndex]);
 
   const goToPrevImage = () => {
-    if (!lessonImages || lessonImages.length <= 1) return;
+    if (!images || images.length <= 1) return;
 
     setActiveIndex((prevIndex) =>
-      prevIndex === 0 ? lessonImages.length - 1 : prevIndex - 1,
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1,
     );
   };
 
   const goToNextImage = () => {
-    if (!lessonImages || lessonImages.length <= 1) return;
+    if (!images || images.length <= 1) return;
 
     setActiveIndex((prevIndex) =>
-      prevIndex === lessonImages.length - 1 ? 0 : prevIndex + 1,
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1,
     );
   };
 
@@ -54,7 +51,7 @@ export const LessonGallery = ({
             alt={title}
             className="w-full h-full object-cover transition-opacity duration-300 ease-in-out"
           />
-          {lessonImages && lessonImages.length > 1 && (
+          {images && images.length > 1 && (
             <>
               <Button
                 variant="ghost"
@@ -75,10 +72,10 @@ export const LessonGallery = ({
             </>
           )}
         </div>
-        {lessonImages && lessonImages.length > 1 && (
+        {images && images.length > 1 && (
           <div className="mt-4 relative">
             <div className="flex space-x-2 overflow-x-auto py-2 scrollbar-hide">
-              {lessonImages.map((img, index) => (
+              {images.map((img, index) => (
                 <img
                   key={img.id}
                   src={img.image}

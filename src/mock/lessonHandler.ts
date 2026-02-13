@@ -1,5 +1,10 @@
 import { http, HttpResponse, delay } from "msw";
-import { httpUrl, mockLessons, mockReviews } from "@/mock/mockData/mockData";
+import {
+  httpUrl,
+  mockLessons,
+  mockReviews,
+  mockLessonDetail,
+} from "@/mock/mockData/mockData";
 import { LESSON_SUB_CATEGORIES } from "@/mock/mockData/categoryMock";
 import type { Level, Lesson } from "@/models/lesson.model";
 import type { FetchLessonsResponse } from "@/models/lesson.model";
@@ -87,7 +92,6 @@ export const lessonHandlers = [
       };
     });
 
-    // 정렬 전 타임스탬프를 미리 계산한 후 미리 계산된 값으로 정렬
     const sortedLessons = [...lessonsWithTimestamp].sort((a, b) => {
       switch (sort) {
         case "PRICE_ASC":
@@ -138,17 +142,17 @@ export const lessonHandlers = [
   http.get(`${httpUrl}/lessons/:lessonId`, async ({ params }) => {
     await delay(500);
     const lessonId = Number(params.lessonId);
-    const lesson = mockLessons.find((l) => l.id === lessonId);
 
-    if (lesson) {
-      const lessonWithStatus = {
-        ...lesson,
-        isLiked: isLessonLiked(lesson.id),
+    if (mockLessonDetail) {
+      const lessonDetailWithStatus = {
+        ...mockLessonDetail,
+        id: lessonId,
+        isLiked: isLessonLiked(lessonId),
       };
-      return HttpResponse.json(lessonWithStatus, { status: 200 });
+      return HttpResponse.json(lessonDetailWithStatus, { status: 200 });
     } else {
       return HttpResponse.json(
-        { message: "레슨을 찾을 수 없습니다." },
+        { message: "상세 목 데이터를 찾을 수 없습니다." },
         { status: 404 },
       );
     }
@@ -170,12 +174,12 @@ export const lessonHandlers = [
     await delay(1000);
     const formData = await request.formData();
 
-    // FormData에서 데이터 추출 (새로운 Lesson 타입에 맞춤)
+    // FormData에서 데이터 추출
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const curriculum = formData.get("curriculum") as string;
     const lessonCategoryId = Number(formData.get("lessonCategoryId"));
-    const lessonCategoryName = formData.get("lessonCategoryName") as string; // 추가
+    const lessonCategoryName = formData.get("lessonCategoryName") as string;
     const subCategoryIdsStr = formData.get("subCategoryIds") as string;
     const subCategories = subCategoryIdsStr
       ? JSON.parse(subCategoryIdsStr).map((id: number) => {
@@ -190,16 +194,16 @@ export const lessonHandlers = [
     const discountedPrice = Number(formData.get("discountedPrice"));
     const maxParticipants = Number(formData.get("maxParticipants"));
     const regionId = Number(formData.get("regionId"));
-    const regionName = formData.get("regionName") as string; // 추가
+    const regionName = formData.get("regionName") as string;
     const address = formData.get("address") as string;
     const latitude = Number(formData.get("latitude"));
     const longitude = Number(formData.get("longitude"));
     const detailAddress = (formData.get("detailAddress") as string) || "";
     const directionsText = (formData.get("directionsText") as string) || "";
     const reservationLeadDays = Number(formData.get("reservationLeadDays"));
-    const teacherId = Number(formData.get("userId")); // userId로 변경
-    const teacherNickname = formData.get("teacherNickname") as string; // 추가
-    const schedulesStr = formData.get("schedules") as string; // 스케줄 추가
+    const teacherId = Number(formData.get("userId"));
+    const teacherNickname = formData.get("teacherNickname") as string;
+    const schedulesStr = formData.get("schedules") as string;
     const schedules = schedulesStr ? JSON.parse(schedulesStr) : [];
 
     // 새 클래스 ID 생성
@@ -222,7 +226,7 @@ export const lessonHandlers = [
       discountedPrice,
       maxParticipants,
       representativeImage: "https://placehold.co/600x400?text=New+Class",
-      likeCount: 0, // likes 대신 likeCount 사용
+      likeCount: 0,
       regionId,
       regionName,
       address,
@@ -236,7 +240,14 @@ export const lessonHandlers = [
       reviewAiSummary: null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      teacher: { id: teacherId, nickname: teacherNickname },
+      teacher: {
+        id: teacherId,
+        userId: teacherId,
+        nickname: teacherNickname,
+        image: "https://placehold.co/40x40?text=Teacher",
+        introduction:
+          "안녕하세요! 여러분의 모멘토입니다. 함께 즐거운 시간을 보내봐요!",
+      },
       subCategories: subCategories,
       schedules: schedules,
     };
@@ -262,12 +273,12 @@ export const lessonHandlers = [
     const lessonId = Number(params.lessonId);
     const formData = await request.formData();
 
-    // FormData에서 데이터 추출 (새로운 Lesson 타입에 맞춤)
+    // FormData에서 데이터 추출
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const curriculum = formData.get("curriculum") as string;
     const lessonCategoryId = Number(formData.get("lessonCategoryId"));
-    const lessonCategoryName = formData.get("lessonCategoryName") as string; // 추가
+    const lessonCategoryName = formData.get("lessonCategoryName") as string;
     const subCategoryIdsStr = formData.get("subCategoryIds") as string;
     const subCategories = subCategoryIdsStr
       ? JSON.parse(subCategoryIdsStr).map((id: number) => {
@@ -282,16 +293,16 @@ export const lessonHandlers = [
     const discountedPrice = Number(formData.get("discountedPrice"));
     const maxParticipants = Number(formData.get("maxParticipants"));
     const regionId = Number(formData.get("regionId"));
-    const regionName = formData.get("regionName") as string; // 추가
+    const regionName = formData.get("regionName") as string;
     const address = formData.get("address") as string;
     const latitude = Number(formData.get("latitude"));
     const longitude = Number(formData.get("longitude"));
     const detailAddress = (formData.get("detailAddress") as string) || "";
     const directionsText = (formData.get("directionsText") as string) || "";
     const reservationLeadDays = Number(formData.get("reservationLeadDays"));
-    const teacherId = Number(formData.get("userId")); // userId로 변경
-    const teacherNickname = formData.get("teacherNickname") as string; // 추가
-    const schedulesStr = formData.get("schedules") as string; // 스케줄 추가
+    const teacherId = Number(formData.get("userId"));
+    const teacherNickname = formData.get("teacherNickname") as string;
+    const schedulesStr = formData.get("schedules") as string;
     const schedules = schedulesStr ? JSON.parse(schedulesStr) : [];
 
     // 기존 클래스 찾기
@@ -322,7 +333,14 @@ export const lessonHandlers = [
         directionsText,
         reservationLeadDays,
         updatedAt: new Date().toISOString(),
-        teacher: { id: teacherId, nickname: teacherNickname },
+        teacher: {
+          id: teacherId,
+          userId: teacherId,
+          nickname: teacherNickname,
+          image: "https://placehold.co/40x40?text=Teacher",
+          introduction:
+            "안녕하세요! 여러분의 모멘토입니다. 함께 즐거운 시간을 보내봐요!",
+        },
         subCategories: subCategories,
         schedules: schedules,
       };

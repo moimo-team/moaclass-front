@@ -5,7 +5,6 @@ import { useAuthStore } from "@/store/authStore";
 import LoginRequiredDialog from "@/components/features/login/LoginRequiredDialog";
 import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import { toast } from "sonner";
 import { useLessonQuery } from "@/hooks/useLessonQuery";
 import { LessonGallery } from "@/components/features/lessons/LessonGallery";
 import { LessonHeader } from "@/components/features/lessons/LessonHeader";
@@ -14,6 +13,7 @@ import { LessonReservationSidebar } from "@/components/features/lessons/LessonRe
 import { useLessonTabs } from "@/hooks/useLessonTabs";
 import { useLessonApplicationConfirmation } from "@/hooks/useLessonApplicationConfirmation";
 import { useLessonReviewsQuery } from "@/hooks/useLessonReviewsQuery";
+import { useLessonLikeMutation } from "@/hooks/useLessonLikeMutation";
 
 export const LessonDetail = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
@@ -45,23 +45,29 @@ export const LessonDetail = () => {
   const {
     showConfirmApply,
     setShowConfirmApply,
-    tempSelectedDate,
+    selectedScheduleForDisplay,
     tempHeadcount,
     onApplyLessonFromSidebar,
     confirmApplyAction,
   } = useLessonApplicationConfirmation({
     isLoggedIn,
     setShowLoginPrompt,
+    lessonDetail,
   });
+
+  const likeMutation = useLessonLikeMutation([["lesson", Number(lessonId)]]);
 
   const handleWishlistToggle = () => {
     if (!isLoggedIn) {
       setShowLoginPrompt(true);
       return;
     }
-    toast.info("위시리스트 기능 (API 연동 필요)");
-    // API Endpoint: POST /api/lessons/{lessonId}/wishlist
-    // TODO: API 연동 필요 (위시리스트 기능)
+    if (!lessonDetail) return;
+
+    likeMutation.mutate({
+      lessonId: lessonDetail.id,
+      newIsLiked: !lessonDetail.isLiked,
+    });
   };
 
   const handleInquiry = () => {
@@ -100,16 +106,19 @@ export const LessonDetail = () => {
     discountRate,
     discountedPrice,
     maxParticipants,
-    likes,
+    likeCount,
     address,
     detailAddress,
     directionsText,
     rate,
-    lessonImages,
-    teacherProfile,
+    images,
+    teacher,
     latitude,
     longitude,
     reservationLeadDays,
+    lessonCategoryName,
+    subCategories,
+    schedules,
   } = lessonDetail;
 
   return (
@@ -119,24 +128,21 @@ export const LessonDetail = () => {
           {/* 왼쪽 메인 컨테이너 */}
           <div className="md:col-span-2 space-y-8">
             <LessonGallery
-              key={
-                lessonImages
-                  ? lessonImages.map((img) => img.id).join("-")
-                  : "no-images"
-              }
+              key={images ? images.map((img) => img.id).join("-") : "no-images"}
               title={title}
-              lessonImages={lessonImages}
+              images={images}
             />
             <LessonHeader
               title={title}
-              classCategoryName={lessonDetail.classCategory?.name}
-              subClassCategories={lessonDetail.subClassCategories}
-              likes={likes}
+              classCategoryName={lessonCategoryName}
+              subCategories={subCategories}
+              likeCount={likeCount}
               rate={rate}
               durationMin={durationMin}
               address={address}
               level={level}
               maxParticipants={maxParticipants}
+              isLiked={lessonDetail.isLiked}
             />
 
             {/* 탭 네비게이션 및 클래스 정보 섹션 */}
@@ -147,7 +153,7 @@ export const LessonDetail = () => {
               onSectionRef={handleSectionRef}
               description={description}
               curriculum={curriculum}
-              teacherProfile={teacherProfile}
+              teacher={teacher}
               latitude={latitude}
               longitude={longitude}
               address={address}
@@ -171,10 +177,13 @@ export const LessonDetail = () => {
               d.setMonth(d.getMonth() + 3);
               return d;
             })()}
+            schedules={schedules}
+            maxParticipants={maxParticipants}
             onWishlistToggle={handleWishlistToggle}
             onInquiry={handleInquiry}
             onApplyLesson={onApplyLessonFromSidebar}
             showLoginPrompt={setShowLoginPrompt}
+            isLiked={lessonDetail.isLiked}
           />
         </div>
       </div>
@@ -187,7 +196,7 @@ export const LessonDetail = () => {
         open={showConfirmApply}
         onOpenChange={setShowConfirmApply}
         title="클래스 신청 확인"
-        description={`선택하신 날짜(${tempSelectedDate ? formatFullDateTime(tempSelectedDate) : "날짜 미선택"})에 ${tempHeadcount}명으로 클래스를 신청하시겠습니까?`}
+        description={`선택하신 시간(${selectedScheduleForDisplay ? formatFullDateTime(selectedScheduleForDisplay.startAt) : "시간 미선택"})에 ${tempHeadcount}명으로 클래스를 신청하시겠습니까?`}
         confirmText="신청하기"
         cancelText="취소"
         onConfirm={confirmApplyAction}

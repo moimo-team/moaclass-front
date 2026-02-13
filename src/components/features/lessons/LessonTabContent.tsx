@@ -15,7 +15,7 @@ interface LessonTabContentProps {
   onSectionRef: (id: string, el: HTMLElement | null) => void;
   description: string;
   curriculum: string;
-  teacherProfile:
+  teacher:
     | {
         userId: number;
         nickname: string;
@@ -39,7 +39,7 @@ export const LessonTabContent = ({
   onSectionRef,
   description,
   curriculum,
-  teacherProfile,
+  teacher,
   latitude,
   longitude,
   address,
@@ -103,22 +103,22 @@ export const LessonTabContent = ({
               <CardTitle className="text-xl font-bold">모멘토 소개</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              {teacherProfile && (
+              {teacher && (
                 <div className="flex items-center gap-4 mb-6 p-4 border rounded-lg bg-secondary/10">
                   <img
-                    src={teacherProfile.image || defaultProfileImage}
-                    alt={teacherProfile.nickname}
+                    src={teacher.image || defaultProfileImage}
+                    alt={teacher.nickname}
                     className="w-20 h-20 rounded-full object-cover border border-border flex-shrink-0"
                   />
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold mb-1">
-                      {teacherProfile.nickname}
+                      {teacher.nickname}
                     </h3>
                     <Button
                       variant="link"
                       className="p-0 h-auto text-primary text-sm hover:underline"
                       onClick={() =>
-                        navigate(`/mypage/profile/${teacherProfile.userId}`)
+                        navigate(`/mypage/profile/${teacher.userId}`)
                       }
                     >
                       모멘토 페이지 바로가기
@@ -127,7 +127,7 @@ export const LessonTabContent = ({
                 </div>
               )}
               <p className="text-base text-foreground whitespace-pre-wrap leading-relaxed">
-                {teacherProfile?.introduction || "모멘토 소개가 없습니다."}
+                {teacher?.introduction || "모멘토 소개가 없습니다."}
               </p>
             </CardContent>
           </Card>

@@ -7,12 +7,21 @@ import type {
   ParticipationStatus,
 } from "@/models/participation.model";
 import { interestImageMap } from "@/utils/interestImageMap";
-import type { Lesson, Level } from "@/models/lesson.model";
+import type {
+  Lesson,
+  Level,
+  TeacherProfile,
+  LessonDetail,
+} from "@/models/lesson.model";
 import {
   LESSON_CATEGORIES,
   LESSON_SUB_CATEGORIES,
 } from "@/mock/mockData/categoryMock";
-import type { Review, UserProfileForReview } from "@/models/review.model";
+import type {
+  Review,
+  UserProfileForReview,
+  ReviewImage,
+} from "@/models/review.model";
 
 export const httpUrl =
   import.meta.env.VITE_API_URL || "https://moimo-back.vercel.app";
@@ -123,7 +132,7 @@ export const mockMeetings: Meeting[] = Array.from({ length: 25 }, (_, i) => {
     title: `모임 제목 ${i + 1}`,
     meetingImage:
       interestImageMap[interest.name] ||
-      faker.image.urlLoremFlickr({ category: "meeting" }), // Add meetingImage
+      faker.image.urlLoremFlickr({ category: "meeting" }),
     interestId: interest.id,
     interestName: interest.name,
     maxParticipants: 10,
@@ -138,9 +147,12 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
   const selectedClassCategory = faker.helpers.arrayElement(LESSON_CATEGORIES);
   const selectedRegion = faker.location.county();
 
-  const teacherProfile = {
+  const teacherProfile: TeacherProfile = {
     id: faker.number.int({ min: 1, max: 100 }),
+    userId: faker.number.int({ min: 1, max: 100 }),
     nickname: faker.person.fullName(),
+    image: faker.image.avatar(),
+    introduction: faker.lorem.paragraph(),
   };
 
   const numberOfSubCategories = faker.number.int({ min: 0, max: 3 });
@@ -183,7 +195,7 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
 
   return {
     id: i + 1,
-    userId: teacherProfile.id,
+    userId: teacherProfile.userId,
     lessonCategoryId: selectedClassCategory.id,
     lessonCategoryName: selectedClassCategory.name,
 
@@ -232,33 +244,47 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
 
 // Mock 리뷰 데이터
 export const mockReviews: Review[] = mockLessons.flatMap((lesson) =>
-  Array.from(
-    { length: faker.number.int({ min: 0, max: 10 }) }, // 각 레슨당 0~10개의 리뷰 생성
-    () => {
-      const userProfile: UserProfileForReview = {
-        id: faker.number.int({ min: 1, max: 1000 }),
-        nickname: faker.person.fullName(),
-        profileImage: faker.image.avatar(),
-      };
+  Array.from({ length: faker.number.int({ min: 0, max: 10 }) }, () => {
+    const userProfile: UserProfileForReview = {
+      id: faker.number.int({ min: 1, max: 1000 }),
+      nickname: faker.person.fullName(),
+      profileImage: faker.image.avatar(),
+    };
 
-      return {
-        id: faker.number.int({ min: 1000, max: 9999 }),
-        user: userProfile,
-        lessonId: lesson.id,
-        rating: faker.number.float({ min: 1.0, max: 5.0 }),
-        representativeImage: faker.datatype.boolean()
-          ? faker.image.urlLoremFlickr({
-              category: "food",
-              width: 400,
-              height: 300,
-            })
-          : null,
-        content: faker.lorem.paragraphs(faker.number.int({ min: 1, max: 4 })),
-        createdAt: faker.date.recent().toISOString(),
-        updatedAt: faker.date.recent().toISOString(),
-      };
-    },
-  ),
+    const reviewId = faker.number.int({ min: 1000, max: 9999 });
+
+    const images: ReviewImage[] = Array.from(
+      { length: faker.number.int({ min: 0, max: 3 }) },
+      (_, i) => ({
+        id: faker.number.int({ min: 10000, max: 99999 }),
+        reviewId: reviewId,
+        image: faker.image.urlLoremFlickr({
+          category: "review",
+          width: 400,
+          height: 400,
+        }),
+        sequence: i + 1,
+      }),
+    );
+
+    return {
+      id: reviewId,
+      user: userProfile,
+      lessonId: lesson.id,
+      rating: faker.number.float({ min: 1.0, max: 5.0 }),
+      representativeImage: faker.datatype.boolean()
+        ? faker.image.urlLoremFlickr({
+            category: "food",
+            width: 400,
+            height: 300,
+          })
+        : null,
+      content: faker.lorem.paragraphs(faker.number.int({ min: 1, max: 4 })),
+      createdAt: faker.date.recent().toISOString(),
+      updatedAt: faker.date.recent().toISOString(),
+      images: images,
+    };
+  }),
 );
 
 // 내 참여모임
@@ -316,3 +342,27 @@ export const mockParticipants: Record<number, ParticipationDetail[]> =
     },
     {} as Record<number, ParticipationDetail[]>,
   );
+
+export const mockLessonDetail: LessonDetail = {
+  ...mockLessons[0], // 기본 데이터는 mockLessons의 첫번째 아이템을 재사용
+
+  // 상세 페이지에만 필요한 images 필드 추가
+  images: Array.from(
+    { length: faker.number.int({ min: 3, max: 6 }) },
+    (_, i) => ({
+      id: 200 + i,
+      lessonId: mockLessons[0].id,
+      image: faker.image.urlLoremFlickr({
+        category: "art",
+        width: 800,
+        height: 600,
+      }),
+      sequence: i + 1,
+    }),
+  ),
+
+  // 상세 페이지에만 필요한 reviews 필드 추가 (mockReviews에서 해당 레슨의 리뷰들을 필터링)
+  reviews: mockReviews.filter(
+    (review) => review.lessonId === mockLessons[0].id,
+  ),
+};

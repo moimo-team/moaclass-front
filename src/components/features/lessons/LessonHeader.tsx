@@ -7,6 +7,7 @@ import {
   FaClock,
   FaMapMarkerAlt,
   FaRegHeart,
+  FaHeart,
   FaTachometerAlt,
   FaUsers,
 } from "react-icons/fa";
@@ -14,25 +15,27 @@ import {
 interface LessonHeaderProps {
   title: string;
   classCategoryName: string | undefined;
-  subClassCategories: { id: number; name: string }[] | undefined;
-  likes: number;
+  subCategories: { id: number; name: string }[] | undefined;
+  likeCount: number;
   rate: number;
   durationMin: number;
   address: string;
   level: Level;
   maxParticipants: number | undefined;
+  isLiked: boolean | undefined;
 }
 
 export const LessonHeader = ({
   title,
   classCategoryName,
-  subClassCategories,
-  likes,
+  subCategories,
+  likeCount,
   rate,
   durationMin,
   address,
   level,
   maxParticipants,
+  isLiked,
 }: LessonHeaderProps) => {
   return (
     <>
@@ -42,9 +45,9 @@ export const LessonHeader = ({
           <Badge className="bg-primary/10 text-primary hover:bg-primary/20 text-base px-3 py-1.5 font-medium border-primary/20">
             {classCategoryName || "카테고리 없음"}
           </Badge>
-          {subClassCategories &&
-            subClassCategories.length > 0 &&
-            subClassCategories.map((subCat) => (
+          {subCategories &&
+            subCategories.length > 0 &&
+            subCategories.map((subCat) => (
               <Badge
                 key={subCat.id}
                 variant="default"
@@ -57,8 +60,12 @@ export const LessonHeader = ({
         <h1 className="text-4xl font-bold text-foreground">{title}</h1>
         <div className="flex items-center gap-4 text-lg text-foreground/80">
           <div className="flex items-center gap-1">
-            <FaRegHeart className="text-red-500" />
-            <span>{likes}</span>
+            {isLiked ? (
+              <FaHeart className="text-red-500" />
+            ) : (
+              <FaRegHeart className="text-red-500" />
+            )}
+            <span>{likeCount}</span>
           </div>
           <div className="flex items-center gap-1">
             <StarRating rating={rate} starSize={20} />
