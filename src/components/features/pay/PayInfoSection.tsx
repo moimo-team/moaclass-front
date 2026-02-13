@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { X } from "lucide-react";
 import { PaySectionCard } from "./PaySectionCard";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import { FormInput } from "../modal/components/FormInput";
 import { usePayCalculation } from "@/hooks/usePayQuery";
 import { AxiosError } from "axios";
 import type { PayErrorResponse } from "@/models/pay.model";
-import ConfirmDialog from "../modal/ConfirmDialog";
+import AlertNotification from "../modal/AlertNotification";
 import type { CreatePaymentResponse } from "@/api/pay.api";
 
 const PAY_ERROR_MESSAGES: Record<string, string> = {
@@ -113,6 +113,13 @@ export const PayInfoSection = ({
     }
   };
 
+  // 결제 성공 후 알림창이 닫히면 주문 내역 페이지로 이동
+  useEffect(() => {
+    if (!isAlertOpen && alertType === "SUCCESS") {
+      navigate("/mypage/class/orders", { replace: true });
+    }
+  }, [isAlertOpen, alertType, navigate]);
+
   return (
     <PaySectionCard title="결제 정보">
       <div className="space-y-4">
@@ -185,7 +192,7 @@ export const PayInfoSection = ({
         />
 
         {/* 결제 성공/실패 알림창 */}
-        <ConfirmDialog
+        <AlertNotification
           open={isAlertOpen}
           onOpenChange={setIsAlertOpen}
           title={
@@ -193,61 +200,57 @@ export const PayInfoSection = ({
               ? "결제가 완료되었습니다."
               : "결제에 실패했습니다."
           }
-          onConfirm={() => {
-            if (alertType === "SUCCESS") {
-              navigate("/mypage/class/orders", { replace: true });
-            }
-          }}
-          showCancel={false}
-        >
-          {alertType === "SUCCESS" && successData ? (
-            <div className="space-y-3 py-4">
-              <div className="flex justify-between items-center text-sm border-b border-border/40 pb-2">
-                <span className="text-muted-foreground">등록 번호</span>
-                <span className="font-semibold text-foreground">
-                  {successData.enrollmentId}
-                </span>
-              </div>
-              <div className="flex justify-between items-center text-sm border-b border-border/40 pb-2">
-                <span className="text-muted-foreground">결제 금액</span>
-                <span className="font-bold text-carrot">
-                  {successData.transaction.amount.toLocaleString()} 원
-                </span>
-              </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">포인트 잔액</span>
-                <span className="font-bold text-blue-600">
-                  {successData.remainingPoints.toLocaleString()} 원
-                </span>
-              </div>
-            </div>
-          ) : alertType === "ERROR" ? (
-            <div className="space-y-3 py-4 text-left">
-              <p className="text-sm font-medium text-destructive text-center mb-2">
-                {errorData
-                  ? PAY_ERROR_MESSAGES[errorData.error.code] ||
-                    PAY_ERROR_MESSAGES.DEFAULT
-                  : PAY_ERROR_MESSAGES.DEFAULT}
-              </p>
-              {errorData?.requiredPoints && (
-                <div className="flex justify-between items-center text-xs border-t border-border/40 pt-2 text-muted-foreground">
-                  <span>필요 포인트</span>
+          hasButton={true}
+          description={
+            alertType === "SUCCESS" && successData ? (
+              <div className="space-y-3 py-4">
+                <div className="flex justify-between items-center text-sm border-b border-border/40 pb-2">
+                  <span className="text-muted-foreground">등록 번호</span>
                   <span className="font-semibold text-foreground">
-                    {errorData.requiredPoints.toLocaleString()} 원
+                    {successData.enrollmentId}
                   </span>
                 </div>
-              )}
-              {errorData?.userPoints !== undefined && (
-                <div className="flex justify-between items-center text-xs text-muted-foreground">
-                  <span>보유 포인트</span>
-                  <span className="font-semibold text-foreground">
-                    {errorData.userPoints.toLocaleString()} 원
+                <div className="flex justify-between items-center text-sm border-b border-border/40 pb-2">
+                  <span className="text-muted-foreground">결제 금액</span>
+                  <span className="font-bold text-carrot">
+                    {successData.transaction.amount.toLocaleString()} 원
                   </span>
                 </div>
-              )}
-            </div>
-          ) : null}
-        </ConfirmDialog>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">포인트 잔액</span>
+                  <span className="font-bold text-blue-600">
+                    {successData.remainingPoints.toLocaleString()} 원
+                  </span>
+                </div>
+              </div>
+            ) : alertType === "ERROR" ? (
+              <div className="space-y-3 py-4 text-left">
+                <p className="text-sm font-medium text-destructive text-center mb-2">
+                  {errorData
+                    ? PAY_ERROR_MESSAGES[errorData.error.code] ||
+                      PAY_ERROR_MESSAGES.DEFAULT
+                    : PAY_ERROR_MESSAGES.DEFAULT}
+                </p>
+                {errorData?.requiredPoints && (
+                  <div className="flex justify-between items-center text-xs border-t border-border/40 pt-2 text-muted-foreground">
+                    <span>필요 포인트</span>
+                    <span className="font-semibold text-foreground">
+                      {errorData.requiredPoints.toLocaleString()} 원
+                    </span>
+                  </div>
+                )}
+                {errorData?.userPoints !== undefined && (
+                  <div className="flex justify-between items-center text-xs text-muted-foreground">
+                    <span>보유 포인트</span>
+                    <span className="font-semibold text-foreground">
+                      {errorData.userPoints.toLocaleString()} 원
+                    </span>
+                  </div>
+                )}
+              </div>
+            ) : null
+          }
+        />
 
         <Separator className="bg-border/60" />
 
