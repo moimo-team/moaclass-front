@@ -11,8 +11,8 @@ import { validateImageFile, fileToDataURL } from '@/utils/imageValidation';
 interface FormImageUploadProps {
 	previewImage?: string | null;
 	previewImages?: string[];
-	onImageChange?: (dataUrl: string) => void;
-	onImagesChange?: (dataUrls: string[]) => void;
+	onImageChange?: (dataUrl: string, file: File) => void;
+	onImagesChange?: (dataUrls: string[], files: File[]) => void;
 	onRemoveImage?: (index: number) => void;
 	variant?: 'form' | 'profile' | 'multiple';
 	shape?: 'circle' | 'square';
@@ -76,7 +76,7 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 
 				try {
 					const dataUrl = await fileToDataURL(file);
-					onImageChange(dataUrl);
+					onImageChange(dataUrl, file);
 				} catch (error) {
 					console.error('Image conversion failed:', error);
 					toast.error('이미지 변환에 실패했습니다');
@@ -109,7 +109,9 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 					const dataUrls = await Promise.all(
 						validFiles.map((file) => fileToDataURL(file)),
 					);
-					onImagesChange([...previewImages, ...dataUrls]);
+					// 기존 Data URL들과 새로 추가된 Data URL들을 병합하여 전달
+					// 두 번째 인자로 새로 추가된 File 객체 배열만 전달 (부모에서 관리 목적)
+					onImagesChange([...previewImages, ...dataUrls], validFiles);
 				} catch (error) {
 					console.error('Image conversion failed:', error);
 					toast.error('이미지 변환에 실패했습니다');

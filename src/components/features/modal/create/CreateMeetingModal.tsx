@@ -40,6 +40,7 @@ const meetingSchema = z.object({
 	meetingMinute: z.string(),
 	meetingPeriod: z.enum(['AM', 'PM']),
 	address: z.string().min(1, '모임 장소를 입력해주세요'),
+	meetingImageFile: z.instanceof(File).optional(),
 });
 
 type MeetingFormValues = z.infer<typeof meetingSchema>;
@@ -85,6 +86,7 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 			meetingMinute: '00',
 			meetingPeriod: 'PM',
 			address: '',
+			meetingImageFile: undefined,
 		},
 	});
 
@@ -148,6 +150,7 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 					meetingMinute: '00',
 					meetingPeriod: 'PM',
 					address: '',
+					meetingImageFile: undefined,
 				});
 				setPreviewImage(null);
 				setIsFormReady(true);
@@ -158,8 +161,9 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 	}, [open, meeting, meetingDetail, interests, reset]);
 
 	// 이미지 변경 핸들러 (FormImageUpload 컴포넌트에서 검증 처리)
-	const handleImageChange = (dataUrl: string) => {
+	const handleImageChange = (dataUrl: string, file: File) => {
 		setPreviewImage(dataUrl);
+		setValue('meetingImageFile', file, { shouldValidate: true });
 	};
 
 	// 장소 선택 핸들러
@@ -205,10 +209,8 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 			formData.append('interestId', String(data.interestId));
 			formData.append('address', data.address);
 
-			// 이미지 파일 처리 (meetingImage 복구)
-			const imageFile = fileInputRef.current?.files?.[0];
-			if (imageFile) {
-				formData.append('meetingImage', imageFile);
+			if (data.meetingImageFile) {
+				formData.append('meetingImage', data.meetingImageFile);
 			}
 
 			if (meeting) {
