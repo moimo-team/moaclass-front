@@ -1,168 +1,175 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ClassManageCard } from "@/components/features/class-manage/ClassManageCard";
-import { CreateClassButton } from "@/components/features/class-manage/CreateClassButton";
-import ConfirmDialog from "@/components/features/modal/ConfirmDialog";
-import CreateClassModal from "@/components/features/modal/create/CreateClassModal";
-import { useQuery } from "@tanstack/react-query";
-import { fetchLessons } from "@/api/lesson.api";
-import { useDeleteLessonMutation } from "@/hooks/useLessonMutations";
+import { useState } from 'react';
+
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+
+import { fetchLessons } from '@/api/lesson.api';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { toast } from "sonner";
+import { ClassManageCard } from '@/components/features/class-manage/ClassManageCard';
+import { CreateClassButton } from '@/components/features/class-manage/CreateClassButton';
+import ConfirmDialog from '@/components/features/modal/ConfirmDialog';
+import CreateClassModal from '@/components/features/modal/create/CreateClassModal';
+import { useDeleteLessonMutation } from '@/hooks/useLessonMutations';
 
 const ClassManagementPage = () => {
-  const navigate = useNavigate();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
-  const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [editingClassId, setEditingClassId] = useState<number | null>(null);
-  const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
+	const navigate = useNavigate();
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+	const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+	const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+	const [createModalOpen, setCreateModalOpen] = useState(false);
+	const [editingClassId, setEditingClassId] = useState<number | null>(null);
+	const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
 
-  const { data: lessonsResponse, isLoading } = useQuery({
-    queryKey: ["lessons"],
-    queryFn: () => fetchLessons({}),
-  });
+	const { data: lessonsResponse, isLoading } = useQuery({
+		queryKey: ['lessons'],
+		queryFn: () => fetchLessons({}),
+	});
 
-  const { mutate: deleteLesson } = useDeleteLessonMutation();
+	const { mutate: deleteLesson } = useDeleteLessonMutation();
 
-  const lessons = lessonsResponse?.lessons || [];
+	const lessons = lessonsResponse?.lessons || [];
 
-  const handleEdit = (id: number) => {
-    setEditingClassId(id);
-    setCreateModalOpen(true);
-  };
+	const handleEdit = (id: number) => {
+		setEditingClassId(id);
+		setCreateModalOpen(true);
+	};
 
-  const handleDeleteClick = (id: number) => {
-    setSelectedClassId(id);
-    setDeleteDialogOpen(true);
-  };
+	const handleDeleteClick = (id: number) => {
+		setSelectedClassId(id);
+		setDeleteDialogOpen(true);
+	};
 
-  const handleDeleteConfirm = () => {
-    if (selectedClassId) {
-      deleteLesson(selectedClassId, {
-        onSuccess: () => {
-          setDeleteDialogOpen(false);
-          setSelectedClassId(null);
-        }
-      });
-    }
-  };
+	const handleDeleteConfirm = () => {
+		if (selectedClassId) {
+			deleteLesson(selectedClassId, {
+				onSuccess: () => {
+					setDeleteDialogOpen(false);
+					setSelectedClassId(null);
+				},
+			});
+		}
+	};
 
-  const handleDuplicate = (id: number) => {
-    setSelectedClassId(id);
-    setDuplicateDialogOpen(true);
-  };
+	const handleDuplicate = (id: number) => {
+		setSelectedClassId(id);
+		setDuplicateDialogOpen(true);
+	};
 
-  const handleDuplicateConfirm = () => {
-    if (selectedClassId) {
-      toast.info("클래스 복제 기능은 준비 중입니다.");
-      setDuplicateDialogOpen(false);
-      setSelectedClassId(null);
-    }
-  };
+	const handleDuplicateConfirm = () => {
+		if (selectedClassId) {
+			toast.info('클래스 복제 기능은 준비 중입니다.');
+			setDuplicateDialogOpen(false);
+			setSelectedClassId(null);
+		}
+	};
 
-  const handleManage = (id: number) => {
-    navigate(`/lessons/${id}/schedule`);
-  };
+	const handleManage = (id: number) => {
+		navigate(`/lessons/${id}/schedule`);
+	};
 
-  const handleViewClass = (id: number) => {
-    toast.info(`클래스 ${id} 상세 페이지는 준비 중입니다.`);
-  };
+	const handleViewClass = (id: number) => {
+		toast.info(`클래스 ${id} 상세 페이지는 준비 중입니다.`);
+	};
 
-  const handleToggleStatus = (id: number) => {
-    setSelectedClassId(id);
-    setStatusDialogOpen(true);
-  };
+	const handleToggleStatus = (id: number) => {
+		setSelectedClassId(id);
+		setStatusDialogOpen(true);
+	};
 
-  const handleStatusConfirm = () => {
-    if (selectedClassId) {
-      toast.info("상태 변경 기능은 준비 중입니다.");
-      setStatusDialogOpen(false);
-      setSelectedClassId(null);
-    }
-  };
+	const handleStatusConfirm = () => {
+		if (selectedClassId) {
+			toast.info('상태 변경 기능은 준비 중입니다.');
+			setStatusDialogOpen(false);
+			setSelectedClassId(null);
+		}
+	};
 
-  const handleModalClose = () => {
-    setCreateModalOpen(false);
-    setEditingClassId(null);
-  };
+	const handleModalClose = () => {
+		setCreateModalOpen(false);
+		setEditingClassId(null);
+	};
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
+	if (isLoading) {
+		return <LoadingSpinner />;
+	}
 
-  return (
-    <div className="w-full">
-      <div className="mb-8">
-        <h1 className="text-3xl font-nanum-bold mb-2">클래스 관리</h1>
-        <p className="text-muted-foreground">
-          원데이 클래스를 생성하고 관리하세요
-        </p>
-      </div>
+	return (
+		<div className="w-full">
+			<div className="mb-8">
+				<h1 className="text-3xl font-nanum-bold mb-2">클래스 관리</h1>
+				<p className="text-muted-foreground">원데이 클래스를 생성하고 관리하세요</p>
+			</div>
 
-      {/* 클래스 그리드: 320px 아래로 작아지지 않게 하여 큼직하게 유지 */}
-      <div className="grid gap-8" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 2fr))" }}>
-        <CreateClassButton onClick={() => { setCreateModalOpen(true); /**TODO: 호스트 프로필 생성 유무 판단*/ }} />
+			{/* 클래스 그리드: 320px 아래로 작아지지 않게 하여 큼직하게 유지 */}
+			<div
+				className="grid gap-8"
+				style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 2fr))' }}
+			>
+				<CreateClassButton
+					onClick={() => {
+						setCreateModalOpen(true); /**TODO: 호스트 프로필 생성 유무 판단*/
+					}}
+				/>
 
-        {lessons.map((lesson) => (
-          <ClassManageCard
-            key={lesson.id}
-            lesson={lesson}
-            onEdit={() => handleEdit(lesson.id)}
-            onDelete={() => handleDeleteClick(lesson.id)}
-            onDuplicate={() => handleDuplicate(lesson.id)}
-            onManage={() => handleManage(lesson.id)}
-            onViewClass={() => handleViewClass(lesson.id)}
-            onToggleStatus={() => handleToggleStatus(lesson.id)}
-          />
-        ))}
-      </div>
+				{lessons.map((lesson) => (
+					<ClassManageCard
+						key={lesson.id}
+						lesson={lesson}
+						onEdit={() => handleEdit(lesson.id)}
+						onDelete={() => handleDeleteClick(lesson.id)}
+						onDuplicate={() => handleDuplicate(lesson.id)}
+						onManage={() => handleManage(lesson.id)}
+						onViewClass={() => handleViewClass(lesson.id)}
+						onToggleStatus={() => handleToggleStatus(lesson.id)}
+					/>
+				))}
+			</div>
 
-      {/* 삭제 확인 다이얼로그 */}
-      <ConfirmDialog
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
-        title="클래스 삭제"
-        description="정말로 이 클래스를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
-        confirmText="삭제"
-        onConfirm={handleDeleteConfirm}
-        variant="destructive"
-      />
+			{/* 삭제 확인 다이얼로그 */}
+			<ConfirmDialog
+				open={deleteDialogOpen}
+				onOpenChange={setDeleteDialogOpen}
+				title="클래스 삭제"
+				description="정말로 이 클래스를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+				confirmText="삭제"
+				onConfirm={handleDeleteConfirm}
+				variant="destructive"
+			/>
 
-      {/* 상태 변경 다이얼로그 */}
-      <ConfirmDialog
-        open={statusDialogOpen}
-        onOpenChange={setStatusDialogOpen}
-        title="클래스 상태 변경"
-        description={
-          selectedClassId && lessons.find((l) => l.id === selectedClassId)?.status === "ACTIVE"
-            ? "이 클래스를 휴면 상태로 전환하시겠습니까?"
-            : "이 클래스를 활성화하시겠습니까?"
-        }
-        confirmText="확인"
-        onConfirm={handleStatusConfirm}
-      />
+			{/* 상태 변경 다이얼로그 */}
+			<ConfirmDialog
+				open={statusDialogOpen}
+				onOpenChange={setStatusDialogOpen}
+				title="클래스 상태 변경"
+				description={
+					selectedClassId &&
+					lessons.find((l) => l.id === selectedClassId)?.status === 'ACTIVE'
+						? '이 클래스를 휴면 상태로 전환하시겠습니까?'
+						: '이 클래스를 활성화하시겠습니까?'
+				}
+				confirmText="확인"
+				onConfirm={handleStatusConfirm}
+			/>
 
-      {/* 복제 클래스 다이얼로그 */}
-      <ConfirmDialog
-        open={duplicateDialogOpen}
-        onOpenChange={setDuplicateDialogOpen}
-        title="클래스 복제"
-        description="해당 클래스를 복제하시겠습니까? 복제된 클래스는 휴면 상태로 설정됩니다."
-        confirmText="복제"
-        onConfirm={handleDuplicateConfirm}
-      />
+			{/* 복제 클래스 다이얼로그 */}
+			<ConfirmDialog
+				open={duplicateDialogOpen}
+				onOpenChange={setDuplicateDialogOpen}
+				title="클래스 복제"
+				description="해당 클래스를 복제하시겠습니까? 복제된 클래스는 휴면 상태로 설정됩니다."
+				confirmText="복제"
+				onConfirm={handleDuplicateConfirm}
+			/>
 
-      {/* 클래스 생성/수정 모달 */}
-      <CreateClassModal
-        open={createModalOpen}
-        onOpenChange={handleModalClose}
-        classId={editingClassId || undefined}
-      />
-
-    </div>
-  );
+			{/* 클래스 생성/수정 모달 */}
+			<CreateClassModal
+				open={createModalOpen}
+				onOpenChange={handleModalClose}
+				classId={editingClassId || undefined}
+			/>
+		</div>
+	);
 };
 
 export default ClassManagementPage;
