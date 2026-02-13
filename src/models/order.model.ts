@@ -10,7 +10,8 @@ export interface Order {
   scheduleId: number;
   pointTransactionId: number;
   title: string;
-  date: string;
+  startAt: string;
+  endAt: string;
   image: string;
   status: OrderStatus;
   transactionStatus: string;

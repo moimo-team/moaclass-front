@@ -2,6 +2,8 @@ import { delay, http, HttpResponse } from "msw";
 import { httpUrl } from "./mockData/mockData";
 import { MOCK_POINT_HISTORY } from "./mockData/pointMock";
 import { userStore } from "./mockData/userMock";
+import type { PointType } from "@/models/point.model";
+import type { PayStatus } from "@/models/pay.model";
 
 // 포인트 내역 상태 관리 (메모리)
 let pointHistory = [...MOCK_POINT_HISTORY];
@@ -20,7 +22,13 @@ const getUserPoints = http.get(`${httpUrl}/points/me`, async ({ request }) => {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 
-  return HttpResponse.json(sortedHistory, { status: 200 });
+  return HttpResponse.json(
+    {
+      userPoints: userStore.userInfo.point,
+      history: sortedHistory,
+    },
+    { status: 200 },
+  );
 });
 
 // 포인트 충전
@@ -38,7 +46,7 @@ const chargePoint = http.post(
     }
 
     try {
-      const { amount } = (await request.json()) as any;
+      const { amount } = (await request.json()) as { amount: number };
       console.log("Charging points with body:", { amount });
 
       // Mock Data 업데이트 (유저 포인트)
@@ -46,18 +54,26 @@ const chargePoint = http.post(
 
       // Mock Data 업데이트 (포인트 내역 추가)
       const newPointHistory = {
-        pointId: Math.floor(Math.random() * 1000000).toString(),
-        type: "CHARGE" as const,
+        transactionId: Math.floor(Math.random() * 1000000),
+        type: "CHARGE" as PointType,
         title: "포인트 충전",
         amount: amount,
+        coupon: null,
+        status: "COMPLETED" as PayStatus,
         createdAt: new Date().toISOString(), // 현재 시간
       };
       pointHistory.push(newPointHistory);
 
       return HttpResponse.json(
         {
-          message: "포인트가 성공적으로 충전되었습니다.",
-          ...newPointHistory,
+          transaction: {
+            id: 44,
+            amount: 10000,
+            type: "CHARGE",
+            status: "COMPLETED",
+            createdAt: "2026-02-11T21:54:31.586Z",
+          },
+          userPoints: 99902001,
         },
         { status: 201 },
       );

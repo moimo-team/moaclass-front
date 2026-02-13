@@ -16,14 +16,14 @@ export const payPreviewMock = {
   availableCoupons: [
     {
       id: 1,
-      name: "가입 10% 할인",
+      description: "가입 10% 할인",
       discountType: "PERCENT",
       discountValue: 10,
       validUntil: "2026-12-31T23:59:59",
     },
     {
       id: 2,
-      name: "6만원 이상 1만원 할인",
+      description: "6만원 이상 1만원 할인",
       discountType: "FIXED",
       discountValue: 10000,
       validUntil: "2026-01-31T23:59:59",

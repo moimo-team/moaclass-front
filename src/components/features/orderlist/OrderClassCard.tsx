@@ -7,7 +7,7 @@ import { FileText, Pencil, MessageCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReviewModal from "@/components/features/review/SetReviewModal";
 import type { Order, OrderStatus } from "@/models/order.model";
-import { formatFullDateTime } from "@/utils/dateFormat";
+import { formatDateTime, formatFullDateTime } from "@/utils/dateFormat";
 
 interface OrderClassCardProps {
   order: Order;
@@ -75,7 +75,8 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
               </h3>
             </div>
             <p className="text-muted-foreground text-sm">
-              {formatFullDateTime(order.date)}
+              {formatFullDateTime(order.startAt)} ~{" "}
+              {formatDateTime(order.endAt, { type: "time" })}
             </p>
           </div>
 
