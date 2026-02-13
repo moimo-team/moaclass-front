@@ -7,7 +7,10 @@ import StarRating from '@/components/common/StarRating';
 import { FormImageUpload } from '@/components/features/modal/components/FormImageUpload';
 import { FormModal } from '@/components/features/modal/components/FormModal';
 import { Textarea } from '@/components/ui/textarea';
-import { useReviewMutation } from '@/hooks/useReviewMutations';
+import { useReviewMutation, useUpdateReviewMutation } from '@/hooks/useReviewMutations';
+import { useMyReviewQuery } from '@/hooks/useMyReviewQuery';
+import { useEffect } from 'react';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 /**
  * 리뷰 작성을 위한 Zod 스키마
@@ -63,14 +66,22 @@ interface ReviewModalProps {
 	onOpenChange: (open: boolean) => void;
 	/** 후기를 작성할 클래스 아이디 */
 	lessonId?: number;
+	/** 초기 수정 모드 여부 (이미 리뷰가 존재하는지 여부) */
+	isEditMode?: boolean;
 }
 
 /**
  * 클래스 수강 완료 후 후기를 작성할 수 있는 모달 컴포넌트입니다.
  * 별점 부여, 텍스트 후기 작성, 이미지/동영상 첨부 기능을 포함합니다.
  */
-const MyReviewModal: React.FC<ReviewModalProps> = ({ open, onOpenChange, lessonId }) => {
-	const { mutateAsync: writeReview, isPending } = useReviewMutation();
+const MyReviewModal: React.FC<ReviewModalProps> = ({
+	open,
+	onOpenChange,
+	lessonId,
+	isEditMode: initialIsEditMode = false,
+}) => {
+	const { mutateAsync: writeReview, isPending: isWriting } = useReviewMutation();
+	const { mutateAsync: updateReview, isPending: isUpdating } = useUpdateReviewMutation();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const {
 		control,
@@ -78,6 +89,7 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({ open, onOpenChange, lessonI
 		register,
 		getValues,
 		setValue,
+		reset,
 		formState: { isValid },
 	} = useForm<ReviewFormData>({
 		resolver: zodResolver(reviewSchema),
@@ -89,6 +101,31 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({ open, onOpenChange, lessonI
 		},
 		mode: 'onChange',
 	});
+
+	// 기존 리뷰 데이터 조회 (모달이 열릴 때만 조회하도록 최적화)
+	const { data: existingReview, isLoading: isDataLoading } = useMyReviewQuery(lessonId || 0, {
+		enabled: open && initialIsEditMode, // 수정 모드일 때만 데이터 로드
+	});
+	const isEditMode = initialIsEditMode;
+
+	// 데이터 로드 시 폼 초기화
+	useEffect(() => {
+		if (existingReview && open) {
+			reset({
+				rating: existingReview.rating,
+				content: existingReview.content,
+				images: existingReview.images || [],
+				imageFiles: [],
+			});
+		} else if (!open) {
+			reset({
+				rating: 0,
+				content: '',
+				images: [],
+				imageFiles: [],
+			});
+		}
+	}, [existingReview, reset, open]);
 
 	// 이미지 삭제 콜백 (리렌더링 방지를 위해 getValues 사용)
 	const handleRemoveImage = useCallback(
@@ -120,7 +157,17 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({ open, onOpenChange, lessonI
 			});
 		}
 
-		await writeReview(formData);
+		if (isEditMode && existingReview && existingReview.id !== undefined) {
+			// 수정 로직 (훅 사용)
+			await updateReview({
+				reviewId: existingReview.id,
+				lessonId,
+				data: formData,
+			});
+		} else {
+			// 등록 로직 (훅 사용)
+			await writeReview(formData);
+		}
 		onOpenChange(false);
 	};
 
@@ -129,10 +176,17 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({ open, onOpenChange, lessonI
 			isOpen={open}
 			onClose={() => onOpenChange(false)}
 			onSubmit={handleSubmit(onSubmit)}
-			title="클래스 리뷰 작성"
-			submitButtonText="등록"
-			isSubmitDisabled={!isValid}
-			isLoading={isPending}
+			title={isEditMode ? '클래스 리뷰 수정' : '클래스 리뷰 작성'}
+			submitButtonText={isEditMode ? '수정' : '등록'}
+			isSubmitDisabled={!isValid || isDataLoading}
+			isLoading={isWriting || isUpdating || isDataLoading}
+			loadingComponent={
+				isDataLoading ? (
+					<div className="flex flex-col items-center justify-center py-20 gap-4">
+						<LoadingSpinner />
+					</div>
+				) : null
+			}
 			containerClassName="sm:max-w-[440px]"
 		>
 			<div className="flex flex-col items-center gap-8">

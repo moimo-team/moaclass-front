@@ -63,8 +63,8 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 		 * 파일 처리 공통 로직
 		 */
 		const processFiles = async (files: File[]) => {
-			// 단일 이미지 모드
-			if (variant === 'form' && onImageChange) {
+			// 단일 이미지 모드 (form 또는 profile)
+			if ((variant === 'form' || variant === 'profile') && onImageChange) {
 				const file = files[0];
 				const validation = validateImageFile(file);
 				if (!validation.isValid) {

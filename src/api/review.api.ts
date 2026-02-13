@@ -14,7 +14,7 @@ export const getLessonReviews = async (lessonId: number): Promise<Review[]> => {
 
 // 리뷰 작성
 export const writeReview = async (data: FormData) => {
-	const response = await apiClient.post<Review>(`/reviews`, data, {
+	const response = await apiClient.post<ReviewInfo>(`/reviews`, data, {
 		headers: {
 			'Content-Type': 'multipart/form-data',
 		},
@@ -22,13 +22,17 @@ export const writeReview = async (data: FormData) => {
 	return response.data;
 };
 // 내가 작성한 특정 클래스 리뷰 조회
-export const getMyClassReview = async (lessonId: number) => {
-	const response = await apiClient.get<Review>(`/reviews/me/${lessonId}`);
+export const getMyReview = async (lessonId: number) => {
+	const response = await apiClient.get<ReviewInfo>(`/reviews/me/${lessonId}`);
 	return response.data;
 };
 // 리뷰 수정
-export const updateReview = async (reviewId: number, review: ReviewInfo) => {
-	const response = await apiClient.put<Review>(`/reviews/${reviewId}`, review);
+export const updateReview = async (reviewId: number, data: FormData) => {
+	const response = await apiClient.put<ReviewInfo>(`/reviews/${reviewId}`, data, {
+		headers: {
+			'Content-Type': 'multipart/form-data',
+		},
+	});
 	return response.data;
 };
 // 리뷰 삭제

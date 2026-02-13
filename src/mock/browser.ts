@@ -17,6 +17,7 @@ import { pointHandlers } from './pointHandler';
 import { regionHandler } from './regionHandler';
 import { scheduleHandlers } from './scheduleHandler';
 import { userInfoHandler } from './userInfoHandler';
+import { reviewHandler } from './reviewHandler';
 
 const handlers = [
 	...authHandler,
@@ -36,6 +37,7 @@ const handlers = [
 	...likeHandlers,
 	...pointHandlers,
 	...orderHandler,
+	...reviewHandler,
 ];
 
 export const worker = setupWorker(...handlers);

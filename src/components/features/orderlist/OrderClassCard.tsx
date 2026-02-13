@@ -32,6 +32,9 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
 	const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 	const isInactive = order.status === '수강완료' || order.status === '수강취소';
 
+	// 리뷰 작성 여부 확인 (Order 모델에 추가된 reviewId 필드 사용)
+	const hasReview = order.reviewId !== null;
+
 	return (
 		<Card
 			className={cn(
@@ -96,7 +99,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
 								onClick={() => onDetailClick?.(order)}
 							/>
 							<ActionButton
-								label="후기 작성"
+								label={hasReview ? '리뷰 수정' : '리뷰 작성'}
 								theme="primary"
 								icon={
 									<Pencil
@@ -134,6 +137,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
 				open={isReviewModalOpen}
 				onOpenChange={setIsReviewModalOpen}
 				lessonId={order.lessonId}
+				isEditMode={hasReview}
 			/>
 		</Card>
 	);
