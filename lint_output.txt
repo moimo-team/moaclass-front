@@ -1,0 +1,418 @@
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/api/lesson.api.ts
+  84:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  90:70  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/class-manage/schedule/ScheduleSidebar.tsx
+  39:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/class-manage/schedule/ScheduleSidebar.tsx:39:5
+  37 |   // 선택된 날짜가 바뀌면 선택 상태 초기화
+  38 |   useEffect(() => {
+> 39 |     setSelectedScheduleIds([]);
+     |     ^^^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  40 |   }, [selectedDates]);
+  41 |
+  42 |   const dateKeys = selectedDates.map((d) => toYYYYMMDD(d.toISOString()));  react-hooks/set-state-in-effect
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/coupon/CouponModal.tsx
+  33:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/coupon/CouponModal.tsx:33:7
+  31 |   useEffect(() => {
+  32 |     if (isOpen) {
+> 33 |       setSelectedCouponId(selectedId || null);
+     |       ^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  34 |     }
+  35 |   }, [isOpen, selectedId]);
+  36 |  react-hooks/set-state-in-effect
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/home/HostedMeetingsList.tsx
+  60:77  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/map/kakaoMaps/KakaoMapSearch.tsx
+  53:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  53:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/map/kakaoMaps/KakaoMapView.tsx
+  15:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/modal/create/CreateClassModal.tsx
+  108:30  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/modal/create/CreateClassModal.tsx:108:30
+  106 |   });
+  107 |
+> 108 |   const selectedCategoryId = watch("classCategoryId");
+      |                              ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  109 |   const { data: categories } = useCategoryQuery();
+  110 |   const { data: subCategories, isLoading: isSubCategoriesLoading } = useSubCategoryQuery(selectedCategoryId);
+  111 |  react-hooks/incompatible-library
+  467:43  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  480:50  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/modal/create/CreateMeetingModal.tsx
+    4:1   error    There should be no empty line within import group                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              import/order
+    7:1   error    There should be at least one empty line between import groups                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  import/order
+    8:1   error    There should be at least one empty line between import groups                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  import/order
+    8:1   error    `@/hooks/useInterestQuery` import should occur after import of `@/components/ui/slider`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        import/order
+    9:1   error    `react-hook-form` import should occur after import of `lucide-react`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           import/order
+   14:1   error    There should be at least one empty line between import groups                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  import/order
+   91:30  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/modal/create/CreateMeetingModal.tsx:91:30
+  89 |
+  90 |   // 폼 데이터 감시
+> 91 |   const selectedInterestId = watch("interestId");
+     |                              ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  92 |   const maxParticipants = watch("maxParticipants");
+  93 |   const meetingDate = watch("meetingDate");
+  94 |   const meetingHour = watch("meetingHour");  react-hooks/incompatible-library
+  168:71  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+  227:21  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+  321:67  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/modal/create/CreateScheduleModal.tsx
+  34:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/modal/create/CreateScheduleModal.tsx:34:7
+  32 |   useEffect(() => {
+  33 |     if (isOpen) {
+> 34 |       setActiveTab(selectedDates.length > 0 ? "single" : "recurring");
+     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  35 |     }
+  36 |   }, [isOpen, selectedDates.length]);
+  37 |  react-hooks/set-state-in-effect
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/modal/point/PointChargeModal.tsx
+  25:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/modal/point/PointChargeModal.tsx:25:7
+  23 |   useEffect(() => {
+  24 |     if (open) {
+> 25 |       setAmount(0);
+     |       ^^^^^^^^^ Avoid calling setState() directly within an effect
+  26 |     }
+  27 |   }, [open]);
+  28 |  react-hooks/set-state-in-effect
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/modal/profile/UserProfileModal.tsx
+   18:1   error    There should be no empty line within import group                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         import/order
+   23:1   error    `@/components/ui/skeleton` import should occur before import of `@/hooks/useInterestQuery`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                import/order
+   24:1   error    `@/constants/regions` import should occur before import of `@/hooks/useInterestQuery`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     import/order
+   25:1   error    `@/components/features/modal/components/FormImageUpload` import should occur before import of `@/components/features/modal/components/FormModal`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          import/order
+   26:1   error    `@/components/features/modal/components/FormTextarea` import should occur before import of `@/components/ui/input`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        import/order
+   27:1   error    `@/components/common/SelectableBadge` import should occur before import of `@/components/features/modal/components/FormModal`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             import/order
+   28:1   error    `@/hooks/useCategoryQuery` import should occur before import of `@/hooks/useInterestQuery`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                import/order
+   69:17  warning  'allInterests' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   unused-imports/no-unused-vars
+  246:41  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/features/modal/profile/UserProfileModal.tsx:246:41
+  244 |         {isReadOnly ? (
+  245 |           <div className="w-50 bg-gray-50 border border-gray-100 rounded-lg p-3 text-sm text-gray-700">
+> 246 |             {REGIONS.find(r => r.id === watch("regionId"))?.name || "지역 정보 없음"}
+      |                                         ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  247 |           </div>
+  248 |         ) : (
+  249 |           <Controller  react-hooks/incompatible-library
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/ui/badge.tsx
+  50:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/ui/button.tsx
+  60:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/ui/form.tsx
+  172:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/ui/sidebar.tsx
+  664:26  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/ui/sidebar.tsx:664:26
+  662 |   // Random width between 50 to 90%.
+  663 |   const width = React.useMemo(() => {
+> 664 |     return `${Math.floor(Math.random() * 40) + 50}%`
+      |                          ^^^^^^^^^^^^^ Cannot call impure function
+  665 |   }, [])
+  666 |
+  667 |   return (  react-hooks/purity
+  771:3   warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-refresh/only-export-components
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/components/ui/toggle.tsx
+  44:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/hooks/useAuthQuery.ts
+  40:16  warning  'error' is defined but never used  unused-imports/no-unused-vars
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/hooks/useChatSocket.ts
+  100:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/hooks/useChatSocket.ts:100:7
+   98 |     const socket = socketRef.current;
+   99 |     if (!socket || !meetingId) {
+> 100 |       setInitialMessages([]);
+      |       ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  101 |       return;
+  102 |     }
+  103 |  react-hooks/set-state-in-effect
+  107:52  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-explicit-any
+  134:66  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/hooks/useDeleteMeetingDialog.tsx
+  36:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/hooks/useKakaoMap.ts
+  15:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/hooks/useKakaoMap.ts:15:7
+  13 |     // 이미 로드되어 있는지 확인
+  14 |     if (window.kakao && window.kakao.maps) {
+> 15 |       setIsLoaded(true);
+     |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  16 |       return;
+  17 |     }
+  18 |  react-hooks/set-state-in-effect
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/hooks/useLessonMutations.ts
+  19:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  52:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/hooks/useMeetingMutations.ts
+  15:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  48:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  65:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/main.tsx
+  8:1  error  `@tanstack/react-query` import should occur before import of `react-dom/client`  import/order
+  9:1  error  `@react-oauth/google` import should occur before import of `react-dom/client`    import/order
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/mock/authHandler.ts
+   14:57  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   71:63  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:63  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  158:67  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  190:49  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  211:52  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  239:49  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  270:55  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  330:33  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  457:20  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  467:16  warning  'e' is defined but never used             unused-imports/no-unused-vars
+  485:24  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  493:39  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/mock/meetingHandler.ts
+   46:14  warning  'error' is defined but never used         unused-imports/no-unused-vars
+   90:14  warning  'error' is defined but never used         unused-imports/no-unused-vars
+  127:12  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/mock/mockData/socketMock.ts
+    6:34  error  The `Function` type accepts any function-like value.
+Prefer explicitly defining any function parameters and return type  @typescript-eslint/no-unsafe-function-type
+    8:35  error  The `Function` type accepts any function-like value.
+Prefer explicitly defining any function parameters and return type  @typescript-eslint/no-unsafe-function-type
+   16:36  error  Unexpected any. Specify a different type                                                                                 @typescript-eslint/no-explicit-any
+   24:36  error  The `Function` type accepts any function-like value.
+Prefer explicitly defining any function parameters and return type  @typescript-eslint/no-unsafe-function-type
+   48:48  error  Unexpected any. Specify a different type                                                                                 @typescript-eslint/no-explicit-any
+   83:51  error  Unexpected any. Specify a different type                                                                                 @typescript-eslint/no-explicit-any
+   97:22  error  Unexpected any. Specify a different type                                                                                 @typescript-eslint/no-explicit-any
+  170:32  error  Unexpected any. Specify a different type                                                                                 @typescript-eslint/no-explicit-any
+  175:44  error  Unexpected any. Specify a different type                                                                                 @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/mock/mockData/userMock.ts
+  20:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/mock/orderHandler.ts
+  120:66  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:14  warning  'error' is defined but never used         unused-imports/no-unused-vars
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/mock/payHandler.ts
+   22:13  warning  'scheduleId' is assigned a value but never used. Allowed unused vars must match /^_/u  unused-imports/no-unused-vars
+   23:13  warning  'quantity' is assigned a value but never used. Allowed unused vars must match /^_/u    unused-imports/no-unused-vars
+   26:14  warning  'error' is defined but never used                                                      unused-imports/no-unused-vars
+   64:14  warning  'error' is defined but never used                                                      unused-imports/no-unused-vars
+   87:15  warning  'quantity' is assigned a value but never used. Allowed unused vars must match /^_/u    unused-imports/no-unused-vars
+   87:25  warning  'scheduleId' is assigned a value but never used. Allowed unused vars must match /^_/u  unused-imports/no-unused-vars
+   87:49  warning  'couponId' is assigned a value but never used. Allowed unused vars must match /^_/u    unused-imports/no-unused-vars
+   88:35  error    Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  126:14  warning  'error' is defined but never used                                                      unused-imports/no-unused-vars
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/models/kakao-maps.model.ts
+   4:12  error  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+   8:1   error  ES2015 module syntax is preferred over namespaces  @typescript-eslint/no-namespace
+  40:3   error  ES2015 module syntax is preferred over namespaces  @typescript-eslint/no-namespace
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/chat/Chatting.tsx
+  76:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/chat/Chatting.tsx:76:7
+  74 |   useEffect(() => {
+  75 |     if (initialMessages) {
+> 76 |       setMessages(initialMessages);
+     |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  77 |     }
+  78 |   }, [initialMessages]);
+  79 |                     react-hooks/set-state-in-effect
+  94:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/chat/Chatting.tsx:94:9
+  92 |
+  93 |       if (targetRoom) {
+> 94 |         setSelectedMeeting(targetRoom);
+     |         ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  95 |       }
+  96 |     }
+  97 |   }, [isLoading, chatRooms, location.state]);  react-hooks/set-state-in-effect
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/class/LessonList.tsx
+  86:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/class/LessonList.tsx:86:5
+  84 |     };
+  85 |     setAllFilters(filtersFromUrl);
+> 86 |     setIsInitialized(true);
+     |     ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  87 |   }, [searchParams, setAllFilters]);
+  88 |
+  89 |   const currentPage = Number(searchParams.get("page")) || 1;  react-hooks/set-state-in-effect
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/meetings/MeetingDetail.tsx
+   14:1   error  There should be no empty line within import group                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          import/order
+   21:1   error  `@/components/features/modal/ConfirmDialog` import should occur before import of `@/components/features/modal/create/CreateMeetingModal`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   import/order
+   22:1   error  `@/hooks/useMeQuery` import should occur before import of `@/store/authStore`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              import/order
+   23:1   error  `@/components/features/meetings/MeetingActionButtons` import should occur before import of `@/components/features/modal/create/CreateMeetingModal`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         import/order
+   25:1   error  `@/components/features/meetings/MeetingParticipantsCard` import should occur before import of `@/components/features/modal/create/CreateMeetingModal`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      import/order
+   27:1   error  `@/lib/utils` import should occur before import of `@/store/authStore`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     import/order
+   28:1   error  `@/hooks/useParticipationsQuery` import should occur before import of `@/store/authStore`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  import/order
+   98:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/meetings/MeetingDetail.tsx:98:7
+   96 |         (meeting) => meeting.meetingId === Number(meetingId),
+   97 |       );
+>  98 |       setIsPending(isAlreadyApplied);
+      |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+   99 |     }
+  100 |   }, [meetingId, pendingMeetings]);
+  101 |  react-hooks/set-state-in-effect
+  144:21  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/mypage/CancelClass.tsx
+  54:29  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/mypage/CancelClass.tsx:54:29
+  52 |   });
+  53 |
+> 54 |   const watchDetailReason = watch("detailReason");
+     |                             ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  55 |
+  56 |   if (!cancelClassInfo) {
+  57 |     return (  react-hooks/incompatible-library
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/user/FindPassword.tsx
+  17:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/user/Join.tsx
+   14:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  120:14  warning  'error' is defined but never used                                                                                               unused-imports/no-unused-vars
+  143:14  warning  'error' is defined but never used                                                                                               unused-imports/no-unused-vars
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/user/Login.tsx
+  22:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  71:18  warning  'error' is defined but never used                                                                                               unused-imports/no-unused-vars
+  71:25  error    Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/user/ResetPassword.tsx
+  17:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/user/UserInfo.tsx
+  48:29  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/Users/seoin/Desktop/KDT/moaclass-front/src/pages/user/UserInfo.tsx:48:29
+  46 |   });
+  47 |
+> 48 |   const selectedInterests = watch("interests");
+     |                             ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  49 |
+  50 |   const toggleInterest = (interestId: number) => {
+  51 |     const currentInterests = [...selectedInterests];  react-hooks/incompatible-library
+  73:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               unused-imports/no-unused-vars
+
+✖ 117 problems (85 errors, 32 warnings)
+  20 errors and 0 warnings potentially fixable with the `--fix` option.
+

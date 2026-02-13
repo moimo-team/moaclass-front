@@ -1,5 +1,6 @@
-import { http, HttpResponse, delay } from "msw";
-import { httpUrl } from "./mockData/mockData";
+import { http, HttpResponse, delay } from 'msw';
+
+import { httpUrl } from './mockData/mockData';
 import {
   MOCK_CANCEL_ORDER,
   MOCK_ORDER_CANCEL_DETAIL,
@@ -117,30 +118,22 @@ const cancelClass = http.put(
 
 // 결제 상세 조회
 const getOrderDetail = http.get(
-  `${httpUrl}/payments/detail/:pointTransactionId`,
-  async ({ request, params }) => {
-    await delay(500);
-    const token = request.headers.get("Authorization");
-    if (!token) {
-      return HttpResponse.json(
-        { message: "토큰이 없습니다." },
-        { status: 401 },
-      );
-    }
+	`${httpUrl}/payments/detail/:pointTransactionId`,
+	async ({ request, params }) => {
+		await delay(500);
+		const token = request.headers.get('Authorization');
+		if (!token) {
+			return HttpResponse.json({ message: '토큰이 없습니다.' }, { status: 401 });
+		}
 
-    const { pointTransactionId } = params;
+		const { pointTransactionId } = params;
 
-    if (pointTransactionId === "1") {
-      return HttpResponse.json(MOCK_ORDER_DETAIL, { status: 200 });
-    } else {
-      return HttpResponse.json(MOCK_ORDER_CANCEL_DETAIL, { status: 200 });
-    }
-  },
+		if (pointTransactionId === '1') {
+			return HttpResponse.json(MOCK_ORDER_DETAIL, { status: 200 });
+		} else {
+			return HttpResponse.json(MOCK_ORDER_CANCEL_DETAIL, { status: 200 });
+		}
+	},
 );
 
-export const orderHandler = [
-  getOrderList,
-  getCancelClass,
-  cancelClass,
-  getOrderDetail,
-];
+export const orderHandler = [getOrderList, getCancelClass, cancelClass, getOrderDetail];

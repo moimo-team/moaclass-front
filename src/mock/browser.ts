@@ -1,21 +1,22 @@
 import { setupWorker } from 'msw/browser';
+
 import { authHandler } from './authHandler';
-import { meetingHandler } from './meetingHandler';
-import { getInterests } from './interestHandler';
-import { getMyMeetings } from './meHandler';
-import { userInfoHandler } from './userInfoHandler';
-import { chatHandler } from './chatHandler';
-import { participationHandlers } from './participationHandler';
-import { notificationHandlers } from './notificationHandler';
-import { lessonHandlers } from './lessonHandler';
-import { regionHandler } from './regionHandler';
 import { categoryHandler } from './categoryHandler';
-import { payHandler } from './payHandler';
+import { chatHandler } from './chatHandler';
 import { couponHandlers } from './couponHandler';
+import { getInterests } from './interestHandler';
+import { lessonHandlers } from './lessonHandler';
 import { likeHandlers } from './likeHandler';
-import { pointHandlers } from './pointHandler';
-import { scheduleHandlers } from './scheduleHandler';
+import { meetingHandler } from './meetingHandler';
+import { getMyMeetings } from './meHandler';
+import { notificationHandlers } from './notificationHandler';
 import { orderHandler } from './orderHandler';
+import { participationHandlers } from './participationHandler';
+import { payHandler } from './payHandler';
+import { pointHandlers } from './pointHandler';
+import { regionHandler } from './regionHandler';
+import { scheduleHandlers } from './scheduleHandler';
+import { userInfoHandler } from './userInfoHandler';
 
 const handlers = [
 	...authHandler,
