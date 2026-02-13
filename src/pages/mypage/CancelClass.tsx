@@ -186,7 +186,7 @@ const CancelClass = () => {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span>ㄴ 쿠폰</span>
+                  <span>ㄴ 쿠폰 할인</span>
                   <span>
                     -
                     {cancelClassInfo.paymentInfo.discountAmount.toLocaleString()}
