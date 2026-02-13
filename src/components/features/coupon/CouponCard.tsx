@@ -1,4 +1,4 @@
-import type { CouponInfo } from "@/models/coupon.model";
+import type { CouponInfo, CouponStatus } from "@/models/coupon.model";
 import { formatFullDateTime } from "@/utils/dateFormat";
 
 // export interface Coupon {
@@ -22,6 +22,19 @@ interface CouponCardProps {
   showSelectionIndicator?: boolean;
 }
 
+const getStatusBadgeText = (status: CouponStatus) => {
+  switch (status) {
+    case "USED":
+      return "사용완료";
+    case "AVAILABLE":
+      return "사용가능";
+    case "EXPIRED":
+      return "기간만료";
+    default:
+      return status;
+  }
+};
+
 export const CouponCard = ({
   coupon,
   selected = false,
@@ -43,7 +56,7 @@ export const CouponCard = ({
   return (
     <div
       onClick={isAvailable ? onClick : undefined}
-      className={`relative p-5 rounded-xl border transition-all overflow-hidden group ${
+      className={`relative p-5 rounded-xl border transition-all overflow-hidden group h-full ${
         isAvailable
           ? `bg-white cursor-pointer shadow-sm ${
               selected
@@ -85,7 +98,7 @@ export const CouponCard = ({
               isAvailable ? "text-slate-800" : "text-slate-400"
             }`}
           >
-            {coupon.name}
+            {coupon.description}
           </h3>
         </div>
 
@@ -93,7 +106,7 @@ export const CouponCard = ({
           <span
             className={`text-[13px] font-bold ${isAvailable ? "text-slate-800" : "text-slate-400"}`}
           >
-            사용가능
+            {getStatusBadgeText(coupon.status!)}
           </span>
 
           <div className="text-right">
