@@ -42,9 +42,8 @@ const chargePoint = http.post(`${httpUrl}/points/charge`, async ({ request }) =>
 		return HttpResponse.json({ message: '토큰이 없습니다.' }, { status: 401 });
 	}
 
-	try {
-		const { amount } = (await request.json()) as { amount: number };
-		console.log('Charging points with body:', { amount });
+    try {
+      const { amount } = (await request.json()) as { amount: number };
 
 		// Mock Data 업데이트 (유저 포인트)
 		userStore.updatePoint(amount);
@@ -61,25 +60,26 @@ const chargePoint = http.post(`${httpUrl}/points/charge`, async ({ request }) =>
 		};
 		pointHistory.push(newPointHistory);
 
-		return HttpResponse.json(
-			{
-				transaction: {
-					id: 44,
-					amount: 10000,
-					type: 'CHARGE',
-					status: 'COMPLETED',
-					createdAt: '2026-02-11T21:54:31.586Z',
-				},
-				userPoints: 99902001,
-			},
-			{ status: 201 },
-		);
-	} catch {
-		return HttpResponse.json(
-			{ message: '포인트 충전 중 오류가 발생했습니다.' },
-			{ status: 500 },
-		);
-	}
-});
+      return HttpResponse.json(
+        {
+          transaction: {
+            id: 44,
+            amount: amount,
+            type: "CHARGE",
+            status: "COMPLETED",
+            createdAt: "2026-02-11T21:54:31.586Z",
+          },
+          userPoints: userStore.userInfo.point,
+        },
+        { status: 201 },
+      );
+    } catch (error) {
+      return HttpResponse.json(
+        { message: "포인트 충전 중 오류가 발생했습니다." },
+        { status: 500 },
+      );
+    }
+  },
+);
 
 export const pointHandlers = [getUserPoints, chargePoint];
