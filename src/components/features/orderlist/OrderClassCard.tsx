@@ -83,64 +83,65 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
 						</p>
 					</div>
 
-					{/* Right: Actions */}
-					<div className="p-5 border-t sm:border-t-0 sm:border-l border-primary/10 bg-sidebar/20 flex flex-col justify-center gap-2 min-w-[200px]">
-						<div className="grid grid-cols-2 gap-2">
-							<ActionButton
-								label="결제 상세"
-								theme="outline"
-								icon={
-									<FileText
-										className="w-3.5 h-3.5 text-primary"
-										fill="currentColor"
-									/>
-								}
-								className="w-full"
-								onClick={() => onDetailClick?.(order)}
-							/>
-							<ActionButton
-								label={hasReview ? '리뷰 수정' : '리뷰 작성'}
-								theme="primary"
-								icon={
-									<Pencil
-										className="w-3.5 h-3.5 text-primary"
-										fill="currentColor"
-									/>
-								}
-								disabled={order.status !== '수강완료'}
-								className="w-full"
-								onClick={() => setIsReviewModalOpen(true)}
-							/>
-							<ActionButton
-								label="채팅 문의"
-								theme="carrot"
-								icon={
-									<MessageCircle className="w-3.5 h-3.5 text-carrot fill-carrot" />
-								}
-								className="w-full"
-							/>
-							<ActionButton
-								label="수강 취소"
-								theme="destructive"
-								icon={<X className="w-3.5 h-3.5" />}
-								disabled={order.status !== '수강예정'}
-								className="w-full"
-								onClick={() =>
-									navigate(`/mypage/class/orders/${order.enrollmentId}/cancel`)
-								}
-							/>
-						</div>
-					</div>
-				</div>
-			</CardContent>
-			<MyReviewModal
-				open={isReviewModalOpen}
-				onOpenChange={setIsReviewModalOpen}
-				lessonId={order.lessonId}
-				isEditMode={hasReview}
-			/>
-		</Card>
-	);
+          {/* Right: Actions */}
+          <div className="p-5 border-t sm:border-t-0 sm:border-l border-primary/10 bg-sidebar/20 flex flex-col justify-center gap-2 min-w-[200px]">
+            <div className="grid grid-cols-2 gap-2">
+              <ActionButton
+                label="결제 상세"
+                theme="outline"
+                icon={
+                  <FileText
+                    className="w-3.5 h-3.5 text-primary"
+                    fill="currentColor"
+                  />
+                }
+                className="w-full"
+                onClick={() => onDetailClick?.(order)}
+              />
+              <ActionButton
+                label="후기 작성"
+                theme="primary"
+                icon={
+                  <Pencil
+                    className="w-3.5 h-3.5 text-primary"
+                    fill="currentColor"
+                  />
+                }
+                disabled={order.status !== "수강완료"}
+                className="w-full"
+                onClick={() => setIsReviewModalOpen(true)}
+              />
+              <ActionButton
+                label="채팅 문의"
+                theme="carrot"
+                icon={
+                  <MessageCircle className="w-3.5 h-3.5 text-carrot fill-carrot" />
+                }
+                className="w-full"
+              />
+              <ActionButton
+                label="수강 취소"
+                theme="destructive"
+                icon={<X className="w-3.5 h-3.5" />}
+                disabled={order.status !== "수강예정"}
+                className="w-full"
+                onClick={() =>
+                  navigate(
+                    `/mypage/class/orders/${order.enrollmentId}/cancel-info`,
+                  )
+                }
+              />
+            </div>
+          </div>
+        </div>
+      </CardContent>
+      <ReviewModal
+        open={isReviewModalOpen}
+        onOpenChange={setIsReviewModalOpen}
+        orderId={order.enrollmentId}
+      />
+    </Card>
+  );
 };
 
 export default OrderClassCard;
