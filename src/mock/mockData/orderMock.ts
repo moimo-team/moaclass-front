@@ -35,9 +35,9 @@ export const MOCK_CANCEL_ORDER = {
     },
   },
   refundInfo: {
-    refundRate: 1,
-    refundDiscountAmount: 0,
-    refundFinalAmount: 54000,
+    paidAmount: 54000, // 실 결제금액
+    deductedAmount: 16200, // 차감된 포인트
+    refundAmount: 37800, // 환급된 포인트
   },
 };
 

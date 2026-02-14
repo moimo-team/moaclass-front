@@ -38,9 +38,9 @@ export interface CancelClassResponse {
     coupon: CouponInfo;
   };
   refundInfo: {
-    refundRate: number;
-    refundDiscountAmount: number;
-    refundFinalAmount: number;
+    paidAmount: number; // 실 결제금액
+    deductedAmount: number; // 차감된 포인트
+    refundAmount: number; // 환급된 포인트
   };
 }
 

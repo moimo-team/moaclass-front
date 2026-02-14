@@ -209,30 +209,28 @@ const CancelClass = () => {
               <div className="flex justify-between items-center">
                 <span className="font-bold text-gray-600">환불 금액</span>
                 <span className="font-bold text-gray-900">
-                  {cancelClassInfo.refundInfo.refundFinalAmount.toLocaleString()}
-                  원
+                  {cancelClassInfo.refundInfo.refundAmount.toLocaleString()}원
                 </span>
               </div>
               <div className="pl-4 space-y-2 text-sm text-gray-500">
                 <div className="flex justify-between">
                   <span>ㄴ 실 결제 금액</span>
                   <span>
-                    {cancelClassInfo.paymentInfo.finalPrice.toLocaleString()}원
+                    {cancelClassInfo.refundInfo.paidAmount.toLocaleString()}원
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>ㄴ 환불 차감액</span>
                   <span>
                     -
-                    {cancelClassInfo.refundInfo.refundDiscountAmount.toLocaleString()}
+                    {cancelClassInfo.refundInfo.deductedAmount.toLocaleString()}
                     원
                   </span>
                 </div>
                 <div className="flex justify-between font-medium">
                   <span>ㄴ 실 환불 금액</span>
                   <span>
-                    {cancelClassInfo.refundInfo.refundFinalAmount.toLocaleString()}
-                    원
+                    {cancelClassInfo.refundInfo.refundAmount.toLocaleString()}원
                   </span>
                 </div>
               </div>
