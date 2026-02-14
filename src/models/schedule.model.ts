@@ -1,3 +1,15 @@
+export type LessonScheduleStatus = "RECRUITING" | "CLOSED" | "COMPLETED";
+
+// GET /lessons 응답에 포함된 축약된 스케줄 정보
+export interface Schedule {
+  id: number;
+  startAt: string;
+  endAt: string;
+  status: LessonScheduleStatus;
+  currentParticipants: number;
+}
+
+// 특정 스케줄의 상세 정보
 export interface LessonSchedule {
   id: number;
   lessonId: number;

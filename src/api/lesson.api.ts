@@ -3,6 +3,7 @@ import type {
   FetchLessonsParams,
   FetchLessonsResponse,
   Lesson,
+  LessonDetail,
 } from "@/models/lesson.model";
 
 // --- 클래스 조회(GET) 관련 ---
@@ -15,39 +16,29 @@ export const fetchLatestLessons = async (): Promise<Lesson[]> => {
 export const fetchLessons = async (
   mappedParams: FetchLessonsParams,
 ): Promise<FetchLessonsResponse> => {
-  try {
-    const queryParams = new URLSearchParams();
+  const queryParams = new URLSearchParams();
 
-    Object.entries(mappedParams).forEach(([key, value]) => {
-      if (value === undefined || value === null) return;
+  Object.entries(mappedParams).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
 
-      // 배열인 경우 각 요소를 개별 쿼리 파라미터로 추가
-      if (Array.isArray(value)) {
-        value.forEach((item) => queryParams.append(key, String(item)));
-      } else {
-        queryParams.append(key, String(value));
-      }
-    });
+    // 배열인 경우 쉼표로 구분된 하나의 쿼리 파라미터로 추가
+    if (Array.isArray(value)) {
+      queryParams.append(key, value.map(String).join(','));
+    } else {
+      queryParams.append(key, String(value));
+    }
+  });
 
-    const queryString = queryParams.toString();
-    const url = queryString ? `/lessons?${queryString}` : "/lessons";
+  const queryString = queryParams.toString();
+  const url = queryString ? `/lessons?${queryString}` : "/lessons";
 
-    const response = await apiClient.get<FetchLessonsResponse>(url);
-    return response.data;
-  } catch (error) {
-    console.error("fetchLessons error:", error);
-    throw error;
-  }
+  const response = await apiClient.get<FetchLessonsResponse>(url);
+  return response.data;
 };
 
-export const fetchLesson = async (lessonId: number): Promise<Lesson> => {
-  try {
-    const response = await apiClient.get<Lesson>(`/lessons/${lessonId}`);
-    return response.data;
-  } catch (error) {
-    console.error(`fetchLesson (ID: ${lessonId}) error:`, error);
-    throw error;
-  }
+export const fetchLesson = async (lessonId: number): Promise<LessonDetail> => {
+  const response = await apiClient.get<LessonDetail>(`/lessons/${lessonId}`);
+  return response.data;
 };
 
 // --- 클래스 생성/수정/삭제 관련 ---
@@ -74,7 +65,7 @@ export const updateLesson = async (lessonId: number, formData: FormData) => {
 
 // 3. 레슨 삭제
 export const deleteLesson = async (lessonId: number) => {
-  const response = await apiClient.delete(`/lessons/${lessonId}`);
+  const response = await apiClient.delete(`/likes/${lessonId}`);
   return response.data;
 };
 

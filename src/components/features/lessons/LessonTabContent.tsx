@@ -11,44 +11,44 @@ import type { Review } from '@/models/review.model';
 import type { useNavigate } from 'react-router-dom';
 
 interface LessonTabContentProps {
-	activeTab: string;
-	tabTitles: { id: string; title: string }[];
-	handleTabClick: (id: string) => void;
-	onSectionRef: (id: string, el: HTMLElement | null) => void;
-	description: string;
-	curriculum: string;
-	teacherProfile:
-		| {
-				userId: number;
-				nickname: string;
-				image: string;
-				introduction: string;
-		  }
-		| undefined;
-	latitude: number;
-	longitude: number;
-	address: string;
-	detailAddress: string;
-	directionsText: string;
-	navigate: ReturnType<typeof useNavigate>;
-	reviews: Review[];
+  activeTab: string;
+  tabTitles: { id: string; title: string }[];
+  handleTabClick: (id: string) => void;
+  onSectionRef: (id: string, el: HTMLElement | null) => void;
+  description: string;
+  curriculum: string;
+  teacher:
+    | {
+        id: number;
+        nickname: string;
+        image: string;
+        introduction: string;
+      }
+    | undefined;
+  latitude: number;
+  longitude: number;
+  address: string;
+  detailAddress: string;
+  directionsText: string;
+  navigate: ReturnType<typeof useNavigate>;
+  reviews: Review[];
 }
 
 export const LessonTabContent = ({
-	activeTab,
-	tabTitles,
-	handleTabClick,
-	onSectionRef,
-	description,
-	curriculum,
-	teacherProfile,
-	latitude,
-	longitude,
-	address,
-	detailAddress,
-	directionsText,
-	navigate,
-	reviews,
+  activeTab,
+  tabTitles,
+  handleTabClick,
+  onSectionRef,
+  description,
+  curriculum,
+  teacher,
+  latitude,
+  longitude,
+  address,
+  detailAddress,
+  directionsText,
+  navigate,
+  reviews,
 }: LessonTabContentProps) => {
 	return (
 		<>
@@ -99,41 +99,39 @@ export const LessonTabContent = ({
 					</Card>
 				</section>
 
-				<section id="momento" ref={(el) => onSectionRef('momento', el)}>
-					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
-						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
-							<CardTitle className="text-xl font-bold">모멘토 소개</CardTitle>
-						</CardHeader>
-						<CardContent className="p-6">
-							{teacherProfile && (
-								<div className="flex items-center gap-4 mb-6 p-4 border rounded-lg bg-secondary/10">
-									<img
-										src={teacherProfile.image || defaultProfileImage}
-										alt={teacherProfile.nickname}
-										className="w-20 h-20 rounded-full object-cover border border-border flex-shrink-0"
-									/>
-									<div className="flex-1">
-										<h3 className="text-xl font-semibold mb-1">
-											{teacherProfile.nickname}
-										</h3>
-										<Button
-											variant="link"
-											className="p-0 h-auto text-primary text-sm hover:underline"
-											onClick={() =>
-												navigate(`/mypage/profile/${teacherProfile.userId}`)
-											}
-										>
-											모멘토 페이지 바로가기
-										</Button>
-									</div>
-								</div>
-							)}
-							<p className="text-base text-foreground whitespace-pre-wrap leading-relaxed">
-								{teacherProfile?.introduction || '모멘토 소개가 없습니다.'}
-							</p>
-						</CardContent>
-					</Card>
-				</section>
+        <section id="momento" ref={(el) => onSectionRef("momento", el)}>
+          <Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
+            <CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
+              <CardTitle className="text-xl font-bold">모멘토 소개</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              {teacher && (
+                <div className="flex items-center gap-4 mb-6 p-4 border rounded-lg bg-secondary/10">
+                  <img
+                    src={teacher.image || defaultProfileImage}
+                    alt={teacher.nickname}
+                    className="w-20 h-20 rounded-full object-cover border border-border flex-shrink-0"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold mb-1">
+                      {teacher.nickname}
+                    </h3>
+                    <Button
+                      variant="link"
+                      className="p-0 h-auto text-primary text-sm hover:underline"
+                      onClick={() => navigate(`/mypage/profile/${teacher.id}`)}
+                    >
+                      모멘토 페이지 바로가기
+                    </Button>
+                  </div>
+                </div>
+              )}
+              <p className="text-base text-foreground whitespace-pre-wrap leading-relaxed">
+                {teacher?.introduction || "모멘토 소개가 없습니다."}
+              </p>
+            </CardContent>
+          </Card>
+        </section>
 
 				<section id="location" ref={(el) => onSectionRef('location', el)}>
 					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
