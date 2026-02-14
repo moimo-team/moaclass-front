@@ -51,11 +51,9 @@ export const LessonReservationSidebar = ({
   maxParticipants,
   isLiked,
 }: LessonReservationSidebarProps) => {
-  const [selectedDate, setSelectedDate] = useState<string | undefined>(
-    undefined,
-  );
-  const [headcount, setHeadcount] = useState(1);
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+	const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined);
+	const [headcount, setHeadcount] = useState(1);
+	const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const filteredSchedules = useMemo(() => {
     if (selectedDate) {
@@ -81,9 +79,9 @@ export const LessonReservationSidebar = ({
     }
   };
 
-  const handleHeadcountChange = (amount: number) => {
-    setHeadcount((prev) => Math.max(1, Math.min(50, prev + amount)));
-  };
+	const handleHeadcountChange = (amount: number) => {
+		setHeadcount((prev) => Math.max(1, Math.min(50, prev + amount)));
+	};
 
   const handleApplyClick = () => {
     if (!isLoggedIn) {
@@ -115,13 +113,11 @@ export const LessonReservationSidebar = ({
     onApplyLesson(selectedScheduleId, headcount);
   };
 
-  return (
-    <div className="md:col-span-1">
-      <div className="sticky top-12 space-y-6">
-        <Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl p-6">
-          <h2 className="text-xl md:text-2xl font-bold mb-4">
-            클래스 예약하기
-          </h2>
+	return (
+		<div className="md:col-span-1">
+			<div className="sticky top-12 space-y-6">
+				<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl p-6">
+					<h2 className="text-xl md:text-2xl font-bold mb-4">클래스 예약하기</h2>
 
           {/* 날짜 선택 */}
           <div className="mb-2">
@@ -199,50 +195,46 @@ export const LessonReservationSidebar = ({
             </p>
           </div>
 
-          <div className="mb-6">
-            <p className="text-lg font-semibold mb-2">인원 선택</p>
-            <div className="flex items-center justify-between border rounded-md p-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleHeadcountChange(-1)}
-                disabled={headcount <= 1}
-              >
-                -
-              </Button>
-              <Input
-                type="number"
-                value={headcount}
-                readOnly
-                className="w-16 text-center text-lg font-semibold border-none focus-visible:ring-0"
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleHeadcountChange(1)}
-                disabled={headcount >= 50}
-              >
-                +
-              </Button>
-            </div>
-          </div>
+					<div className="mb-6">
+						<p className="text-lg font-semibold mb-2">인원 선택</p>
+						<div className="flex items-center justify-between border rounded-md p-2">
+							<Button
+								variant="ghost"
+								size="icon"
+								onClick={() => handleHeadcountChange(-1)}
+								disabled={headcount <= 1}
+							>
+								-
+							</Button>
+							<Input
+								type="number"
+								value={headcount}
+								readOnly
+								className="w-16 text-center text-lg font-semibold border-none focus-visible:ring-0"
+							/>
+							<Button
+								variant="ghost"
+								size="icon"
+								onClick={() => handleHeadcountChange(1)}
+								disabled={headcount >= 50}
+							>
+								+
+							</Button>
+						</div>
+					</div>
 
-          <div className="text-right mb-4">
-            {discountRate > 0 && (
-              <div className="flex items-center justify-end gap-2 text-muted-foreground line-through text-sm">
-                <span>{price.toLocaleString()}원</span>
-                <span className="text-red-500 font-semibold">
-                  {discountRate}%
-                </span>
-              </div>
-            )}
-            <div className="text-3xl font-bold text-primary">
-              {(discountedPrice * headcount).toLocaleString()}원
-            </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              ({headcount}명 기준)
-            </p>
-          </div>
+					<div className="text-right mb-4">
+						{discountRate > 0 && (
+							<div className="flex items-center justify-end gap-2 text-muted-foreground line-through text-sm">
+								<span>{price.toLocaleString()}원</span>
+								<span className="text-red-500 font-semibold">{discountRate}%</span>
+							</div>
+						)}
+						<div className="text-3xl font-bold text-primary">
+							{(discountedPrice * headcount).toLocaleString()}원
+						</div>
+						<p className="text-sm text-muted-foreground mt-1">({headcount}명 기준)</p>
+					</div>
 
           <div className="flex flex-wrap gap-3">
             <Button

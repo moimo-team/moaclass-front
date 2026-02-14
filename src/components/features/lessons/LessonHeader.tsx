@@ -74,24 +74,24 @@ export const LessonHeader = ({
         </div>
       </section>
 
-      <section className="flex flex-wrap items-center gap-x-6 gap-y-2 text-lg text-foreground/80 py-4 border-y border-border/50">
-        <div className="flex items-center gap-2">
-          <FaClock className="text-primary" />
-          <span>{durationMin}분</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <FaMapMarkerAlt className="text-primary" />
-          <span>{getDisplayAddress(address)}</span>{" "}
-        </div>
-        <div className="flex items-center gap-2">
-          <FaTachometerAlt className="text-primary" />
-          <span>{getLevelDisplayName(level)}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <FaUsers className="text-primary" />
-          <span>최대 {maxParticipants}명</span>
-        </div>
-      </section>
-    </>
-  );
+			<section className="flex flex-wrap items-center gap-x-6 gap-y-2 text-lg text-foreground/80 py-4 border-y border-border/50">
+				<div className="flex items-center gap-2">
+					<FaClock className="text-primary" />
+					<span>{durationMin}분</span>
+				</div>
+				<div className="flex items-center gap-2">
+					<FaMapMarkerAlt className="text-primary" />
+					<span>{getDisplayAddress(address)}</span>{' '}
+				</div>
+				<div className="flex items-center gap-2">
+					<FaTachometerAlt className="text-primary" />
+					<span>{getLevelDisplayName(level)}</span>
+				</div>
+				<div className="flex items-center gap-2">
+					<FaUsers className="text-primary" />
+					<span>최대 {maxParticipants}명</span>
+				</div>
+			</section>
+		</>
+	);
 };

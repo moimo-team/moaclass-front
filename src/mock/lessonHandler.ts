@@ -11,10 +11,10 @@ import type { FetchLessonsResponse } from "@/models/lesson.model";
 import { isLessonLiked } from "./likeHandler";
 
 const applyLikeStatus = (lessons: Lesson[]): Lesson[] => {
-  return lessons.map((lesson) => ({
-    ...lesson,
-    isLiked: isLessonLiked(lesson.id),
-  }));
+	return lessons.map((lesson) => ({
+		...lesson,
+		isLiked: isLessonLiked(lesson.id),
+	}));
 };
 
 export const lessonHandlers = [

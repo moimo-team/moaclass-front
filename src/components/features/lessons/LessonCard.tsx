@@ -1,46 +1,48 @@
-import { cn } from "@/lib/utils";
-import { Card } from "@/components/ui/card";
-import { IoLocationOutline } from "react-icons/io5";
-import { IoIosHeartEmpty, IoIosHeart } from "react-icons/io";
-import { Link } from "react-router-dom";
-import type { Lesson } from "@/models/lesson.model";
-import { getDisplayAddress } from "@/utils/formatAddress";
-import defaultLessonImage from "@/assets/images/moimer-intro.png";
-import defaultProfileImage from "@/assets/images/profile.png";
-import { ClassInfoBody } from "@/components/common/ClassInfoBody";
-import { useLessonLikeMutation } from "@/hooks/useLessonLikeMutation";
-import type { QueryKey } from "@tanstack/react-query";
+import { IoIosHeartEmpty, IoIosHeart } from 'react-icons/io';
+import { IoLocationOutline } from 'react-icons/io5';
+import { Link } from 'react-router-dom';
+
+import defaultLessonImage from '@/assets/images/moimer-intro.png';
+import defaultProfileImage from '@/assets/images/profile.png';
+import { ClassInfoBody } from '@/components/common/ClassInfoBody';
+import { Card } from '@/components/ui/card';
+import { useLessonLikeMutation } from '@/hooks/useLessonLikeMutation';
+import { cn } from '@/lib/utils';
+import type { Lesson } from '@/models/lesson.model';
+import { getDisplayAddress } from '@/utils/formatAddress';
+
+import type { QueryKey } from '@tanstack/react-query';
 
 interface LessonCardProps {
-  lesson: Lesson;
-  className?: string;
-  queryKeyToInvalidate?: QueryKey;
-  onToggleLike?: (lessonId: number, isLiked: boolean) => void;
+	lesson: Lesson;
+	className?: string;
+	queryKeyToInvalidate?: QueryKey;
+	onToggleLike?: (lessonId: number, isLiked: boolean) => void;
 }
 
 export function LessonCard({
-  lesson,
-  className,
-  queryKeyToInvalidate = ["lessons"],
-  onToggleLike,
+	lesson,
+	className,
+	queryKeyToInvalidate = ['lessons'],
+	onToggleLike,
 }: LessonCardProps) {
-  const { id, title, address, isLiked } = lesson;
-  const href = `/lessons/${id}`;
+	const { id, title, address, isLiked } = lesson;
+	const href = `/lessons/${id}`;
 
-  const { mutate: toggleLike, isPending: isLiking } = useLessonLikeMutation([
-    queryKeyToInvalidate,
-  ]);
+	const { mutate: toggleLike, isPending: isLiking } = useLessonLikeMutation([
+		queryKeyToInvalidate,
+	]);
 
-  const handleLikeClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+	const handleLikeClick = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
 
-    if (onToggleLike) {
-      onToggleLike(id, isLiked ?? false);
-    } else {
-      toggleLike({ lessonId: id, newIsLiked: !isLiked });
-    }
-  };
+		if (onToggleLike) {
+			onToggleLike(id, isLiked ?? false);
+		} else {
+			toggleLike({ lessonId: id, newIsLiked: !isLiked });
+		}
+	};
 
   return (
     <Link
@@ -61,23 +63,23 @@ export function LessonCard({
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
 
-          {/* 좋아요 아이콘 */}
-          <button
-            type="button"
-            className={cn(
-              "absolute top-2 right-2 z-20 cursor-pointer p-1 rounded-full hover:bg-black/10 transition-colors",
-              isLiking && "pointer-events-none opacity-70 animate-pulse",
-            )}
-            onClick={handleLikeClick}
-            aria-label={isLiked ? "좋아요 취소" : "좋아요"}
-          >
-            {isLiked ? (
-              <IoIosHeart className="text-red-500 text-2xl drop-shadow-sm" />
-            ) : (
-              <IoIosHeartEmpty className="text-white text-2xl drop-shadow-lg" />
-            )}
-          </button>
-        </div>
+					{/* 좋아요 아이콘 */}
+					<button
+						type="button"
+						className={cn(
+							'absolute top-2 right-2 z-20 cursor-pointer p-1 rounded-full hover:bg-black/10 transition-colors',
+							isLiking && 'pointer-events-none opacity-70 animate-pulse',
+						)}
+						onClick={handleLikeClick}
+						aria-label={isLiked ? '좋아요 취소' : '좋아요'}
+					>
+						{isLiked ? (
+							<IoIosHeart className="text-red-500 text-2xl drop-shadow-sm" />
+						) : (
+							<IoIosHeartEmpty className="text-white text-2xl drop-shadow-lg" />
+						)}
+					</button>
+				</div>
 
         {/* 정보 섹션 */}
         <div className="p-3 flex flex-col gap-2.5 flex-1">
@@ -98,17 +100,17 @@ export function LessonCard({
               </div>
             </div>
 
-            <ClassInfoBody
-              title={title}
-              category={lesson.classCategory?.name || "전체"}
-              price={lesson.price}
-              discountRate={lesson.discountRate}
-              discountedPrice={lesson.discountedPrice}
-              showDate={false}
-              titleClassName="text-[16px] line-clamp-1"
-              className="gap-1.5"
-            />
-          </div>
+						<ClassInfoBody
+							title={title}
+							category={lesson.classCategory?.name || '전체'}
+							price={lesson.price}
+							discountRate={lesson.discountRate}
+							discountedPrice={lesson.discountedPrice}
+							showDate={false}
+							titleClassName="text-[16px] line-clamp-1"
+							className="gap-1.5"
+						/>
+					</div>
 
           {/* 모멘토 프로필 */}
           <div className="flex items-center gap-2 pt-3 border-t border-gray-50 mt-auto">

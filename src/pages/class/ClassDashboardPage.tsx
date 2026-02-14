@@ -1,53 +1,55 @@
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import TeacherProfilePage from "./teacher/TeacherProfilePage";
-import ClassManagementPage from "./manage/ClassManagementPage";
+import { useState } from 'react';
 
-type TabType = "profile" | "classes";
+import { cn } from '@/lib/utils';
+
+import ClassManagementPage from './manage/ClassManagementPage';
+import TeacherProfilePage from './teacher/TeacherProfilePage';
+
+type TabType = 'profile' | 'classes';
 
 const ClassDashboardPage = () => {
-  const [activeTab, setActiveTab] = useState<TabType>("classes");
+	const [activeTab, setActiveTab] = useState<TabType>('classes');
 
-  const tabs = [
-    { id: "profile" as TabType, label: "모멘토 프로필" },
-    { id: "classes" as TabType, label: "클래스 관리" },
-  ];
+	const tabs = [
+		{ id: 'profile' as TabType, label: '모멘토 프로필' },
+		{ id: 'classes' as TabType, label: '클래스 관리' },
+	];
 
-  return (
-    <div className="flex min-h-screen w-full bg-white">
-      {/* 좌측 사이드바 - sticky로 고정 */}
-      <aside className="w-52 border-r border-gray-100 flex-shrink-0 z-20 h-screen sticky top-0 bg-white">
-        <div className="p-8">
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">클래스</h1>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">대시보드</h1>
-        </div>
-        <nav className="px-4">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "w-full text-left px-5 py-3.5 rounded-xl mb-2 transition-all font-semibold text-sm",
-                activeTab === tab.id
-                  ? "bg-primary text-white shadow-md shadow-primary/20"
-                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      </aside>
+	return (
+		<div className="flex min-h-screen w-full bg-white">
+			{/* 좌측 사이드바 - sticky로 고정 */}
+			<aside className="w-52 border-r border-gray-100 flex-shrink-0 z-20 h-screen sticky top-0 bg-white">
+				<div className="p-8">
+					<h1 className="text-2xl font-bold text-gray-900 tracking-tight">클래스</h1>
+					<h1 className="text-2xl font-bold text-gray-900 tracking-tight">대시보드</h1>
+				</div>
+				<nav className="px-4">
+					{tabs.map((tab) => (
+						<button
+							key={tab.id}
+							onClick={() => setActiveTab(tab.id)}
+							className={cn(
+								'w-full text-left px-5 py-3.5 rounded-xl mb-2 transition-all font-semibold text-sm',
+								activeTab === tab.id
+									? 'bg-primary text-white shadow-md shadow-primary/20'
+									: 'text-gray-500 hover:bg-gray-100 hover:text-gray-900',
+							)}
+						>
+							{tab.label}
+						</button>
+					))}
+				</nav>
+			</aside>
 
-      {/* 우측 컨텐츠 영역 - 브라우저 전체 스크롤 사용 */}
-      <main className="flex-1 bg-white">
-        <div className="max-w-[1400px] mx-auto p-10">
-          {activeTab === "profile" && <TeacherProfilePage />}
-          {activeTab === "classes" && <ClassManagementPage />}
-        </div>
-      </main>
-    </div>
-  );
+			{/* 우측 컨텐츠 영역 - 브라우저 전체 스크롤 사용 */}
+			<main className="flex-1 bg-white">
+				<div className="max-w-[1400px] mx-auto p-10">
+					{activeTab === 'profile' && <TeacherProfilePage />}
+					{activeTab === 'classes' && <ClassManagementPage />}
+				</div>
+			</main>
+		</div>
+	);
 };
 
 export default ClassDashboardPage;
