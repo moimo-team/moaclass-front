@@ -250,38 +250,27 @@ export const mockReviews: Review[] = mockLessons.flatMap((lesson) =>
 
     const reviewId = faker.number.int({ min: 1000, max: 9999 });
 
-    const images: ReviewImage[] = Array.from(
-      { length: faker.number.int({ min: 0, max: 3 }) },
-      (_, i) => ({
-        id: faker.number.int({ min: 10000, max: 99999 }),
-        reviewId: reviewId,
-        image: faker.image.urlLoremFlickr({
-          category: "review",
-          width: 400,
-          height: 400,
-        }),
-        sequence: i + 1,
-      }),
-    );
+			const representativeImage = faker.datatype.boolean()
+				? faker.image.urlLoremFlickr({
+						category: 'food',
+						width: 400,
+						height: 300,
+					})
+				: null;
 
-    return {
-      id: reviewId,
-      user: userProfile,
-      lessonId: lesson.id,
-      rating: faker.number.float({ min: 1.0, max: 5.0 }),
-      representativeImage: faker.datatype.boolean()
-        ? faker.image.urlLoremFlickr({
-            category: "food",
-            width: 400,
-            height: 300,
-          })
-        : null,
-      content: faker.lorem.paragraphs(faker.number.int({ min: 1, max: 4 })),
-      createdAt: faker.date.recent().toISOString(),
-      updatedAt: faker.date.recent().toISOString(),
-      images: images,
-    };
-  }),
+			return {
+				id: faker.number.int({ min: 1000, max: 9999 }),
+				user: userProfile,
+				lessonId: lesson.id,
+				rating: faker.number.float({ min: 1.0, max: 5.0 }),
+				representativeImage,
+				images: representativeImage ? [representativeImage] : [],
+				content: faker.lorem.paragraphs(faker.number.int({ min: 1, max: 4 })),
+				createdAt: faker.date.recent().toISOString(),
+				updatedAt: faker.date.recent().toISOString(),
+			};
+		},
+	),
 );
 
 // 내 참여모임

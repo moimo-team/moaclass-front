@@ -46,6 +46,8 @@ const classSchema = z.object({
 	detailAddress: z.string().optional(),
 	directionsText: z.string().optional(),
 	reservationLeadDays: z.number().min(0).max(10),
+	representativeImageFile: z.instanceof(File).optional(),
+	additionalImageFiles: z.array(z.instanceof(File)).optional(),
 });
 
 type ClassFormValues = z.infer<typeof classSchema>;
@@ -104,6 +106,8 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
 			detailAddress: '',
 			directionsText: '',
 			reservationLeadDays: 1,
+			representativeImageFile: undefined,
+			additionalImageFiles: [],
 		},
 	});
 
@@ -216,20 +220,30 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
 		setValue('subCategoryIds', currentIds, { shouldValidate: true });
 	};
 
-	const handleImageChange = (dataUrl: string) => {
+	const handleImageChange = (dataUrl: string, file: File) => {
 		setPreviewImage(dataUrl);
+		setValue('representativeImageFile', file, { shouldValidate: true });
 	};
 
-	const handleAdditionalImagesChange = (dataUrls: string[]) => {
+	const handleAdditionalImagesChange = (dataUrls: string[], newFiles: File[]) => {
 		setAdditionalImages(dataUrls);
+		const currentFiles = watch('additionalImageFiles') || [];
+		setValue('additionalImageFiles', [...currentFiles, ...newFiles], { shouldValidate: true });
 	};
 
 	const removeRepresentativeImage = () => {
 		setPreviewImage(null);
+		setValue('representativeImageFile', undefined, { shouldValidate: true });
 	};
 
 	const removeAdditionalImage = (index: number) => {
 		setAdditionalImages(additionalImages.filter((_, i) => i !== index));
+		const currentFiles = watch('additionalImageFiles') || [];
+		setValue(
+			'additionalImageFiles',
+			currentFiles.filter((_, i) => i !== index),
+			{ shouldValidate: true },
+		);
 	};
 
 	const handlePlaceSelect = (place: PlaceInfo) => {
@@ -267,16 +281,14 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
 			formData.append('directionsText', data.directionsText || '');
 			formData.append('reservationLeadDays', data.reservationLeadDays.toString());
 
-			const repFile = representativeImageRef.current?.files?.[0];
-			if (repFile) {
-				formData.append('representativeImage', repFile);
+			if (data.representativeImageFile) {
+				formData.append('representativeImage', data.representativeImageFile);
 			}
 
-			const addFiles = additionalImagesRef.current?.files;
-			if (addFiles && addFiles.length > 0) {
-				for (let i = 0; i < addFiles.length; i++) {
-					formData.append('lessonImages', addFiles[i]);
-				}
+			if (data.additionalImageFiles && data.additionalImageFiles.length > 0) {
+				data.additionalImageFiles.forEach((file) => {
+					formData.append('lessonImages', file);
+				});
 			}
 
 			if (classId) {

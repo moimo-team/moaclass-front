@@ -11,6 +11,7 @@ export const MOCK_ORDERS = Array.from({ length: 15 }, (_, i) => ({
 	// status: i % 3 === 0 ? "ACCEPTED" : i % 3 === 1 ? "CANCEL" : "COMPLETED",
 	status: i % 3 === 0 ? '수강예정' : i % 3 === 1 ? '수강취소' : '수강완료',
 	transactionStatus: i % 3 === 0 ? 'CANCELLED' : i % 3 === 1 ? 'FAILED' : 'COMPLETED',
+	reviewId: i === 2 ? 106 : i % 3 === 2 && i % 2 === 0 ? i + 100 : null,
 }));
 
 // 수강취소 페이지용 Mock Data

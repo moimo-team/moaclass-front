@@ -21,6 +21,7 @@ const teacherProfileSchema = z.object({
 		.string()
 		.min(40, '소개는 40자 이상 입력해주세요.')
 		.max(600, '소개는 600자 이내로 입력해주세요.'),
+	profileImageFile: z.instanceof(File).optional(),
 });
 
 type TeacherProfileFormValues = z.infer<typeof teacherProfileSchema>;
@@ -61,6 +62,7 @@ export const TeacherProfileModal = ({
 	const {
 		register,
 		handleSubmit,
+		setValue,
 		watch,
 		reset,
 		formState: { errors, isValid },
@@ -70,6 +72,7 @@ export const TeacherProfileModal = ({
 		defaultValues: {
 			nickname: '',
 			introduction: '',
+			profileImageFile: undefined,
 		},
 	});
 
@@ -89,8 +92,9 @@ export const TeacherProfileModal = ({
 		}
 	}, [profile, reset, isOpen]);
 
-	const handleImageChange = (dataUrl: string) => {
+	const handleImageChange = (dataUrl: string, file: File) => {
 		setPreviewImage(dataUrl);
+		setValue('profileImageFile', file, { shouldValidate: true });
 	};
 
 	const onSubmit = async (data: TeacherProfileFormValues) => {
@@ -108,8 +112,8 @@ export const TeacherProfileModal = ({
 			formData.append('nickname', data.nickname);
 			formData.append('introduction', data.introduction);
 
-			if (fileInputRef.current?.files?.[0]) {
-				formData.append('file', fileInputRef.current.files[0]);
+			if (data.profileImageFile) {
+				formData.append('file', data.profileImageFile);
 			}
 
 			// TODO: 실제 API 호출

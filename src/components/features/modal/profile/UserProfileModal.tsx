@@ -32,6 +32,7 @@ const profileSchema = z.object({
 	bio: z.string().max(100, '자기소개는 100자 이내로 입력해주세요.'),
 	regionId: z.number().min(1, '지역을 선택해주세요.'),
 	interests: z.array(z.number()).min(3, '관심사를 3개 이상 선택해주세요!'),
+	profileImageFile: z.instanceof(File).optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -95,6 +96,7 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
 			bio: '',
 			regionId: 0,
 			interests: [],
+			profileImageFile: undefined,
 		},
 	});
 
@@ -126,8 +128,9 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
 		setValue('interests', currentInterests, { shouldValidate: true });
 	};
 
-	const handleImageChange = (dataUrl: string) => {
+	const handleImageChange = (dataUrl: string, file: File) => {
 		setPreviewImage(dataUrl);
+		setValue('profileImageFile', file, { shouldValidate: true });
 	};
 
 	const onSubmit = async (data: ProfileFormValues) => {
@@ -138,8 +141,8 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
 			formData.append('regionId', data.regionId.toString());
 			formData.append('interests', JSON.stringify(data.interests));
 
-			if (fileInputRef.current?.files?.[0]) {
-				formData.append('file', fileInputRef.current.files[0]);
+			if (data.profileImageFile) {
+				formData.append('file', data.profileImageFile);
 			}
 
 			await userUpdateMutation.mutateAsync(formData);

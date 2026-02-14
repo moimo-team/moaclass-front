@@ -16,6 +16,7 @@ export interface Order {
 	image: string;
 	status: OrderStatus;
 	transactionStatus: string;
+	reviewId: number | null;
 }
 
 export interface OrderListResponse {
