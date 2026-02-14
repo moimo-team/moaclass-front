@@ -19,5 +19,6 @@ export interface Review {
   representativeImage: string | null;
   content: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
+  images: ReviewImage[];
 }
