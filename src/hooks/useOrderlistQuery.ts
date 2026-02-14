@@ -1,7 +1,9 @@
-import { getCancelClass, getOrderDetail, getOrderList } from "@/api/order.api";
-import { useAuthStore } from "@/store/authStore";
-import { useQuery } from "@tanstack/react-query";
-import { usePagination } from "./usePagination";
+import { useQuery } from '@tanstack/react-query';
+
+import { getCancelClass, getOrderDetail, getOrderList } from '@/api/order.api';
+import { useAuthStore } from '@/store/authStore';
+
+import { usePagination } from './usePagination';
 
 // 내 클래스 결제내역 조회
 export const useOrderlistQuery = (
@@ -45,9 +47,9 @@ export const useCancelClassQuery = (enrollmentId: number) => {
 
 // 결제상세 조회
 export const useOrderDetailQuery = (pointTransactionId: number) => {
-  return useQuery({
-    queryKey: ["orderDetail", pointTransactionId],
-    queryFn: () => getOrderDetail(pointTransactionId),
-    enabled: !!pointTransactionId,
-  });
+	return useQuery({
+		queryKey: ['orderDetail', pointTransactionId],
+		queryFn: () => getOrderDetail(pointTransactionId),
+		enabled: !!pointTransactionId,
+	});
 };

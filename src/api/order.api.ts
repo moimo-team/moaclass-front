@@ -51,16 +51,14 @@ export const cancelClass = async (
 };
 
 // 결제상세 조회
-export const getOrderDetail = async (
-  pointTransactionId: number,
-): Promise<OrderDetailResponse> => {
-  try {
-    const response = await apiClient.get<OrderDetailResponse>(
-      `/payments/detail/${pointTransactionId}`,
-    );
-    return response.data;
-  } catch (error) {
-    console.error("getOrderDetail error:", error);
-    throw error;
-  }
+export const getOrderDetail = async (pointTransactionId: number): Promise<OrderDetailResponse> => {
+	try {
+		const response = await apiClient.get<OrderDetailResponse>(
+			`/payments/detail/${pointTransactionId}`,
+		);
+		return response.data;
+	} catch (error) {
+		console.error('getOrderDetail error:', error);
+		throw error;
+	}
 };
