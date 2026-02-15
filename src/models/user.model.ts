@@ -1,4 +1,4 @@
-import type { Interest } from './interest.model';
+import type { LessonCategory } from './lesson.model';
 import type { Region } from './region.model';
 
 export interface User {
@@ -17,6 +17,6 @@ export interface User {
 }
 
 export type UserInfo = Partial<User> & {
-	interests: Interest[];
+	interests: LessonCategory[];
 	userId?: number;
 };

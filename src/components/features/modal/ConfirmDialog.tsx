@@ -1,85 +1,83 @@
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface ConfirmDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  title: string;
-  description?: string;
-  confirmText?: string;
-  cancelText?: string;
-  onConfirm: () => void;
-  onCancel?: () => void;
-  variant?: "default" | "destructive"; // 삭제 등 위험한 액션용
-  showCancel?: boolean; // 취소 버튼 표시 여부
-  children?: React.ReactNode;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	title: string;
+	description?: string;
+	confirmText?: string;
+	cancelText?: string;
+	onConfirm: () => void;
+	onCancel?: () => void;
+	variant?: 'default' | 'destructive'; // 삭제 등 위험한 액션용
+	showCancel?: boolean; // 취소 버튼 표시 여부
+	children?: React.ReactNode;
 }
 
 function ConfirmDialog({
-  open,
-  onOpenChange,
-  title,
-  description,
-  confirmText = "확인",
-  cancelText = "취소",
-  onConfirm,
-  onCancel,
-  variant = "default",
-  showCancel = true,
-  children,
+	open,
+	onOpenChange,
+	title,
+	description,
+	confirmText = '확인',
+	cancelText = '취소',
+	onConfirm,
+	onCancel,
+	variant = 'default',
+	showCancel = true,
+	children,
 }: ConfirmDialogProps) {
-  const handleConfirm = () => {
-    onConfirm();
-    onOpenChange(false);
-  };
+	const handleConfirm = () => {
+		onConfirm();
+		onOpenChange(false);
+	};
 
-  const handleCancel = () => {
-    if (onCancel) {
-      onCancel();
-    }
-    onOpenChange(false);
-  };
+	const handleCancel = () => {
+		if (onCancel) {
+			onCancel();
+		}
+		onOpenChange(false);
+	};
 
-  return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          {description && (
-            <AlertDialogDescription className="whitespace-pre-line">
-              {description}
-            </AlertDialogDescription>
-          )}
-        </AlertDialogHeader>
-        {children}
-        <AlertDialogFooter>
-          {showCancel && (
-            <AlertDialogCancel onClick={handleCancel}>
-              {cancelText}
-            </AlertDialogCancel>
-          )}
-          <AlertDialogAction
-            onClick={handleConfirm}
-            className={
-              variant === "destructive"
-                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                : ""
-            }
-          >
-            {confirmText}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
+	return (
+		<AlertDialog open={open} onOpenChange={onOpenChange}>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle>{title}</AlertDialogTitle>
+					{description && (
+						<AlertDialogDescription className="whitespace-pre-line">
+							{description}
+						</AlertDialogDescription>
+					)}
+				</AlertDialogHeader>
+				{children}
+				<AlertDialogFooter>
+					{showCancel && (
+						<AlertDialogCancel onClick={handleCancel}>{cancelText}</AlertDialogCancel>
+					)}
+					<AlertDialogAction
+						onClick={handleConfirm}
+						className={
+							variant === 'destructive'
+								? 'bg-destructive text-white hover:bg-destructive/90'
+								: ''
+						}
+					>
+						{confirmText}
+					</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
+	);
 }
 
 export default ConfirmDialog;

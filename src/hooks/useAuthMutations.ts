@@ -1,4 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import {
 	login,
@@ -11,6 +13,7 @@ import {
 	kakaoLogin,
 	logout,
 	verifyResetCode,
+	deleteUser,
 } from '@/api/auth.api';
 import type { FindPasswordFormValues } from '@/pages/user/FindPassword';
 import type { JoinFormValues } from '@/pages/user/Join';
@@ -31,7 +34,10 @@ export const useLoginMutation = () => {
 		},
 		onSuccess: (data) => {
 			// 로그인 성공 시 전역 상태 업데이트
-			storeLogin({ id: data.user.id, nickname: data.user.nickname }, data.accessToken);
+			storeLogin(
+				{ id: data.user.id, nickname: data.user.nickname, email: data.user.email },
+				data.accessToken,
+			);
 			// 인증 상태 쿼리 초기화
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
 		},
@@ -51,7 +57,10 @@ export const useGoogleLoginMutation = () => {
 			return await googleLogin(data);
 		},
 		onSuccess: (data) => {
-			storeLogin({ id: data.user.id, nickname: data.user.nickname }, data.accessToken);
+			storeLogin(
+				{ id: data.user.id, nickname: data.user.nickname, email: data.user.email },
+				data.accessToken,
+			);
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
 		},
 		onError: (error: AxiosError<{ message: string }>) => {
@@ -70,7 +79,10 @@ export const useKakaoLoginMutation = () => {
 			return await kakaoLogin(data);
 		},
 		onSuccess: (data) => {
-			storeLogin({ id: data.user.id, nickname: data.user.nickname }, data.accessToken);
+			storeLogin(
+				{ id: data.user.id, nickname: data.user.nickname, email: data.user.email },
+				data.accessToken,
+			);
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
 		},
 		onError: (error: AxiosError<{ message: string }>) => {
@@ -110,7 +122,10 @@ export const useJoinMutation = () => {
 		onSuccess: (data) => {
 			const { storeLogin } = useAuthStore.getState();
 			if (data.accessToken) {
-				storeLogin({ id: data.user.id, nickname: data.user.nickname }, data.accessToken);
+				storeLogin(
+					{ id: data.user.id, nickname: data.user.nickname, email: data.user.email },
+					data.accessToken,
+				);
 				queryClient.invalidateQueries({ queryKey: ['authUser'] });
 			}
 		},
@@ -178,6 +193,24 @@ export const useResetPasswordMutation = () => {
 		},
 		onError: (error: AxiosError<{ message: string }>) => {
 			console.error(error);
+		},
+	});
+};
+
+// 회원 탈퇴
+export const useDeleteUserMutation = () => {
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
+	return useMutation({
+		mutationFn: async () => {
+			return await deleteUser();
+		},
+		onSuccess: () => {
+			const { storeLogout } = useAuthStore.getState();
+			storeLogout();
+			queryClient.clear();
+			navigate('/');
+			toast.success('회원탈퇴가 완료되었습니다.');
 		},
 	});
 };
