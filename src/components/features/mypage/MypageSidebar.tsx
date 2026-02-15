@@ -164,24 +164,39 @@ export const MypageSidebar = ({ onMenuItemClick }: MypageSidebarProps) => {
 					</div>
 
 					{/* 모멘토 */}
-					<div>
-						<h3 className="text-lg font-bold text-gray-900 mb-4">모멘토</h3>
-						<div className="flex flex-col gap-3 pl-2">
-							<NavLink
-								to="/classes-manage"
-								onClick={onMenuItemClick}
-								className={({ isActive }) =>
-									`transition-colors ${
-										isActive
-											? 'text-primary font-bold'
-											: 'text-gray-500 hover:text-gray-900'
-									}`
-								}
-							>
-								클래스 관리
-							</NavLink>
+					{user.teacherProfile && (
+						<div>
+							<h3 className="text-lg font-bold text-gray-900 mb-4">모멘토</h3>
+							<div className="flex flex-col gap-3 pl-2">
+								<NavLink
+									to="/classes-manage"
+									onClick={onMenuItemClick}
+									className={({ isActive }) =>
+										`transition-colors ${
+											isActive
+												? 'text-primary font-bold'
+												: 'text-gray-500 hover:text-gray-900'
+										}`
+									}
+								>
+									클래스 관리
+								</NavLink>
+								<NavLink
+									to="/mypage/class/profit"
+									onClick={onMenuItemClick}
+									className={({ isActive }) =>
+										`transition-colors ${
+											isActive
+												? 'text-primary font-bold'
+												: 'text-gray-500 hover:text-gray-900'
+										}`
+									}
+								>
+									수익 내역
+								</NavLink>
+							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</nav>
 

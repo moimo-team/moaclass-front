@@ -126,6 +126,7 @@ export interface VerifyUserResponse {
 	nickname: string;
 	bio: string;
 	point: number;
+	teacherProfile: boolean;
 	region?: {
 		id: number;
 		name: string;

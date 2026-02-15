@@ -11,6 +11,7 @@ export interface User {
 	profileImage?: string | null; // image > profile_image > profileImage로 변경
 	region?: Region;
 	point?: number;
+	teacherProfile?: boolean;
 	createdAt: Date;
 	updatedAt?: Date;
 }
