@@ -13,10 +13,10 @@ interface TeacherProtectedRouteProps {
 
 const TeacherProtectedRoute = ({ children }: TeacherProtectedRouteProps) => {
 	const { isLoggedIn, isTeacher } = useAuthStore();
-	const { isLoading, isFetching } = useAuthQuery();
+	const { isLoading } = useAuthQuery();
 	const navigate = useNavigate();
 
-	if (isLoading || isFetching) {
+	if (isLoading) {
 		return <LoadingSpinner />;
 	}
 
