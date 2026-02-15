@@ -15,7 +15,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useCategoryQuery } from '@/hooks/useCategoryQuery';
+import { useCategoryQuery, useSubCategoryQuery } from '@/hooks/useCategoryQuery';
 import { useRegionQuery } from '@/hooks/useRegionQuery';
 import type { FetchLessonsParams } from '@/models/lesson.model';
 import { useFilterStore } from '@/store/filterStore';
@@ -58,10 +58,12 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 		getFetchLessonsParams,
 		setRegionIdMap,
 		setCategoryIdMap,
+		setSubCategoryIdMap,
 	} = useFilterStore();
 
 	const { data: regions, isLoading: isRegionsLoading } = useRegionQuery();
 	const { data: lessonCategories, isLoading: isCategoriesLoading } = useCategoryQuery();
+	const { data: subCategoriesData = [] } = useSubCategoryQuery(activeMainCategoryId);
 
 	useEffect(() => {
 		if (regions && !isRegionsLoading) {
@@ -78,6 +80,18 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 			setCategoryIdMap(newCategoryMap);
 		}
 	}, [lessonCategories, isCategoriesLoading, setCategoryIdMap]);
+
+	useEffect(() => {
+		if (!activeMainCategoryId) {
+			setSubCategoryIdMap(new Map());
+			return;
+		}
+
+		const newSubCategoryMap = new Map(
+			subCategoriesData.map((subCategory) => [subCategory.name, subCategory.id]),
+		);
+		setSubCategoryIdMap(newSubCategoryMap);
+	}, [activeMainCategoryId, subCategoriesData, setSubCategoryIdMap]);
 
 	const getRegionButtonText = () => {
 		if (!selectedRegions.length) return '지역을 선택하세요';
@@ -154,7 +168,9 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 						activeMainCategoryId={activeMainCategoryId}
 						selectedMainCategory={selectedMainCategory}
 						handleMainCategoryClick={selectMainCategory}
-						handleSubCategoryCheckedChange={toggleSubCategory}
+						handleSubCategoryCheckedChange={(subCategoryName, _subCategoryId) =>
+							toggleSubCategory(subCategoryName)
+						}
 					/>
 
 					{/* 3. 요일 필터 */}
