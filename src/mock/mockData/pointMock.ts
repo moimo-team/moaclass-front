@@ -57,7 +57,7 @@ export const MOCK_POINT_HISTORY: PointHistory[] = [
 	},
 	{
 		//선생님에게 입금됨
-		transactionId: 3,
+		transactionId: 6,
 		title: '(선생님)수학 강의',
 		type: 'EARN',
 		status: 'COMPLETED',

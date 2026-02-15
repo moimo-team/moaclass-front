@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, X } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { PointCouponInfo } from '@/components/features/mypage/PointCouponInfo';
@@ -124,9 +124,6 @@ const TeacherProfit = () => {
 												: item.amount.toLocaleString()}
 											원
 										</span>
-										<button className="p-1 hover:bg-black/5 rounded-full transition-colors opacity-0 group-hover:opacity-100">
-											<X className="w-3.5 h-3.5 text-black/20" />
-										</button>
 									</div>
 								</motion.div>
 							))
