@@ -51,8 +51,11 @@ const LessonListDisplay: React.FC<{
 const LessonListPage: React.FC = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [isInitialized, setIsInitialized] = useState(false);
-	const { setAllFilters, resetFilters, getFetchLessonsParams, selectedSort, setSelectedSort } =
-		useFilterStore();
+	const setAllFilters = useFilterStore((state) => state.setAllFilters);
+	const resetFilters = useFilterStore((state) => state.resetFilters);
+	const getFetchLessonsParams = useFilterStore((state) => state.getFetchLessonsParams);
+	const selectedSort = useFilterStore((state) => state.selectedSort);
+	const setSelectedSort = useFilterStore((state) => state.setSelectedSort);
 
 	useEffect(() => {
 		const filtersFromUrl: Partial<FilterState> = {

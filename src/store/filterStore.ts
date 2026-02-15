@@ -166,7 +166,7 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 		}),
 
 	resetFilters: () => set(INITIAL_STATE),
-	setAllFilters: (filters) => set((state) => ({ ...state, ...filters })),
+	setAllFilters: (filters) => set(filters),
 
 	getFetchLessonsParams: () => {
 		const state = get();
