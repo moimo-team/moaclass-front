@@ -267,7 +267,7 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 							<p>
 								첨부하면{' '}
 								<span className="text-emerald-500 font-bold">
-									같은 카테고리 클래스 할인 쿠폰 발급!
+									원데이클래스 10% 할인 쿠폰 발급!
 								</span>
 							</p>
 						}
