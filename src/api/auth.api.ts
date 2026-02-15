@@ -188,6 +188,7 @@ export interface VerifyUserResponse {
 	nickname: string;
 	bio: string;
 	point: number;
+	teacherProfile: boolean;
 	region?: {
 		id: number;
 		name: string;
@@ -202,22 +203,15 @@ export interface VerifyUserResponse {
 
 // 사용자 인증
 export const verifyUser = async () => {
-	try {
-		const response = await apiClient.get<VerifyUserResponse>('/users/verify');
-		const accessToken = response.headers.authorization?.replace('Bearer ', '');
-		// const bodyToken = response.data.accessToken;
-		// const accessToken = bodyToken || headerToken;
+	const response = await apiClient.get<VerifyUserResponse>('/users/verify');
+	const accessToken = response.headers.authorization?.replace('Bearer ', '');
 
-		if (accessToken) {
-			return {
-				...response.data,
-				accessToken,
-			};
-		}
-
-		return response.data;
-	} catch (error) {
-		console.error('verify error:', error);
-		throw error;
+	if (accessToken) {
+		return {
+			...response.data,
+			accessToken,
+		};
 	}
+
+	return response.data;
 };

@@ -4,51 +4,37 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, X } from 'lucide-react';
 
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { PointChargeModal } from '@/components/features/modal/point/PointChargeModal';
 import { PointCouponInfo } from '@/components/features/mypage/PointCouponInfo';
-import { Button } from '@/components/ui/button';
-import { POINT_TABS } from '@/constants/tabs';
-import { useAuthQuery } from '@/hooks/useAuthQuery';
-import { useChargePointMutation } from '@/hooks/usePointMutations';
+import { PROFIT_TABS } from '@/constants/tabs';
 import { usePointQuery } from '@/hooks/usePointQuery';
 import { formatDateTime } from '@/utils/dateFormat';
 import { createPointMapper } from '@/utils/point/createPointMapper';
 
 // 탭 상태 타입
-type TabStatus = (typeof POINT_TABS)[number];
+type TabStatus = (typeof PROFIT_TABS)[number];
 
 /**
  * API 포인트 타입을 탭 상태로 변환
- * @param status API에서 받은 포인트 타입 ("CHARGE" | "USE" | "REFUND")
- * @returns 탭에서 사용하는 상태 ("전체" | "적립" | "사용")
+ * @param status API에서 받은 포인트 타입 ("EARN" | "DEDUCT")
+ * @returns 탭에서 사용하는 상태 ("전체" | "수익" | "차감")
  */
-const mapPointToPointTab = createPointMapper<typeof POINT_TABS>({
-	CHARGE: '적립',
-	REFUND: '적립',
-	USE: '사용',
+const mapPointToProfitTab = createPointMapper<typeof PROFIT_TABS>({
+	EARN: '수익',
+	DEDUCT: '차감',
 });
 
-const Points = () => {
+const TeacherProfit = () => {
 	const [activeTab, setActiveTab] = useState<TabStatus>('전체');
-	const [isChargeModalOpen, setIsChargeModalOpen] = useState(false);
 	const { data: pointData, isLoading } = usePointQuery();
-	const { data: userInfo } = useAuthQuery();
-	const { mutateAsync: chargePoint } = useChargePointMutation();
-
-	// 사용 가능 포인트
-	const totalPoints = userInfo?.point || 0;
-
-	// 포인트 충전
-	const handleCharge = async (amount: number) => {
-		await chargePoint(amount);
-	};
 
 	// 포인트 목록을 탭 상태에 맞게 필터링
 	const filteredHistory = useMemo(() => {
 		if (!pointData) return [];
 		return pointData.history.filter((point) => {
-			if (activeTab === '전체') return true;
-			return mapPointToPointTab(point.type) === activeTab;
+			if (activeTab === '전체') {
+				return point.type === 'DEDUCT' || point.type === 'EARN';
+			}
+			return mapPointToProfitTab(point.type) === activeTab;
 		});
 	}, [pointData, activeTab]);
 
@@ -56,22 +42,15 @@ const Points = () => {
 		<div className="max-w-3xl mx-auto w-full p-6 space-y-6 bg-white min-h-screen">
 			{/* 헤더 영역 */}
 			<div className="flex justify-between items-center">
-				<h1 className="text-2xl font-bold text-foreground">포인트 내역</h1>
-				<Button
-					variant="outline"
-					onClick={() => setIsChargeModalOpen(true)}
-					className="bg-[#c3d9c6] text-white border-none hover:bg-[#b0ccb4] rounded-xl px-4 py-2 text-sm font-bold"
-				>
-					포인트 충전
-				</Button>
+				<h1 className="text-2xl font-bold text-foreground">수익 내역</h1>
 			</div>
 
 			{/* 메인 포인트 카드 & 탭 시스템 */}
 			<PointCouponInfo
-				title="사용 가능 포인트"
-				value={pointData?.userPoints || totalPoints}
+				title="수익 내역"
+				value={pointData?.teacherProfit || 0}
 				unit="원"
-				tabs={POINT_TABS}
+				tabs={PROFIT_TABS}
 				activeTab={activeTab}
 				onTabChange={setActiveTab}
 			/>
@@ -92,7 +71,7 @@ const Points = () => {
 								exit={{ opacity: 0, x: -10 }}
 								className="flex justify-center items-center h-[200px] text-gray-400"
 							>
-								<p>포인트 내역이 없습니다.</p>
+								<p>내역이 없습니다.</p>
 							</motion.div>
 						) : (
 							filteredHistory.map((item, index) => (
@@ -124,7 +103,7 @@ const Points = () => {
 													})}
 												</span>
 												<div className="mx-1.5 w-px h-2 bg-black/10" />
-												{mapPointToPointTab(item.type) === '적립' && (
+												{mapPointToProfitTab(item.type) === '수익' && (
 													<div className="ml-1 w-3 h-3 rounded-full bg-black/5 flex items-center justify-center">
 														<ChevronRight className="w-2 h-2 rotate-90" />
 													</div>
@@ -135,12 +114,12 @@ const Points = () => {
 									<div className="flex items-center gap-2">
 										<span
 											className={`text-[15px] font-black tabular-nums ${
-												mapPointToPointTab(item.type) === '적립'
+												mapPointToProfitTab(item.type) === '수익'
 													? 'text-[#4f8f6a]'
 													: 'text-[#2f2f2f]'
 											}`}
 										>
-											{mapPointToPointTab(item.type) === '적립'
+											{mapPointToProfitTab(item.type) === '수익'
 												? `+${item.amount.toLocaleString()}`
 												: item.amount.toLocaleString()}
 											원
@@ -155,14 +134,8 @@ const Points = () => {
 					</AnimatePresence>
 				)}
 			</div>
-
-			<PointChargeModal
-				open={isChargeModalOpen}
-				onOpenChange={setIsChargeModalOpen}
-				onCharge={handleCharge}
-			/>
 		</div>
 	);
 };
 
-export default Points;
+export default TeacherProfit;

@@ -1,18 +1,19 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface StoreState {
-  isLoggedIn: boolean;
-  userId: number | null;
-  nickname: string | null;
-  email: string | null;
-  accessToken: string | null;
-  storeLogin: (
-    user: { id: number; nickname: string; email: string },
-    accessToken: string,
-  ) => void;
-  storeLogout: () => void;
-  setAccessToken: (token: string) => void;
+	isLoggedIn: boolean;
+	userId: number | null;
+	nickname: string | null;
+	email: string | null;
+	accessToken: string | null;
+	isTeacher: boolean;
+	storeLogin: (
+		user: { id: number; nickname: string; email: string; teacherProfile: boolean },
+		accessToken: string,
+	) => void;
+	storeLogout: () => void;
+	setAccessToken: (token: string) => void;
 }
 
 // export const useAuthStore = create<StoreState>((set) => ({
@@ -27,38 +28,41 @@ interface StoreState {
 // }));
 
 export const useAuthStore = create<StoreState>()(
-  persist(
-    (set) => ({
-      isLoggedIn: false,
-      userId: null,
-      nickname: null,
-      email: null,
-      accessToken: null,
-      storeLogin: (
-        user: { id: number; nickname: string; email: string },
-        accessToken: string,
-      ) =>
-        set({
-          isLoggedIn: true,
-          userId: user.id,
-          nickname: user.nickname,
-          email: user.email,
-          accessToken,
-        }),
-      storeLogout: () =>
-        set({
-          isLoggedIn: false,
-          userId: null,
-          nickname: null,
-          email: null,
-          accessToken: null,
-        }),
-      setAccessToken: (accessToken: string) => {
-        set(() => ({ accessToken }));
-      },
-    }),
-    {
-      name: "auth-storage",
-    },
-  ),
+	persist(
+		(set) => ({
+			isLoggedIn: false,
+			userId: null,
+			nickname: null,
+			email: null,
+			accessToken: null,
+			isTeacher: false,
+			storeLogin: (
+				user: { id: number; nickname: string; email: string; teacherProfile: boolean },
+				accessToken: string,
+			) =>
+				set({
+					isLoggedIn: true,
+					userId: user.id,
+					nickname: user.nickname,
+					email: user.email,
+					accessToken,
+					isTeacher: user.teacherProfile,
+				}),
+			storeLogout: () =>
+				set({
+					isLoggedIn: false,
+					userId: null,
+					nickname: null,
+					email: null,
+					accessToken: null,
+					isTeacher: false,
+				}),
+			setAccessToken: (accessToken: string) => {
+				set(() => ({ accessToken }));
+			},
+		}),
+		{
+			name: 'auth-storage',
+		},
+	),
 );
