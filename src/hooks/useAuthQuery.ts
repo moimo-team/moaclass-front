@@ -27,6 +27,7 @@ export const useAuthQuery = () => {
 							id: verifyUserInfo.id,
 							nickname: verifyUserInfo.nickname,
 							email: verifyUserInfo.email,
+							teacherProfile: verifyUserInfo.teacherProfile,
 						},
 						tokenToStore!,
 					);

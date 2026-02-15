@@ -62,14 +62,11 @@ const Profile = () => {
 					<div className="flex flex-wrap gap-2">
 						{userInfo?.region && (
 							<Badge
+								key={userInfo.region.id}
 								variant="secondary"
 								className="bg-primary/60 text-white hover:bg-primary/70 px-4 py-1.5 text-sm font-normal rounded-md"
 							>
-								{
-									regionsData?.find(
-										(region) => region.id === userInfo?.region?.id,
-									)?.name
-								}
+								{userInfo?.region?.name}
 							</Badge>
 						)}
 						{!userInfo?.region && (

@@ -276,7 +276,7 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 
 					{/* 포인트 적립 안내 문구 */}
 					<p className="text-[11px] leading-snug text-emerald-500 font-bold whitespace-pre-wrap">
-						후기를 등록하면 포인트 1,000원 적립!
+						리뷰를 등록하면 포인트 1,000원 적립!
 					</p>
 				</div>
 			</div>

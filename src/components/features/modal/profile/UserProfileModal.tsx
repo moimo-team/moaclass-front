@@ -286,8 +286,7 @@ const UserProfileModal = ({ isOpen, onClose, userInfo, userId, readOnly }: Profi
 								label={interest.name}
 								isSelected={selectedInterests.includes(interest.id)}
 								onClick={() => toggleInterest(interest.id)}
-								variant="card"
-								className="h-12 text-sm"
+								size="md"
 							/>
 						))}
 					</div>
