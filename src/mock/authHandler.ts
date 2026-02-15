@@ -469,6 +469,32 @@ const userUpdate = http.put(`${httpUrl}/users`, async ({ request }) => {
 	}
 });
 
+// 회원 탈퇴
+const deleteUser = http.delete(`${httpUrl}/users`, async ({ request }) => {
+	try {
+		const authHeader = request.headers.get('Authorization');
+		if (!authHeader) {
+			return new HttpResponse(null, { status: 401 });
+		}
+
+		console.log('User Delete (Token Based):', {
+			token: authHeader,
+		});
+
+		// Mock 상태 업데이트
+		userStore.setUserInfo({});
+
+		await delay(1000);
+		return HttpResponse.json(
+			{ message: '회원 탈퇴가 성공적으로 완료되었습니다.' },
+			{ status: 200 },
+		);
+	} catch (error) {
+		console.error('deleteUser handler error:', error);
+		return new HttpResponse(null, { status: 500 });
+	}
+});
+
 export const authHandler = [
 	login,
 	join,
@@ -483,4 +509,5 @@ export const authHandler = [
 	refresh,
 	verifyUser,
 	userUpdate, // 사용자 정보 업데이트 핸들러 추가
+	deleteUser,
 ];
