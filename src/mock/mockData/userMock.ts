@@ -10,7 +10,7 @@ export const userStore = {
 			id: 1,
 			name: '서울',
 		},
-		teacherProfile: false,
+		teacherProfile: true,
 		interests: [
 			{ id: 1, name: '인간관계(친목)' },
 			{ id: 2, name: '술' },

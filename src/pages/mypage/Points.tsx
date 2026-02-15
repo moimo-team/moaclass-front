@@ -47,7 +47,9 @@ const Points = () => {
 	const filteredHistory = useMemo(() => {
 		if (!pointData) return [];
 		return pointData.history.filter((point) => {
-			if (activeTab === '전체') return true;
+			if (activeTab === '전체') {
+				return point.type === 'USE' || point.type === 'CHARGE' || point.type === 'REFUND';
+			}
 			return mapPointToPointTab(point.type) === activeTab;
 		});
 	}, [pointData, activeTab]);
