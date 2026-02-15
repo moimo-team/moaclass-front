@@ -66,8 +66,7 @@ const login = http.post(`${httpUrl}/users/login`, async ({ request }) => {
 // 구글 로그인
 const googleLogin = http.post(`${httpUrl}/users/login/google`, async ({ request }) => {
 	try {
-		const { code, redirectUri } = (await request.json()) as any;
-		console.log('google login request:', { code, redirectUri });
+		// const { code, redirectUri } = (await request.json()) as any;
 		await delay(1000);
 		return HttpResponse.json(
 			{
@@ -105,8 +104,7 @@ const googleLogin = http.post(`${httpUrl}/users/login/google`, async ({ request 
 // 카카오 로그인
 const kakaoLogin = http.post(`${httpUrl}/users/login/kakao`, async ({ request }) => {
 	try {
-		const { code, redirectUri } = (await request.json()) as any;
-		console.log('kakao login request:', { code, redirectUri });
+		// const { code, redirectUri } = (await request.json()) as any;
 		await delay(1000);
 		return HttpResponse.json(
 			{
@@ -272,9 +270,6 @@ const verifyResetCode = http.post(`${httpUrl}/users/password-reset/verify`, asyn
 		resetCode: code,
 		expiresAt: tokenExpiresAt,
 	});
-	console.log(
-		`[Mock] Reset Token Generated for ${email}: ${resetToken}, Expires at: ${tokenExpiresAt.toLocaleTimeString()}`,
-	);
 
 	return HttpResponse.json(
 		{
@@ -312,11 +307,6 @@ const resetPassword = http.put(`${httpUrl}/users/password-reset/confirm`, async 
 			status: 410,
 		});
 	}
-
-	// 비밀번호 변경 성공 (Mock에서는 로그만 출력)
-	console.log(
-		`[Mock] Password reset successful for ${tokenData.email}, New Password: ${newPassword}`,
-	);
 
 	// 사용 완료된 토큰 및 코드 삭제
 	resetTokenStore.delete(resetToken);
@@ -370,11 +360,6 @@ const verifyUser = http.get(`${httpUrl}/users/verify`, async ({ request }) => {
 			{ status: 200 },
 		);
 	}
-
-	console.log('User Info (Verify - Token Based):', {
-		token,
-		userInfo: userStore.userInfo,
-	});
 
 	// 통합된 응답: 인증 정보 + 모든 사용자 정보
 	return HttpResponse.json(
