@@ -36,16 +36,16 @@ const ChatRoomListSection: React.FC<ChatRoomListSectionProps> = ({
 					<Fragment>
 						{chatRooms?.map((room) => (
 							<div
-								key={room.meetingId}
+								key={room.roomId}
 								onClick={() => onSelectRoom(room)}
 								className={
-									selectedMeetingId === room.meetingId
+									selectedMeetingId === (room.meetingId ?? room.roomId)
 										? 'bg-muted/50'
 										: 'hover:bg-muted/50'
 								}
 							>
 								<ChatRoomItem
-									id={room.meetingId}
+									id={room.roomId}
 									meetingImage={room.image}
 									meetingTitle={room.title}
 									lastMessageContent={

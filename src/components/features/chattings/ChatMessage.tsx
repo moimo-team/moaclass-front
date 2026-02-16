@@ -11,7 +11,12 @@ interface ChatMessageProps {
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message, isMine, hostId }) => {
-	const { content, createdAt, sender } = message;
+	const { content, createdAt } = message;
+	const sender = message.sender ?? {
+		id: message.senderId,
+		nickname: message.senderNickname ?? '알 수 없음',
+		image: '',
+	};
 
 	// 메시지 발신자가 호스트인지 확인
 	const isHost = sender.id === hostId;
