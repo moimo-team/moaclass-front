@@ -138,7 +138,7 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
 					title: existingLesson.title,
 					description: existingLesson.description,
 					curriculum: existingLesson.curriculum,
-					classCategoryId: existingLesson.classCategoryId,
+					classCategoryId: existingLesson.lessonCategoryId,
 					subCategoryIds: subCategoryIds,
 					level: existingLesson.level,
 					duration: existingLesson.durationMin,
@@ -160,7 +160,7 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
 					setAdditionalImages(existingLesson.lessonImages.map((img) => img.image));
 				}
 
-				prevCategoryIdRef.current = existingLesson.classCategoryId;
+				prevCategoryIdRef.current = existingLesson.lessonCategoryId;
 			} else {
 				// 생성 모드 - 테스트용 기본값으로 이후에 수정할 예정입니다
 				reset({

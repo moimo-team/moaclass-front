@@ -14,43 +14,49 @@ const getPayPreview = http.get(`${httpUrl}/payments/preview`, async ({ request }
 
 	try {
 		const url = new URL(request.url);
-		const scheduleId = Number(url.searchParams.get('scheduleId'));
-		const quantity = Number(url.searchParams.get('quantity')) || 1; // 기본값 1
+		const _scheduleId = Number(url.searchParams.get('scheduleId'));
+		const _quantity = Number(url.searchParams.get('quantity')) || 1; // 기본값 1
 
 		return HttpResponse.json(payPreviewMock, { status: 200 });
-	} catch (error) {
+	} catch (_error) {
 		return HttpResponse.json({ message: '잘못된 요청입니다.' }, { status: 400 });
 	}
 });
 
 // 쿠폰 선택 계산
-const calculateCouponDiscount = http.post(`${httpUrl}/payments/calculate`, async ({ request }) => {
-	await delay(500);
-	const token = request.headers.get('Authorization');
-	if (!token) {
-		return HttpResponse.json({ message: '토큰이 없습니다.' }, { status: 401 });
-	}
+const calculateCouponDiscount = http.post(
+	`${httpUrl}/payments/calculate`,
+	async ({ request: _request }) => {
+		await delay(500);
+		const token = _request.headers.get('Authorization');
+		if (!token) {
+			return HttpResponse.json({ message: '토큰이 없습니다.' }, { status: 401 });
+		}
 
-	try {
-		// const { scheduleId, quantity, couponId } = (await request.json()) as any;
+		try {
+			// const { scheduleId, quantity, couponId } = (await request.json()) as any;
 
-		// TODO: 실제 쿠폰 계산 로직 구현
-		// 현재는 성공 응답만 반환
-		return HttpResponse.json(
-			{
-				message: '쿠폰이 적용되었습니다.',
-				subtotal: 40000,
-				couponDiscount: 4000,
-				finalPrice: 36000,
-				userPoints: 42000,
-				canPay: true,
-			},
-			{ status: 200 },
-		);
-	} catch (error) {
-		return HttpResponse.json({ message: '쿠폰 계산 중 오류가 발생했습니다.' }, { status: 500 });
-	}
-});
+			// TODO: 실제 쿠폰 계산 로직 구현
+			// 현재는 성공 응답만 반환
+			return HttpResponse.json(
+				{
+					message: '쿠폰이 적용되었습니다.',
+					subtotal: 40000,
+					couponDiscount: 4000,
+					finalPrice: 36000,
+					userPoints: 42000,
+					canPay: true,
+				},
+				{ status: 200 },
+			);
+		} catch (error) {
+			return HttpResponse.json(
+				{ message: '쿠폰 계산 중 오류가 발생했습니다.' },
+				{ status: 500 },
+			);
+		}
+	},
+);
 
 // 결제 (수강생 등록)
 const createEnrollment = http.post(`${httpUrl}/enrollments`, async ({ request }) => {
@@ -61,7 +67,12 @@ const createEnrollment = http.post(`${httpUrl}/enrollments`, async ({ request })
 	}
 
 	try {
-		const { quantity, scheduleId, finalPrice, couponId } = (await request.json()) as any;
+		const {
+			quantity: _quantity,
+			scheduleId: _scheduleId,
+			finalPrice,
+			couponId: _couponId,
+		} = (await request.json()) as any;
 
 		const currentPoints = userStore.userInfo.point || 0;
 
@@ -99,7 +110,7 @@ const createEnrollment = http.post(`${httpUrl}/enrollments`, async ({ request })
 			},
 			{ status: 201 },
 		);
-	} catch (error) {
+	} catch (_error) {
 		return HttpResponse.json({ message: '결제 생성 중 오류가 발생했습니다.' }, { status: 500 });
 	}
 });
