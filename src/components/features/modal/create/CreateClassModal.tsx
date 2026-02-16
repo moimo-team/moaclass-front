@@ -55,7 +55,8 @@ type ClassFormValues = z.infer<typeof classSchema>;
 interface CreateClassModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	classId?: number; // 수정 모드용
+	classId?: number; // 수정 또는 복제할 클래스 ID
+	isDuplicating?: boolean; // 복제 모드 여부
 }
 
 const LEVEL_OPTIONS: { value: Level; label: string; description: string }[] = [
@@ -64,7 +65,12 @@ const LEVEL_OPTIONS: { value: Level; label: string; description: string }[] = [
 	{ value: 'ADVANCED', label: '고급', description: '전문적인 실력 향상을 위한' },
 ];
 
-function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps) {
+function CreateClassModal({
+	open,
+	onOpenChange,
+	classId,
+	isDuplicating = false,
+}: CreateClassModalProps) {
 	const representativeImageRef = useRef<HTMLInputElement>(null);
 	const additionalImagesRef = useRef<HTMLInputElement>(null);
 	const prevCategoryIdRef = useRef<number | null>(null);
@@ -74,8 +80,10 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
 	const { mutateAsync: createLessonMutation } = useCreateLessonMutation();
 	const { mutateAsync: updateLessonMutation } = useUpdateLessonMutation();
 
-	// 수정 모드일 때 기존 레슨 데이터 불러오기
-	const { data: existingLesson } = useLessonQuery(classId || 0);
+	// 수정 또는 복제 모드일 때 기존 레슨 데이터 불러오기
+	const { data: existingLesson, isLoading: isLoadingLesson } = useLessonQuery(classId || 0, {
+		enabled: !!classId && open, // classId가 있고 모달이 열려있을 때만 쿼리 실행
+	});
 
 	const {
 		register,
@@ -129,67 +137,75 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
 
 	useEffect(() => {
 		if (open) {
-			if (classId && existingLesson) {
-				// 수정 모드 - 기존 데이터로 폼 채우기
-				const subCategoryIds =
-					existingLesson.subClassCategories?.map((sub) => sub.id) || [];
-
-				reset({
-					title: existingLesson.title,
-					description: existingLesson.description,
-					curriculum: existingLesson.curriculum,
-					classCategoryId: existingLesson.lessonCategoryId,
-					subCategoryIds: subCategoryIds,
-					level: existingLesson.level,
-					duration: existingLesson.durationMin,
-					price: existingLesson.price,
-					discountRate: existingLesson.discountRate,
-					maxParticipants: existingLesson.maxParticipants || 10,
-					regionId: existingLesson.regionId,
-					address: existingLesson.address,
-					latitude: existingLesson.latitude,
-					longitude: existingLesson.longitude,
-					detailAddress: existingLesson.detailAddress,
-					directionsText: existingLesson.directionsText,
-					reservationLeadDays: existingLesson.reservationLeadDays,
-				});
-
-				// 이미지 미리보기 설정
-				setPreviewImage(existingLesson.representativeImage);
-				if (existingLesson.lessonImages && existingLesson.lessonImages.length > 0) {
-					setAdditionalImages(existingLesson.lessonImages.map((img) => img.image));
+			// classId가 있으면 데이터 로딩을 기다림
+			if (classId) {
+				if (isLoadingLesson) {
+					// 로딩 중이면 아무것도 하지 않음
+					return;
 				}
 
-				prevCategoryIdRef.current = existingLesson.lessonCategoryId;
+				if (existingLesson) {
+					// 수정 또는 복제 모드 - 기존 데이터로 폼 채우기
+					const subCategoryIds =
+						existingLesson.subClassCategories?.map((sub) => sub.id) || [];
+
+					reset({
+						title: existingLesson.title,
+						description: existingLesson.description,
+						curriculum: existingLesson.curriculum,
+						classCategoryId: existingLesson.lessonCategoryId,
+						subCategoryIds,
+						level: existingLesson.level,
+						duration: existingLesson.durationMin,
+						price: existingLesson.price,
+						discountRate: existingLesson.discountRate,
+						maxParticipants: existingLesson.maxParticipants || 10,
+						regionId: existingLesson.regionId,
+						address: existingLesson.address,
+						latitude: existingLesson.latitude,
+						longitude: existingLesson.longitude,
+						detailAddress: existingLesson.detailAddress,
+						directionsText: existingLesson.directionsText,
+						reservationLeadDays: existingLesson.reservationLeadDays,
+					});
+
+					// 이미지 미리보기 설정
+					setPreviewImage(existingLesson.representativeImage);
+					if (existingLesson.lessonImages && existingLesson.lessonImages.length > 0) {
+						setAdditionalImages(existingLesson.lessonImages.map((img) => img.image));
+					}
+
+					prevCategoryIdRef.current = existingLesson.lessonCategoryId;
+				}
 			} else {
-				// 생성 모드 - 테스트용 기본값으로 이후에 수정할 예정입니다
+				// 생성 모드 - 폼 초기화
 				reset({
-					title: '테스트 클래스',
-					description:
-						'이것은 테스트용 클래스 설명입니다. 실제 서비스에서는 이 내용을 수정해주세요.',
-					curriculum:
-						'1. 첫 번째 커리큘럼 내용입니다.\n2. 두 번째 커리큘럼 내용입니다.\n3. 세 번째 커리큘럼 내용입니다.',
-					classCategoryId: 1, // 핸드메이드
-					subCategoryIds: [2], // 향수
+					title: '',
+					description: '',
+					curriculum: '',
+					classCategoryId: 0,
+					subCategoryIds: [],
 					level: 'BEGINNER',
-					duration: 120,
-					price: 50000,
-					discountRate: 10,
+					duration: 60,
+					price: 0,
+					discountRate: 0,
 					maxParticipants: 10,
-					regionId: 1, // 서울
-					address: '서울특별시 강남구 테헤란로 123',
-					latitude: 37.5665,
-					longitude: 126.978,
-					detailAddress: '4층 401호',
-					directionsText: '강남역 2번 출구에서 도보 5분',
-					reservationLeadDays: 3,
+					regionId: 0,
+					address: '',
+					latitude: 0,
+					longitude: 0,
+					detailAddress: '',
+					directionsText: '',
+					reservationLeadDays: 1,
+					representativeImageFile: undefined,
+					additionalImageFiles: [],
 				});
 				setPreviewImage(null);
 				setAdditionalImages([]);
-				prevCategoryIdRef.current = 1; // 핸드메이드로 설정하여 소분류 초기화 방지
+				prevCategoryIdRef.current = 0;
 			}
 		}
-	}, [open, classId, existingLesson, reset]);
+	}, [open, classId, existingLesson, isLoadingLesson, reset]);
 
 	// 대분류 카테고리가 실제로 변경되었을 때만 소분류 초기화
 	useEffect(() => {
@@ -291,7 +307,7 @@ function CreateClassModal({ open, onOpenChange, classId }: CreateClassModalProps
 				});
 			}
 
-			if (classId) {
+			if (classId && !isDuplicating) {
 				await updateLessonMutation({ lessonId: classId, formData });
 				toast.success('클래스 수정 완료', {
 					description: '클래스가 성공적으로 수정되었습니다!',
