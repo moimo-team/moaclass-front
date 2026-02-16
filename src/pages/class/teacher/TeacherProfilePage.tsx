@@ -2,23 +2,26 @@ import { useState } from 'react';
 
 import { Pencil } from 'lucide-react';
 
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { TeacherProfileModal } from '@/components/features/modal/profile/TeacherProfileModal';
 import { Button } from '@/components/ui/button';
-import type { TeacherProfile } from '@/models/lesson.model';
-
-// Mock 데이터 (나중에 API로 교체)
-const MOCK_TEACHER_PROFILE: TeacherProfile | null = null;
+import { useTeacherProfileQuery } from '@/hooks/useTeacherProfileMutations';
+import { useAuthStore } from '@/store/authStore';
 
 const TeacherProfilePage = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [teacherProfile, setTeacherProfile] = useState<TeacherProfile | null>(
-		MOCK_TEACHER_PROFILE,
-	);
+	const userId = useAuthStore((state) => state.userId);
 
-	const handleSave = (profile: TeacherProfile) => {
-		setTeacherProfile(profile);
+	const { data: teacherProfile, isLoading } = useTeacherProfileQuery(userId ?? undefined);
+
+	const handleModalClose = () => {
 		setIsModalOpen(false);
 	};
+
+	// 로딩 중
+	if (isLoading) {
+		return <LoadingSpinner />;
+	}
 
 	// 프로필이 없으면 등록 안내
 	if (!teacherProfile) {
@@ -42,8 +45,7 @@ const TeacherProfilePage = () => {
 
 				<TeacherProfileModal
 					isOpen={isModalOpen}
-					onClose={() => setIsModalOpen(false)}
-					onSave={handleSave}
+					onClose={handleModalClose}
 					profile={null}
 				/>
 			</div>
@@ -97,15 +99,14 @@ const TeacherProfilePage = () => {
 						{teacherProfile.introduction}
 					</div>
 					<p className="text-xs text-gray-400 mt-2">
-						{teacherProfile.introduction.length}자 / 40~600자
+						{teacherProfile.introduction?.length || 0}자 / 40~600자
 					</p>
 				</div>
 			</div>
 
 			<TeacherProfileModal
 				isOpen={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
-				onSave={handleSave}
+				onClose={handleModalClose}
 				profile={teacherProfile}
 			/>
 		</div>
