@@ -151,7 +151,9 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId }: PayInfoSectio
 							<Input
 								disabled
 								placeholder={
-									appliedCoupon ? appliedCoupon.name : '쿠폰을 선택해주세요'
+									appliedCoupon
+										? appliedCoupon.description
+										: '쿠폰을 선택해주세요'
 								}
 								className={`h-10 rounded-sm border-border/60 ${appliedCoupon ? 'bg-white text-primary font-medium pr-8' : 'bg-muted/20'}`}
 							/>

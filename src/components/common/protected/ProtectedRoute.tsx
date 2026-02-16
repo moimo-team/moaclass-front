@@ -1,10 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import LoginRequiredDialog from '@/components/features/login/LoginRequiredDialog';
 import { useAuthQuery } from '@/hooks/useAuthQuery';
 import { useAuthStore } from '@/store/authStore';
-
-import LoadingSpinner from '../common/LoadingSpinner';
-import LoginRequiredDialog from '../features/login/LoginRequiredDialog';
 
 interface ProtectedRouteProps {
 	children: React.ReactNode;

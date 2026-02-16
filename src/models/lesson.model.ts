@@ -17,20 +17,20 @@ export interface Lesson {
 	title: string;
 	description: string; // 클래스 상세내용
 
-	level: Level; // 난이도
-	durationMin: number; // 소요 시간(분 단위)
+	level: Level;
+	durationMin: number; // 소요 시간 - 초 단위로 변경 예정
 	curriculum: string; // 커리큘럼 (40자~600자)
 
-	status: LessonStatus; // 클래스 상태
+	status: LessonStatus;
 	price: number;
-	discountRate: number; // 할인율
-	discountedPrice: number; // 할인된 가격
+	discountRate: number;
+	discountedPrice: number;
 	maxParticipants: number;
 
-	representativeImage: string; // 클래스 대표 이미지
+	representativeImage: string; //리뷰 파트와 통일 예정
 	likeCount: number;
 
-	regionId: number; // 지역 참조값
+	regionId: number;
 	regionName: string;
 	address: string;
 	latitude: number;
@@ -38,7 +38,7 @@ export interface Lesson {
 	detailAddress: string; // 상세 주소
 	directionsText: string; // 찾아오는 길
 
-	reservationLeadDays: number; // 몇일 전 예약 가능 (0 = 당일 가능)
+	reservationLeadDays: number; // 며칠 전 예약 가능 (0 = 당일 가능)
 
 	rate: number; // 리뷰 점수 평균
 
@@ -95,10 +95,10 @@ export interface LessonSubCategory {
 // 선생님 프로필
 export interface TeacherProfile {
 	id: number;
-	userId: number;
+	userId?: number;
 	nickname: string; // 선생님 활동 닉네임/상호명
 	image: string; // 선생님 프로필 이미지
-	introduction: string; // 40자~600자
+	introduction?: string; // 40자~600자
 	createdAt?: string;
 	updatedAt?: string;
 }
@@ -171,4 +171,17 @@ export interface LessonSchedule {
 export interface LessonCreateScheduleRequest {
 	startAt: string;
 	endAt: string;
+}
+
+// 빌드 에러 방지를 위한 추가 타입
+export interface ClassCardData {
+	id: number;
+	title: string;
+	category: string;
+	thumbnailImage: string;
+	status: LessonStatus;
+	createdAt: string;
+	price: number;
+	discountRate: number;
+	discountedPrice: number;
 }
