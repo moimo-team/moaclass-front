@@ -8,10 +8,11 @@ import { createRoot } from 'react-dom/client';
 
 import App from './App.tsx';
 import { queryClient } from './lib/queryClient';
+import { ENV } from './utils/env';
 // import "pretendard/dist/web/static/pretendard.css";
 
 async function enableMocking() {
-	if (!import.meta.env.DEV || (import.meta.env.VITE_ENABLE_MOCK || 'true') !== 'true') {
+	if (!ENV.IS_DEV || !ENV.ENABLE_MOCK) {
 		return;
 	}
 
@@ -25,7 +26,7 @@ async function enableMocking() {
 }
 
 enableMocking().then(() => {
-	const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+	const CLIENT_ID = ENV.GOOGLE_CLIENT_ID;
 
 	createRoot(document.getElementById('root')!).render(
 		<StrictMode>

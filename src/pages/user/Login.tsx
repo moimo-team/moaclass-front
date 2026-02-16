@@ -19,6 +19,7 @@ import {
 	useKakaoLoginMutation,
 	useLoginMutation,
 } from '@/hooks/useAuthMutations';
+import { ENV } from '@/utils/env';
 
 // import { GoogleLogin } from "@react-oauth/google";
 
@@ -111,8 +112,8 @@ const Login = () => {
 
 	// 카카오 로그인(팝업 + postMessage 방식)
 	const handleKakaoLogin = () => {
-		const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
-		const KAKAO_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
+		const KAKAO_CLIENT_ID = ENV.KAKAO_CLIENT_ID;
+		const KAKAO_REDIRECT_URI = ENV.KAKAO_REDIRECT_URI;
 
 		// 카카오 인가 URL 생성
 		const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}&response_type=code`;

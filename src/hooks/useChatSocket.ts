@@ -5,14 +5,14 @@ import { io } from 'socket.io-client';
 import type { createMockSocket } from '@/mock/mockData/socketMock';
 import type { ChatMessage } from '@/models/chat.model';
 import { useAuthStore } from '@/store/authStore';
+import { ENV } from '@/utils/env';
 
 import type { Socket } from 'socket.io-client';
 
 type MockSocketType = ReturnType<typeof createMockSocket>;
 
 // Mocking 설정
-const isMockingEnabled =
-	import.meta.env.DEV && (import.meta.env.VITE_ENABLE_MOCK || 'true') === 'true';
+const isMockingEnabled = ENV.IS_DEV && ENV.ENABLE_MOCK;
 
 // 소켓 인스턴스 팩토리
 const getSocketInstance = async (
@@ -25,7 +25,7 @@ const getSocketInstance = async (
 
 	if (!accessToken) return null;
 
-	return io(import.meta.env.VITE_SOCKET_URL, {
+	return io(ENV.SOCKET_URL, {
 		auth: { token: accessToken },
 		transports: ['websocket'],
 		reconnection: true,

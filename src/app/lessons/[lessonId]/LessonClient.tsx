@@ -1,15 +1,17 @@
+'use client';
+
 import { useState, useLayoutEffect } from 'react';
 
-import { useParams, useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
+import { LessonClientTabContent } from '@/app/lessons/[lessonId]/_components/LessonClientTabContent';
+import LoginRequiredClientDialog from '@/app/lessons/[lessonId]/_components/LoginRequiredClientDialog';
+import { useLessonClientConfirmation } from '@/app/lessons/[lessonId]/_hooks/useLessonClientConfirmation';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { LessonGallery } from '@/components/features/lessons/LessonGallery';
 import { LessonHeader } from '@/components/features/lessons/LessonHeader';
 import { LessonReservationSidebar } from '@/components/features/lessons/LessonReservationSidebar';
-import { LessonTabContent } from '@/components/features/lessons/LessonTabContent';
-import LoginRequiredDialog from '@/components/features/login/LoginRequiredDialog';
 import ConfirmDialog from '@/components/features/modal/ConfirmDialog';
-import { useLessonApplicationConfirmation } from '@/hooks/useLessonApplicationConfirmation';
 import { useLessonLikeMutation } from '@/hooks/useLessonLikeMutation';
 import { useLessonQuery } from '@/hooks/useLessonQuery';
 import { useLessonReviewsQuery } from '@/hooks/useLessonReviewsQuery';
@@ -17,9 +19,17 @@ import { useLessonTabs } from '@/hooks/useLessonTabs';
 import { useAuthStore } from '@/store/authStore';
 import { formatFullDateTime } from '@/utils/dateFormat';
 
-export const LessonDetail = () => {
-	const { lessonId } = useParams<{ lessonId: string }>();
-	const navigate = useNavigate();
+interface LessonClientProps {
+	lessonId: string;
+}
+
+export default function LessonClient({ lessonId }: LessonClientProps) {
+	const router = useRouter();
+	// const params = useParams(); // [DELETE] remove useParams
+	// const lessonId = params.lessonId as string; // [DELETE] use prop instead
+
+	// navigate wrapper for compatibility
+	const navigate = (path: string) => router.push(path);
 
 	useLayoutEffect(() => {
 		window.scrollTo(0, 0);
@@ -46,7 +56,7 @@ export const LessonDetail = () => {
 		tempHeadcount,
 		onApplyLessonFromSidebar,
 		confirmApplyAction,
-	} = useLessonApplicationConfirmation({
+	} = useLessonClientConfirmation({
 		isLoggedIn,
 		setShowLoginPrompt,
 		lessonDetail,
@@ -143,7 +153,7 @@ export const LessonDetail = () => {
 						/>
 
 						{/* 탭 네비게이션 및 클래스 정보 섹션 */}
-						<LessonTabContent
+						<LessonClientTabContent
 							activeTab={activeTab}
 							tabTitles={tabTitles}
 							handleTabClick={handleTabClick}
@@ -185,7 +195,7 @@ export const LessonDetail = () => {
 				</div>
 			</div>
 
-			<LoginRequiredDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
+			<LoginRequiredClientDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
 			<ConfirmDialog
 				open={showConfirmApply}
 				onOpenChange={setShowConfirmApply}
@@ -197,6 +207,4 @@ export const LessonDetail = () => {
 			/>
 		</div>
 	);
-};
-
-export default LessonDetail;
+}

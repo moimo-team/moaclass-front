@@ -1,22 +1,23 @@
 import { useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import type { LessonDetail } from '@/models/lesson.model';
 
-interface UseLessonApplicationConfirmationProps {
+interface UseLessonClientConfirmationProps {
 	isLoggedIn: boolean;
 	setShowLoginPrompt: (show: boolean) => void;
 	lessonDetail: LessonDetail | undefined;
 }
 
-export const useLessonApplicationConfirmation = ({
+// Next.js 전용 훅 (기존 훅을 복사하여 수정)
+export const useLessonClientConfirmation = ({
 	isLoggedIn,
 	setShowLoginPrompt,
 	lessonDetail,
-}: UseLessonApplicationConfirmationProps) => {
-	const navigate = useNavigate();
+}: UseLessonClientConfirmationProps) => {
+	const router = useRouter();
 	const [showConfirmApply, setShowConfirmApply] = useState(false);
 
 	const [tempScheduleId, setTempScheduleId] = useState<number | null>(null);
@@ -42,7 +43,7 @@ export const useLessonApplicationConfirmation = ({
 		const scheduleId = tempScheduleId;
 		const quantity = tempHeadcount;
 
-		navigate(`/payments/preview?scheduleId=${scheduleId}&quantity=${quantity}`);
+		router.push(`/payments/preview?scheduleId=${scheduleId}&quantity=${quantity}`);
 		setShowConfirmApply(false);
 		toast.success('클래스 신청 페이지로 이동합니다.');
 	};
