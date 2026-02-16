@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 
-import ProtectedRoute from '@/components/common/ProtectedRoute';
+import ProtectedRoute from '@/components/common/protected/ProtectedRoute';
+import TeacherProtectedRoute from '@/components/common/protected/TeacherProtectedRoute';
 import MainLayout from '@/components/layout/MainLayout';
 import Chatting from '@/pages/chat/Chatting';
 import ClassDashboardPage from '@/pages/class/ClassDashboardPage';
@@ -22,6 +23,7 @@ import OrderList from '@/pages/mypage/OrderList';
 import Participations from '@/pages/mypage/Participations';
 import Points from '@/pages/mypage/Points';
 import Profile from '@/pages/mypage/Profile';
+import TeacherProfit from '@/pages/mypage/TeacherProfit';
 import WishList from '@/pages/mypage/WishList';
 import ClassPayment from '@/pages/pay/ClassPayment';
 import FindPassword from '@/pages/user/FindPassword';
@@ -154,8 +156,16 @@ export const routeList = [
 						element: <OrderList />,
 					},
 					{
-						path: 'class/orders/:id/cancel',
+						path: 'class/orders/:enrollmentId/cancel-info',
 						element: <CancelClass />,
+					},
+					{
+						path: 'class/profit',
+						element: (
+							<TeacherProtectedRoute>
+								<TeacherProfit />
+							</TeacherProtectedRoute>
+						),
 					},
 					{
 						path: 'meetings/join',

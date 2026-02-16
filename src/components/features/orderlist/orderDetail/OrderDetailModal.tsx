@@ -15,11 +15,7 @@ interface OrderDetailModalProps {
 }
 
 const OrderDetailModal = ({ isOpen, onClose, order }: OrderDetailModalProps) => {
-	const {
-		data: detail,
-		isLoading,
-		isError,
-	} = useOrderDetailQuery(order?.pointTransactionId ?? 0);
+	const { data: detail, isLoading, isError } = useOrderDetailQuery(order?.enrollmentId ?? 0);
 
 	if (!order) return null;
 
@@ -55,13 +51,13 @@ const OrderDetailModal = ({ isOpen, onClose, order }: OrderDetailModalProps) => 
 
 						{/* 클래스 정보 섹션 */}
 						<OrderClassInfo
-							title={detail.title}
-							teacherName={detail.teacherName}
-							price={detail.originPrice}
+							title={detail.classInfo.title}
+							teacherName={detail.classInfo.teacherName}
+							price={detail.paymentInfo.originPrice}
 						/>
 
 						{/* 수강취소사유 (조건부) */}
-						{isCanceled && detail.reason && (
+						{isCanceled && detail.refundInfo?.reason && (
 							<div className="border border-[#4A5D4A] rounded-[16px] p-5 space-y-2 bg-[#FDFEFC]">
 								<div className="flex items-center gap-2">
 									<span className="font-bold text-sm text-[#4A5D4A]">
@@ -71,12 +67,12 @@ const OrderDetailModal = ({ isOpen, onClose, order }: OrderDetailModalProps) => 
 										variant="outline"
 										className="text-[10px] h-5 border-[#4A5D4A] text-[#4A5D4A]"
 									>
-										{detail.reason}
+										{detail.refundInfo.reason}
 									</Badge>
 								</div>
-								{detail.detailReason && (
+								{detail.refundInfo?.detailReason && (
 									<p className="text-[#667085] text-sm leading-relaxed bg-white/50 p-3 rounded-lg border border-dashed border-[#4A5D4A]/20">
-										{detail.detailReason}
+										{detail.refundInfo.detailReason}
 									</p>
 								)}
 							</div>
@@ -88,50 +84,51 @@ const OrderDetailModal = ({ isOpen, onClose, order }: OrderDetailModalProps) => 
 								<div className="flex justify-between items-center">
 									<span className="font-bold text-[#2D3A3A]">총 결제 금액</span>
 									<span className="font-bold text-xl text-[#2D3A3A]">
-										{detail.amount.toLocaleString()}원
+										{detail.paymentInfo.finalPrice.toLocaleString()}원
 									</span>
 								</div>
 
 								<div className="space-y-2 text-sm text-muted-foreground pt-2 border-t border-gray-100">
 									<div className="flex justify-between">
-										<span>강의 금액</span>
-										<span>{detail.originPrice.toLocaleString()}원</span>
+										<span>상품 금액</span>
+										<span>
+											{detail.paymentInfo.originPrice.toLocaleString()}원
+										</span>
 									</div>
 									<div className="flex justify-between items-center">
 										<span>할인 금액</span>
 										<span className="text-gray-400">
-											-{detail.discountedAmount.toLocaleString()}원
+											-{detail.paymentInfo.discountAmount.toLocaleString()}원
 										</span>
 									</div>
 								</div>
 							</div>
 
 							{/* 환불 금액 요약 섹션 (조건부) */}
-							{isCanceled && detail.refundAmount !== undefined && (
+							{isCanceled && detail.refundInfo !== null && (
 								<div className="bg-[#F8F9F8] rounded-[20px] p-6 space-y-4">
 									<div className="flex justify-between items-center">
 										<span className="font-bold text-[#2D3A3A]">
 											총 환불 금액
 										</span>
 										<span className="font-bold text-xl text-[#2D3A3A]">
-											{detail.refundAmount.toLocaleString()}원
+											{detail.refundInfo.refundAmount.toLocaleString()}원
 										</span>
 									</div>
 
 									<div className="space-y-2 text-sm text-muted-foreground pt-2 border-t border-gray-100">
 										<div className="flex justify-between">
-											<span>강의 금액</span>
-											<span>{detail.originPrice.toLocaleString()}원</span>
+											<span>실 결제 금액</span>
+											<span>
+												{detail.refundInfo.paidAmount.toLocaleString()}원
+											</span>
 										</div>
 										<div className="flex justify-between items-center">
 											<span className="font-bold text-[#2D3A3A]">
 												차감 금액
 											</span>
 											<span className="text-gray-400">
-												-
-												{(
-													detail.amount - detail.refundAmount
-												).toLocaleString()}
+												-{detail.refundInfo.deductedAmount.toLocaleString()}
 												원
 											</span>
 										</div>
@@ -158,8 +155,8 @@ const OrderDetailModal = ({ isOpen, onClose, order }: OrderDetailModalProps) => 
 									</span>
 									<span className="text-[#2D3A3A] font-bold">
 										{formatDateTime(
-											isCanceled && detail.refundDate
-												? detail.refundDate
+											isCanceled && detail.refundInfo?.refundDate
+												? detail.refundInfo.refundDate
 												: detail.paymentDate,
 										)}
 									</span>

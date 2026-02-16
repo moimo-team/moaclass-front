@@ -11,6 +11,7 @@ import { userStore } from './mockData/userMock';
 const pointHistory = [...MOCK_POINT_HISTORY];
 
 // 유저 포인트 내역 조회
+// 선생님 수익 내역 조회
 const getUserPoints = http.get(`${httpUrl}/points/me`, async ({ request }) => {
 	await delay(1000);
 	const token = request.headers.get('Authorization');
@@ -27,6 +28,7 @@ const getUserPoints = http.get(`${httpUrl}/points/me`, async ({ request }) => {
 	return HttpResponse.json(
 		{
 			userPoints: userStore.userInfo.point,
+			teacherProfit: 160000,
 			history: sortedHistory,
 		},
 		{ status: 200 },
@@ -44,7 +46,6 @@ const chargePoint = http.post(`${httpUrl}/points/charge`, async ({ request }) =>
 
 	try {
 		const { amount } = (await request.json()) as { amount: number };
-		console.log('Charging points with body:', { amount });
 
 		// Mock Data 업데이트 (유저 포인트)
 		userStore.updatePoint(amount);
@@ -65,16 +66,16 @@ const chargePoint = http.post(`${httpUrl}/points/charge`, async ({ request }) =>
 			{
 				transaction: {
 					id: 44,
-					amount: 10000,
+					amount: amount,
 					type: 'CHARGE',
 					status: 'COMPLETED',
 					createdAt: '2026-02-11T21:54:31.586Z',
 				},
-				userPoints: 99902001,
+				userPoints: userStore.userInfo.point,
 			},
 			{ status: 201 },
 		);
-	} catch {
+	} catch (error) {
 		return HttpResponse.json(
 			{ message: '포인트 충전 중 오류가 발생했습니다.' },
 			{ status: 500 },

@@ -44,24 +44,24 @@ export function LessonCard({
 		}
 	};
 
-	return (
-		<Link
-			to={href}
-			className="relative block w-full h-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-		>
-			<Card
-				className={cn(
-					'h-full flex flex-col overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 bg-white border border-gray-100 group',
-					className,
-				)}
-			>
-				{/* 상단: 클래스 사진 - 높이를 줄여 전체 카드를 컴팩트하게 조절 */}
-				<div className="relative w-full aspect-[4/2.8] overflow-hidden bg-muted">
-					<img
-						src={lesson.representativeImage || defaultLessonImage}
-						alt={title}
-						className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-					/>
+  return (
+    <Link
+      to={href}
+      className="relative block w-full h-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+    >
+      <Card
+        className={cn(
+          "h-full flex flex-col overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 bg-white border border-gray-100 group",
+          className,
+        )}
+      >
+        {/* 상단: 클래스 사진  */}
+        <div className="relative w-full aspect-[4/2.8] overflow-hidden bg-muted">
+          <img
+            src={lesson.representativeImage || defaultLessonImage}
+            alt={title}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
 
 					{/* 좋아요 아이콘 */}
 					<button
@@ -81,24 +81,24 @@ export function LessonCard({
 					</button>
 				</div>
 
-				{/* 정보 섹션 - 표준 패딩 복구 (가독성 중심) */}
-				<div className="p-3 flex flex-col gap-2.5 flex-1">
-					<div className="space-y-1.5">
-						{/* 평점, 좋아요, 지역 위치 정보 */}
-						<div className="flex justify-between items-center text-[10px] text-gray-500 font-medium">
-							<div className="flex items-center gap-2">
-								<span className="flex items-center gap-0.5">
-									⭐ {lesson.rate.toFixed(1)}
-								</span>
-								<span className="flex items-center gap-0.5">
-									❤️ {lesson.likeCount}
-								</span>
-							</div>
-							<div className="flex items-center gap-0.5">
-								<IoLocationOutline className="w-3 h-3 text-primary/60" />
-								<span>{getDisplayAddress(address)}</span>
-							</div>
-						</div>
+        {/* 정보 섹션 */}
+        <div className="p-3 flex flex-col gap-2.5 flex-1">
+          <div className="space-y-1.5">
+            {/* 평점, 좋아요, 지역 위치 정보 */}
+            <div className="flex justify-between items-center text-[10px] text-gray-500 font-medium">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-0.5">
+                  ⭐ {lesson.rate.toFixed(1)}
+                </span>
+                <span className="flex items-center gap-0.5">
+                  ❤️ {lesson.likeCount}
+                </span>
+              </div>
+              <div className="flex items-center gap-0.5">
+                <IoLocationOutline className="w-3 h-3 text-primary/60" />
+                <span>{getDisplayAddress(address)}</span>
+              </div>
+            </div>
 
 						<ClassInfoBody
 							title={title}
@@ -112,23 +112,23 @@ export function LessonCard({
 						/>
 					</div>
 
-					{/* 모멘토 프로필 */}
-					<div className="flex items-center gap-2 pt-3 border-t border-gray-50 mt-auto">
-						<div className="w-5 h-5 rounded-full overflow-hidden border border-gray-100 shrink-0">
-							<img
-								src={lesson.teacherProfile?.image || defaultProfileImage}
-								alt={lesson.teacherProfile?.nickname || '모멘토'}
-								className="w-full h-full object-cover"
-							/>
-						</div>
-						<span className="text-xs font-medium text-gray-600 truncate">
-							{lesson.teacherProfile?.nickname || '모멘토'}
-						</span>
-					</div>
-				</div>
-			</Card>
-		</Link>
-	);
+          {/* 모멘토 프로필 */}
+          <div className="flex items-center gap-2 pt-3 border-t border-gray-50 mt-auto">
+            <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-100 shrink-0">
+              <img
+                src={lesson.teacher.image || defaultProfileImage}
+                alt={lesson.teacher.nickname || "모멘토"}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <span className="text-xs font-medium text-gray-600 truncate">
+              {lesson.teacher.nickname || "모멘토"}
+            </span>
+          </div>
+        </div>
+      </Card>
+    </Link>
+  );
 }
 
 export default LessonCard;

@@ -6,12 +6,12 @@ import { useAuthStore } from '@/store/authStore';
 import { usePagination } from './usePagination';
 
 // 내 클래스 결제내역 조회
-export const useOrderlistQuery = (status: string = 'all', page: number = 1, limit: number = 6) => {
+export const useOrderlistQuery = (filter: string, page: number = 1, limit: number = 6) => {
 	const { userId } = useAuthStore();
 
 	const queryResult = useQuery({
-		queryKey: ['orderlist', userId, status, page, limit],
-		queryFn: () => getOrderList(status, page, limit),
+		queryKey: ['orderlist', userId, filter, page, limit],
+		queryFn: () => getOrderList(filter, page, limit),
 		enabled: !!userId,
 	});
 
@@ -33,19 +33,19 @@ export const useOrderlistQuery = (status: string = 'all', page: number = 1, limi
 };
 
 // 수강취소 내역 조회
-export const useCancelClassQuery = (id: number) => {
+export const useCancelClassQuery = (enrollmentId: number) => {
 	return useQuery({
-		queryKey: ['cancelClass', id],
-		queryFn: () => getCancelClass(id),
-		enabled: !!id,
+		queryKey: ['cancelClass', enrollmentId],
+		queryFn: () => getCancelClass(enrollmentId),
+		enabled: !!enrollmentId,
 	});
 };
 
 // 결제상세 조회
-export const useOrderDetailQuery = (pointTransactionId: number) => {
+export const useOrderDetailQuery = (enrollmentId: number) => {
 	return useQuery({
-		queryKey: ['orderDetail', pointTransactionId],
-		queryFn: () => getOrderDetail(pointTransactionId),
-		enabled: !!pointTransactionId,
+		queryKey: ['orderDetail', enrollmentId],
+		queryFn: () => getOrderDetail(enrollmentId),
+		enabled: !!enrollmentId,
 	});
 };

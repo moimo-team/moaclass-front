@@ -15,11 +15,12 @@ import { useOrderlistQuery } from '@/hooks/useOrderlistQuery';
 import type { Order } from '@/models/order.model';
 
 const OrderList = () => {
-	const [filter, setFilter] = useState('all');
-	const [page, setPage] = useState(1);
-	const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	const { orderlist, totalPages, isLoading, isError, error } = useOrderlistQuery(filter, page);
+  const [filter, setFilter] = useState("전체");
+  const [page, setPage] = useState(1);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { orderlist, totalPages, isLoading, isError, error } =
+    useOrderlistQuery(filter, page);
 
 	const handleDetailClick = (order: Order) => {
 		setSelectedOrder(order);
@@ -31,26 +32,26 @@ const OrderList = () => {
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-2xl font-bold text-foreground">내가 신청한 클래스</h1>
 
-				<div className="w-32">
-					<Select
-						value={filter}
-						onValueChange={(value) => {
-							setFilter(value);
-							setPage(1);
-						}}
-					>
-						<SelectTrigger className="bg-white border-primary/20">
-							<SelectValue placeholder="전체" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="all">전체</SelectItem>
-							<SelectItem value="accepted">수강예정</SelectItem>
-							<SelectItem value="cancel">수강취소</SelectItem>
-							<SelectItem value="completed">수강완료</SelectItem>
-						</SelectContent>
-					</Select>
-				</div>
-			</div>
+        <div className="w-32">
+          <Select
+            value={filter}
+            onValueChange={(value) => {
+              setFilter(value);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="bg-white border-primary/20">
+              <SelectValue placeholder="전체" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="전체">전체</SelectItem>
+              <SelectItem value="수강예정">수강예정</SelectItem>
+              <SelectItem value="수강취소">수강취소</SelectItem>
+              <SelectItem value="수강완료">수강완료</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
 
 			<div className="space-y-4 mb-10">
 				{isLoading ? (

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { mockReviews, type Review } from '@/mock/reviewMock';
+import { mockReviews, type MeetingReview as Review } from '@/mock/reviewMock';
 
 interface UseReviewsQueryResult {
 	reviews: Review[];

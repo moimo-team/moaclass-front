@@ -4,7 +4,7 @@ import { FileText, Pencil, MessageCircle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import ActionButton from '@/components/common/ActionButton';
-import ReviewModal from '@/components/features/review/SetReviewModal';
+import MyReviewModal from '@/components/features/review/MyReviewModal';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -33,6 +33,9 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
 	const navigate = useNavigate();
 	const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 	const isInactive = order.status === '수강완료' || order.status === '수강취소';
+
+	// 리뷰 작성 여부 확인 (Order 모델에 추가된 reviewId 필드 사용)
+	const hasReview = order.reviewId !== null;
 
 	return (
 		<Card
@@ -125,17 +128,20 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
 								disabled={order.status !== '수강예정'}
 								className="w-full"
 								onClick={() =>
-									navigate(`/mypage/class/orders/${order.enrollmentId}/cancel`)
+									navigate(
+										`/mypage/class/orders/${order.enrollmentId}/cancel-info`,
+									)
 								}
 							/>
 						</div>
 					</div>
 				</div>
 			</CardContent>
-			<ReviewModal
+			<MyReviewModal
 				open={isReviewModalOpen}
 				onOpenChange={setIsReviewModalOpen}
-				orderId={order.enrollmentId}
+				lessonId={order.lessonId}
+				isEditMode={hasReview}
 			/>
 		</Card>
 	);
