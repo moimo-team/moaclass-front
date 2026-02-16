@@ -1,20 +1,11 @@
 import type { PaginationMeta } from '@/models/pagination.model';
 import type { Review } from '@/models/review.model';
+import type { LessonScheduleStatus, Schedule } from '@/models/schedule.model';
 
 export type Level = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
 // 클래스 상태 타입
 export type LessonStatus = 'ACTIVE' | 'INACTIVE' | 'DELETED' | 'DRAFT' | 'DUPLICATED';
-export type LessonScheduleStatus = 'RECRUITING' | 'CLOSED' | 'COMPLETED';
-
-// GET /lessons 응답의 schedule 정보
-export interface Schedule {
-	id: number;
-	startAt: string;
-	endAt: string;
-	status: LessonScheduleStatus;
-	currentParticipants: number;
-}
 
 // 클래스
 export interface Lesson {
