@@ -42,8 +42,10 @@ export interface FilterState {
 	setAllFilters: (filters: Partial<FilterState>) => void;
 	regionIdMap: Map<string, number>;
 	categoryIdMap: Map<string, number>;
+	subCategoryIdMap: Map<string, number>;
 	setRegionIdMap: (map: Map<string, number>) => void;
 	setCategoryIdMap: (map: Map<string, number>) => void;
+	setSubCategoryIdMap: (map: Map<string, number>) => void;
 	getFetchLessonsParams: () => FetchLessonsParams;
 }
 
@@ -59,8 +61,9 @@ const INITIAL_STATE = {
 	selectedCategories: [],
 	activeMainCategoryId: null,
 	selectedMainCategory: null,
-	regionIdMap: new Map(),
-	categoryIdMap: new Map(),
+	regionIdMap: new Map<string, number>(),
+	categoryIdMap: new Map<string, number>(),
+	subCategoryIdMap: new Map<string, number>(),
 };
 
 export const useFilterStore = create<FilterState>((set, get) => ({
@@ -71,6 +74,7 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 	setPriceRange: (value) => set({ priceRange: value }),
 	setRegionIdMap: (map) => set({ regionIdMap: map }),
 	setCategoryIdMap: (map) => set({ categoryIdMap: map }),
+	setSubCategoryIdMap: (map) => set({ subCategoryIdMap: map }),
 	setSelectedRegions: (regions) => set({ selectedRegions: regions }),
 	setSelectedDays: (days) => set({ selectedDays: days }),
 	setSelectedDifficulty: (difficulty) => set({ selectedDifficulty: difficulty }),
@@ -125,14 +129,12 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 		set((state) => {
 			if (!state.selectedMainCategory) return state;
 			const currentSub = state.selectedCategories.filter(
-				(c) => c !== state.selectedMainCategory,
+				(category) => category !== state.selectedMainCategory,
 			);
-			let newSub;
-			if (currentSub.includes(subCategory)) {
-				newSub = currentSub.filter((c) => c !== subCategory);
-			} else {
-				newSub = [...currentSub, subCategory];
-			}
+			const newSub = currentSub.includes(subCategory)
+				? currentSub.filter((category) => category !== subCategory)
+				: [...currentSub, subCategory];
+
 			return { selectedCategories: [state.selectedMainCategory, ...newSub] };
 		}),
 
@@ -146,7 +148,9 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 				};
 			}
 			return {
-				selectedCategories: state.selectedCategories.filter((c) => c !== category),
+				selectedCategories: state.selectedCategories.filter(
+					(selectedCategory) => selectedCategory !== category,
+				),
 			};
 		}),
 
@@ -166,7 +170,7 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 		}),
 
 	resetFilters: () => set(INITIAL_STATE),
-	setAllFilters: (filters) => set((state) => ({ ...state, ...filters })),
+	setAllFilters: (filters) => set(filters),
 
 	getFetchLessonsParams: () => {
 		const state = get();
@@ -175,7 +179,7 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 		if (state.selectedRegions.length > 0 && !state.selectedRegions.includes('전체')) {
 			const regionIds = state.selectedRegions
 				.map((name) => state.regionIdMap.get(name))
-				.filter((id) => id !== undefined);
+				.filter((id): id is number => id !== undefined);
 			if (regionIds.length > 0) {
 				params.regionId = regionIds;
 			}
@@ -183,19 +187,29 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 
 		if (state.activeMainCategoryId) {
 			params.categoryId = state.activeMainCategoryId;
-		} else if (state.selectedCategories.length > 0) {
-			// TODO: 만약 세분화된 카테고리 ID가 필요하다면 이 로직을 수정해야 함
-			// 현재는 activeMainCategoryId만 사용
+		}
+
+		if (state.selectedMainCategory) {
+			const selectedSubCategoryNames = state.selectedCategories.filter(
+				(name) => name !== state.selectedMainCategory,
+			);
+			const selectedSubCategoryIds = selectedSubCategoryNames
+				.map((name) => state.subCategoryIdMap.get(name))
+				.filter((id): id is number => id !== undefined);
+
+			if (selectedSubCategoryIds.length > 0) {
+				params.subCategoryId = selectedSubCategoryIds;
+			}
 		}
 
 		if (state.selectedDifficulty.length > 0) {
 			params.level = state.selectedDifficulty
-				.map((d) => REVERSE_LEVEL_MAP[d])
+				.map((difficulty) => REVERSE_LEVEL_MAP[difficulty])
 				.filter(Boolean);
 		}
 
 		if (state.selectedDays.length > 0) {
-			params.days = state.selectedDays.map((d) => DAYS_MAP[d]).filter(Boolean);
+			params.days = state.selectedDays.map((day) => DAYS_MAP[day]).filter(Boolean);
 		}
 
 		if (state.timeRange[0] !== 0 || state.timeRange[1] !== 24) {
@@ -218,7 +232,7 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 			state.selectedPersonnel !== INITIAL_STATE.selectedPersonnel
 		) {
 			const personnelValueStr = state.selectedPersonnel.replace(/[^0-9]/g, '');
-			const maxParticipantsNum = parseInt(personnelValueStr);
+			const maxParticipantsNum = parseInt(personnelValueStr, 10);
 
 			if (!isNaN(maxParticipantsNum)) {
 				params.maxParticipants = maxParticipantsNum;

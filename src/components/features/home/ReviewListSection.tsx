@@ -4,15 +4,15 @@ import ReviewList from '@/components/features/home/ReviewList';
 import ReviewModal from '@/components/features/home/ReviewModal';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useReviewsQuery } from '@/hooks/useReviewsQuery';
-import type { Review } from '@/mock/reviewMock';
+import type { LatestReviewItem } from '@/models/review.model';
 
 const ReviewListSection = () => {
 	const { reviews, isLoading, isError } = useReviewsQuery();
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+	const [selectedReview, setSelectedReview] = useState<LatestReviewItem | null>(null);
 
-	const handleReviewClick = (review: Review) => {
+	const handleReviewClick = (review: LatestReviewItem) => {
 		setSelectedReview(review);
 		setIsModalOpen(true);
 	};
@@ -21,8 +21,6 @@ const ReviewListSection = () => {
 		setIsModalOpen(false);
 		setSelectedReview(null);
 	};
-
-	const REVIEWS = 6;
 
 	return (
 		<div className="w-full py-8 pt-12">
@@ -40,7 +38,7 @@ const ReviewListSection = () => {
 				<p className="text-center text-red-500">후기를 불러오는 중 에러가 발생했습니다.</p>
 			)}
 			{!isLoading && !isError && reviews.length > 0 && (
-				<ReviewList reviews={reviews.slice(0, REVIEWS)} onReviewClick={handleReviewClick} />
+				<ReviewList reviews={reviews} onReviewClick={handleReviewClick} />
 			)}
 			{!isLoading && !isError && reviews.length === 0 && (
 				<p className="text-center py-16">후기가 없습니다.</p>
