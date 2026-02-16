@@ -282,11 +282,11 @@ export const lessonHandlers = [
 			schedules: schedules,
 		};
 
-		// mockLessons 배열 맨 앞에 추가?
+		// mockLessons 배열 맨 앞에 추가
 		mockLessons.unshift(newLesson);
 
-		console.log('??Mock Lesson Created:', newLesson);
-		console.log('?�� Total Lessons:', mockLessons.length);
+		console.log('✅ Mock Lesson Created:', newLesson);
+		console.log('📋 Total Lessons:', mockLessons.length);
 
 		return HttpResponse.json(
 			{

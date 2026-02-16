@@ -55,6 +55,21 @@ export interface LessonReviewListResponseRaw {
 	meta: PaginationMeta;
 }
 
+export interface LatestReviewItem {
+	id: number;
+	lessonId: number;
+	lessonTitle: string;
+	userId: number;
+	rating: number;
+	content: string;
+	representativeImage: string | null;
+}
+
+export interface LatestReviewListResponse {
+	data: LatestReviewItem[];
+	meta: PaginationMeta;
+}
+
 export type ReviewInfo = Partial<Review> & {
 	userId?: number;
 	images?: string[];

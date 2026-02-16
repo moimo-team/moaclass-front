@@ -14,71 +14,71 @@ export const httpUrl = import.meta.env.VITE_API_URL || 'https://moimo-back.verce
 export const interestCategories: Interest[] = [
 	{
 		id: 1,
-		name: '?�간관�?친목)',
+		name: '인간관계(친목)',
 	},
 	{
 		id: 2,
-		name: '���',
+		name: '술',
 	},
 	{
 		id: 3,
-		name: '?�기계발/공�?',
+		name: '자기계발/공부',
 	},
 	{
 		id: 4,
-		name: '?�술',
+		name: '예술',
 	},
 	{
 		id: 5,
-		name: '?�포�??�동',
+		name: '스포츠/운동',
 	},
 	{
 		id: 6,
-		name: '?�식',
+		name: '음식',
 	},
 	{
 		id: 7,
-		name: '������',
+		name: '라이프',
 	},
 	{
 		id: 8,
-		name: '����/�����',
+		name: '공예/만들기',
 	},
 	{
 		id: 9,
-		name: '�?글?�기/?�서',
+		name: '책/글쓰기/독서',
 	},
 	{
 		id: 10,
-		name: '�??�료',
+		name: '차/음료',
 	},
 	{
 		id: 11,
-		name: '커리??직장',
+		name: '커리어/직장',
 	},
 	{
 		id: 12,
-		name: '�м�',
+		name: '재테크',
 	},
 	{
 		id: 13,
-		name: '반려?�물',
+		name: '반려동물',
 	},
 	{
 		id: 14,
-		name: '게임/?�티비티',
+		name: '게임/액티비티',
 	},
 	{
 		id: 15,
-		name: '?�행',
+		name: '여행',
 	},
 	{
 		id: 16,
-		name: '?�리/?�담',
+		name: '심리/상담',
 	},
 	{
 		id: 17,
-		name: '���׸���/����',
+		name: '인테리어/가구',
 	},
 	{
 		id: 18,
@@ -86,11 +86,11 @@ export const interestCategories: Interest[] = [
 	},
 	{
 		id: 19,
-		name: '?�경',
+		name: '환경',
 	},
 	{
 		id: 20,
-		name: '?�터',
+		name: '엔터',
 	},
 	{
 		id: 21,
@@ -98,15 +98,15 @@ export const interestCategories: Interest[] = [
 	},
 	{
 		id: 22,
-		name: 'Ʈ����',
+		name: '트렌드',
 	},
 	{
 		id: 23,
-		name: '����/�̼�����',
+		name: '연애/이성관계',
 	},
 	{
 		id: 24,
-		name: '?�물/?�연',
+		name: '식물/자연',
 	},
 ];
 
@@ -114,19 +114,19 @@ export const mockMeetings: Meeting[] = Array.from({ length: 25 }, (_, i) => {
 	const interest = interestCategories[i % interestCategories.length];
 	return {
 		meetingId: i + 1,
-		title: `모임 ?�목 ${i + 1}`,
+		title: `모임 제목 ${i + 1}`,
 		meetingImage:
 			interestImageMap[interest.name] || faker.image.urlLoremFlickr({ category: 'meeting' }),
 		interestId: interest.id,
 		interestName: interest.name,
 		maxParticipants: 10,
 		currentParticipants: i % 10,
-		address: `?�울??강남�???��??${i + 1}번�?`,
+		address: `서울시 강남구 역삼동 ${i + 1}번지`,
 		meetingDate: `2024-03-${String((i % 28) + 1).padStart(2, '0')}T1${i % 9}:00:00`,
 	};
 });
 
-// Mock ?�데?�클?�스 ?�이??
+// Mock 원데이클래스 데이터
 export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
 	const selectedClassCategory = faker.helpers.arrayElement(LESSON_CATEGORIES);
 	const selectedRegion = faker.location.county();
@@ -172,7 +172,7 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
 		lessonCategoryId: selectedClassCategory.id,
 		lessonCategoryName: selectedClassCategory.name,
 
-		title: `${selectedClassCategory.name} ?�데???�래??${i + 1}`,
+		title: `${selectedClassCategory.name} 원데이 클래스 ${i + 1}`,
 		description: faker.lorem.paragraph(),
 		curriculum: faker.lorem.paragraphs(2),
 
@@ -192,18 +192,18 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
 
 		regionId: faker.number.int({ min: 1, max: 10 }),
 		regionName: selectedRegion,
-		address: `?�울??${selectedRegion} ${faker.location.city()} ${faker.location.streetAddress()}`,
+		address: `서울시 ${selectedRegion} ${faker.location.city()} ${faker.location.streetAddress()}`,
 		latitude: faker.location.latitude(),
 		longitude: faker.location.longitude(),
-		detailAddress: `${faker.number.int({ min: 1, max: 20 })}�� ${faker.number.int({ min: 101, max: 999 })}ȣ`,
-		directionsText: '����ö 2ȣ�� ������ 3�� �ⱸ���� ���� 5��',
+		detailAddress: `${faker.number.int({ min: 1, max: 20 })}층 ${faker.number.int({ min: 101, max: 999 })}호`,
+		directionsText: '지하철 2호선 강남역 3번 출구에서 도보 5분',
 
 		reservationLeadDays: faker.number.int({ min: 0, max: 7 }),
 
 		rate: faker.number.float({ min: 3.0, max: 5.0, fractionDigits: 1 }),
 
 		reviewAiSummary: faker.datatype.boolean() ? faker.lorem.sentence() : null,
-		deletedAt: null, // null�?명시
+		deletedAt: null, // null로 명시
 		createdAt: faker.date.recent().toISOString(),
 		updatedAt: faker.date.recent().toISOString(),
 
@@ -211,11 +211,11 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
 		subCategories: selectedSubCategories,
 		schedules: schedules,
 
-		isLiked: faker.datatype.boolean(), // ?�론???�용
+		isLiked: faker.datatype.boolean(), // 프론트 전용
 	};
 });
 
-// Mock 리뷰 ?�이??
+// Mock 리뷰 데이터
 export const mockReviews: Review[] = mockLessons.flatMap((lesson) =>
 	Array.from({ length: faker.number.int({ min: 0, max: 10 }) }, () => {
 		const userProfile: UserProfileForReview = {
@@ -245,7 +245,7 @@ export const mockReviews: Review[] = mockLessons.flatMap((lesson) =>
 	}),
 );
 
-// ??참여모임
+// 내 참여모임
 export const myMeetings: MyMeetingsResponse[] = Array.from({ length: 60 }, (_, i) => {
 	const isHost = i % 3 === 0;
 	const isCompleted = i % 2 === 0;
@@ -269,7 +269,7 @@ export const myMeetings: MyMeetingsResponse[] = Array.from({ length: 60 }, (_, i
 	};
 });
 
-// ?�모???�청??
+// 내모임 신청자
 export const mockParticipants: Record<number, ParticipationDetail[]> = myMeetings.reduce(
 	(acc, meeting) => {
 		acc[meeting.meetingId] = Array.from({ length: meeting.currentParticipants }, (_, i) => ({
@@ -290,9 +290,9 @@ export const mockParticipants: Record<number, ParticipationDetail[]> = myMeeting
 );
 
 export const mockLessonDetail: LessonDetail = {
-	...mockLessons[0], // 기본 ?�이?�는 mockLessons??첫번�??�이?�을 ?�사??
+	...mockLessons[0], // 기본 데이터는 mockLessons의 첫번째 아이템을 재사용
 
-	// ?�세 ?�이지?�만 ?�요??images ?�드 추�?
+	// 상세 페이지에만 필요한 images 필드 추가
 	images: Array.from({ length: faker.number.int({ min: 3, max: 6 }) }, (_, i) => ({
 		id: 200 + i,
 		lessonId: mockLessons[0].id,
@@ -304,6 +304,6 @@ export const mockLessonDetail: LessonDetail = {
 		sequence: i + 1,
 	})),
 
-	// ?�세 ?�이지?�만 ?�요??reviews ?�드 추�? (mockReviews?�서 ?�당 ?�슨??리뷰?�을 ?�터�?
+	// 상세 페이지에만 필요한 reviews 필드 추가 (mockReviews에서 해당 레슨의 리뷰들을 필터링)
 	reviews: mockReviews.filter((review) => review.lessonId === mockLessons[0].id),
 };

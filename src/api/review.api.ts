@@ -1,5 +1,6 @@
 import { apiClient } from '@/api/client';
 import type {
+	LatestReviewListResponse,
 	LessonReviewListItemRaw,
 	LessonReviewListResponse,
 	LessonReviewListResponseRaw,
@@ -55,6 +56,11 @@ export const getLessonReviews = async (
 		data: response.data.data.map(normalizeLessonReview),
 		meta: response.data.meta,
 	};
+};
+
+export const getLatestReviews = async (): Promise<LatestReviewListResponse> => {
+	const response = await apiClient.get<LatestReviewListResponse>('/reviews?page=1&limit=6');
+	return response.data;
 };
 
 export const writeReview = async (data: FormData) => {
