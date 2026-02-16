@@ -224,8 +224,6 @@ export const mockReviews: Review[] = mockLessons.flatMap((lesson) =>
 			profileImage: faker.image.avatar(),
 		};
 
-		const reviewId = faker.number.int({ min: 1000, max: 9999 });
-
 		const representativeImage = faker.datatype.boolean()
 			? faker.image.urlLoremFlickr({
 					category: 'food',

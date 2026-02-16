@@ -22,12 +22,12 @@ const ChatRoomListSection: React.FC<ChatRoomListSectionProps> = ({
 	const { nickname } = useAuthStore();
 
 	return (
-		<div className={`w-full lg:w-[28%] min-w-[300px] flex-col h-full border-r`}>
+		<div className={`w-full lg:w-[28%] min-w-[300px] flex flex-col h-full min-h-0 border-r`}>
 			<div className="p-4 font-semibold shrink-0">
 				{nickname ? `${nickname} 님의 채팅` : '로그인이 필요합니다'}
 			</div>
 			<Separator />
-			<div className="flex-grow overflow-y-auto">
+			<div className="flex-1 min-h-0 overflow-y-auto">
 				{isLoading ? (
 					<div className="flex justify-center items-center h-full">
 						<LoadingSpinner />

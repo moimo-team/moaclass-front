@@ -45,6 +45,7 @@ const LessonChatMessageSection: React.FC<LessonChatMessageSectionProps> = ({
 			onBackToList={onBackToList}
 			scrollRef={scrollRef}
 			userId={userId}
+			hostBadgeLabel="모멘토"
 		/>
 	);
 };

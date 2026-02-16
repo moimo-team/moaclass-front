@@ -207,7 +207,7 @@ const Chatting = () => {
 	};
 
 	return (
-		<div className="flex flex-col h-[calc(100vh-80px)] bg-background">
+		<div className="flex flex-col h-[calc(100vh-80px)] bg-background overflow-hidden">
 			<div className="flex justify-around p-4 border-b border-gray-200">
 				{/* type으로 모임과 원데이클래스 채팅을 구분 */}
 				<button
@@ -239,7 +239,7 @@ const Chatting = () => {
 			</div>
 
 			{chatType === 'meeting' ? (
-				<div className="flex flex-row flex-grow">
+				<div className="flex flex-row flex-grow min-h-0 overflow-hidden">
 					<ChatRoomListSection
 						chatRooms={meetingRooms}
 						isLoading={isLoading}
@@ -261,7 +261,7 @@ const Chatting = () => {
 					/>
 				</div>
 			) : (
-				<div className="flex flex-row flex-grow">
+				<div className="flex flex-row flex-grow min-h-0 overflow-hidden">
 					<LessonChatRoomListSection
 						chatRooms={lessonRooms}
 						isLoading={isLoading}

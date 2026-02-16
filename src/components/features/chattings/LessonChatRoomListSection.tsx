@@ -19,10 +19,10 @@ const LessonChatRoomListSection: React.FC<LessonChatRoomListSectionProps> = ({
 	selectedRoomId,
 }) => {
 	return (
-		<div className="w-full lg:w-[28%] min-w-[300px] flex-col h-full border-r">
+		<div className="w-full lg:w-[28%] min-w-[300px] flex flex-col h-full min-h-0 border-r">
 			<div className="p-4 font-semibold shrink-0">레슨 채팅</div>
 			<Separator />
-			<div className="flex-grow overflow-y-auto">
+			<div className="flex-1 min-h-0 overflow-y-auto">
 				{isLoading ? (
 					<div className="flex justify-center items-center h-full">
 						<LoadingSpinner />

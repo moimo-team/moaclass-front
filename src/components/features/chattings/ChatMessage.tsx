@@ -8,9 +8,15 @@ interface ChatMessageProps {
 	message: ChatMessageType;
 	isMine: boolean;
 	hostId: number;
+	hostBadgeLabel?: string;
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message, isMine, hostId }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({
+	message,
+	isMine,
+	hostId,
+	hostBadgeLabel = '호스트',
+}) => {
 	const { content, createdAt } = message;
 	const sender = message.sender ?? {
 		id: message.senderId,
@@ -18,7 +24,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isMine, hostId }) =>
 		image: '',
 	};
 
-	// 메시지 발신자가 호스트인지 확인
 	const isHost = sender.id === hostId;
 
 	return (
@@ -28,7 +33,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isMine, hostId }) =>
 				isMine ? 'self-end flex-row-reverse' : 'self-start',
 			)}
 		>
-			{/* 상대방 메시지일 때만 프로필 이미지와 닉네임 표시 */}
 			{!isMine && (
 				<Avatar className="w-10 h-10">
 					<AvatarImage src={sender.image || defaultProfileIcon} alt={sender.nickname} />
@@ -37,7 +41,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isMine, hostId }) =>
 			)}
 
 			<div className={cn('flex flex-col gap-1', isMine ? 'items-end' : 'items-start')}>
-				{/* 상대방 메시지일 때만 닉네임과 뱃지 표시 */}
 				{!isMine && (
 					<div className="flex items-center gap-2">
 						<span className="font-semibold text-sm">{sender.nickname}</span>
@@ -46,7 +49,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isMine, hostId }) =>
 								variant="outline"
 								className="bg-orange-100 text-orange-700 border-orange-300"
 							>
-								호스트
+								{hostBadgeLabel}
 							</Badge>
 						)}
 					</div>
@@ -58,7 +61,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isMine, hostId }) =>
 						'lg:flex-row lg:items-end lg:gap-2',
 					)}
 				>
-					{/* 메시지 버블 */}
 					<div
 						className={cn(
 							'p-3 rounded-lg max-w-md',
@@ -70,7 +72,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isMine, hostId }) =>
 						<p className="text-sm">{content}</p>
 					</div>
 
-					{/* 보낸 시간 */}
 					<time className="text-xs text-muted-foreground">
 						{new Date(createdAt).toLocaleTimeString([], {
 							hour: '2-digit',
