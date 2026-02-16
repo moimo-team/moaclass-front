@@ -1,5 +1,6 @@
 import axios, { type AxiosRequestConfig } from 'axios';
 
+import { CHAT_API_URL } from '@/config/chatConfig';
 import { useAuthStore } from '@/store/authStore';
 
 export const createClient = (config?: AxiosRequestConfig) => {
@@ -97,5 +98,5 @@ export const apiClient = createClient();
 
 // Chat API를 위한 별도 클라이언트
 export const chatApiClient = createClient({
-	baseURL: 'https://moimo-back.onrender.com',
+	baseURL: CHAT_API_URL,
 });

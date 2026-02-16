@@ -1,65 +1,92 @@
 import { fakerKO as faker } from '@faker-js/faker';
 
-import type { ChatMessage, ChatRoom } from '@/models/chat.model';
+import type { ChatMessage, ChatRoom, MessageSender } from '@/models/chat.model';
 import type { User } from '@/models/user.model';
 
-const mockUser1: Pick<User, 'id' | 'email' | 'nickname' | 'profileImage'> = {
+const meetingUser1: Pick<User, 'id' | 'email' | 'nickname' | 'profileImage'> = {
 	id: 1,
 	email: 'user1@example.com',
 	nickname: '첫번째유저',
 	profileImage: 'https://i.pravatar.cc/150?img=1',
 };
 
-const mockUser2: Pick<User, 'id' | 'email' | 'nickname' | 'profileImage'> = {
+const meetingUser2: Pick<User, 'id' | 'email' | 'nickname' | 'profileImage'> = {
 	id: 2,
 	email: 'user2@example.com',
 	nickname: '두번째유저',
 	profileImage: 'https://i.pravatar.cc/150?img=2',
 };
 
-const mockUser3: Pick<User, 'id' | 'email' | 'nickname' | 'profileImage'> = {
+const meetingUser3: Pick<User, 'id' | 'email' | 'nickname' | 'profileImage'> = {
 	id: 3,
 	email: 'user3@example.com',
 	nickname: '세번째유저',
 	profileImage: 'https://i.pravatar.cc/150?img=3',
 };
 
-export const mockUsers = [mockUser1, mockUser2, mockUser3];
+const lessonMentor: MessageSender = {
+	id: 100,
+	nickname: '모멘토(선생)',
+	image: 'https://i.pravatar.cc/150?img=30',
+};
 
-const generateChatMessages = (roomId: number, count: number): ChatMessage[] => {
-	const messages: ChatMessage[] = [];
-	for (let i = 0; i < count; i++) {
-		const sender = mockUsers[i % mockUsers.length];
-		const createdAt = new Date(Date.now() - (count - i) * 60 * 1000).toISOString();
-		messages.push({
+const lessonMentee: MessageSender = {
+	id: 200,
+	nickname: '모멘티(학생)',
+	image: 'https://i.pravatar.cc/150?img=45',
+};
+
+export const mockUsers = [meetingUser1, meetingUser2, meetingUser3];
+
+const generateMeetingMessages = (roomId: number, count: number): ChatMessage[] => {
+	const senders = [meetingUser1, meetingUser2, meetingUser3];
+	return Array.from({ length: count }, (_, i) => {
+		const sender = senders[i % senders.length];
+		return {
 			id: roomId * 1000 + i + 1,
-			content: `[방 ${roomId}] ${sender.nickname}의 ${i + 1}번째 메시지`,
+			content: `[모임 ${roomId}] ${sender.nickname}의 ${i + 1}번째 메시지`,
 			senderId: sender.id,
 			roomId,
 			meetingId: roomId,
-			createdAt,
+			createdAt: new Date(Date.now() - (count - i) * 60 * 1000).toISOString(),
 			sender: {
 				id: sender.id,
 				nickname: sender.nickname,
 				image: sender.profileImage || '',
 			},
-		});
-	}
-	return messages;
+		};
+	});
+};
+
+const generateLessonMessages = (roomId: number, lessonId: number, count: number): ChatMessage[] => {
+	const senders = [lessonMentor, lessonMentee];
+	return Array.from({ length: count }, (_, i) => {
+		const sender = senders[i % 2];
+		return {
+			id: roomId * 1000 + i + 1,
+			content:
+				i % 2 === 0
+					? `레슨 ${lessonId} 문의 답변 드릴게요.`
+					: `레슨 ${lessonId} 문의드립니다.`,
+			senderId: sender.id,
+			roomId,
+			createdAt: new Date(Date.now() - (count - i) * 60 * 1000).toISOString(),
+			sender,
+		};
+	});
 };
 
 export const mockChatMessages: Record<number, ChatMessage[]> = {
-	1: generateChatMessages(1, 10),
-	2: generateChatMessages(2, 8),
-	3: generateChatMessages(3, 6),
-	101: generateChatMessages(101, 5),
-	102: generateChatMessages(102, 4),
+	1: generateMeetingMessages(1, 10),
+	2: generateMeetingMessages(2, 8),
+	3: generateMeetingMessages(3, 6),
+	101: generateLessonMessages(101, 1, 6),
+	102: generateLessonMessages(102, 2, 6),
 };
 
 const buildLastMessage = (roomId: number) => {
 	const messages = mockChatMessages[roomId];
 	const lastMessage = messages[messages.length - 1];
-
 	return {
 		sender: lastMessage.sender?.nickname ?? '알 수 없음',
 		content: lastMessage.content,
@@ -75,20 +102,28 @@ const meetingRooms: ChatRoom[] = [1, 2, 3].map((roomId, i) => ({
 	memberCount: faker.number.int({ min: 2, max: 10 }),
 	image: faker.image.urlLoremFlickr({ category: 'nature' }),
 	lastMessage: buildLastMessage(roomId),
-	hostId: mockUsers[0].id,
+	hostId: meetingUser1.id,
 	isLeader: i % 2 === 0,
 }));
 
-const lessonRooms: ChatRoom[] = [101, 102].map((roomId, i) => ({
+const lessonRooms: ChatRoom[] = [
+	{ roomId: 101, lessonId: 1 },
+	{ roomId: 102, lessonId: 2 },
+].map(({ roomId, lessonId }) => ({
 	roomId,
-	chatType: 'lesson',
-	lessonId: i + 20,
-	title: `레슨 문의 ${i + 1}`,
+	chatType: 'lesson' as const,
+	lessonId,
+	title: `레슨 ${lessonId} 문의`,
 	memberCount: 2,
 	image: faker.image.urlLoremFlickr({ category: 'people' }),
 	lastMessage: buildLastMessage(roomId),
-	hostId: mockUsers[1].id,
+	hostId: lessonMentor.id,
 	isLeader: false,
 }));
 
 export const mockChatRooms: ChatRoom[] = [...meetingRooms, ...lessonRooms];
+
+export const lessonChatParticipants = {
+	mentor: lessonMentor,
+	mentee: lessonMentee,
+};
