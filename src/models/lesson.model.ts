@@ -73,8 +73,8 @@ export interface LessonDetail extends Lesson {
 
 // 클래스 상세 정보
 export interface LessonDetail extends Lesson {
-  images: LessonImage[];
-  reviews: Review[];
+	images: LessonImage[];
+	reviews: Review[];
 }
 
 // 클래스 갤러리 이미지
@@ -107,13 +107,6 @@ export interface TeacherProfile {
 	introduction?: string; // 40자~600자
 	createdAt?: string;
 	updatedAt?: string;
-}
-
-// 선생님 프로필 생성/수정 요청 타입
-export interface TeacherProfileRequest {
-	nickname: string;
-	image: string;
-	introduction: string;
 }
 
 // 클래스 목록 조회 params & response (백엔드 호환)
