@@ -1,4 +1,5 @@
 import type { PaginationMeta } from '@/models/pagination.model';
+import type { Review } from '@/models/review.model';
 
 export type Level = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
@@ -56,11 +57,7 @@ export interface Lesson {
 	createdAt: string;
 	updatedAt: string;
 
-	teacher: {
-		id: number;
-		nickname: string;
-		image?: string;
-	};
+	teacher: TeacherProfile;
 
 	subCategories: {
 		id: number;
@@ -75,6 +72,12 @@ export interface Lesson {
 	subClassCategories?: LessonSubCategory[];
 	teacherProfile?: TeacherProfile;
 	lessonImages?: LessonImage[];
+}
+
+// 클래스 상세 정보
+export interface LessonDetail extends Lesson {
+	images: LessonImage[];
+	reviews: Review[];
 }
 
 // 클래스 갤러리 이미지
@@ -101,12 +104,12 @@ export interface LessonSubCategory {
 // 선생님 프로필
 export interface TeacherProfile {
 	id: number;
-	userId: number;
+	userId?: number;
 	nickname: string; // 선생님 활동 닉네임/상호명
 	image: string; // 선생님 프로필 이미지
-	introduction: string; // 40자~600자
-	createdAt: string;
-	updatedAt: string;
+	introduction?: string; // 40자~600자
+	createdAt?: string;
+	updatedAt?: string;
 }
 
 // 선생님 프로필 생성/수정 요청 타입
