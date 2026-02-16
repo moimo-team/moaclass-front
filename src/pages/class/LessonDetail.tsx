@@ -157,7 +157,7 @@ export const LessonDetail = () => {
 							detailAddress={detailAddress}
 							directionsText={directionsText}
 							navigate={navigate}
-							reviews={reviewsData || []}
+							reviews={reviewsData?.data || []}
 						/>
 					</div>
 

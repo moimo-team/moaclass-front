@@ -1,18 +1,62 @@
 import { apiClient } from '@/api/client';
-import type { Review, ReviewInfo } from '@/models/review.model';
+import type {
+	LessonReviewListItemRaw,
+	LessonReviewListResponse,
+	LessonReviewListResponseRaw,
+	Review,
+	ReviewInfo,
+} from '@/models/review.model';
 
-// 클래스 리뷰 목록 조회
-export const getLessonReviews = async (lessonId: number): Promise<Review[]> => {
-	try {
-		const response = await apiClient.get<Review[]>(`/lessons/${lessonId}/reviews`);
-		return response.data;
-	} catch (error) {
-		console.error(`Error fetching reviews for lesson ${lessonId}:`, error);
-		throw error;
-	}
+const getReviewImages = (review: LessonReviewListItemRaw): string[] =>
+	[
+		review.image1,
+		review.image2,
+		review.image3,
+		review.image4,
+		review.image5,
+		review.image6,
+		review.image7,
+		review.image8,
+	].filter((image): image is string => Boolean(image));
+
+const normalizeLessonReview = (review: LessonReviewListItemRaw): Review => {
+	const images = getReviewImages(review);
+	const timestamp = review.createdAt ?? new Date().toISOString();
+
+	return {
+		id: review.id,
+		lessonId: review.lessonId,
+		lessonTitle: review.lessonTitle,
+		userId: review.userId,
+		user: {
+			id: review.userId,
+			nickname: `User ${review.userId}`,
+			profileImage: null,
+		},
+		rating: review.rating,
+		representativeImage: images[0] ?? null,
+		content: review.content,
+		createdAt: timestamp,
+		updatedAt: review.updatedAt ?? timestamp,
+	};
 };
 
-// 리뷰 작성
+// GET /lessons/{lessonId}/reviews?page=1&limit=6
+export const getLessonReviews = async (
+	lessonId: number,
+	page = 1,
+	limit = 6,
+): Promise<LessonReviewListResponse> => {
+	const response = await apiClient.get<LessonReviewListResponseRaw>(
+		`/lessons/${lessonId}/reviews?page=${page}&limit=${limit}`,
+	);
+
+	return {
+		data: response.data.data.map(normalizeLessonReview),
+		meta: response.data.meta,
+	};
+};
+
 export const writeReview = async (data: FormData) => {
 	const response = await apiClient.post<ReviewInfo>(`/reviews`, data, {
 		headers: {
@@ -21,12 +65,12 @@ export const writeReview = async (data: FormData) => {
 	});
 	return response.data;
 };
-// 내가 작성한 특정 클래스 리뷰 조회
+
 export const getMyReview = async (lessonId: number) => {
 	const response = await apiClient.get<ReviewInfo>(`/reviews/me/${lessonId}`);
 	return response.data;
 };
-// 리뷰 수정
+
 export const updateReview = async (reviewId: number, data: FormData) => {
 	const response = await apiClient.put<ReviewInfo>(`/reviews/${reviewId}`, data, {
 		headers: {
@@ -35,7 +79,7 @@ export const updateReview = async (reviewId: number, data: FormData) => {
 	});
 	return response.data;
 };
-// 리뷰 삭제
+
 export const deleteReview = async (reviewId: number) => {
 	const response = await apiClient.delete<void>(`/reviews/${reviewId}`);
 	return response.data;
