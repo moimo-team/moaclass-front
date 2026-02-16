@@ -4,7 +4,7 @@ import { getLatestReviews } from '@/api/review.api';
 
 export function useReviewsQuery() {
 	const query = useQuery({
-		queryKey: ['reviews', 'latest6'],
+		queryKey: ['reviews', 'latest'],
 		queryFn: getLatestReviews,
 	});
 
