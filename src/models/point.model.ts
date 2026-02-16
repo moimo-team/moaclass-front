@@ -6,7 +6,7 @@ export type PointType = 'CHARGE' | 'USE' | 'REFUND' | 'EARN' | 'DEDUCT'; // 충�
 // 포인트 히스토리
 export interface PointHistory {
 	transactionId: number;
-	title: string;
+	lessonName: string | null; // 명세서 반영
 	type: PointType;
 	status: PayStatus;
 	amount: number;
