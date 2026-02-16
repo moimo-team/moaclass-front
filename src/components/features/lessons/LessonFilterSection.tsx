@@ -27,6 +27,15 @@ interface LessonFilterSectionProps {
 	onReset?: () => void;
 }
 
+// 동일한 map 반복 생성하는지 확인
+const isSameMap = (a: Map<string, number>, b: Map<string, number>) => {
+	if (a.size !== b.size) return false;
+	for (const [key, value] of a) {
+		if (b.get(key) !== value) return false;
+	}
+	return true;
+};
+
 export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 	onClose,
 	showCloseButton = true,
@@ -58,12 +67,13 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 		getFetchLessonsParams,
 		setRegionIdMap,
 		setCategoryIdMap,
+		subCategoryIdMap,
 		setSubCategoryIdMap,
 	} = useFilterStore();
 
 	const { data: regions, isLoading: isRegionsLoading } = useRegionQuery();
 	const { data: lessonCategories, isLoading: isCategoriesLoading } = useCategoryQuery();
-	const { data: subCategoriesData = [] } = useSubCategoryQuery(activeMainCategoryId);
+	const { data: subCategoriesData } = useSubCategoryQuery(activeMainCategoryId);
 
 	useEffect(() => {
 		if (regions && !isRegionsLoading) {
@@ -82,16 +92,21 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 	}, [lessonCategories, isCategoriesLoading, setCategoryIdMap]);
 
 	useEffect(() => {
+		// 선택한 대분류가 있을 때만 소분류 카테고리 맵 생성
 		if (!activeMainCategoryId) {
-			setSubCategoryIdMap(new Map());
+			if (subCategoryIdMap.size > 0) {
+				setSubCategoryIdMap(new Map());
+			}
 			return;
 		}
+		if (!subCategoriesData) return;
 
 		const newSubCategoryMap = new Map(
 			subCategoriesData.map((subCategory) => [subCategory.name, subCategory.id]),
 		);
+		if (isSameMap(subCategoryIdMap, newSubCategoryMap)) return;
 		setSubCategoryIdMap(newSubCategoryMap);
-	}, [activeMainCategoryId, subCategoriesData, setSubCategoryIdMap]);
+	}, [activeMainCategoryId, subCategoriesData, subCategoryIdMap, setSubCategoryIdMap]);
 
 	const getRegionButtonText = () => {
 		if (!selectedRegions.length) return '지역을 선택하세요';
