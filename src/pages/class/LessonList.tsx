@@ -14,19 +14,16 @@ import {
 } from '@/components/ui/select';
 import { REVERSE_SORT_MAP, type SortEnum } from '@/constants/sortConstants';
 import { useLessonsQuery } from '@/hooks/useLessonsQuery';
-import type { Lesson, FetchLessonsParams } from '@/models/lesson.model';
+import type { FetchLessonsParams, Lesson } from '@/models/lesson.model';
 import { useFilterStore } from '@/store/filterStore';
 import type { FilterState } from '@/store/filterStore';
-
-import type { QueryKey } from '@tanstack/react-query';
 
 const LessonListDisplay: React.FC<{
 	lessons: Lesson[];
 	isLoading: boolean;
 	isError: boolean;
 	emptyMessage: string;
-	queryKeyToInvalidate: QueryKey;
-}> = ({ lessons, isLoading, isError, emptyMessage, queryKeyToInvalidate }) => {
+}> = ({ lessons, isLoading, isError, emptyMessage }) => {
 	if (isLoading) return <div className="text-center p-8">로딩 중...</div>;
 	if (isError)
 		return (
@@ -38,11 +35,7 @@ const LessonListDisplay: React.FC<{
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
 			{lessons.map((lesson) => (
-				<LessonCard
-					key={lesson.id}
-					lesson={lesson}
-					queryKeyToInvalidate={queryKeyToInvalidate}
-				/>
+				<LessonCard key={lesson.id} lesson={lesson} />
 			))}
 		</div>
 	);
@@ -51,8 +44,11 @@ const LessonListDisplay: React.FC<{
 const LessonListPage: React.FC = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [isInitialized, setIsInitialized] = useState(false);
-	const { setAllFilters, resetFilters, getFetchLessonsParams, selectedSort, setSelectedSort } =
-		useFilterStore();
+	const setAllFilters = useFilterStore((state) => state.setAllFilters);
+	const resetFilters = useFilterStore((state) => state.resetFilters);
+	const getFetchLessonsParams = useFilterStore((state) => state.getFetchLessonsParams);
+	const selectedSort = useFilterStore((state) => state.selectedSort);
+	const setSelectedSort = useFilterStore((state) => state.setSelectedSort);
 
 	useEffect(() => {
 		const filtersFromUrl: Partial<FilterState> = {
@@ -78,12 +74,11 @@ const LessonListPage: React.FC = () => {
 	const currentPage = Number(searchParams.get('page')) || 1;
 	//const itemsPerPage = 12; // TODO: 한 페이지에 보여줄 아이템 수 정의 필요
 
-	const {
-		data,
-		isLoading,
-		isError,
-		queryKey: lessonsQueryKey,
-	} = useLessonsQuery(getFetchLessonsParams(), currentPage, isInitialized);
+	const { data, isLoading, isError } = useLessonsQuery(
+		getFetchLessonsParams(),
+		currentPage,
+		isInitialized,
+	);
 
 	const { totalPages } = { totalPages: data?.meta?.totalPages || 0 };
 
@@ -151,7 +146,6 @@ const LessonListPage: React.FC = () => {
 					isLoading={isLoading}
 					isError={isError}
 					emptyMessage="조건에 맞는 클래스가 없습니다."
-					queryKeyToInvalidate={lessonsQueryKey}
 				/>
 			</div>
 

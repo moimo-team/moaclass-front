@@ -71,12 +71,6 @@ export interface LessonDetail extends Lesson {
 	reviews: Review[];
 }
 
-// 클래스 상세 정보
-export interface LessonDetail extends Lesson {
-  images: LessonImage[];
-  reviews: Review[];
-}
-
 // 클래스 갤러리 이미지
 export interface LessonImage {
 	id: number;
@@ -116,17 +110,18 @@ export interface TeacherProfileRequest {
 	introduction: string;
 }
 
-// 클래스 목록 조회 params & response (백엔드 호환)
+// 클래스 목록 조회 params & response
 export interface FetchLessonsParams {
 	regionId?: number[];
 	categoryId?: number;
+	subCategoryId?: number[];
 	level?: string[];
 	days?: string[];
 	timeRange?: string; // "HH-HH"
 	minPrice?: number;
 	maxPrice?: number;
 	sort?: string;
-	maxParticipants?: number; // 최대 인원 필터 (단일 사용)
+	maxParticipants?: number;
 	status?: string;
 }
 
