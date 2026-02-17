@@ -4,6 +4,7 @@ import type {
 	FetchLessonsResponse,
 	Lesson,
 	LessonDetail,
+	LessonCreateScheduleRequest,
 } from '@/models/lesson.model';
 
 // --- 클래스 조회(GET) 관련 ---
@@ -72,13 +73,16 @@ export const deleteLesson = async (lessonId: number) => {
 // --- 클래스 일정 관련 ---
 
 // 4. 클래스 일정 추가
-export const addLessonSchedule = async (lessonId: number, data: any) => {
+export const addLessonSchedule = async (lessonId: number, data: LessonCreateScheduleRequest[]) => {
 	const response = await apiClient.post(`/lessons/${lessonId}/schedules`, data);
 	return response.data;
 };
 
 // 5. 클래스 일정 수정
-export const updateLessonSchedule = async (scheduleId: number, data: any) => {
+export const updateLessonSchedule = async (
+	scheduleId: number,
+	data: LessonCreateScheduleRequest,
+) => {
 	const response = await apiClient.put(`/lessons/schedules/${scheduleId}`, data);
 	return response.data;
 };

@@ -1,6 +1,5 @@
-import type { Lesson, LessonCategory, TeacherProfile } from './lesson.model';
+import type { Lesson } from './lesson.model';
 import type { PaginationMeta } from './pagination.model';
-import type { Region } from './region.model';
 
 // // 위시리스트 클래스 아이템
 // export interface WishlistLessonItem {
@@ -13,21 +12,16 @@ import type { Region } from './region.model';
 //     price: number;
 // }
 
-// lesson 모델에서 변환한 위시리스트 아이템
-export type WishlistLessonItem = {
+// 위시리스트 클래스 아이템 (백엔드 명세 반영)
+export interface WishlistLessonItem {
 	lessonId: Lesson['id'];
 	title: Lesson['title'];
 	image: Lesson['representativeImage'];
-	category: LessonCategory;
-	teacherNickname: TeacherProfile['nickname'];
-	region: Region;
-	address: Lesson['address'];
+	categoryName: string; // 축소된 형태 반영
+	teacherNickname: string;
+	regionName: string;
 	price: Lesson['price'];
-	discountRate: Lesson['discountRate']; // 할인율
-	discountedPrice: Lesson['discountedPrice']; // 할인된 가격
-	likeCount: Lesson['likeCount'];
-	rate: Lesson['rate'];
-};
+}
 
 // 위시리스트 목록 조회 response
 export interface WishlistResponse {
@@ -45,23 +39,13 @@ export const convertWishlistItemToLesson = (item: WishlistLessonItem): Lesson =>
 		title: item.title,
 		representativeImage: item.image,
 		price: item.price,
-		discountRate: item.discountRate,
-		discountedPrice: item.discountedPrice,
-		address: item.address,
+		discountRate: 0, // 명세서에 없음
+		discountedPrice: item.price, // 명세서에 없음
+		address: '', // 명세서에 없음
 		isLiked: true, // 위시리스트에 있는 항목이므로 true
-		likeCount: item.likeCount,
-		rate: item.rate,
-		classCategory: item.category,
-		lessonCategoryName: item.category.name,
-		teacherProfile: {
-			id: 0,
-			userId: 0,
-			nickname: item.teacherNickname,
-			image: '',
-			introduction: '',
-			createdAt: '',
-			updatedAt: '',
-		},
+		likeCount: 0,
+		rate: 0,
+		lessonCategoryName: item.categoryName,
 		teacher: {
 			id: 0,
 			nickname: item.teacherNickname,
@@ -69,15 +53,15 @@ export const convertWishlistItemToLesson = (item: WishlistLessonItem): Lesson =>
 		},
 		// LessonCard에서 직접 사용하지 않는 필수 필드들
 		userId: 0,
-		lessonCategoryId: item.category.id,
+		lessonCategoryId: 0,
 		description: '',
 		curriculum: '',
 		level: 'BEGINNER',
 		durationMin: 0,
 		status: 'ACTIVE',
 		maxParticipants: 0,
-		regionId: item.region.id,
-		regionName: item.region.name,
+		regionId: 0,
+		regionName: item.regionName,
 		latitude: 0,
 		longitude: 0,
 		detailAddress: '',
