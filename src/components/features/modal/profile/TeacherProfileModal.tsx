@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import * as z from 'zod';
 
 import { FormImageUpload } from '@/components/features/modal/components/FormImageUpload';
@@ -10,6 +9,10 @@ import { FormInput } from '@/components/features/modal/components/FormInput';
 import { FormModal } from '@/components/features/modal/components/FormModal';
 import { FormTextarea } from '@/components/features/modal/components/FormTextarea';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+	useCreateTeacherProfileMutation,
+	useUpdateTeacherProfileMutation,
+} from '@/hooks/useTeacherProfileMutations';
 import type { TeacherProfile } from '@/models/lesson.model';
 
 const teacherProfileSchema = z.object({
@@ -29,7 +32,6 @@ type TeacherProfileFormValues = z.infer<typeof teacherProfileSchema>;
 interface TeacherProfileModalProps {
 	isOpen: boolean;
 	onClose: () => void;
-	onSave: (profile: TeacherProfile) => void;
 	profile: TeacherProfile | null;
 }
 
@@ -49,15 +51,14 @@ const ProfileSkeleton = () => (
 	</div>
 );
 
-export const TeacherProfileModal = ({
-	isOpen,
-	onClose,
-	onSave,
-	profile,
-}: TeacherProfileModalProps) => {
+export const TeacherProfileModal = ({ isOpen, onClose, profile }: TeacherProfileModalProps) => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [previewImage, setPreviewImage] = useState<string | null>(null);
-	const [isLoading, setIsLoading] = useState(false);
+
+	const createMutation = useCreateTeacherProfileMutation();
+	const updateMutation = useUpdateTeacherProfileMutation();
+
+	const isLoading = createMutation.isPending || updateMutation.isPending;
 
 	const {
 		register,
@@ -98,46 +99,23 @@ export const TeacherProfileModal = ({
 	};
 
 	const onSubmit = async (data: TeacherProfileFormValues) => {
-		// 이미지 검증
-		if (!previewImage) {
-			// *TODO: 이미지도 zod로 관리
-			toast.error('모멘토 프로필 사진을 등록해주세요.');
-			return;
+		const formData = new FormData();
+		formData.append('nickname', data.nickname);
+		formData.append('introduction', data.introduction);
+
+		if (data.profileImageFile) {
+			formData.append('image', data.profileImageFile);
 		}
 
 		try {
-			setIsLoading(true);
-
-			const formData = new FormData();
-			formData.append('nickname', data.nickname);
-			formData.append('introduction', data.introduction);
-
-			if (data.profileImageFile) {
-				formData.append('file', data.profileImageFile);
+			if (profile) {
+				await updateMutation.mutateAsync(formData);
+			} else {
+				await createMutation.mutateAsync(formData);
 			}
-
-			// TODO: 실제 API 호출
-			// await teacherProfileMutation.mutateAsync(formData);
-
-			// 임시: Mock 데이터 생성
-			const newProfile: TeacherProfile = {
-				id: profile?.id || Date.now(),
-				userId: 1,
-				nickname: data.nickname,
-				image: previewImage,
-				introduction: data.introduction,
-				createdAt: profile?.createdAt || new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
-			};
-
-			onSave(newProfile);
-			toast.success(profile ? '프로필이 수정되었습니다.' : '프로필이 등록되었습니다.');
 			onClose();
-		} catch (error) {
-			console.error('Profile save failed:', error);
-			toast.error('프로필 저장에 실패했습니다.');
-		} finally {
-			setIsLoading(false);
+		} catch {
+			// 에러는 Mutation의 onError에서 처리됨
 		}
 	};
 

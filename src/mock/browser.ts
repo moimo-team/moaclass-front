@@ -15,9 +15,10 @@ import { participationHandlers } from './participationHandler';
 import { payHandler } from './payHandler';
 import { pointHandlers } from './pointHandler';
 import { regionHandler } from './regionHandler';
-import { scheduleHandlers } from './scheduleHandler';
-import { userInfoHandler } from './userInfoHandler';
 import { reviewHandler } from './reviewHandler';
+import { scheduleHandlers } from './scheduleHandler';
+import { teacherHandler } from './teacherHandler';
+import { userInfoHandler } from './userInfoHandler';
 
 const handlers = [
 	...authHandler,
@@ -38,6 +39,7 @@ const handlers = [
 	...pointHandlers,
 	...orderHandler,
 	...reviewHandler,
+	...teacherHandler,
 ];
 
 export const worker = setupWorker(...handlers);

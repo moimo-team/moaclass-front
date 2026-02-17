@@ -2,24 +2,32 @@ import { useState } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 
 import { fetchLessons } from '@/api/lesson.api';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { ClassManageCard } from '@/components/features/class-manage/ClassManageCard';
 import { CreateClassButton } from '@/components/features/class-manage/CreateClassButton';
+import AlertNotification from '@/components/features/modal/AlertNotification';
 import ConfirmDialog from '@/components/features/modal/ConfirmDialog';
 import CreateClassModal from '@/components/features/modal/create/CreateClassModal';
 import { useDeleteLessonMutation } from '@/hooks/useLessonMutations';
+import { useTeacherProfileQuery } from '@/hooks/useTeacherProfileMutations';
+import { useToggleLessonStatusMutation } from '@/hooks/useToggleLessonStatusMutation';
 import type { Lesson, FetchLessonsResponse } from '@/models/lesson.model';
+import { useAuthStore } from '@/store/authStore';
 
 const ClassManagementPage = () => {
 	const navigate = useNavigate();
+	const userId = useAuthStore((state) => state.userId);
+	const { data: teacherProfile } = useTeacherProfileQuery(userId ?? undefined);
+
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 	const [statusDialogOpen, setStatusDialogOpen] = useState(false);
 	const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
 	const [createModalOpen, setCreateModalOpen] = useState(false);
+	const [profileAlertOpen, setProfileAlertOpen] = useState(false);
 	const [editingClassId, setEditingClassId] = useState<number | null>(null);
+	const [duplicatingClassId, setDuplicatingClassId] = useState<number | null>(null);
 	const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
 
 	const {
@@ -33,6 +41,7 @@ const ClassManagementPage = () => {
 	});
 
 	const { mutate: deleteLesson } = useDeleteLessonMutation();
+	const { mutate: toggleStatusMutation } = useToggleLessonStatusMutation();
 
 	const lessons = lessonsResponse?.data ?? [];
 
@@ -58,15 +67,20 @@ const ClassManagementPage = () => {
 	};
 
 	const handleDuplicate = (id: number) => {
+		if (!teacherProfile) {
+			setProfileAlertOpen(true);
+			return;
+		}
 		setSelectedClassId(id);
 		setDuplicateDialogOpen(true);
 	};
 
 	const handleDuplicateConfirm = () => {
 		if (selectedClassId) {
-			toast.info('클래스 복제 기능은 준비 중입니다.');
+			setDuplicatingClassId(selectedClassId);
 			setDuplicateDialogOpen(false);
 			setSelectedClassId(null);
+			setCreateModalOpen(true);
 		}
 	};
 
@@ -75,7 +89,7 @@ const ClassManagementPage = () => {
 	};
 
 	const handleViewClass = (id: number) => {
-		toast.info(`클래스 ${id} 상세 페이지는 준비 중입니다.`);
+		navigate(`/lessons/${id}`);
 	};
 
 	const handleToggleStatus = (id: number) => {
@@ -85,7 +99,13 @@ const ClassManagementPage = () => {
 
 	const handleStatusConfirm = () => {
 		if (selectedClassId) {
-			toast.info('상태 변경 기능은 준비 중입니다.');
+			const lesson = lessons.find((l) => l.id === selectedClassId);
+			if (lesson) {
+				toggleStatusMutation({
+					lessonId: selectedClassId,
+					currentStatus: lesson.status,
+				});
+			}
 			setStatusDialogOpen(false);
 			setSelectedClassId(null);
 		}
@@ -94,6 +114,15 @@ const ClassManagementPage = () => {
 	const handleModalClose = () => {
 		setCreateModalOpen(false);
 		setEditingClassId(null);
+		setDuplicatingClassId(null);
+	};
+
+	const handleCreateClick = () => {
+		if (!teacherProfile) {
+			setProfileAlertOpen(true);
+			return;
+		}
+		setCreateModalOpen(true);
 	};
 
 	if (isLoading) {
@@ -118,11 +147,7 @@ const ClassManagementPage = () => {
 				className="grid gap-8"
 				style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 2fr))' }}
 			>
-				<CreateClassButton
-					onClick={() => {
-						setCreateModalOpen(true); /**TODO: 호스트 프로필 생성 유무 판단*/
-					}}
-				/>
+				<CreateClassButton onClick={handleCreateClick} />
 
 				{lessons.map((lesson: Lesson) => (
 					<ClassManageCard
@@ -164,12 +189,12 @@ const ClassManagementPage = () => {
 				onConfirm={handleStatusConfirm}
 			/>
 
-			{/* 복제 클래스 다이얼로그 */}
+			{/* 복제 확인 다이얼로그 */}
 			<ConfirmDialog
 				open={duplicateDialogOpen}
 				onOpenChange={setDuplicateDialogOpen}
 				title="클래스 복제"
-				description="해당 클래스를 복제하시겠습니까? 복제된 클래스는 휴면 상태로 설정됩니다."
+				description="해당 클래스를 복제하시겠습니까?"
 				confirmText="복제"
 				onConfirm={handleDuplicateConfirm}
 			/>
@@ -178,7 +203,23 @@ const ClassManagementPage = () => {
 			<CreateClassModal
 				open={createModalOpen}
 				onOpenChange={handleModalClose}
-				classId={editingClassId || undefined}
+				classId={editingClassId || duplicatingClassId || undefined}
+				isDuplicating={!!duplicatingClassId}
+			/>
+
+			{/* 프로필 미등록 안내 */}
+			<AlertNotification
+				open={profileAlertOpen}
+				onOpenChange={setProfileAlertOpen}
+				title="모멘토 프로필 등록 필요"
+				description={
+					<>
+						클래스를 등록하려면 먼저 모멘토 프로필을 등록해주세요.
+						<br />
+						좌측 메뉴에서 '모멘토 프로필' 탭을 선택하여 프로필을 등록할 수 있습니다.
+					</>
+				}
+				hasButton={true}
 			/>
 		</div>
 	);
