@@ -127,15 +127,30 @@ export const mockMeetings: Meeting[] = Array.from({ length: 25 }, (_, i) => {
 });
 
 // Mock 원데이클래스 데이터
-export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
+export const mockLessons: Lesson[] = Array.from({ length: 50 }, (_, i) => {
 	const selectedClassCategory = faker.helpers.arrayElement(LESSON_CATEGORIES);
 	const selectedRegion = faker.location.county();
 
+	// 테스트 유저 1, 2, 3에게 적절히 클래스 배분
+	const fixedTeacherId = (i % 3) + 1;
+	// 50개 중 일부(예: 30개)는 고정된 테스트 선생님들에게 할당
+	const teacherId = i < 30 ? fixedTeacherId : faker.number.int({ min: 4, max: 100 });
+
 	const teacherProfile: TeacherProfile = {
-		id: faker.number.int({ min: 1, max: 100 }),
-		userId: faker.number.int({ min: 1, max: 100 }),
-		nickname: faker.person.fullName(),
-		image: faker.image.avatar(),
+		id: teacherId,
+		userId: teacherId,
+		nickname:
+			i < 30
+				? fixedTeacherId === 1
+					? '김도예 멘토'
+					: fixedTeacherId === 2
+						? '이그림 멘토'
+						: '박요리 멘토'
+				: faker.person.fullName(),
+		image:
+			i < 30
+				? `https://picsum.photos/id/${63 + fixedTeacherId}/300/300`
+				: faker.image.avatar(),
 		introduction: faker.lorem.paragraph(),
 	};
 
@@ -168,7 +183,7 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
 
 	return {
 		id: i + 1,
-		userId: teacherProfile.userId,
+		userId: teacherId,
 		lessonCategoryId: selectedClassCategory.id,
 		lessonCategoryName: selectedClassCategory.name,
 
@@ -217,14 +232,12 @@ export const mockLessons: Lesson[] = Array.from({ length: 15 }, (_, i) => {
 
 // Mock 리뷰 데이터
 export const mockReviews: Review[] = mockLessons.flatMap((lesson) =>
-	Array.from({ length: faker.number.int({ min: 0, max: 10 }) }, () => {
+	Array.from({ length: faker.number.int({ min: 5, max: 15 }) }, () => {
 		const userProfile: UserProfileForReview = {
 			id: faker.number.int({ min: 1, max: 1000 }),
 			nickname: faker.person.fullName(),
 			profileImage: faker.image.avatar(),
 		};
-
-		const reviewId = faker.number.int({ min: 1000, max: 9999 });
 
 		const representativeImage = faker.datatype.boolean()
 			? faker.image.urlLoremFlickr({
