@@ -1,12 +1,11 @@
 import defaultMeetingImage from '@/assets/images/moimo-meetings.png';
 import StarRating from '@/components/common/StarRating';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import type { Meeting } from '@/models/meeting.model';
 
 interface ReviewCardProps {
-	meeting: Meeting;
-	imageUrls?: string[];
+	lessonTitle: string;
+	representativeImage: string | null;
 	className?: string;
 	rating: number;
 	content: string;
@@ -14,16 +13,14 @@ interface ReviewCardProps {
 }
 
 const ReviewCard = ({
-	meeting,
-	imageUrls,
+	lessonTitle,
+	representativeImage,
 	className,
 	rating,
 	content,
 	onCardClick,
 }: ReviewCardProps) => {
-	const { title } = meeting;
-
-	const displayImage = imageUrls && imageUrls.length > 0 ? imageUrls[0] : defaultMeetingImage;
+	const displayImage = representativeImage || defaultMeetingImage;
 
 	return (
 		<Card
@@ -35,14 +32,15 @@ const ReviewCard = ({
 		>
 			{/* 상단: 후기 이미지*/}
 			<div className="relative w-full h-[70%]">
-				<img src={displayImage} alt={title} className={'w-full h-full object-cover'} />
+				<img src={displayImage} alt={lessonTitle} className="w-full h-full object-cover" />
 			</div>
 
 			{/* 중간: 별점 */}
 			<CardHeader className="p-3 pb-0 flex-grow">
 				<CardTitle className="text-base font-semibold text-foreground line-clamp-1 mb-1">
-					<StarRating rating={rating} />
+					{lessonTitle}
 				</CardTitle>
+				<StarRating rating={rating} />
 			</CardHeader>
 
 			{/* 하단: 후기 내용 일부 */}

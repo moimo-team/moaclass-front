@@ -11,27 +11,17 @@ import { cn } from '@/lib/utils';
 import type { Lesson } from '@/models/lesson.model';
 import { getDisplayAddress } from '@/utils/formatAddress';
 
-import type { QueryKey } from '@tanstack/react-query';
-
 interface LessonCardProps {
 	lesson: Lesson;
 	className?: string;
-	queryKeyToInvalidate?: QueryKey;
 	onToggleLike?: (lessonId: number, isLiked: boolean) => void;
 }
 
-export function LessonCard({
-	lesson,
-	className,
-	queryKeyToInvalidate = ['lessons'],
-	onToggleLike,
-}: LessonCardProps) {
+export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps) {
 	const { id, title, address, isLiked } = lesson;
 	const href = `/lessons/${id}`;
 
-	const { mutate: toggleLike, isPending: isLiking } = useLessonLikeMutation([
-		queryKeyToInvalidate,
-	]);
+	const { mutate: toggleLike, isPending: isLiking } = useLessonLikeMutation();
 
 	const handleLikeClick = (e: React.MouseEvent) => {
 		e.preventDefault();

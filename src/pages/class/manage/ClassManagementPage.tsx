@@ -11,6 +11,7 @@ import { CreateClassButton } from '@/components/features/class-manage/CreateClas
 import ConfirmDialog from '@/components/features/modal/ConfirmDialog';
 import CreateClassModal from '@/components/features/modal/create/CreateClassModal';
 import { useDeleteLessonMutation } from '@/hooks/useLessonMutations';
+import type { Lesson, FetchLessonsResponse } from '@/models/lesson.model';
 
 const ClassManagementPage = () => {
 	const navigate = useNavigate();
@@ -21,14 +22,19 @@ const ClassManagementPage = () => {
 	const [editingClassId, setEditingClassId] = useState<number | null>(null);
 	const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
 
-	const { data: lessonsResponse, isLoading } = useQuery({
-		queryKey: ['lessons'],
+	const {
+		data: lessonsResponse,
+		isLoading,
+		isError,
+	} = useQuery<FetchLessonsResponse>({
+		queryKey: ['lessons', 'manage-list'],
 		queryFn: () => fetchLessons({}),
+		refetchOnMount: 'always',
 	});
 
 	const { mutate: deleteLesson } = useDeleteLessonMutation();
 
-	const lessons = lessonsResponse?.lessons || [];
+	const lessons = lessonsResponse?.data ?? [];
 
 	const handleEdit = (id: number) => {
 		setEditingClassId(id);
@@ -94,6 +100,12 @@ const ClassManagementPage = () => {
 		return <LoadingSpinner />;
 	}
 
+	if (isError) {
+		return (
+			<div className="py-10 text-center text-red-500">클래스 목록을 불러오지 못했습니다.</div>
+		);
+	}
+
 	return (
 		<div className="w-full">
 			<div className="mb-8">
@@ -112,7 +124,7 @@ const ClassManagementPage = () => {
 					}}
 				/>
 
-				{lessons.map((lesson) => (
+				{lessons.map((lesson: Lesson) => (
 					<ClassManageCard
 						key={lesson.id}
 						lesson={lesson}

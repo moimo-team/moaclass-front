@@ -12,6 +12,8 @@
 		"lint": "eslint .",
 		"lint:next": "next lint",
 		"preview": "vite preview",
+		"test": "vitest",
+		"test:ui": "vitest --ui",
 		"prepare": "husky install"
 	},
 	"dependencies": {
@@ -61,8 +63,12 @@
 		"@eslint/js": "^9.39.1",
 		"@faker-js/faker": "^10.2.0",
 		"@tailwindcss/postcss": "^4.1.18",
-		"@types/node": "^24.10.13",
-		"@types/react": "^19.2.14",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1",
+		"@types/jest": "^30.0.0",
+		"@types/node": "^24.10.1",
+		"@types/react": "^19.2.5",
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^5.1.1",
 		"autoprefixer": "^10.4.23",
@@ -73,6 +79,7 @@
 		"eslint-plugin-unused-imports": "^4.4.1",
 		"globals": "^16.5.0",
 		"husky": "^9.1.7",
+		"jsdom": "^28.0.0",
 		"lint-staged": "^16.2.7",
 		"msw": "^2.12.7",
 		"postcss": "^8.5.6",
@@ -80,7 +87,8 @@
 		"tailwindcss": "^4.1.18",
 		"typescript": "~5.9.3",
 		"typescript-eslint": "^8.46.4",
-		"vite": "^7.2.4"
+		"vite": "^7.2.4",
+		"vitest": "^4.0.18"
 	},
 	"msw": {
 		"workerDirectory": [

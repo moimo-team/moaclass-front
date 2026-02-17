@@ -52,7 +52,7 @@ export const LessonDetail = () => {
 		lessonDetail,
 	});
 
-	const likeMutation = useLessonLikeMutation([['lesson', Number(lessonId)]]);
+	const likeMutation = useLessonLikeMutation();
 
 	const handleWishlistToggle = () => {
 		if (!isLoggedIn) {
@@ -157,7 +157,7 @@ export const LessonDetail = () => {
 							detailAddress={detailAddress}
 							directionsText={directionsText}
 							navigate={navigate}
-							reviews={reviewsData || []}
+							reviews={reviewsData?.data || []}
 						/>
 					</div>
 
