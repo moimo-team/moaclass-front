@@ -71,12 +71,6 @@ export interface LessonDetail extends Lesson {
 	reviews: Review[];
 }
 
-// 클래스 상세 정보
-export interface LessonDetail extends Lesson {
-	images: LessonImage[];
-	reviews: Review[];
-}
-
 // 클래스 갤러리 이미지
 export interface LessonImage {
 	id: number;
