@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from 'msw';
 
-import { httpUrl } from './mockData/mockData';
+import { httpUrl, mockLessons, mockReviews } from './mockData/mockData';
 
 // Mock 선생님 프로필 저장소
 const teacherProfileStore = new Map<
@@ -11,7 +11,37 @@ const teacherProfileStore = new Map<
 		image: string;
 		introduction: string;
 	}
->();
+>([
+	[
+		1,
+		{
+			id: 1,
+			nickname: '김도예 멘토',
+			image: 'https://picsum.photos/id/64/300/300',
+			introduction:
+				'도예 10년 경력의 베테랑 멘토입니다. 쉽고 재미있게 물레를 배우고 싶으신 분들을 환영합니다.도예 10년 경력의 베테랑 멘토입니다. 쉽고 재미있게 물레를 배우고 싶으신 분들을 환영합니다.도예 10년 경력의 베테랑 멘토입니다. 쉽고 재미있게 물레를 배우고 싶으신 분들을 환영합니다.도예 10년 경력의 베테랑 멘토입니다. 쉽고 재미있게 물레를 배우고 싶으신 분들을 환영합니다.도예 10년 경력의 베테랑 멘토입니다. 쉽고 재미있게 물레를 배우고 싶으신 분들을 환영합니다.도예 10년 경력의 베테랑 멘토입니다. 쉽고 재미있게 물레를 배우고 싶으신 분들을 환영합니다.',
+		},
+	],
+	[
+		2,
+		{
+			id: 2,
+			nickname: '이그림 멘토',
+			image: 'https://picsum.photos/id/65/300/300',
+			introduction:
+				'유화와 수채화를 전문으로 가르치고 있습니다. 나만의 예술적 감각을 깨워보세요.',
+		},
+	],
+	[
+		3,
+		{
+			id: 3,
+			nickname: '박요리 멘토',
+			image: 'https://picsum.photos/id/66/300/300',
+			introduction: '한식부터 양식까지, 누구나 따라 할 수 있는 집밥 레시피를 공유합니다.',
+		},
+	],
+]);
 
 // 선생님 프로필 등록
 const createTeacherProfile = http.post(`${httpUrl}/teachers`, async ({ request }) => {
@@ -167,9 +197,63 @@ const deleteTeacherProfile = http.delete(
 	},
 );
 
+// 특정 모멘토가 받은 후기 조회
+const getTeacherReviews = http.get(
+	`${httpUrl}/teachers/:userId/reviews`,
+	async ({ params, request }) => {
+		try {
+			const userId = Number(params.userId);
+			const url = new URL(request.url);
+			const page = Number(url.searchParams.get('page') || '1');
+			const limit = Number(url.searchParams.get('limit') || '10');
+
+			const teacherLessonIds = mockLessons
+				.filter((lesson) => lesson.userId === userId || lesson.teacher.id === userId)
+				.map((lesson) => lesson.id);
+
+			const filteredReviews = mockReviews
+				.filter((review) => teacherLessonIds.includes(review.lessonId))
+				.map((review) => ({
+					id: review.id,
+					userId: review.user.id,
+					rating: review.rating,
+					content: review.content,
+					representativeImage: review.representativeImage,
+					createdAt: review.createdAt,
+					user: review.user, // 작성자 정보 포함
+				}));
+
+			filteredReviews.sort(
+				(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+			);
+
+			const totalCount = filteredReviews.length;
+			const totalPages = Math.ceil(totalCount / limit);
+			const paginatedReviews = filteredReviews.slice((page - 1) * limit, page * limit);
+
+			await delay(500);
+			return HttpResponse.json(
+				{
+					data: paginatedReviews,
+					meta: {
+						totalCount,
+						page,
+						limit,
+						totalPages,
+					},
+				},
+				{ status: 200 },
+			);
+		} catch {
+			return new HttpResponse(null, { status: 500 });
+		}
+	},
+);
+
 export const teacherHandler = [
 	createTeacherProfile,
 	updateTeacherProfile,
 	getTeacherProfile,
 	deleteTeacherProfile,
+	getTeacherReviews,
 ];
