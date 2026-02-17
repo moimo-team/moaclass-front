@@ -4,8 +4,6 @@ import LessonList from '@/components/features/lessons/LessonList';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Lesson } from '@/models/lesson.model';
 
-import type { QueryKey } from '@tanstack/react-query';
-
 interface LessonListSectionProps {
 	title: string;
 	seeMoreHref?: string;
@@ -13,7 +11,6 @@ interface LessonListSectionProps {
 	lessons: Lesson[];
 	isLoading: boolean;
 	isError: boolean;
-	queryKeyToInvalidate?: QueryKey;
 }
 
 function LessonListSection({
@@ -23,7 +20,6 @@ function LessonListSection({
 	lessons,
 	isLoading,
 	isError,
-	queryKeyToInvalidate,
 }: LessonListSectionProps) {
 	if (hideIfEmpty && !isLoading && lessons.length === 0) {
 		return null;
@@ -51,9 +47,7 @@ function LessonListSection({
 					수업 목록을 불러오는 중 에러가 발생했습니다.
 				</p>
 			)}
-			{!isLoading && !isError && lessons.length > 0 && (
-				<LessonList lessons={lessons} queryKeyToInvalidate={queryKeyToInvalidate} />
-			)}
+			{!isLoading && !isError && lessons.length > 0 && <LessonList lessons={lessons} />}
 			{!isLoading && !isError && lessons.length === 0 && (
 				<p className="text-center py-16">수업이 없습니다.</p>
 			)}

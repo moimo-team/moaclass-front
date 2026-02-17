@@ -8,11 +8,11 @@ import {
 	CarouselPrevious,
 	CarouselNext,
 } from '@/components/ui/carousel';
-import type { Review } from '@/mock/reviewMock';
+import type { LatestReviewItem } from '@/models/review.model';
 
 interface ReviewListProps {
-	reviews: Review[];
-	onReviewClick: (review: Review) => void;
+	reviews: LatestReviewItem[];
+	onReviewClick: (review: LatestReviewItem) => void;
 }
 
 const ReviewList = ({ reviews, onReviewClick }: ReviewListProps) => {
@@ -31,12 +31,12 @@ const ReviewList = ({ reviews, onReviewClick }: ReviewListProps) => {
 		>
 			<CarouselContent className="-ml-3">
 				{reviews.map((review) => (
-					<CarouselItem key={review.reviewId} className="pl-3 md:basis-1/3 lg:basis-1/4">
+					<CarouselItem key={review.id} className="pl-3 md:basis-1/3 lg:basis-1/4">
 						<div className="p-1">
 							<ReviewCard
 								className="h-80"
-								meeting={review.meeting}
-								imageUrls={review.imageUrl}
+								lessonTitle={review.lessonTitle}
+								representativeImage={review.representativeImage}
 								rating={review.rating}
 								content={review.content}
 								onCardClick={() => onReviewClick(review)}

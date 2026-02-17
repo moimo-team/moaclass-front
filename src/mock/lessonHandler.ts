@@ -7,6 +7,8 @@ import type { FetchLessonsResponse } from '@/models/lesson.model';
 
 import { isLessonLiked } from './likeHandler';
 
+const toNullableImage = (image: string | undefined): string | null => image ?? null;
+
 const applyLikeStatus = (lessons: Lesson[]): Lesson[] => {
 	return lessons.map((lesson) => ({
 		...lesson,
@@ -160,12 +162,60 @@ export const lessonHandlers = [
 	}),
 
 	// 클래스 리뷰 목록
-	http.get(`${httpUrl}/lessons/:lessonId/reviews`, async ({ params }) => {
+	http.get(`${httpUrl}/lessons/:lessonId/reviews`, async ({ params, request }) => {
 		await delay(300);
+		const url = new URL(request.url);
 		const lessonId = Number(params.lessonId);
-		const filteredReviews = mockReviews.filter((review) => review.lessonId === lessonId);
+		const page = Number(url.searchParams.get('page') || '1');
+		const limit = Number(url.searchParams.get('limit') || '6');
 
-		return HttpResponse.json(filteredReviews, { status: 200 });
+		const lessonTitle =
+			mockLessons.find((lesson) => lesson.id === lessonId)?.title || '레슨 타이틀';
+
+		const filteredReviews = mockReviews
+			.filter((review) => review.lessonId === lessonId)
+			.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+		const totalCount = filteredReviews.length;
+		const totalPages = Math.ceil(totalCount / limit);
+		const paginated = filteredReviews.slice((page - 1) * limit, page * limit);
+
+		const data = paginated.map((review) => {
+			const images = review.representativeImage ? [review.representativeImage] : [];
+			const reviewImages = review.images && review.images.length > 0 ? review.images : images;
+
+			return {
+				id: review.id,
+				lessonId: review.lessonId,
+				lessonTitle,
+				userId: review.user.id,
+				rating: review.rating,
+				content: review.content,
+				image1: toNullableImage(reviewImages[0]),
+				image2: toNullableImage(reviewImages[1]),
+				image3: toNullableImage(reviewImages[2]),
+				image4: toNullableImage(reviewImages[3]),
+				image5: toNullableImage(reviewImages[4]),
+				image6: toNullableImage(reviewImages[5]),
+				image7: toNullableImage(reviewImages[6]),
+				image8: toNullableImage(reviewImages[7]),
+				createdAt: review.createdAt,
+				updatedAt: review.updatedAt,
+			};
+		});
+
+		return HttpResponse.json(
+			{
+				data,
+				meta: {
+					totalCount,
+					page,
+					limit,
+					totalPages,
+				},
+			},
+			{ status: 200 },
+		);
 	}),
 
 	// 클래스 생성

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient, type QueryKey } from '@tanstack/react-quer
 import { toast } from 'sonner';
 
 import { addLike, cancelLike } from '@/api/like.api';
-import type { Lesson, FetchLessonsResponse } from '@/models/lesson.model';
+import type { FetchLessonsResponse, Lesson } from '@/models/lesson.model';
 
 interface ToggleLikeVariables {
 	lessonId: number;
@@ -12,11 +12,11 @@ interface ToggleLikeVariables {
 interface LessonLikeMutationContext {
 	previousData: Array<{
 		queryKey: QueryKey;
-		data: Lesson[] | Lesson | undefined;
+		data: Lesson[] | Lesson | FetchLessonsResponse | undefined;
 	}>;
 }
 
-export const useLessonLikeMutation = (queryKeysToInvalidate: QueryKey[] = [['lessons']]) => {
+export const useLessonLikeMutation = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation<void, Error, ToggleLikeVariables, LessonLikeMutationContext>({
@@ -31,10 +31,18 @@ export const useLessonLikeMutation = (queryKeysToInvalidate: QueryKey[] = [['les
 			// 1. 진행 중인 쿼리 취소 및 이전 데이터 백업
 			const previousData: LessonLikeMutationContext['previousData'] = [];
 
-			for (const queryKey of queryKeysToInvalidate) {
+			// 활성화된 모든 lesson 쿼리를 동적으로 찾기
+			const queryCache = queryClient.getQueryCache();
+			const queryKeysToUpdate = queryCache
+				.findAll({ queryKey: ['lessons'], type: 'active' })
+				.map((query) => query.queryKey);
+
+			for (const queryKey of queryKeysToUpdate) {
 				await queryClient.cancelQueries({ queryKey });
 
-				const previous = queryClient.getQueryData<Lesson[] | Lesson>(queryKey);
+				const previous = queryClient.getQueryData<Lesson[] | Lesson | FetchLessonsResponse>(
+					queryKey,
+				);
 				previousData.push({ queryKey, data: previous });
 
 				// 2. 낙관적 업데이트
@@ -43,11 +51,13 @@ export const useLessonLikeMutation = (queryKeysToInvalidate: QueryKey[] = [['les
 					(oldData) => {
 						if (!oldData) return oldData;
 
-						let newData: Lesson[] | Lesson | FetchLessonsResponse | undefined;
-
-						// oldData가 FetchLessonsResponse 타입인 경우
-						if ('data' in oldData && Array.isArray(oldData.data)) {
-							newData = {
+						// FetchLessonsResponse 객체 (useLessonsQuery)
+						if (
+							typeof oldData === 'object' &&
+							'data' in oldData &&
+							Array.isArray(oldData.data)
+						) {
+							return {
 								...oldData,
 								data: oldData.data.map((lesson) =>
 									lesson.id === lessonId
@@ -62,9 +72,9 @@ export const useLessonLikeMutation = (queryKeysToInvalidate: QueryKey[] = [['les
 								),
 							};
 						}
-						// oldData가 Lesson 배열 타입인 경우 (useLatestLessonsQuery, useParticipationQuery 등)
+						// Lesson 배열 (useLatestLessonsQuery, useParticipationQuery 등)
 						else if (Array.isArray(oldData)) {
-							newData = oldData.map((lesson) =>
+							return oldData.map((lesson) =>
 								lesson.id === lessonId
 									? {
 											...lesson,
@@ -76,22 +86,20 @@ export const useLessonLikeMutation = (queryKeysToInvalidate: QueryKey[] = [['les
 									: lesson,
 							);
 						}
-						// oldData가 단일 Lesson 객체 타입인 경우 (예: useLessonQuery)
-						else {
+						// 단일 Lesson 객체 (useLessonQuery)
+						else if (typeof oldData === 'object' && 'id' in oldData) {
 							const lesson = oldData as Lesson;
 							if (lesson.id === lessonId) {
-								newData = {
+								return {
 									...lesson,
 									isLiked: newIsLiked,
 									likeCount: newIsLiked
 										? lesson.likeCount + 1
 										: lesson.likeCount - 1,
 								};
-							} else {
-								newData = oldData;
 							}
 						}
-						return newData;
+						return oldData;
 					},
 				);
 			}
@@ -99,7 +107,6 @@ export const useLessonLikeMutation = (queryKeysToInvalidate: QueryKey[] = [['les
 			return { previousData };
 		},
 		onError: (_, __, context) => {
-			toast.error('좋아요 토글 실패.');
 			// 3. 에러 발생 시 이전 데이터로 롤백
 			if (context?.previousData) {
 				context.previousData.forEach(({ queryKey, data }) => {
@@ -108,11 +115,9 @@ export const useLessonLikeMutation = (queryKeysToInvalidate: QueryKey[] = [['les
 			}
 			toast.error('좋아요 상태 변경에 실패했습니다.');
 		},
-		onSettled: (_, __, ___, context) => {
-			// 4. 성공/실패 여부와 관계없이 쿼리 무효화 (최신 데이터 동기화)
-			for (const { queryKey } of context?.previousData || []) {
-				queryClient.invalidateQueries({ queryKey });
-			}
+		onSettled: () => {
+			// 4. 성공/실패 여부와 관계없이 모든 lesson 관련 쿼리 무효화 (최신 데이터 동기화)
+			queryClient.invalidateQueries({ queryKey: ['lessons'] });
 		},
 	});
 };

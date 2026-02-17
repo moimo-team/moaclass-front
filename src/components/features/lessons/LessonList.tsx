@@ -10,14 +10,11 @@ import {
 } from '@/components/ui/carousel';
 import type { Lesson } from '@/models/lesson.model';
 
-import type { QueryKey } from '@tanstack/react-query';
-
 export interface LessonListProps {
 	lessons: Lesson[];
-	queryKeyToInvalidate?: QueryKey;
 }
 
-const LessonList = ({ lessons, queryKeyToInvalidate }: LessonListProps) => {
+const LessonList = ({ lessons }: LessonListProps) => {
 	return (
 		<Carousel
 			opts={{
@@ -38,10 +35,7 @@ const LessonList = ({ lessons, queryKeyToInvalidate }: LessonListProps) => {
 						className="pl-3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
 					>
 						<div className="p-1">
-							<LessonCard
-								lesson={lesson}
-								queryKeyToInvalidate={queryKeyToInvalidate}
-							/>
+							<LessonCard lesson={lesson} />
 						</div>
 					</CarouselItem>
 				))}
