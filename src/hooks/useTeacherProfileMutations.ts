@@ -8,8 +8,6 @@ import {
 	updateTeacherProfile,
 } from '@/api/teacher.api';
 
-import type { AxiosError } from 'axios';
-
 // 선생님 프로필 조회 Query
 export const useTeacherProfileQuery = (userId?: number) => {
 	return useQuery({
@@ -29,10 +27,6 @@ export const useCreateTeacherProfileMutation = () => {
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
 			toast.success('모멘토 프로필이 등록되었습니다.');
 		},
-		onError: (error: AxiosError<{ message: string }>) => {
-			const message = error.response?.data?.message || '프로필 등록에 실패했습니다.';
-			toast.error(message);
-		},
 	});
 };
 
@@ -47,10 +41,6 @@ export const useUpdateTeacherProfileMutation = () => {
 			queryClient.invalidateQueries({ queryKey: ['teacherProfile'] });
 			toast.success('모멘토 프로필이 수정되었습니다.');
 		},
-		onError: (error: AxiosError<{ message: string }>) => {
-			const message = error.response?.data?.message || '프로필 수정에 실패했습니다.';
-			toast.error(message);
-		},
 	});
 };
 
@@ -64,10 +54,6 @@ export const useDeleteTeacherProfileMutation = () => {
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
 			queryClient.invalidateQueries({ queryKey: ['teacherProfile'] });
 			toast.success('모멘토 프로필이 삭제되었습니다.');
-		},
-		onError: (error: AxiosError<{ message: string }>) => {
-			const message = error.response?.data?.message || '프로필 삭제에 실패했습니다.';
-			toast.error(message);
 		},
 	});
 };

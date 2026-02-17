@@ -12,9 +12,6 @@ export const useCreateLessonMutation = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['lessons'] });
 		},
-		onError: (error: any) => {
-			console.error('레슨 생성 실패:', error);
-		},
 	});
 };
 
@@ -29,9 +26,6 @@ export const useUpdateLessonMutation = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['lessons'] });
 		},
-		onError: (error: any) => {
-			console.error('레슨 수정 실패:', error);
-		},
 	});
 };
 
@@ -44,9 +38,6 @@ export const useDeleteLessonMutation = () => {
 		mutationFn: deleteLesson,
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['lessons'] });
-		},
-		onError: (error: any) => {
-			console.error('레슨 삭제 실패:', error);
 		},
 	});
 };
