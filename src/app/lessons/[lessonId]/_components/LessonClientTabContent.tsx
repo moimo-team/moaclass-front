@@ -1,14 +1,16 @@
-import { ReviewList } from '@components/features/lessons/ReviewList';
+import { useState, useEffect } from 'react';
+
 import { FaMapMarkerAlt } from 'react-icons/fa';
 
 import defaultProfileImage from '@/assets/images/profile.png';
+import { ReviewList } from '@/components/features/lessons/ReviewList';
 import KakaoMapView from '@/components/features/map/kakaoMaps/KakaoMapView';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { Review } from '@/models/review.model';
 
-interface LessonTabContentProps {
+interface LessonClientTabContentProps {
 	activeTab: string;
 	tabTitles: { id: string; title: string }[];
 	handleTabClick: (id: string) => void;
@@ -28,12 +30,11 @@ interface LessonTabContentProps {
 	address: string;
 	detailAddress: string;
 	directionsText: string;
-	// navigate: ReturnType<typeof useNavigate>;
 	navigate: (path: string) => void;
 	reviews: Review[];
 }
 
-export const LessonTabContent = ({
+export const LessonClientTabContent = ({
 	activeTab,
 	tabTitles,
 	handleTabClick,
@@ -48,7 +49,20 @@ export const LessonTabContent = ({
 	directionsText,
 	navigate,
 	reviews,
-}: LessonTabContentProps) => {
+}: LessonClientTabContentProps) => {
+	const [isMapReady, setIsMapReady] = useState(false);
+
+	useEffect(() => {
+		if (!window.kakao?.maps) return;
+
+		// Next.js환경에서는 autoload=false이므로 명시적 로드 필요
+		window.kakao.maps.load(() => {
+			setIsMapReady(true);
+		});
+	}, []);
+	// 섹션 참조를 위한 내부 ref (필요한 경우)
+	// const introRef = useRef<HTMLElement>(null);
+
 	return (
 		<>
 			{/* 탭 네비게이션 */}
@@ -140,13 +154,22 @@ export const LessonTabContent = ({
 							<CardTitle className="text-xl font-bold">위치</CardTitle>
 						</CardHeader>
 						<CardContent className="p-0">
-							<div className="w-full h-96 bg-muted">
-								<KakaoMapView
-									lat={latitude}
-									lng={longitude}
-									placeName={address}
-									level={3}
-								/>
+							<div className="w-full h-96 bg-muted relative">
+								{isMapReady ? (
+									<KakaoMapView
+										lat={latitude}
+										lng={longitude}
+										placeName={address}
+										level={3}
+									/>
+								) : (
+									<div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400">
+										<div className="text-center">
+											<FaMapMarkerAlt className="w-8 h-8 mx-auto mb-2 opacity-50" />
+											<p>지도를 불러오는 중입니다...</p>
+										</div>
+									</div>
+								)}
 							</div>
 							<div className="p-4 bg-card border-t border-border/50">
 								<p className="text-base font-medium text-foreground flex items-center gap-2">
