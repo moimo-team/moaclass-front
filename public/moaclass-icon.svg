@@ -1,0 +1,17 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with slightly rounded corners -->
+  <rect width="512" height="512" rx="100" fill="#ffffff"/>
+  
+  <!-- Main Community/Gathering Circle -->
+  <circle cx="256" cy="256" r="200" stroke="#6b8f71" stroke-width="40"/>
+  
+  <!-- Stylized 'M' and 'C' fusion (MoaClass) -->
+  <path d="M160 320V192L256 288L352 192V320" stroke="#6b8f71" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Carrot Accent (The spark of learning/community) -->
+  <path d="M380 140L410 110M410 140L380 110" stroke="#f97316" stroke-width="20" stroke-linecap="round"/>
+  <circle cx="395" cy="125" r="30" stroke="#f97316" stroke-width="8" stroke-dasharray="2 10"/>
+  
+  <!-- Bottom Accent (Foundation/Growth) -->
+  <rect x="180" y="380" width="152" height="20" rx="10" fill="#a9c3b0"/>
+</svg>
