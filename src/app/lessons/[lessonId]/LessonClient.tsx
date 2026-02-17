@@ -25,8 +25,6 @@ interface LessonClientProps {
 
 export default function LessonClient({ lessonId }: LessonClientProps) {
 	const router = useRouter();
-	// const params = useParams(); // [DELETE] remove useParams
-	// const lessonId = params.lessonId as string; // [DELETE] use prop instead
 
 	// navigate wrapper for compatibility
 	const navigate = (path: string) => router.push(path);
@@ -62,7 +60,7 @@ export default function LessonClient({ lessonId }: LessonClientProps) {
 		lessonDetail,
 	});
 
-	const likeMutation = useLessonLikeMutation([['lesson', Number(lessonId)]]);
+	const likeMutation = useLessonLikeMutation();
 
 	const handleWishlistToggle = () => {
 		if (!isLoggedIn) {
@@ -160,14 +158,21 @@ export default function LessonClient({ lessonId }: LessonClientProps) {
 							onSectionRef={handleSectionRef}
 							description={description}
 							curriculum={curriculum}
-							teacher={teacher}
+							teacher={
+								teacher
+									? {
+											...teacher,
+											introduction: teacher.introduction || '',
+										}
+									: undefined
+							}
 							latitude={latitude}
 							longitude={longitude}
 							address={address}
 							detailAddress={detailAddress}
 							directionsText={directionsText}
 							navigate={navigate}
-							reviews={reviewsData || []}
+							reviews={reviewsData?.data || []}
 						/>
 					</div>
 

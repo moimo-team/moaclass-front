@@ -1,4 +1,5 @@
 import LessonClient from '@/app/lessons/[lessonId]/LessonClient';
+import { createPageMetadata } from '@/utils/metadata';
 
 import type { Metadata } from 'next';
 
@@ -14,14 +15,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	// 우선 기본적인 타이틀 설정만 적용하고, 추후 API 호출을 통해 동적 데이터를 가져오도록 구현합니다.
 	// 실제 구현 예시: const lesson = await fetchLesson(lessonId);
 
-	return {
+	return createPageMetadata({
 		title: `클래스 상세 ${lessonId}`,
-		description: '모아클래스에서 다양한 취미를 만나보세요!',
-		openGraph: {
-			title: `클래스 상세 ${lessonId}`,
-			description: '모아클래스에서 다양한 취미를 만나보세요!',
-		},
-	};
+		description: `클래스 상세 ${lessonId}`,
+	});
 }
 
 export default async function LessonDetailPage({ params }: Props) {
