@@ -4,6 +4,7 @@ import { getChatSocket, initChatSocket, type ChatSocket } from '@/lib/chatSocket
 import type { MockSocketClient } from '@/mock/mockData/socketMock';
 import type { ChatMessage } from '@/models/chat.model';
 import { useAuthStore } from '@/store/authStore';
+import { ENV } from '@/utils/env';
 
 const isMockingEnabled =
 	import.meta.env.DEV && (import.meta.env.VITE_ENABLE_MOCK || 'true') === 'true';

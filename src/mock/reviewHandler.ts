@@ -1,8 +1,10 @@
 import { http, HttpResponse, delay } from 'msw';
-import { httpUrl, mockReviews } from './mockData/mockData';
-import { mockMyReviews } from './reviewMock';
+
 import type { ReviewInfo } from '@/models/review.model';
+
+import { httpUrl, mockLessons, mockReviews } from './mockData/mockData';
 import { MOCK_ORDERS } from './mockData/orderMock';
+import { mockMyReviews } from './reviewMock';
 
 // 리뷰 작성
 const writeReview = http.post(`${httpUrl}/reviews`, async ({ request }) => {
@@ -22,7 +24,7 @@ const writeReview = http.post(`${httpUrl}/reviews`, async ({ request }) => {
 	for (let i = 1; i <= 5; i++) {
 		const imgFile = formData.get(`image${i}`);
 		if (imgFile instanceof File) {
-			// Mock용 가짜 URL 생성
+			// Mock용 가짜URL 생성
 			images.push(`https://placehold.co/400x300?text=Review+Image+${i}`);
 		}
 	}
@@ -33,7 +35,7 @@ const writeReview = http.post(`${httpUrl}/reviews`, async ({ request }) => {
 		id,
 		user: {
 			id: 1,
-			nickname: '나 (Mock User)',
+			nickname: '??(Mock User)',
 			profileImage: null,
 		},
 		lessonId,
@@ -100,7 +102,6 @@ const updateReview = http.put(`${httpUrl}/reviews/:reviewId`, async ({ params, r
 		if (rating !== undefined) review.rating = rating;
 		if (content !== undefined) review.content = content;
 		if (images.length > 0) {
-			review.images = images;
 			review.representativeImage = images[0];
 		}
 		review.updatedAt = new Date().toISOString();
@@ -110,4 +111,45 @@ const updateReview = http.put(`${httpUrl}/reviews/:reviewId`, async ({ params, r
 	return HttpResponse.json({ message: '리뷰를 찾을 수 없습니다.' }, { status: 404 });
 });
 
-export const reviewHandler = [writeReview, getMyReview, updateReview];
+const getLatestReviews = http.get(`${httpUrl}/reviews`, async ({ request }) => {
+	await delay(500);
+
+	const url = new URL(request.url);
+	const page = Number(url.searchParams.get('page') ?? '1');
+	const limit = Number(url.searchParams.get('limit') ?? '6');
+
+	const sortedReviews = [...mockReviews].sort(
+		(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+	);
+	const offset = (page - 1) * limit;
+	const pagedReviews = sortedReviews.slice(offset, offset + limit);
+
+	const data = pagedReviews.map((review) => {
+		const lesson = mockLessons.find((item) => item.id === review.lessonId);
+
+		return {
+			id: review.id,
+			lessonId: review.lessonId,
+			lessonTitle: lesson?.title ?? `클래스 ${review.lessonId}`,
+			userId: review.user.id,
+			rating: review.rating,
+			content: review.content,
+			representativeImage: review.representativeImage,
+		};
+	});
+
+	return HttpResponse.json(
+		{
+			data,
+			meta: {
+				totalCount: sortedReviews.length,
+				page,
+				limit,
+				totalPages: Math.max(1, Math.ceil(sortedReviews.length / limit)),
+			},
+		},
+		{ status: 200 },
+	);
+});
+
+export const reviewHandler = [writeReview, getMyReview, updateReview, getLatestReviews];

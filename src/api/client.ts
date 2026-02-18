@@ -2,10 +2,11 @@ import axios, { type AxiosRequestConfig } from 'axios';
 
 import { CHAT_API_URL } from '@/config/chatConfig';
 import { useAuthStore } from '@/store/authStore';
+import { ENV } from '@/utils/env';
 
 export const createClient = (config?: AxiosRequestConfig) => {
 	const axiosInstance = axios.create({
-		baseURL: import.meta.env.VITE_API_URL || 'https://moimo-back.vercel.app',
+		baseURL: ENV.API_URL,
 		headers: {
 			'Content-Type': 'application/json',
 		},

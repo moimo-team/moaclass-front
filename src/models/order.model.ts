@@ -59,15 +59,32 @@ export interface RefundResponse {
 
 export interface OrderDetailResponse {
 	orderId: number;
-	title: string;
-	teacherName: string;
-	originPrice: number;
-	discountedAmount: number;
-	amount: number;
+	transactionStatus: PayStatus;
 	paymentDate: string;
-	status: PayStatus;
-	reason?: string;
-	detailReason?: string;
-	refundAmount?: number;
-	refundDate?: string;
+	classInfo: {
+		title: string;
+		teacherName: string;
+		startAt: string;
+		endAt: string;
+	};
+	paymentInfo: {
+		originPrice: number;
+		discountAmount: number;
+		finalPrice: number;
+		quantity: number;
+		coupon: {
+			id: number;
+			name: string;
+			discountType: string;
+			discountValue: number;
+		};
+	};
+	refundInfo: {
+		paidAmount: number;
+		deductedAmount: number;
+		refundAmount: number;
+		refundDate: string;
+		reason: string;
+		detailReason: string;
+	} | null;
 }

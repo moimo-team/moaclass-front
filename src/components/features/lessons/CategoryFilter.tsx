@@ -13,7 +13,7 @@ interface CategoryFilterProps {
 	activeMainCategoryId: number | null;
 	selectedMainCategory: string | null;
 	handleMainCategoryClick: (category: LessonCategory) => void;
-	handleSubCategoryCheckedChange: (subCategoryName: string) => void;
+	handleSubCategoryCheckedChange: (subCategoryName: string, subCategoryId: number) => void;
 }
 
 export const CategoryFilter: React.FC<CategoryFilterProps> = ({
@@ -114,7 +114,10 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
 											id={`sub-cat-${subCat.id}`}
 											checked={selectedCategories.includes(subCat.name)}
 											onCheckedChange={() =>
-												handleSubCategoryCheckedChange(subCat.name)
+												handleSubCategoryCheckedChange(
+													subCat.name,
+													subCat.id,
+												)
 											}
 											className="shrink-0"
 										/>

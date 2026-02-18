@@ -8,6 +8,7 @@ import ClassDashboardPage from '@/pages/class/ClassDashboardPage';
 import LessonDetail from '@/pages/class/LessonDetail';
 import LessonListPage from '@/pages/class/LessonList';
 import ScheduleManagementPage from '@/pages/class/manage/ScheduleManagementPage';
+import TeacherProfilePage from '@/pages/class/teacher/TeacherProfilePage';
 import Home from '@/pages/Home';
 import Interests from '@/pages/interests/Interests';
 import MeetingDetailPage from '@/pages/meetings/MeetingDetail';
@@ -94,6 +95,10 @@ export const routeList = [
 			{
 				path: 'lessons/:lessonId',
 				element: <LessonDetail />,
+			},
+			{
+				path: '/teachers/:userId',
+				element: <TeacherProfilePage />,
 			},
 			{
 				path: '/lessons/:lessonId/schedule',
