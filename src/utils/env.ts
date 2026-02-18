@@ -47,8 +47,8 @@ const isDevelopment = (): boolean => {
 };
 
 export const ENV = {
-	API_URL: getEnv('VITE_API_URL', 'https://moimo-back.vercel.app'),
-	SOCKET_URL: getEnv('VITE_SOCKET_URL', 'https://moimo-back.onrender.com'),
+	API_URL: getEnv('VITE_API_URL', 'https://moaclass-back.onrender.com'),
+	SOCKET_URL: getEnv('VITE_SOCKET_URL', 'https://moaclass-back.onrender.com'),
 	ENABLE_MOCK: getEnv('VITE_ENABLE_MOCK', 'true') === 'true',
 	GOOGLE_CLIENT_ID: getEnv('VITE_GOOGLE_CLIENT_ID'),
 	KAKAO_CLIENT_ID: getEnv('VITE_KAKAO_CLIENT_ID'),
