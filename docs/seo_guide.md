@@ -201,6 +201,31 @@ export const metadata = createPageMetadata({
 
 ---
 
+## 검색 엔진 인덱싱 차단 (noindex)
+
+개인정보가 포함되거나 보안이 중요한 인증 관련 페이지(로그인, 가입 등) 또는 검색 결과에 노출될 필요가 없는 페이지는 검색 엔진 인덱싱을 차단합니다.
+
+### 설정 방법
+
+`page.tsx`에서 `metadata`의 `robots` 필드를 설정합니다.
+
+```tsx
+export const metadata: Metadata = {
+	robots: {
+		index: false,
+		follow: false,
+	},
+};
+```
+
+### 권장 대상 페이지
+
+- **인증 관련**: `/login`, `/join`, `/find-password`, `/reset-password`
+- **사용자 전용**: `/mypage`, `/chats`, `/user-info`
+- **기타**: OAuth 콜백 페이지 등 시스템 내부용 페이지
+
+---
+
 ## 기본 설정 변경
 
 ### Layout 기본 메타데이터

@@ -17,10 +17,24 @@ import { useLessonTabs } from '@/hooks/useLessonTabs';
 import { useAuthStore } from '@/store/authStore';
 import { formatFullDateTime } from '@/utils/dateFormat';
 
-export const LessonDetail = () => {
-	const { lessonId } = useParams<{ lessonId: string }>();
-	const navigate = useNavigate();
+export interface LessonDetailProps {
+	lessonId: string;
+	navigate: (path: string) => void;
+	onBack?: () => void;
+	LoginRequiredDialogComponent: React.ComponentType<{
+		open: boolean;
+		onOpenChange: (open: boolean) => void;
+	}>;
+	useApplicationConfirmationHook: typeof useLessonApplicationConfirmation;
+}
 
+export const LessonDetailContent = ({
+	lessonId,
+	navigate,
+	onBack,
+	LoginRequiredDialogComponent,
+	useApplicationConfirmationHook,
+}: LessonDetailProps) => {
 	useLayoutEffect(() => {
 		window.scrollTo(0, 0);
 	}, []);
@@ -46,7 +60,7 @@ export const LessonDetail = () => {
 		tempHeadcount,
 		onApplyLessonFromSidebar,
 		confirmApplyAction,
-	} = useLessonApplicationConfirmation({
+	} = useApplicationConfirmationHook({
 		isLoggedIn,
 		setShowLoginPrompt,
 		lessonDetail,
@@ -93,52 +107,23 @@ export const LessonDetail = () => {
 		);
 	}
 
-	const {
-		title,
-		description,
-		curriculum,
-		level,
-		durationMin,
-		price,
-		discountRate,
-		discountedPrice,
-		maxParticipants,
-		likeCount,
-		address,
-		detailAddress,
-		directionsText,
-		rate,
-		images,
-		teacher,
-		latitude,
-		longitude,
-		reservationLeadDays,
-		lessonCategoryName,
-		subCategories,
-		schedules,
-	} = lessonDetail;
-
 	return (
 		<div className="flex flex-col min-h-screen bg-background pt-12">
 			<div className="flex-1 w-full max-w-7xl mx-auto pb-8 px-4 md:px-6 lg:px-8">
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
 					{/* 왼쪽 메인 컨테이너 */}
 					<div className="md:col-span-2 space-y-8">
-						<LessonGallery
-							key={images ? images.map((img) => img.id).join('-') : 'no-images'}
-							title={title}
-							images={images}
-						/>
+						<LessonGallery title={lessonDetail.title} images={lessonDetail.images} />
 						<LessonHeader
-							title={title}
-							classCategoryName={lessonCategoryName}
-							subCategories={subCategories}
-							likeCount={likeCount}
-							rate={rate}
-							durationMin={durationMin}
-							address={address}
-							level={level}
-							maxParticipants={maxParticipants}
+							title={lessonDetail.title}
+							classCategoryName={lessonDetail.lessonCategoryName}
+							subCategories={lessonDetail.subCategories}
+							likeCount={lessonDetail.likeCount}
+							rate={lessonDetail.rate}
+							durationMin={lessonDetail.durationMin}
+							address={lessonDetail.address}
+							level={lessonDetail.level}
+							maxParticipants={lessonDetail.maxParticipants}
 							isLiked={lessonDetail.isLiked}
 						/>
 
@@ -148,14 +133,14 @@ export const LessonDetail = () => {
 							tabTitles={tabTitles}
 							handleTabClick={handleTabClick}
 							onSectionRef={handleSectionRef}
-							description={description}
-							curriculum={curriculum}
-							teacher={teacher}
-							latitude={latitude}
-							longitude={longitude}
-							address={address}
-							detailAddress={detailAddress}
-							directionsText={directionsText}
+							description={lessonDetail.description}
+							curriculum={lessonDetail.curriculum}
+							teacher={lessonDetail.teacher}
+							latitude={lessonDetail.latitude}
+							longitude={lessonDetail.longitude}
+							address={lessonDetail.address}
+							detailAddress={lessonDetail.detailAddress}
+							directionsText={lessonDetail.directionsText}
 							navigate={navigate}
 							reviews={reviewsData?.data || []}
 						/>
@@ -163,10 +148,10 @@ export const LessonDetail = () => {
 
 					{/* 결제 섹션 */}
 					<LessonReservationSidebar
-						reservationLeadDays={reservationLeadDays}
-						price={price}
-						discountRate={discountRate}
-						discountedPrice={discountedPrice}
+						reservationLeadDays={lessonDetail.reservationLeadDays}
+						price={lessonDetail.price}
+						discountRate={lessonDetail.discountRate}
+						discountedPrice={lessonDetail.discountedPrice}
 						isLoggedIn={isLoggedIn}
 						today={new Date()}
 						threeMonthsLater={(() => {
@@ -174,8 +159,8 @@ export const LessonDetail = () => {
 							d.setMonth(d.getMonth() + 3);
 							return d;
 						})()}
-						schedules={schedules}
-						maxParticipants={maxParticipants}
+						schedules={lessonDetail.schedules}
+						maxParticipants={lessonDetail.maxParticipants}
 						onWishlistToggle={handleWishlistToggle}
 						onInquiry={handleInquiry}
 						onApplyLesson={onApplyLessonFromSidebar}
@@ -185,7 +170,10 @@ export const LessonDetail = () => {
 				</div>
 			</div>
 
-			<LoginRequiredDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
+			<LoginRequiredDialogComponent
+				open={showLoginPrompt}
+				onOpenChange={setShowLoginPrompt}
+			/>
 			<ConfirmDialog
 				open={showConfirmApply}
 				onOpenChange={setShowConfirmApply}
@@ -196,6 +184,21 @@ export const LessonDetail = () => {
 				onConfirm={confirmApplyAction}
 			/>
 		</div>
+	);
+};
+
+export const LessonDetail = () => {
+	const { lessonId } = useParams<{ lessonId: string }>();
+	const navigate = useNavigate();
+
+	return (
+		<LessonDetailContent
+			lessonId={lessonId!}
+			navigate={navigate}
+			onBack={() => navigate(-1)}
+			LoginRequiredDialogComponent={LoginRequiredDialog}
+			useApplicationConfirmationHook={useLessonApplicationConfirmation}
+		/>
 	);
 };
 

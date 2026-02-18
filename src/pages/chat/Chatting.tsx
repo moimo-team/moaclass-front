@@ -12,7 +12,11 @@ import { useChatSocket } from '@/hooks/useChatSocket';
 import type { ChatRoom, ChatMessage } from '@/models/chat.model';
 import { useAuthStore } from '@/store/authStore';
 
-const Chatting = () => {
+export interface ChattingProps {
+	initialMeetingId?: string | number | null;
+}
+
+export const ChattingContent = ({ initialMeetingId }: ChattingProps) => {
 	const { userId } = useAuthStore();
 	const [selectedMeeting, setSelectedMeeting] = useState<ChatRoom | null>(null);
 	const [inputValue, setInputValue] = useState('');
@@ -21,7 +25,6 @@ const Chatting = () => {
 	const [messages, setMessages] = useState<ChatMessage[]>([]);
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const queryClient = useQueryClient();
-	const location = useLocation();
 
 	const { data: chatRooms, isLoading } = useQuery({
 		queryKey: ['chatRooms', userId],
@@ -84,15 +87,16 @@ const Chatting = () => {
 	}, [messages]);
 
 	useEffect(() => {
-		if (!isLoading && chatRooms && location.state?.meetingId) {
-			const meetingIdFromState = location.state.meetingId;
-			const targetRoom = chatRooms.find((room) => room.meetingId === meetingIdFromState);
+		if (!isLoading && chatRooms && initialMeetingId) {
+			const targetRoom = chatRooms.find(
+				(room) => room.meetingId === Number(initialMeetingId),
+			);
 
 			if (targetRoom) {
 				setSelectedMeeting(targetRoom);
 			}
 		}
-	}, [isLoading, chatRooms, location.state]);
+	}, [isLoading, chatRooms, initialMeetingId]);
 
 	const handleSendMessage = () => {
 		if (!inputValue.trim()) return;
@@ -131,7 +135,7 @@ const Chatting = () => {
 			</div>
 
 			{chatType === 'meeting' ? (
-				<div className="flex flex-row flex-grow">
+				<div className="flex flex-row grow">
 					<ChatRoomListSection
 						chatRooms={chatRooms}
 						isLoading={isLoading}
@@ -150,13 +154,20 @@ const Chatting = () => {
 					/>
 				</div>
 			) : (
-				<div className="flex flex-row flex-grow">
+				<div className="flex flex-row grow">
 					<LessonChatRoomListSection />
 					<LessonChatMessageSection />
 				</div>
 			)}
 		</div>
 	);
+};
+
+const Chatting = () => {
+	const location = useLocation();
+	const initialMeetingId = location.state?.meetingId;
+
+	return <ChattingContent initialMeetingId={initialMeetingId} />;
 };
 
 export default Chatting;

@@ -134,16 +134,19 @@ function MeetingDetailPage() {
 			setIsPending(true);
 			toast.success('모임 신청이 완료되었습니다. 모이머의 승인을 기다려주세요!');
 			setShowJoinConfirm(false);
-		} catch (error: any) {
+		} catch (error: unknown) {
 			console.error('모임 신청 에러:', error);
-			const errorMessage = error.response?.data?.message || error.response?.data?.error;
+			const err = error as {
+				response?: { data?: { message?: string; error?: string }; status?: number };
+			};
+			const errorMessage = err.response?.data?.message || err.response?.data?.error;
 
-			if (error.response?.status === 400) {
+			if (err.response?.status === 400) {
 				toast.error(errorMessage || '모임 신청에 실패했습니다');
-			} else if (error.response?.status === 409) {
+			} else if (err.response?.status === 409) {
 				toast.warning('이미 신청한 모임입니다');
 				setIsPending(true);
-			} else if (error.response?.status === 410) {
+			} else if (err.response?.status === 410) {
 				toast.error('삭제된 모임입니다');
 			} else {
 				toast.error('모임 신청 중 오류가 발생했습니다');

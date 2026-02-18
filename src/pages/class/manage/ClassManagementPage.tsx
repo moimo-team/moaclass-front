@@ -16,8 +16,11 @@ import { useToggleLessonStatusMutation } from '@/hooks/useToggleLessonStatusMuta
 import type { Lesson, FetchLessonsResponse } from '@/models/lesson.model';
 import { useAuthStore } from '@/store/authStore';
 
-const ClassManagementPage = () => {
-	const navigate = useNavigate();
+export interface ClassManagementProps {
+	onNavigate: (path: string) => void;
+}
+
+export const ClassManagementContent = ({ onNavigate }: ClassManagementProps) => {
 	const userId = useAuthStore((state) => state.userId);
 	const { data: teacherProfile } = useTeacherProfileQuery(userId ?? undefined);
 
@@ -85,11 +88,11 @@ const ClassManagementPage = () => {
 	};
 
 	const handleManage = (id: number) => {
-		navigate(`/lessons/${id}/schedule`);
+		onNavigate(`/lessons/${id}/schedule`);
 	};
 
 	const handleViewClass = (id: number) => {
-		navigate(`/lessons/${id}`);
+		onNavigate(`/lessons/${id}`);
 	};
 
 	const handleToggleStatus = (id: number) => {
@@ -223,6 +226,12 @@ const ClassManagementPage = () => {
 			/>
 		</div>
 	);
+};
+
+const ClassManagementPage = () => {
+	const navigate = useNavigate();
+
+	return <ClassManagementContent onNavigate={(path) => navigate(path)} />;
 };
 
 export default ClassManagementPage;

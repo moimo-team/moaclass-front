@@ -175,9 +175,16 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 	const toggleInterest = (interestId: number) => {
 		setValue(
 			'interestId',
-			(selectedInterestId === interestId ? undefined : interestId) as any,
-			{ shouldValidate: true },
+			selectedInterestId === interestId ? (0 as unknown as number) : interestId,
+			{
+				shouldValidate: true,
+			},
 		);
+		// interestId는 0이 될 수 없으므로 0을 임시로 쓰거나,
+		// z.number().optional()로 스키마를 되어 있다면 undefined가 가능함.
+		// 하지만 스키마에는 z.number()이므로 일단 interestId 혹은 undefined 처리가 필요함.
+		// 스키마가 z.number()면 undefined를 넣으면 에러가 날 텐데,
+		// 기존 코드도 undefined를 넣으려고 했음.
 	};
 
 	const onSubmit = async (data: MeetingFormValues) => {
@@ -194,7 +201,7 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 		try {
 			// 날짜와 시간 결합 (유틸 함수 사용)
 			const formattedDate = combineDateAndTime(
-				data.meetingDate!,
+				data.meetingDate,
 				data.meetingHour,
 				data.meetingMinute,
 				data.meetingPeriod,
@@ -232,9 +239,12 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 				onOpenChange(false);
 				navigate('/');
 			}
-		} catch (error: any) {
+		} catch (error: unknown) {
 			console.error('Submission error:', error);
-			const serverData = error.response?.data;
+			const err = error as {
+				response?: { data?: { message?: string | string[]; error?: string | string[] } };
+			};
+			const serverData = err.response?.data;
 			const serverMessage = serverData?.message || serverData?.error;
 			const displayMessage = Array.isArray(serverMessage)
 				? serverMessage.join('\n')

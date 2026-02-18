@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import ConfirmDialog from '@/components/features/modal/ConfirmDialog';
 
-interface LoginRequiredDialogProps {
+export interface LoginRequiredDialogProps {
 	open: boolean;
 	onOpenChange?: (open: boolean) => void;
 	title?: string;
@@ -11,9 +11,10 @@ interface LoginRequiredDialogProps {
 	cancelText?: string;
 	showCancel?: boolean;
 	onCancel?: () => void;
+	onConfirm?: () => void;
 }
 
-function LoginRequiredDialog({
+export const LoginRequiredDialogContent = ({
 	open,
 	onOpenChange = () => {},
 	title = '로그인이 필요해요',
@@ -22,9 +23,8 @@ function LoginRequiredDialog({
 	cancelText = '취소',
 	showCancel = true,
 	onCancel,
-}: LoginRequiredDialogProps) {
-	const navigate = useNavigate();
-
+	onConfirm,
+}: LoginRequiredDialogProps) => {
 	return (
 		<ConfirmDialog
 			open={open}
@@ -33,10 +33,16 @@ function LoginRequiredDialog({
 			description={description}
 			confirmText={confirmText}
 			cancelText={showCancel ? cancelText : undefined}
-			onConfirm={() => navigate('/login')}
+			onConfirm={() => onConfirm?.()}
 			onCancel={onCancel}
 		/>
 	);
+};
+
+function LoginRequiredDialog(props: LoginRequiredDialogProps) {
+	const navigate = useNavigate();
+
+	return <LoginRequiredDialogContent {...props} onConfirm={() => navigate('/login')} />;
 }
 
 export default LoginRequiredDialog;

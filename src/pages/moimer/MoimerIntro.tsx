@@ -12,17 +12,18 @@ import MoimerApplicationModal from '@/components/features/modal/create/CreateMee
 import { guidelines, faqs } from '@/constants/moimerIntroData';
 import { useAuthStore } from '@/store/authStore';
 
-function MoimerIntro() {
+export interface MoimerIntroProps {
+	isLoggedIn: boolean;
+	onOpenLoginPrompt: () => void;
+}
+
+export const MoimerIntroContent = ({ isLoggedIn, onOpenLoginPrompt }: MoimerIntroProps) => {
 	const [openIndex, setOpenIndex] = useState<number | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
-	// 로그인 상태 및 모달 관리
-	const { isLoggedIn } = useAuthStore();
-	const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-
 	const handleApplyClick = () => {
 		if (!isLoggedIn) {
-			setShowLoginPrompt(true);
+			onOpenLoginPrompt();
 			return;
 		}
 		setIsModalOpen(true);
@@ -69,9 +70,22 @@ function MoimerIntro() {
 			</FixedBottomButton>
 
 			<MoimerApplicationModal open={isModalOpen} onOpenChange={setIsModalOpen} />
-
-			<LoginRequiredDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
 		</div>
+	);
+};
+
+function MoimerIntro() {
+	const { isLoggedIn } = useAuthStore();
+	const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+	return (
+		<>
+			<MoimerIntroContent
+				isLoggedIn={isLoggedIn}
+				onOpenLoginPrompt={() => setShowLoginPrompt(true)}
+			/>
+			<LoginRequiredDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
+		</>
 	);
 }
 

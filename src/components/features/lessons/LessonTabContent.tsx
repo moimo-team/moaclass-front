@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 import { ReviewList } from '@components/features/lessons/ReviewList';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 
@@ -6,6 +8,7 @@ import KakaoMapView from '@/components/features/map/kakaoMaps/KakaoMapView';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import type { TeacherProfile } from '@/models/lesson.model';
 import type { Review } from '@/models/review.model';
 
 interface LessonTabContentProps {
@@ -15,14 +18,7 @@ interface LessonTabContentProps {
 	onSectionRef: (id: string, el: HTMLElement | null) => void;
 	description: string;
 	curriculum: string;
-	teacher:
-		| {
-				id: number;
-				nickname: string;
-				image: string;
-				introduction: string;
-		  }
-		| undefined;
+	teacher: TeacherProfile;
 	latitude: number;
 	longitude: number;
 	address: string;
@@ -49,6 +45,17 @@ export const LessonTabContent = ({
 	navigate,
 	reviews,
 }: LessonTabContentProps) => {
+	const [isMapReady, setIsMapReady] = useState(false);
+
+	useEffect(() => {
+		if (typeof window === 'undefined' || !window.kakao?.maps) return;
+
+		// Next.js환경(autoload=false)과 Vite환경 모두 호환되도록 명시적 로드 처리
+		window.kakao.maps.load(() => {
+			setIsMapReady(true);
+		});
+	}, []);
+
 	return (
 		<>
 			{/* 탭 네비게이션 */}
@@ -140,13 +147,22 @@ export const LessonTabContent = ({
 							<CardTitle className="text-xl font-bold">위치</CardTitle>
 						</CardHeader>
 						<CardContent className="p-0">
-							<div className="w-full h-96 bg-muted">
-								<KakaoMapView
-									lat={latitude}
-									lng={longitude}
-									placeName={address}
-									level={3}
-								/>
+							<div className="w-full h-96 bg-muted relative">
+								{isMapReady ? (
+									<KakaoMapView
+										lat={latitude}
+										lng={longitude}
+										placeName={address}
+										level={3}
+									/>
+								) : (
+									<div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400">
+										<div className="text-center">
+											<FaMapMarkerAlt className="w-8 h-8 mx-auto mb-2 opacity-50" />
+											<p>지도를 불러오는 중입니다...</p>
+										</div>
+									</div>
+								)}
 							</div>
 							<div className="p-4 bg-card border-t border-border/50">
 								<p className="text-base font-medium text-foreground flex items-center gap-2">

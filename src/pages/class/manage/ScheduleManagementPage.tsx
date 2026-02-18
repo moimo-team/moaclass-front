@@ -19,10 +19,17 @@ import { CreateScheduleModal } from '@/components/features/modal/create/CreateSc
 import { Button } from '@/components/ui/button';
 import { useScheduleQuery } from '@/hooks/useScheduleQuery';
 
-export default function ScheduleManagementPage() {
-	const { lessonId } = useParams();
-	const navigate = useNavigate();
+export interface ScheduleManagementProps {
+	lessonId: string;
+	onBack: () => void;
+	onNavigate: (path: string) => void;
+}
 
+export const ScheduleManagementContent = ({
+	lessonId,
+	onBack,
+	onNavigate,
+}: ScheduleManagementProps) => {
 	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const [selectedDates, setSelectedDates] = useState<Date[]>([]);
 	const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
@@ -72,7 +79,7 @@ export default function ScheduleManagementPage() {
 		return (
 			<div className="flex flex-col items-center justify-center min-h-screen gap-4">
 				<p className="text-red-500 font-medium">일정을 불러올 수 없습니다.</p>
-				<Button onClick={() => navigate(-1)} variant="outline">
+				<Button onClick={onBack} variant="outline">
 					돌아가기
 				</Button>
 			</div>
@@ -84,7 +91,7 @@ export default function ScheduleManagementPage() {
 			<div className="flex items-center justify-between mb-8">
 				<div className="flex items-center gap-4">
 					<button
-						onClick={() => navigate(-1)}
+						onClick={onBack}
 						className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
 					>
 						<ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -147,5 +154,18 @@ export default function ScheduleManagementPage() {
 				selectedDates={selectedDates}
 			/>
 		</div>
+	);
+};
+
+export default function ScheduleManagementPage() {
+	const { lessonId } = useParams();
+	const navigate = useNavigate();
+
+	return (
+		<ScheduleManagementContent
+			lessonId={lessonId!}
+			onBack={() => navigate(-1)}
+			onNavigate={(path) => navigate(path)}
+		/>
 	);
 }
