@@ -25,14 +25,10 @@ export const fetchTeacherProfile = async (userId: number): Promise<TeacherProfil
 	return response.data;
 };
 
-// 클래스 조회
+// 클래스 조회 - 프론트에서 ACTIVE 상태만 필터링하여 사용
 export const fetchTeacherLessons = async (_teacherId: number): Promise<FetchLessonsResponse> => {
 	// TODO: 백엔드에서 선생님(userId/teacherId)별 클래스 필터링이 구현될 때까지 임시로 전체 클래스를 조회합니다.
-	const response = await apiClient.get<FetchLessonsResponse>('/lessons', {
-		params: {
-			// userId: teacherId, // 백엔드 미지원으로 주석 처리
-		},
-	});
+	const response = await apiClient.get<FetchLessonsResponse>('/lessons');
 	return response.data;
 };
 

@@ -57,7 +57,8 @@ const TeacherProfilePage = ({ userId: userIdProp }: TeacherProfilePageProps) => 
 		);
 	}
 
-	const lessons = lessonsResponse?.data ?? [];
+	// 운영중(ACTIVE) 상태인 클래스만 표시
+	const lessons = (lessonsResponse?.data ?? []).filter((l) => l.status === 'ACTIVE');
 	// 이미지가 있는 후기만 '대표 후기'로 표시
 	const representativeReviews = (reviewsResponse?.data ?? []).filter(
 		(r) => !!r.representativeImage,
