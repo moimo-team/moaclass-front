@@ -13,13 +13,23 @@ import '@/index.css';
  * - Vite 환경과 충돌하지 않도록 src/app 내부에 위치합니다.
  */
 export const metadata: Metadata = {
-	title: {
-		default: '모아클 | MOACLASS',
-		template: '%s | 모아클',
-	},
-	description: '모여라 아! 이거다 싶은 클래스, 모아클',
+	title: '모아클 | MOACLASS',
+	description: '모아클 - 모여라 아! 이거다 싶은 클래스',
 	icons: {
 		icon: '/moaclass-icon.svg',
+	},
+	openGraph: {
+		type: 'website',
+		locale: 'ko_KR',
+		siteName: '모아클',
+		images: [
+			{
+				url: '/moaclass-icon.svg', // 기본 OG 이미지(추후 변경)
+				width: 1200,
+				height: 630,
+				alt: '모아클 - 모여라 아! 이거다 싶은 클래스',
+			},
+		],
 	},
 };
 
