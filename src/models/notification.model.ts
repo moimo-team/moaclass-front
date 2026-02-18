@@ -49,3 +49,13 @@ export const isNewChatNotification = (
 ): notification is NewChatNotification => {
 	return notification.type === 'NEW_CHAT' && typeof notification.roomId === 'number';
 };
+
+export interface FetchNotificationsResponse {
+	data: Notification[];
+	meta: {
+		page: number;
+		limit: number;
+		totalCount: number;
+		totalPages: number;
+	};
+}
