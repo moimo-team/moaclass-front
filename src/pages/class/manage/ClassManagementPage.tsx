@@ -27,6 +27,7 @@ const ClassManagementPage = () => {
 	const [createModalOpen, setCreateModalOpen] = useState(false);
 	const [profileAlertOpen, setProfileAlertOpen] = useState(false);
 	const [editingClassId, setEditingClassId] = useState<number | null>(null);
+	const [editingIsDraft, setEditingIsDraft] = useState(false);
 	const [duplicatingClassId, setDuplicatingClassId] = useState<number | null>(null);
 	const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
 
@@ -50,8 +51,9 @@ const ClassManagementPage = () => {
 
 	const lessons = lessonsResponse?.data ?? [];
 
-	const handleEdit = (id: number) => {
+	const handleEdit = (id: number, status: string) => {
 		setEditingClassId(id);
+		setEditingIsDraft(status === 'DRAFT');
 		setCreateModalOpen(true);
 	};
 
@@ -119,6 +121,7 @@ const ClassManagementPage = () => {
 	const handleModalClose = () => {
 		setCreateModalOpen(false);
 		setEditingClassId(null);
+		setEditingIsDraft(false);
 		setDuplicatingClassId(null);
 	};
 
@@ -158,7 +161,7 @@ const ClassManagementPage = () => {
 					<ClassManageCard
 						key={lesson.id}
 						lesson={lesson}
-						onEdit={() => handleEdit(lesson.id)}
+						onEdit={() => handleEdit(lesson.id, lesson.status)}
 						onDelete={() => handleDeleteClick(lesson.id)}
 						onDuplicate={() => handleDuplicate(lesson.id)}
 						onManage={() => handleManage(lesson.id)}
@@ -210,6 +213,7 @@ const ClassManagementPage = () => {
 				onOpenChange={handleModalClose}
 				classId={editingClassId || duplicatingClassId || undefined}
 				isDuplicating={!!duplicatingClassId}
+				isDraft={editingIsDraft}
 			/>
 
 			{/* 프로필 미등록 안내 */}

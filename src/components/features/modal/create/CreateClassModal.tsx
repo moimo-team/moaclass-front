@@ -55,8 +55,10 @@ type ClassFormValues = z.infer<typeof classSchema>;
 interface CreateClassModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	classId?: number; // 수정 또는 복제할 클래스 ID
-	isDuplicating?: boolean; // 복제 모드 여부
+	classId?: number;
+	isDuplicating?: boolean;
+	// DRAFT 상태 클래스를 이어서 작성할 때 true - 생성 모드로 동작
+	isDraft?: boolean;
 }
 
 const LEVEL_OPTIONS: { value: Level; label: string; description: string }[] = [
@@ -65,11 +67,37 @@ const LEVEL_OPTIONS: { value: Level; label: string; description: string }[] = [
 	{ value: 'ADVANCED', label: '고급', description: '전문적인 실력 향상을 위한' },
 ];
 
+// CORS로 외부 이미지 직접 fetch가 차단될 수 있어 실패 시 투명 픽셀로 대체
+const TRANSPARENT_PIXEL =
+	'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+async function fetchAndSetDuplicateImage(
+	imageUrl: string,
+	setValue: (
+		field: 'representativeImageFile',
+		value: File,
+		options?: { shouldValidate?: boolean },
+	) => void,
+): Promise<void> {
+	try {
+		const res = await fetch(imageUrl);
+		const blob = await res.blob();
+		const file = new File([blob], 'duplicate_image.png', { type: blob.type });
+		setValue('representativeImageFile', file, { shouldValidate: true });
+	} catch {
+		const res = await fetch(TRANSPARENT_PIXEL);
+		const blob = await res.blob();
+		const dummyFile = new File([blob], 'draft_placeholder.png', { type: 'image/png' });
+		setValue('representativeImageFile', dummyFile, { shouldValidate: true });
+	}
+}
+
 function CreateClassModal({
 	open,
 	onOpenChange,
 	classId,
 	isDuplicating = false,
+	isDraft = false,
 }: CreateClassModalProps) {
 	const representativeImageRef = useRef<HTMLInputElement>(null);
 	const additionalImagesRef = useRef<HTMLInputElement>(null);
@@ -92,7 +120,8 @@ function CreateClassModal({
 		watch,
 		reset,
 		control,
-		formState: { errors, isValid },
+		getValues,
+		formState: { errors, isValid, isSubmitting },
 	} = useForm<ClassFormValues>({
 		resolver: zodResolver(classSchema),
 		mode: 'onChange',
@@ -149,8 +178,20 @@ function CreateClassModal({
 					const subCategoryIds =
 						existingLesson.subClassCategories?.map((sub) => sub.id) || [];
 
+					// 복제 모드일 경우 제목 뒤에 번호 추가 ((1), (2) 등)
+					let title = existingLesson.title;
+					if (isDuplicating) {
+						const match = title.match(/\((\d+)\)$/);
+						if (match) {
+							const num = parseInt(match[1]) + 1;
+							title = title.replace(/\(\d+\)$/, `(${num})`);
+						} else {
+							title = `${title} (1)`;
+						}
+					}
+
 					reset({
-						title: existingLesson.title,
+						title,
 						description: existingLesson.description,
 						curriculum: existingLesson.curriculum,
 						classCategoryId: existingLesson.lessonCategoryId,
@@ -171,6 +212,13 @@ function CreateClassModal({
 
 					// 이미지 미리보기 설정
 					setPreviewImage(existingLesson.representativeImage);
+
+					// CORS로 인해 외부 이미지 직접 fetch가 차단될 수 있으므로 try/catch로 처리
+					// 실패 시 투명 1x1 픽셀로 대체하여 백엔드 필수 이미지 체크 통과
+					if (isDuplicating && existingLesson.representativeImage) {
+						fetchAndSetDuplicateImage(existingLesson.representativeImage, setValue);
+					}
+
 					if (existingLesson.lessonImages && existingLesson.lessonImages.length > 0) {
 						setAdditionalImages(existingLesson.lessonImages.map((img) => img.image));
 					}
@@ -205,7 +253,7 @@ function CreateClassModal({
 				prevCategoryIdRef.current = 0;
 			}
 		}
-	}, [open, classId, existingLesson, isLoadingLesson, reset]);
+	}, [open, classId, isLoadingLesson, existingLesson, isDuplicating, isDraft, reset, setValue]);
 
 	// 대분류 카테고리가 실제로 변경되었을 때만 소분류 초기화
 	useEffect(() => {
@@ -272,48 +320,96 @@ function CreateClassModal({
 		setValue('level', level, { shouldValidate: true });
 	};
 
-	const onSubmit = async (data: ClassFormValues) => {
+	const handleFinalSubmit = async (
+		data: Partial<ClassFormValues>,
+		status: 'DRAFT' | 'ACTIVE',
+	) => {
 		try {
 			const formData = new FormData();
-			formData.append('title', data.title);
-			formData.append('description', data.description);
-			formData.append('curriculum', data.curriculum);
-			formData.append('lessonCategoryId', data.classCategoryId.toString());
-			formData.append('subCategoryIds', JSON.stringify(data.subCategoryIds));
-			formData.append('level', data.level);
-			formData.append('durationMin', data.duration.toString());
-			formData.append('price', data.price.toString());
-			formData.append('discountRate', data.discountRate.toString());
+			// 백엔드 DTO가 DRAFT 상태에서도 모든 필드를 필수(Required)로 요구하므로,
+			// 임시저장 시 빈 값인 필드들은 최소한의 더미 데이터로 채워줍니다.
+			const isDraft = status === 'DRAFT';
+
+			formData.append('title', data.title || (isDraft ? '임시 클래스명' : ''));
+			formData.append('description', data.description || (isDraft ? '임시 클래스 소개' : ''));
+			formData.append(
+				'curriculum',
+				data.curriculum ||
+					(isDraft ? '임시 커리큘럼 내용입니다. (40자 이상 성실히 작성된 내용)' : ''),
+			);
+			formData.append(
+				'lessonCategoryId',
+				(data.classCategoryId || (isDraft ? 1 : 0)).toString(),
+			);
+
+			// subCategoryIds는 최소 1개의 요소가 필요함 (ArrayMinSize(1))
+			const subIds =
+				data.subCategoryIds && data.subCategoryIds.length > 0
+					? data.subCategoryIds
+					: isDraft
+						? [1]
+						: [];
+			formData.append('subCategoryIds', JSON.stringify(subIds));
+
+			formData.append('level', data.level || (isDraft ? 'BEGINNER' : 'BEGINNER'));
+			formData.append('durationMin', (data.duration || (isDraft ? 60 : 60)).toString());
+			formData.append('price', (data.price || 0).toString());
+			formData.append('discountRate', (data.discountRate || 0).toString());
 			formData.append(
 				'discountedPrice',
-				Math.round(data.price * (1 - data.discountRate / 100)).toString(),
+				Math.round((data.price || 0) * (1 - (data.discountRate || 0) / 100)).toString(),
 			);
-			formData.append('maxParticipants', data.maxParticipants.toString());
-			formData.append('regionId', data.regionId.toString());
-			formData.append('address', data.address);
-			formData.append('detailAddress', data.detailAddress || '');
-			formData.append('directionsText', data.directionsText || '');
-			formData.append('reservationLeadDays', data.reservationLeadDays.toString());
+			formData.append(
+				'maxParticipants',
+				(data.maxParticipants || (isDraft ? 10 : 10)).toString(),
+			);
+			formData.append('regionId', (data.regionId || (isDraft ? 1 : 0)).toString());
+			formData.append(
+				'address',
+				data.address || (isDraft ? '서울특별시 마포구 양화로 45' : ''),
+			);
+			formData.append(
+				'detailAddress',
+				data.detailAddress || (isDraft ? '임시 상세주소' : ''),
+			);
+			formData.append(
+				'directionsText',
+				data.directionsText || (isDraft ? '임시 찾아오는 길' : ''),
+			);
+			formData.append('reservationLeadDays', (data.reservationLeadDays || 1).toString());
+			formData.append('status', status);
 
+			// 임시저장인데 대표이미지가 없는 경우, 백엔드 필수 체크를 통과하기 위해 투명 1x1 픽셀 더미 이미지 전송
 			if (data.representativeImageFile) {
 				formData.append('representativeImage', data.representativeImageFile);
+			} else if (status === 'DRAFT') {
+				const transparentPixel =
+					'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+				const res = await fetch(transparentPixel);
+				const blob = await res.blob();
+				const dummyFile = new File([blob], 'draft_placeholder.png', { type: 'image/png' });
+				formData.append('representativeImage', dummyFile);
 			}
 
 			if (data.additionalImageFiles && data.additionalImageFiles.length > 0) {
-				data.additionalImageFiles.forEach((file) => {
+				data.additionalImageFiles.forEach((file: File) => {
 					formData.append('lessonImages', file);
 				});
 			}
 
-			if (classId && !isDuplicating) {
+			// DRAFT 상태를 이어서 작성하는 경우도 새 클래스 생성으로 처리 (updateLesson 사용 금지)
+			if (classId && !isDuplicating && !isDraft) {
 				await updateLessonMutation({ lessonId: classId, formData });
 				toast.success('클래스 수정 완료', {
 					description: '클래스가 성공적으로 수정되었습니다!',
 				});
 			} else {
 				await createLessonMutation(formData);
-				toast.success('클래스 생성 완료', {
-					description: '클래스가 성공적으로 생성되었습니다!',
+				toast.success(status === 'DRAFT' ? '임시저장 완료' : '클래스 생성 완료', {
+					description:
+						status === 'DRAFT'
+							? '클래스가 임시저장되었습니다.'
+							: '클래스가 성공적으로 생성되었습니다!',
 				});
 			}
 
@@ -325,19 +421,31 @@ function CreateClassModal({
 		}
 	};
 
+	const onSubmit = (data: ClassFormValues) => handleFinalSubmit(data, 'ACTIVE');
+
+	const handleDraftSubmit = () => {
+		const data = getValues();
+		handleFinalSubmit(data, 'DRAFT');
+	};
+
 	const priceValue = Number(price) || 0;
 	const discountRateValue = Number(discountRate) || 0;
 	const discountedPrice = Math.round(priceValue * (1 - discountRateValue / 100));
+
+	// DRAFT 상태에서 불러온 경우도 생성 모드로 처리
+	const isCreationMode = !classId || isDuplicating || isDraft;
 
 	return (
 		<FormModal
 			isOpen={open}
 			onClose={() => onOpenChange(false)}
 			onSubmit={handleSubmit(onSubmit)}
-			title={classId ? '클래스 정보 수정하기' : '새 클래스 만들기'}
-			submitButtonText={classId ? '수정하기' : '생성하기'}
-			isSubmitDisabled={!isValid}
-			isLoading={!isFormReady}
+			onDraft={isCreationMode ? handleDraftSubmit : undefined}
+			title={!isCreationMode ? '클래스 정보 수정하기' : '새 클래스 만들기'}
+			submitButtonText={isCreationMode ? '클래스 생성' : '수정하기'}
+			draftButtonText={isCreationMode ? '임시저장' : undefined}
+			isSubmitDisabled={isCreationMode ? !isValid : false}
+			isLoading={!isFormReady || isSubmitting}
 			containerClassName="max-w-2xl"
 		>
 			{/* 클래스명 */}
