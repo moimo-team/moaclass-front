@@ -1,7 +1,9 @@
 import { useState, useLayoutEffect } from 'react';
 
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
+import { joinChatRoom } from '@/api/chat.api';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { LessonGallery } from '@/components/features/lessons/LessonGallery';
 import { LessonHeader } from '@/components/features/lessons/LessonHeader';
@@ -66,7 +68,7 @@ export const LessonDetailContent = ({
 		lessonDetail,
 	});
 
-	const likeMutation = useLessonLikeMutation();
+	const likeMutation = useLessonLikeMutation([['lesson', Number(lessonId)]]);
 
 	const handleWishlistToggle = () => {
 		if (!isLoggedIn) {
@@ -81,14 +83,26 @@ export const LessonDetailContent = ({
 		});
 	};
 
-	const handleInquiry = () => {
+	const handleInquiry = async () => {
 		if (!isLoggedIn) {
 			setShowLoginPrompt(true);
 			return;
 		}
-		navigate('/chats');
-		// API Endpoint: POST /api/lessons/{lessonId}/inquiry
-		// TODO: API 연동 필요 (문의 기능)
+		if (!lessonDetail) return;
+
+		try {
+			const room = await joinChatRoom({ lessonId: lessonDetail.id });
+			navigate('/chats', {
+				state: {
+					chatType: 'lesson',
+					roomId: room.roomId,
+					lessonId: lessonDetail.id,
+				},
+			});
+		} catch (err) {
+			console.error('레슨 문의 채팅방 생성 실패:', err);
+			toast.error('문의 채팅방을 열지 못했습니다. 잠시 후 다시 시도해 주세요.');
+		}
 	};
 
 	if (isLoading || isReviewsLoading) {
@@ -142,7 +156,7 @@ export const LessonDetailContent = ({
 							detailAddress={lessonDetail.detailAddress}
 							directionsText={lessonDetail.directionsText}
 							navigate={navigate}
-							reviews={reviewsData?.data || []}
+							reviews={reviewsData || []}
 						/>
 					</div>
 

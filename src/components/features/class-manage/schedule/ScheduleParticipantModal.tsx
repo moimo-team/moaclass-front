@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { User, MessageSquare } from 'lucide-react';
+import { MessageSquare, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
+import { joinChatRoom } from '@/api/chat.api';
 import { fetchScheduleParticipants } from '@/api/schedule.api';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import type { ScheduleParticipant } from '@/models/schedule.model';
 
 interface ScheduleParticipantModalProps {
+	lessonId: number;
 	scheduleId: number | null;
 	isOpen: boolean;
 	onClose: () => void;
@@ -18,17 +22,31 @@ interface ScheduleParticipantModalProps {
 }
 
 export const ScheduleParticipantModal = ({
+	lessonId,
 	scheduleId,
 	isOpen,
 	onClose,
 	dateStr,
 	timeStr,
 }: ScheduleParticipantModalProps) => {
+	const navigate = useNavigate();
 	const { data: participants, isLoading } = useQuery<ScheduleParticipant[]>({
 		queryKey: ['scheduleParticipants', scheduleId],
 		queryFn: () => fetchScheduleParticipants(scheduleId!),
 		enabled: !!scheduleId && isOpen,
 	});
+
+	const handleInquiry = async (studentId: number) => {
+		try {
+			const room = await joinChatRoom({ lessonId, studentId });
+			onClose();
+			navigate('/chats', {
+				state: { chatType: 'lesson', roomId: room.roomId, lessonId },
+			});
+		} catch {
+			toast.error('문의 채팅방을 열지 못했습니다. 잠시 후 다시 시도해 주세요.');
+		}
+	};
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -64,7 +82,7 @@ export const ScheduleParticipantModal = ({
 							</p>
 						</div>
 					) : (
-						participants.map((participant: ScheduleParticipant) => (
+						participants.map((participant) => (
 							<div
 								key={participant.userId}
 								className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 bg-white hover:border-carrot/20 hover:shadow-md hover:shadow-carrot/5 transition-all duration-300 group"
@@ -98,9 +116,9 @@ export const ScheduleParticipantModal = ({
 									variant="outline"
 									size="sm"
 									className="h-8 px-3 text-[12px] font-black border-carrot/50 text-carrot hover:bg-carrot hover:text-white transition-all rounded-lg gap-1.5 shadow-sm"
+									onClick={() => handleInquiry(participant.userId)}
 								>
 									<MessageSquare className="w-3.5 h-3.5" />
-									{/* TODO: 채팅방 연동 */}
 									문의
 								</Button>
 							</div>

@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import { disconnectChatSocket } from '@/lib/chatSocket';
+
 interface StoreState {
 	isLoggedIn: boolean;
 	userId: number | null;
@@ -48,7 +50,8 @@ export const useAuthStore = create<StoreState>()(
 					accessToken,
 					isTeacher: user.teacherProfile,
 				}),
-			storeLogout: () =>
+			storeLogout: () => {
+				disconnectChatSocket();
 				set({
 					isLoggedIn: false,
 					userId: null,
@@ -56,7 +59,8 @@ export const useAuthStore = create<StoreState>()(
 					email: null,
 					accessToken: null,
 					isTeacher: false,
-				}),
+				});
+			},
 			setAccessToken: (accessToken: string) => {
 				set(() => ({ accessToken }));
 			},

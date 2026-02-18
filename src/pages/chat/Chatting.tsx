@@ -1,54 +1,158 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
+import { toast } from 'sonner';
 
-import { getChatRooms } from '@/api/chat.api';
+import { getMyChatRooms, getRoomMessages } from '@/api/chat.api';
 import ChatMessageSection from '@/components/features/chattings/ChatMessageSection';
 import ChatRoomListSection from '@/components/features/chattings/ChatRoomListSection';
 import LessonChatMessageSection from '@/components/features/chattings/LessonChatMessageSection';
 import LessonChatRoomListSection from '@/components/features/chattings/LessonChatRoomListSection';
 import { useChatSocket } from '@/hooks/useChatSocket';
-import type { ChatRoom, ChatMessage } from '@/models/chat.model';
+import type { ChatMessage, ChatRoom, ChatType } from '@/models/chat.model';
 import { useAuthStore } from '@/store/authStore';
 
-export interface ChattingProps {
-	initialMeetingId?: string | number | null;
-}
+type ChatLocationState = {
+	chatType?: ChatType;
+	meetingId?: number;
+	roomId?: number;
+	lessonId?: number;
+} | null;
 
-export const ChattingContent = ({ initialMeetingId }: ChattingProps) => {
+const getRoomIdFromRoom = (room: ChatRoom): number => room.roomId ?? room.meetingId ?? 0;
+const getRoomIdFromMessage = (message: ChatMessage): number | null =>
+	message.roomId ?? message.meetingId ?? null;
+
+// API/socket payload 차이 정규화
+const normalizeMessage = (message: ChatMessage): ChatMessage => {
+	const roomId = getRoomIdFromMessage(message);
+	const sender = message.sender ?? {
+		id: message.senderId,
+		nickname: message.senderNickname ?? '알 수 없음',
+		image: '',
+	};
+
+	return {
+		...message,
+		roomId: roomId ?? undefined,
+		sender,
+	};
+};
+
+const resolveChatType = (room: ChatRoom): ChatType => {
+	if (room.chatType) return room.chatType;
+	if (room.lessonId) return 'lesson';
+	return 'meeting';
+};
+
+const Chatting = () => {
 	const { userId } = useAuthStore();
+	const location = useLocation();
+	const locationState = (location.state as ChatLocationState) ?? null;
+
 	const [selectedMeeting, setSelectedMeeting] = useState<ChatRoom | null>(null);
+	const [selectedLessonRoom, setSelectedLessonRoom] = useState<ChatRoom | null>(null);
+	const [useInitialRouteSelection, setUseInitialRouteSelection] = useState(true);
 	const [inputValue, setInputValue] = useState('');
-	const [chatType, setChatType] = useState<'meeting' | 'lesson'>('meeting');
+	const [chatType, setChatType] = useState<ChatType>(() => locationState?.chatType ?? 'meeting');
 
 	const [messages, setMessages] = useState<ChatMessage[]>([]);
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const queryClient = useQueryClient();
 
-	const { data: chatRooms, isLoading } = useQuery({
+	const {
+		data: chatRooms,
+		isLoading,
+		refetch: refetchChatRooms,
+	} = useQuery({
 		queryKey: ['chatRooms', userId],
-		queryFn: getChatRooms,
+		queryFn: getMyChatRooms,
 		enabled: !!userId,
 	});
 
+	const meetingRooms = useMemo(
+		() => chatRooms?.filter((room) => resolveChatType(room) === 'meeting') ?? [],
+		[chatRooms],
+	);
+	const lessonRooms = useMemo(
+		() => chatRooms?.filter((room) => resolveChatType(room) === 'lesson') ?? [],
+		[chatRooms],
+	);
+
+	const initialMeetingRoomFromRoute = useMemo(() => {
+		if (!useInitialRouteSelection) return null;
+		if (locationState?.chatType === 'lesson') return null;
+
+		if (locationState?.meetingId) {
+			return meetingRooms.find((room) => room.meetingId === locationState.meetingId) ?? null;
+		}
+
+		if (locationState?.roomId) {
+			const targetRoom =
+				chatRooms?.find((room) => getRoomIdFromRoom(room) === locationState.roomId) ?? null;
+			return targetRoom && resolveChatType(targetRoom) === 'meeting' ? targetRoom : null;
+		}
+
+		return null;
+	}, [useInitialRouteSelection, locationState, meetingRooms, chatRooms]);
+
+	const initialLessonRoomFromRoute = useMemo(() => {
+		if (!useInitialRouteSelection) return null;
+
+		if (locationState?.chatType === 'lesson' && locationState.roomId) {
+			return (
+				lessonRooms.find((room) => getRoomIdFromRoom(room) === locationState.roomId) ?? null
+			);
+		}
+
+		if (locationState?.roomId) {
+			const targetRoom =
+				chatRooms?.find((room) => getRoomIdFromRoom(room) === locationState.roomId) ?? null;
+			return targetRoom && resolveChatType(targetRoom) === 'lesson' ? targetRoom : null;
+		}
+
+		return null;
+	}, [useInitialRouteSelection, locationState, lessonRooms, chatRooms]);
+
+	const selectedRoom =
+		chatType === 'meeting'
+			? (selectedMeeting ?? initialMeetingRoomFromRoute)
+			: (selectedLessonRoom ?? initialLessonRoomFromRoute);
+	const selectedRoomId = selectedRoom ? getRoomIdFromRoom(selectedRoom) : null;
+
+	// 열린 방은 append, 전체 방 목록은 정렬만 갱신
 	const handleNewMessage = useCallback(
 		(newMessage: ChatMessage) => {
-			if (newMessage.meetingId === selectedMeeting?.meetingId) {
-				setMessages((prev) => [...prev, newMessage]);
+			const normalizedMessage = normalizeMessage(newMessage);
+			const resolvedRoomId = getRoomIdFromMessage(normalizedMessage) ?? selectedRoomId;
+			if (!resolvedRoomId) return;
+
+			const messageForState =
+				normalizedMessage.roomId != null
+					? normalizedMessage
+					: { ...normalizedMessage, roomId: resolvedRoomId };
+			const incomingRoomId = getRoomIdFromMessage(messageForState);
+			if (!incomingRoomId) return;
+
+			if (incomingRoomId === selectedRoomId) {
+				setMessages((prev) => [...prev, messageForState]);
 			}
 
 			queryClient.setQueryData<ChatRoom[]>(['chatRooms', userId], (oldData) => {
 				if (!oldData) return [];
 
 				const updatedData = oldData.map((room) => {
-					if (room.meetingId === newMessage.meetingId) {
+					if (getRoomIdFromRoom(room) === incomingRoomId) {
 						return {
 							...room,
 							lastMessage: {
-								content: newMessage.content,
-								createdAt: newMessage.createdAt,
-								sender: newMessage.sender.nickname,
+								content: messageForState.content,
+								createdAt: messageForState.createdAt,
+								sender:
+									messageForState.sender?.nickname ??
+									messageForState.senderNickname ??
+									'알 수 없음',
 							},
 						};
 					}
@@ -56,8 +160,9 @@ export const ChattingContent = ({ initialMeetingId }: ChattingProps) => {
 				});
 
 				const targetRoomIndex = updatedData.findIndex(
-					(room) => room.meetingId === newMessage.meetingId,
+					(room) => getRoomIdFromRoom(room) === incomingRoomId,
 				);
+
 				if (targetRoomIndex > 0) {
 					const targetRoom = updatedData.splice(targetRoomIndex, 1)[0];
 					updatedData.unshift(targetRoom);
@@ -66,19 +171,30 @@ export const ChattingContent = ({ initialMeetingId }: ChattingProps) => {
 				return updatedData;
 			});
 		},
-		[queryClient, selectedMeeting?.meetingId, userId],
+		[queryClient, selectedRoomId, userId],
 	);
 
-	const { initialMessages, sendMessage } = useChatSocket(
-		selectedMeeting?.meetingId || null,
-		handleNewMessage,
-	);
+	const { sendMessage } = useChatSocket(selectedRoomId, handleNewMessage);
 
+	// 방 전환 시 history는 REST로 새로 로드(socket은 실시간 이벤트 전용)
 	useEffect(() => {
-		if (initialMessages) {
-			setMessages(initialMessages);
-		}
-	}, [initialMessages]);
+		const loadMessages = async () => {
+			if (!selectedRoomId) {
+				setMessages([]);
+				return;
+			}
+
+			try {
+				const history = await getRoomMessages(selectedRoomId);
+				setMessages(history.map(normalizeMessage));
+			} catch {
+				setMessages([]);
+				toast.error('메세지 내역을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+			}
+		};
+
+		loadMessages();
+	}, [selectedRoomId]);
 
 	useEffect(() => {
 		if (scrollRef.current) {
@@ -87,16 +203,12 @@ export const ChattingContent = ({ initialMeetingId }: ChattingProps) => {
 	}, [messages]);
 
 	useEffect(() => {
-		if (!isLoading && chatRooms && initialMeetingId) {
-			const targetRoom = chatRooms.find(
-				(room) => room.meetingId === Number(initialMeetingId),
-			);
+		const targetRoomId = locationState?.roomId;
+		if (!targetRoomId || !chatRooms) return;
+		if (chatRooms.some((room) => getRoomIdFromRoom(room) === targetRoomId)) return;
 
-			if (targetRoom) {
-				setSelectedMeeting(targetRoom);
-			}
-		}
-	}, [isLoading, chatRooms, initialMeetingId]);
+		void refetchChatRooms();
+	}, [locationState?.roomId, chatRooms, refetchChatRooms]);
 
 	const handleSendMessage = () => {
 		if (!inputValue.trim()) return;
@@ -105,11 +217,16 @@ export const ChattingContent = ({ initialMeetingId }: ChattingProps) => {
 	};
 
 	const handleBackToList = () => {
-		setSelectedMeeting(null);
+		setUseInitialRouteSelection(false);
+		if (chatType === 'meeting') {
+			setSelectedMeeting(null);
+		} else {
+			setSelectedLessonRoom(null);
+		}
 	};
 
 	return (
-		<div className="flex flex-col h-[calc(100vh-80px)] bg-background">
+		<div className="flex flex-col h-[calc(100vh-80px)] bg-background overflow-hidden">
 			<div className="flex justify-around p-4 border-b border-gray-200">
 				{/* type으로 모임과 원데이클래스 채팅을 구분 */}
 				<button
@@ -118,7 +235,10 @@ export const ChattingContent = ({ initialMeetingId }: ChattingProps) => {
 							? 'text-primary border-b-2 border-primary'
 							: 'text-foreground'
 					}`}
-					onClick={() => setChatType('meeting')}
+					onClick={() => {
+						setUseInitialRouteSelection(false);
+						setChatType('meeting');
+					}}
 				>
 					모임 채팅
 				</button>
@@ -128,19 +248,25 @@ export const ChattingContent = ({ initialMeetingId }: ChattingProps) => {
 							? 'text-primary border-b-2 border-primary'
 							: 'text-foreground'
 					}`}
-					onClick={() => setChatType('lesson')}
+					onClick={() => {
+						setUseInitialRouteSelection(false);
+						setChatType('lesson');
+					}}
 				>
 					레슨 채팅
 				</button>
 			</div>
 
 			{chatType === 'meeting' ? (
-				<div className="flex flex-row grow">
+				<div className="flex flex-row flex-grow min-h-0 overflow-hidden">
 					<ChatRoomListSection
-						chatRooms={chatRooms}
+						chatRooms={meetingRooms}
 						isLoading={isLoading}
-						onSelectRoom={setSelectedMeeting}
-						selectedMeetingId={selectedMeeting?.meetingId}
+						onSelectRoom={(room) => {
+							setUseInitialRouteSelection(false);
+							setSelectedMeeting(room);
+						}}
+						selectedMeetingId={selectedRoom?.meetingId ?? selectedRoom?.roomId}
 					/>
 					<ChatMessageSection
 						selectedMeeting={selectedMeeting}
@@ -154,9 +280,26 @@ export const ChattingContent = ({ initialMeetingId }: ChattingProps) => {
 					/>
 				</div>
 			) : (
-				<div className="flex flex-row grow">
-					<LessonChatRoomListSection />
-					<LessonChatMessageSection />
+				<div className="flex flex-row flex-grow min-h-0 overflow-hidden">
+					<LessonChatRoomListSection
+						chatRooms={lessonRooms}
+						isLoading={isLoading}
+						onSelectRoom={(room) => {
+							setUseInitialRouteSelection(false);
+							setSelectedLessonRoom(room);
+						}}
+						selectedRoomId={selectedRoom?.roomId}
+					/>
+					<LessonChatMessageSection
+						selectedRoom={selectedRoom}
+						messages={messages}
+						sendMessage={handleSendMessage}
+						inputValue={inputValue}
+						setInputValue={setInputValue}
+						onBackToList={handleBackToList}
+						scrollRef={scrollRef}
+						userId={userId}
+					/>
 				</div>
 			)}
 		</div>

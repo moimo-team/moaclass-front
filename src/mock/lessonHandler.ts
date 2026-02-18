@@ -1,7 +1,7 @@
 import { http, HttpResponse, delay } from 'msw';
 
 import { LESSON_SUB_CATEGORIES } from '@/mock/mockData/categoryMock';
-import { httpUrl, mockLessonDetail, mockLessons, mockReviews } from '@/mock/mockData/mockData';
+import { httpUrl, mockLessons, mockReviews, mockLessonDetail } from '@/mock/mockData/mockData';
 import type { Level, Lesson } from '@/models/lesson.model';
 import type { FetchLessonsResponse } from '@/models/lesson.model';
 
@@ -31,20 +31,36 @@ export const lessonHandlers = [
 		const page = Number(url.searchParams.get('page') || '1');
 		const limit = Number(url.searchParams.get('limit') || '12');
 
-		// filterStore에서 보내는 파라미터 키와 일치시킴
-		const categoryId = Number(url.searchParams.get('categoryId') || '0');
-		const regionIds = url.searchParams.getAll('regionId').map(Number);
-		const levels = url.searchParams.getAll('level') as Level[];
+		// 클라이언트(filterStore)에서 보내는 파라미터 키와 일치시킴
+		const teacherIdParam = url.searchParams.get('teacherId');
+		const teacherId = teacherIdParam ? Number(teacherIdParam) : null;
+
+		const categoryIdParam = url.searchParams.get('categoryId');
+		const categoryId = categoryIdParam ? Number(categoryIdParam) : null;
+
+		const regionIdsParam = url.searchParams.get('regionId');
+		const regionIds = regionIdsParam ? regionIdsParam.split(',').map(Number) : [];
+
+		const levelsParam = url.searchParams.get('level');
+		const levels = levelsParam ? (levelsParam.split(',') as Level[]) : [];
+
 		const timeRange = url.searchParams.get('timeRange');
 		const minPrice = Number(url.searchParams.get('minPrice') || '0');
 		const maxPrice = Number(url.searchParams.get('maxPrice') || '500000');
-		const maxParticipants = Number(url.searchParams.get('maxParticipants') || '0');
+
+		const maxParticipantsParam = url.searchParams.get('maxParticipants');
+		const maxParticipants = maxParticipantsParam ? Number(maxParticipantsParam) : null;
+
 		const sort = url.searchParams.get('sort') || 'LATEST';
 
 		const filteredLessons = mockLessons
 			.filter((lesson) => {
-				if (!categoryId) return true;
+				if (categoryId === null) return true;
 				return lesson.lessonCategoryId === categoryId;
+			})
+			.filter((lesson) => {
+				if (teacherId === null) return true;
+				return lesson.userId === teacherId || lesson.teacher.id === teacherId;
 			})
 			.filter((lesson) => {
 				if (regionIds.length === 0) return true;
@@ -55,7 +71,7 @@ export const lessonHandlers = [
 				return levels.includes(lesson.level);
 			})
 			.filter((lesson) => {
-				if (!maxParticipants) return true;
+				if (maxParticipants === null) return true;
 				return lesson.maxParticipants >= maxParticipants;
 			})
 			.filter((lesson) => {
@@ -166,6 +182,8 @@ export const lessonHandlers = [
 
 		const data = paginated.map((review) => {
 			const images = review.representativeImage ? [review.representativeImage] : [];
+			const reviewImages = review.images && review.images.length > 0 ? review.images : images;
+
 			return {
 				id: review.id,
 				lessonId: review.lessonId,
@@ -173,14 +191,14 @@ export const lessonHandlers = [
 				userId: review.user.id,
 				rating: review.rating,
 				content: review.content,
-				image1: toNullableImage(images[0]),
-				image2: toNullableImage(images[1]),
-				image3: toNullableImage(images[2]),
-				image4: toNullableImage(images[3]),
-				image5: toNullableImage(images[4]),
-				image6: toNullableImage(images[5]),
-				image7: toNullableImage(images[6]),
-				image8: toNullableImage(images[7]),
+				image1: toNullableImage(reviewImages[0]),
+				image2: toNullableImage(reviewImages[1]),
+				image3: toNullableImage(reviewImages[2]),
+				image4: toNullableImage(reviewImages[3]),
+				image5: toNullableImage(reviewImages[4]),
+				image6: toNullableImage(reviewImages[5]),
+				image7: toNullableImage(reviewImages[6]),
+				image8: toNullableImage(reviewImages[7]),
 				createdAt: review.createdAt,
 				updatedAt: review.updatedAt,
 			};
@@ -405,7 +423,7 @@ export const lessonHandlers = [
 			mockLessons.splice(lessonIndex, 1);
 
 			console.log(`✅ Mock Lesson Deleted: ID ${lessonId}`);
-			console.log(`✅ Remaining Lessons: ${mockLessons.length}`);
+			console.log(`📋 Remaining Lessons: ${mockLessons.length}`);
 
 			return HttpResponse.json(
 				{

@@ -11,6 +11,8 @@ import { cn } from '@/lib/utils';
 import type { TeacherProfile } from '@/models/lesson.model';
 import type { Review } from '@/models/review.model';
 
+import type { useNavigate } from 'react-router-dom';
+
 interface LessonTabContentProps {
 	activeTab: string;
 	tabTitles: { id: string; title: string }[];
@@ -24,8 +26,7 @@ interface LessonTabContentProps {
 	address: string;
 	detailAddress: string;
 	directionsText: string;
-	// navigate: ReturnType<typeof useNavigate>;
-	navigate: (path: string) => void;
+	navigate: ReturnType<typeof useNavigate>;
 	reviews: Review[];
 }
 
@@ -116,7 +117,7 @@ export const LessonTabContent = ({
 									<img
 										src={teacher.image || defaultProfileImage}
 										alt={teacher.nickname}
-										className="w-20 h-20 rounded-full object-cover border border-border shrink-0"
+										className="w-20 h-20 rounded-full object-cover border border-border flex-shrink-0"
 									/>
 									<div className="flex-1">
 										<h3 className="text-xl font-semibold mb-1">
@@ -125,9 +126,7 @@ export const LessonTabContent = ({
 										<Button
 											variant="link"
 											className="p-0 h-auto text-primary text-sm hover:underline"
-											onClick={() =>
-												navigate(`/mypage/profile/${teacher.id}`)
-											}
+											onClick={() => navigate(`/teachers/${teacher.id}`)}
 										>
 											모멘토 페이지 바로가기
 										</Button>

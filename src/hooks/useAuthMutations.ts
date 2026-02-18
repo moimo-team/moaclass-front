@@ -21,8 +21,6 @@ import type { LoginFormValues } from '@/pages/user/Login';
 import type { ResetPasswordFormValues } from '@/pages/user/ResetPassword';
 import { useAuthStore } from '@/store/authStore';
 
-import type { AxiosError } from 'axios';
-
 // 로그인 Mutation
 export const useLoginMutation = () => {
 	const { storeLogin } = useAuthStore();
@@ -39,14 +37,12 @@ export const useLoginMutation = () => {
 					id: data.user.id,
 					nickname: data.user.nickname,
 					email: data.user.email,
+					teacherProfile: false,
 				},
 				data.accessToken,
 			);
 			// 인증 상태 쿼리 초기화
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
-		},
-		onError: (error) => {
-			console.error(error);
 		},
 	});
 };
@@ -66,13 +62,11 @@ export const useGoogleLoginMutation = () => {
 					id: data.user.id,
 					nickname: data.user.nickname,
 					email: data.user.email,
+					teacherProfile: false,
 				},
 				data.accessToken,
 			);
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
-		},
-		onError: (error: AxiosError<{ message: string }>) => {
-			console.error(error);
 		},
 	});
 };
@@ -92,13 +86,11 @@ export const useKakaoLoginMutation = () => {
 					id: data.user.id,
 					nickname: data.user.nickname,
 					email: data.user.email,
+					teacherProfile: false,
 				},
 				data.accessToken,
 			);
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
-		},
-		onError: (error: AxiosError<{ message: string }>) => {
-			console.error(error);
 		},
 	});
 };
@@ -116,9 +108,6 @@ export const useLogoutMutation = () => {
 			// 로그아웃 성공 시 전역 상태 업데이트 및 캐시 전체 삭제
 			storeLogout();
 			queryClient.clear();
-		},
-		onError: (error) => {
-			console.error(error);
 		},
 	});
 };
@@ -139,14 +128,12 @@ export const useJoinMutation = () => {
 						id: data.user.id,
 						nickname: data.user.nickname,
 						email: data.user.email,
+						teacherProfile: false,
 					},
 					data.accessToken,
 				);
 				queryClient.invalidateQueries({ queryKey: ['authUser'] });
 			}
-		},
-		onError: (error: AxiosError<{ message: string }>) => {
-			console.error(error);
 		},
 	});
 };
@@ -158,9 +145,6 @@ export const useEmailCheckMutation = () => {
 			return await checkEmail({ email });
 		},
 		onSuccess: () => {},
-		onError: (error: AxiosError<{ message: string }>) => {
-			console.error(error);
-		},
 	});
 };
 
@@ -171,9 +155,6 @@ export const useNicknameCheckMutation = () => {
 			return await checkNickname({ nickname });
 		},
 		onSuccess: () => {},
-		onError: (error: AxiosError<{ message: string }>) => {
-			console.error(error);
-		},
 	});
 };
 
@@ -182,9 +163,6 @@ export const useFindPasswordMutation = () => {
 	return useMutation({
 		mutationFn: async (data: FindPasswordFormValues) => {
 			return await findPassword(data);
-		},
-		onError: (error: AxiosError<{ message: string }>) => {
-			console.error(error);
 		},
 	});
 };
@@ -195,9 +173,6 @@ export const useVerifyResetCodeMutation = () => {
 		mutationFn: async (data: { email: string; code: string }) => {
 			return await verifyResetCode(data);
 		},
-		onError: (error: AxiosError<{ message: string }>) => {
-			console.error(error);
-		},
 	});
 };
 
@@ -206,9 +181,6 @@ export const useResetPasswordMutation = () => {
 	return useMutation({
 		mutationFn: async (data: ResetPasswordFormValues) => {
 			return await resetPassword(data);
-		},
-		onError: (error: AxiosError<{ message: string }>) => {
-			console.error(error);
 		},
 	});
 };

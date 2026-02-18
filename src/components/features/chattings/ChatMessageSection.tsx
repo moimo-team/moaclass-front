@@ -19,6 +19,7 @@ interface ChatMessageSectionProps {
 	onBackToList: () => void;
 	scrollRef: React.RefObject<HTMLDivElement | null>;
 	userId: number | null;
+	hostBadgeLabel?: string;
 }
 
 const ChatMessageSection: React.FC<ChatMessageSectionProps> = ({
@@ -30,6 +31,7 @@ const ChatMessageSection: React.FC<ChatMessageSectionProps> = ({
 	onBackToList,
 	scrollRef,
 	userId,
+	hostBadgeLabel,
 }) => {
 	if (!selectedMeeting) {
 		return (
@@ -46,7 +48,7 @@ const ChatMessageSection: React.FC<ChatMessageSectionProps> = ({
 	};
 
 	return (
-		<div className="flex w-full lg:w-[70%] flex-col h-full bg-card">
+		<div className="flex w-full lg:w-[70%] flex-col h-full min-h-0 overflow-hidden bg-card">
 			{/* 헤더 */}
 			<div className="p-4 border-b shrink-0 flex items-center gap-3">
 				<FaArrowLeft className="cursor-pointer text-xl" onClick={onBackToList} />
@@ -59,7 +61,10 @@ const ChatMessageSection: React.FC<ChatMessageSectionProps> = ({
 			</div>
 
 			{/* 메시지 목록 */}
-			<div ref={scrollRef} className="flex flex-col gap-4 p-4 flex-grow overflow-y-auto">
+			<div
+				ref={scrollRef}
+				className="flex flex-col gap-4 p-4 flex-grow min-h-0 overflow-y-auto"
+			>
 				{messages.map((msg, index) => {
 					const showDateSeparator =
 						index === 0 ||
@@ -74,6 +79,7 @@ const ChatMessageSection: React.FC<ChatMessageSectionProps> = ({
 								message={msg}
 								isMine={msg.senderId === userId}
 								hostId={selectedMeeting.hostId}
+								hostBadgeLabel={hostBadgeLabel}
 							/>
 						</Fragment>
 					);
