@@ -125,11 +125,18 @@ const Chatting = () => {
 	const handleNewMessage = useCallback(
 		(newMessage: ChatMessage) => {
 			const normalizedMessage = normalizeMessage(newMessage);
-			const incomingRoomId = getRoomIdFromMessage(normalizedMessage);
+			const resolvedRoomId = getRoomIdFromMessage(normalizedMessage) ?? selectedRoomId;
+			if (!resolvedRoomId) return;
+
+			const messageForState =
+				normalizedMessage.roomId != null
+					? normalizedMessage
+					: { ...normalizedMessage, roomId: resolvedRoomId };
+			const incomingRoomId = getRoomIdFromMessage(messageForState);
 			if (!incomingRoomId) return;
 
 			if (incomingRoomId === selectedRoomId) {
-				setMessages((prev) => [...prev, normalizedMessage]);
+				setMessages((prev) => [...prev, messageForState]);
 			}
 
 			queryClient.setQueryData<ChatRoom[]>(['chatRooms', userId], (oldData) => {
@@ -140,11 +147,11 @@ const Chatting = () => {
 						return {
 							...room,
 							lastMessage: {
-								content: normalizedMessage.content,
-								createdAt: normalizedMessage.createdAt,
+								content: messageForState.content,
+								createdAt: messageForState.createdAt,
 								sender:
-									normalizedMessage.sender?.nickname ??
-									normalizedMessage.senderNickname ??
+									messageForState.sender?.nickname ??
+									messageForState.senderNickname ??
 									'알 수 없음',
 							},
 						};

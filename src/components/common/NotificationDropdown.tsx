@@ -1,6 +1,7 @@
 import { IoIosNotifications } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 
+import { joinChatRoom } from '@/api/chat.api';
 import { NotificationItem } from '@/components/features/notification/NotificationItem';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -38,13 +39,57 @@ export const NotificationDropdown = () => {
 		}
 	};
 
-	const executeNotificationAction = (notification: Notification) => {
+	const executeNotificationAction = async (notification: Notification) => {
 		if (notification.type !== 'NEW_CHAT') return;
 		const chatType = mapLinkTypeToChatType(notification.linkType);
 
 		if (notification.roomId) {
 			navigate('/chats', { state: { roomId: notification.roomId, chatType } });
 			return;
+		}
+
+		if (notification.linkId && chatType === 'lesson') {
+			try {
+				const room = await joinChatRoom({ lessonId: notification.linkId });
+				navigate('/chats', {
+					state: {
+						chatType: 'lesson',
+						roomId: room.roomId,
+						lessonId: notification.linkId,
+					},
+				});
+				return;
+			} catch {
+				navigate('/chats', {
+					state: {
+						chatType: 'lesson',
+						lessonId: notification.linkId,
+					},
+				});
+				return;
+			}
+		}
+
+		if (notification.linkId && chatType === 'meeting') {
+			try {
+				const room = await joinChatRoom({ meetingId: notification.linkId });
+				navigate('/chats', {
+					state: {
+						chatType: 'meeting',
+						roomId: room.roomId,
+						meetingId: notification.linkId,
+					},
+				});
+				return;
+			} catch {
+				navigate('/chats', {
+					state: {
+						chatType: 'meeting',
+						meetingId: notification.linkId,
+					},
+				});
+				return;
+			}
 		}
 
 		if (notification.linkId) {
@@ -63,7 +108,7 @@ export const NotificationDropdown = () => {
 
 	const handleNotificationClick = (notification: Notification) => {
 		markAsReadWithReset(notification);
-		executeNotificationAction(notification);
+		void executeNotificationAction(notification); // 반환 Promise를 기다리지 않아 void 추가
 	};
 
 	const handleMarkAllRead = () => {
