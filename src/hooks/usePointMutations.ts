@@ -30,7 +30,7 @@ export const useChargePointMutation = () => {
 
 					const newHistoryEntry: PointHistory = {
 						transactionId: data.transaction.id,
-						title: '포인트 충전',
+						lessonName: '포인트 충전',
 						type: data.transaction.type,
 						status: data.transaction.status,
 						amount: data.transaction.amount,
@@ -47,9 +47,6 @@ export const useChargePointMutation = () => {
 			);
 
 			toast.success(`${variables.toLocaleString()}포인트가 충전되었습니다.`);
-		},
-		onError: () => {
-			toast.error('포인트 충전 중 오류가 발생했습니다.');
 		},
 	});
 };
