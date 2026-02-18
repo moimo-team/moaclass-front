@@ -319,14 +319,15 @@ function CreateClassModal({
 
 			onOpenChange(false);
 		} catch (error) {
-			console.error('클래스 처리 실패:', error);
 			toast.error('오류 발생', {
 				description: '클래스 처리 중 오류가 발생했습니다.',
 			});
 		}
 	};
 
-	const discountedPrice = Math.round(price * (1 - discountRate / 100));
+	const priceValue = Number(price) || 0;
+	const discountRateValue = Number(discountRate) || 0;
+	const discountedPrice = Math.round(priceValue * (1 - discountRateValue / 100));
 
 	return (
 		<FormModal
@@ -391,11 +392,6 @@ function CreateClassModal({
 				subCategories &&
 				subCategories.length > 0 &&
 				(() => {
-					console.log('🔍 소분류 렌더링:', {
-						selectedCategoryId,
-						subCategories,
-						selectedSubCategoryIds,
-					});
 					return (
 						<FormField
 							label="소분류 카테고리"
@@ -407,9 +403,7 @@ function CreateClassModal({
 									const isSelected = selectedSubCategoryIds.includes(
 										subCategory.id,
 									);
-									console.log(
-										`  - ${subCategory.name} (ID: ${subCategory.id}): ${isSelected ? '✅ 선택됨' : '❌ 선택안됨'}`,
-									);
+
 									return (
 										<SelectableBadge
 											key={subCategory.id}
@@ -526,6 +520,7 @@ function CreateClassModal({
 						id="price"
 						label="가격"
 						register={register('price', { valueAsNumber: true })}
+						type="number"
 						placeholder="0"
 						suffix="원"
 						error={errors.price?.message}
@@ -540,6 +535,7 @@ function CreateClassModal({
 						id="discountRate"
 						label="할인율"
 						register={register('discountRate', { valueAsNumber: true })}
+						type="number"
 						placeholder="0"
 						suffix="%"
 						error={errors.discountRate?.message}

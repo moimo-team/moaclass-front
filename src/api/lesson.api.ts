@@ -21,7 +21,10 @@ export const fetchLessons = async (params: FetchLessonsParams): Promise<FetchLes
 	Object.entries(params).forEach(([key, value]) => {
 		if (value === undefined || value === null || value === '') return;
 
-		// 백엔드 DTO의 @Transform(라인 41, 62 등) 로직에 맞춰
+		// TODO: 백엔드에서 선생님(userId)별 클래스 필터링이 구현될 때까지 임시로 userId 파라미터를 제외합니다.
+		if (key === 'userId') return;
+
+		// 백엔드 DTO의 @Transform 로직에 맞춰
 		// 배열 데이터는 쉼표로 구분된 하나의 문자열로 직렬화하여 전송합니다.
 		if (Array.isArray(value)) {
 			queryParams.append(key, value.map(String).join(','));
