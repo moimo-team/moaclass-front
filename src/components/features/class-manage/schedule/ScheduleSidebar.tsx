@@ -218,6 +218,7 @@ export const ScheduleSidebar = ({
 			/>
 
 			<ScheduleParticipantModal
+				lessonId={lessonId}
 				isOpen={!!participantModalInfo}
 				onClose={() => setParticipantModalInfo(null)}
 				scheduleId={participantModalInfo?.scheduleId ?? null}
