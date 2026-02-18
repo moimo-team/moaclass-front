@@ -35,9 +35,14 @@ const ClassManagementPage = () => {
 		isLoading,
 		isError,
 	} = useQuery<FetchLessonsResponse>({
-		queryKey: ['lessons', 'manage-list'],
-		queryFn: () => fetchLessons({}),
+		queryKey: ['lessons', 'manage-list', userId],
+		queryFn: () =>
+			fetchLessons({
+				userId: userId ?? undefined,
+				status: ['ACTIVE', 'INACTIVE', 'DRAFT', 'DUPLICATED'],
+			}),
 		refetchOnMount: 'always',
+		enabled: !!userId,
 	});
 
 	const { mutate: deleteLesson } = useDeleteLessonMutation();
