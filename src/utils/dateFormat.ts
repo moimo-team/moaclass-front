@@ -4,8 +4,7 @@
  * @returns 포맷된 날짜 문자열 (예: "2026년 02월 12일 (목)")
  */
 export function formatScheduleFullDate(dateInput: string | Date): string {
-	const date =
-		typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+	const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
 	const year = date.getFullYear();
 	const month = (date.getMonth() + 1).toString().padStart(2, '0');
 	const day = date.getDate().toString().padStart(2, '0');
@@ -29,9 +28,7 @@ export function formatFullDateTime(dateString: string): string {
 	const weekday = weekdays[date.getDay()];
 	const hours = date.getHours();
 	const minutes = date.getMinutes();
-	return `${year}. ${month}. ${day} (${weekday}) ${hours}:${minutes
-		.toString()
-		.padStart(2, '0')}`;
+	return `${year}. ${month}. ${day} (${weekday}) ${hours}:${minutes.toString().padStart(2, '0')}`;
 }
 
 /**
@@ -183,57 +180,63 @@ export function parseToTimeComponents(dateString: string): {
  * @returns 포맷된 문자열 (예: "2024-01-01 13:30:00", "24.01.01" 또는 "13:30")
  */
 export function formatDateTime(
-  dateString: string,
-  options?: {
-    type?: "date" | "time" | "full";
-    separator?: string;
-  },
+	dateString: string,
+	options?: {
+		type?: 'date' | 'time' | 'full';
+		separator?: string;
+	},
 ): string {
 	if (!dateString) return '';
 
-  const { type = "full", separator } = options || {};
+	const { type = 'full', separator } = options || {};
 
-  // 숫자가 아닌 문자를 제거하여 순수 숫자만 추출
-  const numbers = dateString.replace(/\D/g, "");
+	// 숫자가 아닌 문자를 제거하여 순수 숫자만 추출
+	const numbers = dateString.replace(/\D/g, '');
 
-  if (type === "full") {
-    if (numbers.length >= 14) {
-      return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6, 8)} ${numbers.slice(8, 10)}:${numbers.slice(10, 12)}:${numbers.slice(12, 14)}`;
-    }
-    if (numbers.length >= 12) {
-      return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6, 8)} ${numbers.slice(8, 10)}:${numbers.slice(10, 12)}`;
-    }
-    if (numbers.length >= 8) {
-      return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6, 8)}`;
-    }
-    return dateString;
-  }
+	if (type === 'full') {
+		if (numbers.length >= 14) {
+			return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6, 8)} ${numbers.slice(8, 10)}:${numbers.slice(10, 12)}:${numbers.slice(12, 14)}`;
+		}
+		if (numbers.length >= 12) {
+			return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6, 8)} ${numbers.slice(8, 10)}:${numbers.slice(10, 12)}`;
+		}
+		if (numbers.length >= 8) {
+			return `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6, 8)}`;
+		}
+		return dateString;
+	}
 
 	// 구분자 설정 (기본값: 날짜는 '.', 시간은 ':')
 	const sep = separator ?? (type === 'date' ? '.' : ':');
 
-  if (type === "date") {
-    // 8자리(YYYYMMDD)인 경우 YY{sep}MM{sep}DD 형식으로 변환
-    if (numbers.length >= 8) {
-      // 뒤에서부터 8자리를 기준으로 처리하거나 앞에서부터 처리
-      // 보통 YYYYMMDD 형식이므로 마지막 8자리를 가져옴 (시각이 포함된 경우 대비)
-      const datePart = numbers.slice(0, 8);
-      return `${datePart.slice(2, 4)}${sep}${datePart.slice(4, 6)}${sep}${datePart.slice(6, 8)}`;
-    }
-  } else if (type === "time") {
-    // 시간 부분 추출 (보통 날짜 뒤에 오므로 numbers가 12자리 이상이면 시각은 8번째부터)
-    if (numbers.length >= 12) {
-      const timePart = numbers.slice(8, 12);
-      return `${timePart.slice(0, 2)}${sep}${timePart.slice(2, 4)}`;
-    }
-    // 4자리만 있는 경우 바로 처리
-    if (numbers.length >= 4) {
-      return `${numbers.slice(0, 2)}${sep}${numbers.slice(2, 4)}`;
-    }
-  }
+	if (type === 'date') {
+		// 8자리(YYYYMMDD)인 경우 YY{sep}MM{sep}DD 형식으로 변환
+		if (numbers.length >= 8) {
+			// 뒤에서부터 8자리를 기준으로 처리하거나 앞에서부터 처리
+			// 보통 YYYYMMDD 형식이므로 마지막 8자리를 가져옴 (시각이 포함된 경우 대비)
+			const datePart = numbers.slice(0, 8);
+			return `${datePart.slice(2, 4)}${sep}${datePart.slice(4, 6)}${sep}${datePart.slice(6, 8)}`;
+		}
+	} else if (type === 'time') {
+		// 시간 부분 추출 (보통 날짜 뒤에 오므로 numbers가 12자리 이상이면 시각은 8번째부터)
+		if (numbers.length >= 12) {
+			const timePart = numbers.slice(8, 12);
+			return `${timePart.slice(0, 2)}${sep}${timePart.slice(2, 4)}`;
+		}
+		// 4자리만 있는 경우 바로 처리
+		if (numbers.length >= 4) {
+			return `${numbers.slice(0, 2)}${sep}${numbers.slice(2, 4)}`;
+		}
+	}
 
-  return dateString;
+	return dateString;
 }
 
 // 기존 코드와의 호환성을 위해 별칭으로도 export
 export const formatClassCreateDate = formatFullDateTime;
+
+/**
+ * ISO 8601 문자열에서 밀리초·타임존을 제거해 "YYYY-MM-DDTHH:mm:ss" 형태로 반환
+ * 백엔드가 타임존 없는 로컬 시간 형식을 요구할 때 사용
+ */
+export const toLocalISOString = (isoString: string): string => isoString.slice(0, 19);
