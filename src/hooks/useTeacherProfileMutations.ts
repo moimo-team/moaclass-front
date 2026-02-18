@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import {
 	createTeacherProfile,
 	deleteTeacherProfile,
-	getTeacherProfile,
+	fetchTeacherProfile,
 	updateTeacherProfile,
 } from '@/api/teacher.api';
 
@@ -14,7 +14,7 @@ import type { AxiosError } from 'axios';
 export const useTeacherProfileQuery = (userId?: number) => {
 	return useQuery({
 		queryKey: ['teacherProfile', userId],
-		queryFn: () => getTeacherProfile(userId!),
+		queryFn: () => fetchTeacherProfile(userId!),
 		enabled: !!userId,
 	});
 };

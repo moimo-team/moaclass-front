@@ -21,6 +21,7 @@ export interface Review {
 	userId?: number;
 	rating: number;
 	representativeImage: string | null;
+	images?: string[];
 	content: string;
 	createdAt: string;
 	updatedAt: string;
