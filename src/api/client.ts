@@ -99,5 +99,6 @@ export const apiClient = createClient();
 
 // Chat API를 위한 별도 클라이언트
 export const chatApiClient = createClient({
+	// baseURL: 'https://moaclass-back.onrender.com',
 	baseURL: CHAT_API_URL,
 });
