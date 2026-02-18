@@ -1,0 +1,41 @@
+import { useFormContext } from 'react-hook-form';
+
+import { FormInput } from '@/components/features/modal/components/FormInput';
+import { FormTextarea } from '@/components/features/modal/components/FormTextarea';
+
+import type { ClassFormValues } from '../classSchema';
+
+export function BasicInfoSection() {
+	const {
+		register,
+		watch,
+		formState: { errors },
+	} = useFormContext<ClassFormValues>();
+
+	return (
+		<>
+			<FormInput
+				id="title"
+				label="클래스명"
+				register={register('title')}
+				placeholder="매력적인 클래스명을 입력하세요 (100자 이내)"
+				maxLength={100}
+				currentLength={watch('title')?.length || 0}
+				error={errors.title?.message}
+				required
+			/>
+
+			<FormTextarea
+				id="description"
+				label="클래스 소개"
+				register={register('description')}
+				placeholder="클래스에 대해 자유롭게 설명해주세요 (4000자 이내)"
+				maxLength={4000}
+				currentLength={watch('description')?.length || 0}
+				error={errors.description?.message}
+				className="min-h-[120px]"
+				required
+			/>
+		</>
+	);
+}
