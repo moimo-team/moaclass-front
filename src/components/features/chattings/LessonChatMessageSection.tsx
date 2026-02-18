@@ -1,10 +1,53 @@
-const LessonChatMessageSection = () => {
-  return (
-    <div className="flex-1 flex flex-col items-center justify-center bg-gray-100 text-gray-400 p-4">
-      <p className="text-lg font-semibold mb-2">선택된 클래스 채팅 내용</p>
-      <p className="text-sm">(개발 중)</p>
-    </div>
-  );
+import React from 'react';
+
+import ChatMessageSection from '@/components/features/chattings/ChatMessageSection';
+import type { ChatMessage, ChatRoom } from '@/models/chat.model';
+
+interface LessonChatMessageSectionProps {
+	selectedRoom: ChatRoom | null;
+	messages: ChatMessage[];
+	sendMessage: () => void;
+	inputValue: string;
+	setInputValue: (value: string) => void;
+	onBackToList: () => void;
+	scrollRef: React.RefObject<HTMLDivElement | null>;
+	userId: number | null;
+}
+
+const LessonChatMessageSection: React.FC<LessonChatMessageSectionProps> = ({
+	selectedRoom,
+	messages,
+	sendMessage,
+	inputValue,
+	setInputValue,
+	onBackToList,
+	scrollRef,
+	userId,
+}) => {
+	if (!selectedRoom) {
+		return (
+			<div className="hidden lg:flex flex-col items-center justify-center h-full text-muted-foreground w-full lg:w-[70%]">
+				<p>레슨 채팅방을 선택하여 대화를 시작하세요.</p>
+			</div>
+		);
+	}
+
+	return (
+		<ChatMessageSection
+			selectedMeeting={{
+				...selectedRoom,
+				meetingId: selectedRoom.meetingId ?? selectedRoom.roomId,
+			}}
+			messages={messages}
+			sendMessage={sendMessage}
+			inputValue={inputValue}
+			setInputValue={setInputValue}
+			onBackToList={onBackToList}
+			scrollRef={scrollRef}
+			userId={userId}
+			hostBadgeLabel="모멘토"
+		/>
+	);
 };
 
 export default LessonChatMessageSection;

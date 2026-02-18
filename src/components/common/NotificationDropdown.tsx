@@ -1,5 +1,7 @@
 import { IoIosNotifications } from 'react-icons/io';
+import { useNavigate } from 'react-router-dom';
 
+import { joinChatRoom } from '@/api/chat.api';
 import { NotificationItem } from '@/components/features/notification/NotificationItem';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -13,27 +15,108 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMarkAllAsReadMutation, useMarkAsReadMutation } from '@/hooks/useNotificationMutations';
 import { useNotificationQuery } from '@/hooks/useNotificationQuery';
+import { resetAllNewChatRooms, resetNewChatByRoom } from '@/lib/newChatNotificationState';
+import type { ChatType } from '@/models/chat.model';
+import { isNewChatNotification, type Notification } from '@/models/notification.model';
+
+const mapLinkTypeToChatType = (linkType?: string): ChatType | undefined => {
+	if (linkType === 'MEETING') return 'meeting';
+	if (linkType === 'LESSON') return 'lesson';
+	return undefined;
+};
 
 export const NotificationDropdown = () => {
+	const navigate = useNavigate();
 	const { data: notifications, isLoading, isError } = useNotificationQuery();
 
 	const markAsReadMutation = useMarkAsReadMutation();
 	const markAllAsReadMutation = useMarkAllAsReadMutation();
 
-	const handleNotificationClick = (notificationId: number) => {
-		markAsReadMutation.mutate(notificationId);
-		// TODO: 알림 종류에 따라 특정 페이지로 이동하는 로직 추가 (useNavigate)
+	const markAsReadWithReset = (notification: Notification) => {
+		markAsReadMutation.mutate(notification.id);
+		if (isNewChatNotification(notification)) {
+			resetNewChatByRoom(notification.roomId);
+		}
 	};
 
-	const handleMarkAsRead = (notificationId: number) => {
-		markAsReadMutation.mutate(notificationId);
+	const executeNotificationAction = async (notification: Notification) => {
+		if (notification.type !== 'NEW_CHAT') return;
+		const chatType = mapLinkTypeToChatType(notification.linkType);
+
+		if (notification.roomId) {
+			navigate('/chats', { state: { roomId: notification.roomId, chatType } });
+			return;
+		}
+
+		if (notification.linkId && chatType === 'lesson') {
+			try {
+				const room = await joinChatRoom({ lessonId: notification.linkId });
+				navigate('/chats', {
+					state: {
+						chatType: 'lesson',
+						roomId: room.roomId,
+						lessonId: notification.linkId,
+					},
+				});
+				return;
+			} catch {
+				navigate('/chats', {
+					state: {
+						chatType: 'lesson',
+						lessonId: notification.linkId,
+					},
+				});
+				return;
+			}
+		}
+
+		if (notification.linkId && chatType === 'meeting') {
+			try {
+				const room = await joinChatRoom({ meetingId: notification.linkId });
+				navigate('/chats', {
+					state: {
+						chatType: 'meeting',
+						roomId: room.roomId,
+						meetingId: notification.linkId,
+					},
+				});
+				return;
+			} catch {
+				navigate('/chats', {
+					state: {
+						chatType: 'meeting',
+						meetingId: notification.linkId,
+					},
+				});
+				return;
+			}
+		}
+
+		if (notification.linkId) {
+			navigate('/chats', {
+				state: {
+					chatType,
+					meetingId: chatType === 'meeting' ? notification.linkId : undefined,
+					lessonId: chatType === 'lesson' ? notification.linkId : undefined,
+				},
+			});
+			return;
+		}
+
+		navigate('/chats');
 	};
 
-	const handleReadAll = () => {
+	const handleNotificationClick = (notification: Notification) => {
+		markAsReadWithReset(notification);
+		void executeNotificationAction(notification); // 반환 Promise를 기다리지 않아 void 추가
+	};
+
+	const handleMarkAllRead = () => {
 		markAllAsReadMutation.mutate();
+		resetAllNewChatRooms();
 	};
 
-	const unreadCount = notifications?.filter((n) => !n.isRead).length || 0;
+	const unreadCount = notifications?.filter((n) => !n.isRead).length ?? 0;
 
 	if (isLoading) {
 		return (
@@ -69,7 +152,7 @@ export const NotificationDropdown = () => {
 						variant="ghost"
 						size="sm"
 						className="h-auto p-1 text-xs"
-						onClick={handleReadAll}
+						onClick={handleMarkAllRead}
 						disabled={unreadCount === 0 || markAllAsReadMutation.isPending || isError}
 					>
 						전체 읽음
@@ -78,7 +161,7 @@ export const NotificationDropdown = () => {
 				<DropdownMenuSeparator />
 				{isError ? (
 					<DropdownMenuLabel className="text-center text-red-500">
-						알림을 불러오는 데 실패했습니다.
+						알림을 불러오지 못했습니다.
 					</DropdownMenuLabel>
 				) : notifications && notifications.length > 0 ? (
 					notifications.map((notification) => (
@@ -86,7 +169,7 @@ export const NotificationDropdown = () => {
 							key={notification.id}
 							notification={notification}
 							onClick={handleNotificationClick}
-							onMarkAsRead={handleMarkAsRead}
+							onMarkAsRead={markAsReadWithReset}
 						/>
 					))
 				) : (

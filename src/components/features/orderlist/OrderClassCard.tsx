@@ -1,8 +1,11 @@
 import { useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { FileText, Pencil, MessageCircle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
+import { joinChatRoom } from '@/api/chat.api';
 import ActionButton from '@/components/common/ActionButton';
 import MyReviewModal from '@/components/features/review/MyReviewModal';
 import { Badge } from '@/components/ui/badge';
@@ -31,11 +34,28 @@ const getStatusBadgeVariant = (status: OrderStatus) => {
 
 const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 	const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 	const isInactive = order.status === '수강완료' || order.status === '수강취소';
 
 	// 리뷰 작성 여부 확인 (Order 모델에 추가된 reviewId 필드 사용)
 	const hasReview = order.reviewId !== null;
+
+	const handleInquiry = async () => {
+		try {
+			const room = await joinChatRoom({ lessonId: order.lessonId });
+			await queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
+			navigate('/chats', {
+				state: {
+					chatType: 'lesson',
+					roomId: room.roomId,
+					lessonId: order.lessonId,
+				},
+			});
+		} catch {
+			toast.error('문의 채팅방을 열지 못했습니다. 잠시 후 다시 시도해 주세요.');
+		}
+	};
 
 	return (
 		<Card
@@ -120,6 +140,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
 									<MessageCircle className="w-3.5 h-3.5 text-carrot fill-carrot" />
 								}
 								className="w-full"
+								onClick={handleInquiry}
 							/>
 							<ActionButton
 								label="수강 취소"

@@ -8,9 +8,19 @@ import { formatRelativeTime } from '@/utils/dateFormat';
 
 export interface NotificationItemProps {
 	notification: Notification;
-	onClick: (notificationId: number) => void;
-	onMarkAsRead: (notificationId: number) => void;
+	onClick: (notification: Notification) => void;
+	onMarkAsRead: (notification: Notification) => void;
 }
+
+const getNotificationTitle = (notification: Notification) =>
+	notification.type === 'NEW_CHAT'
+		? `[${notification.linkType === 'MEETING' ? '모임 채팅' : '클래스 문의'}] ${
+				notification.lessonTitle || '채팅방'
+			}${notification.senderNickname ? ` · ${notification.senderNickname}님` : ''} 새 메시지`
+		: notification.lessonTitle || notification.message || 'Notification';
+
+const getNotificationBody = (notification: Notification) =>
+	notification.message || notification.description || '';
 
 export const NotificationItem = ({
 	notification,
@@ -19,7 +29,7 @@ export const NotificationItem = ({
 }: NotificationItemProps) => {
 	return (
 		<DropdownMenuItem
-			onClick={() => onClick(notification.id)}
+			onClick={() => onClick(notification)}
 			className={cn('flex items-start gap-3 p-3 cursor-pointer w-full')}
 		>
 			{/* 붉은 점 */}
@@ -36,7 +46,7 @@ export const NotificationItem = ({
 							notification.isRead ? 'text-gray-500' : 'text-foreground',
 						)}
 					>
-						{notification.lessonTitle}
+						{getNotificationTitle(notification)}
 					</span>
 					<span
 						className={cn(
@@ -53,7 +63,7 @@ export const NotificationItem = ({
 						notification.isRead ? 'text-gray-500' : 'text-gray-600',
 					)}
 				>
-					{notification.description}
+					{getNotificationBody(notification)}
 				</p>
 			</div>
 
@@ -66,7 +76,7 @@ export const NotificationItem = ({
 						className="h-auto p-1 text-xs"
 						onClick={(e) => {
 							e.stopPropagation();
-							onMarkAsRead(notification.id);
+							onMarkAsRead(notification);
 						}}
 					>
 						읽음
