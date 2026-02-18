@@ -34,10 +34,7 @@ export const deleteSchedules = async (scheduleIds: number[]): Promise<void[]> =>
 	return Promise.all(scheduleIds.map((id) => deleteSchedule(id)));
 };
 
-/**
- * 특정 일정의 신청자(모멘티) 목록 조회
- * (🚨 백엔드 구현 요청 필요: GET /lessons/schedules/:scheduleId/participants)
- */
+// 특정 일정의 신청자(모멘티) 목록 조회
 export const fetchScheduleParticipants = async (
 	scheduleId: number,
 ): Promise<ScheduleParticipant[]> => {
