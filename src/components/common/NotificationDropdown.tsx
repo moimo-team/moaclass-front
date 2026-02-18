@@ -1,4 +1,5 @@
 import { IoIosNotifications } from 'react-icons/io';
+import { useNavigate } from 'react-router-dom';
 
 import { NotificationItem } from '@/components/features/notification/NotificationItem';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,27 +14,51 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMarkAllAsReadMutation, useMarkAsReadMutation } from '@/hooks/useNotificationMutations';
 import { useNotificationQuery } from '@/hooks/useNotificationQuery';
+import type { ChatType } from '@/models/chat.model';
+import type { Notification } from '@/models/notification.model';
+
+const mapLinkTypeToChatType = (linkType?: string): ChatType | undefined => {
+	if (linkType === 'MEETING') return 'meeting';
+	if (linkType === 'LESSON') return 'lesson';
+	return undefined;
+};
 
 export const NotificationDropdown = () => {
+	const navigate = useNavigate();
 	const { data: notifications, isLoading, isError } = useNotificationQuery();
 
 	const markAsReadMutation = useMarkAsReadMutation();
 	const markAllAsReadMutation = useMarkAllAsReadMutation();
 
-	const handleNotificationClick = (notificationId: number) => {
-		markAsReadMutation.mutate(notificationId);
-		// TODO: 알림 종류에 따라 특정 페이지로 이동하는 로직 추가 (useNavigate)
+	const handleNotificationClick = (notification: Notification) => {
+		markAsReadMutation.mutate(notification.id);
+
+		if (notification.type !== 'NEW_CHAT') return;
+
+		const chatType = mapLinkTypeToChatType(notification.linkType);
+
+		if (notification.roomId) {
+			navigate('/chats', {
+				state: { roomId: notification.roomId, chatType },
+			});
+			return;
+		}
+
+		if (notification.linkId) {
+			navigate('/chats', {
+				state: {
+					chatType,
+					meetingId: chatType === 'meeting' ? notification.linkId : undefined,
+					lessonId: chatType === 'lesson' ? notification.linkId : undefined,
+				},
+			});
+			return;
+		}
+
+		navigate('/chats');
 	};
 
-	const handleMarkAsRead = (notificationId: number) => {
-		markAsReadMutation.mutate(notificationId);
-	};
-
-	const handleReadAll = () => {
-		markAllAsReadMutation.mutate();
-	};
-
-	const unreadCount = notifications?.filter((n) => !n.isRead).length || 0;
+	const unreadCount = notifications?.filter((n) => !n.isRead).length ?? 0;
 
 	if (isLoading) {
 		return (
@@ -69,7 +94,7 @@ export const NotificationDropdown = () => {
 						variant="ghost"
 						size="sm"
 						className="h-auto p-1 text-xs"
-						onClick={handleReadAll}
+						onClick={() => markAllAsReadMutation.mutate()}
 						disabled={unreadCount === 0 || markAllAsReadMutation.isPending || isError}
 					>
 						전체 읽음
@@ -86,7 +111,7 @@ export const NotificationDropdown = () => {
 							key={notification.id}
 							notification={notification}
 							onClick={handleNotificationClick}
-							onMarkAsRead={handleMarkAsRead}
+							onMarkAsRead={(id) => markAsReadMutation.mutate(id)}
 						/>
 					))
 				) : (

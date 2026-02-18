@@ -1,70 +1,157 @@
 import { mockChatMessages, mockChatRooms } from '@/mock/mockData/chatMock';
 import type { ChatMessage } from '@/models/chat.model';
+import type { Notification } from '@/models/notification.model';
 
-class CustomEventEmitter {
-	private events: Record<string, Function[]> = {};
+type JoinRoomPayload = number | { roomId: number };
+type SendMessagePayload = {
+	roomId?: number;
+	meetingId?: number;
+	content: string;
+};
 
-	on(eventName: string, listener: Function): this {
-		if (!this.events[eventName]) {
-			this.events[eventName] = [];
+type JoinRoomAck = { status: 'success'; roomId: number };
+type SendMessageAck = { status: 'sent'; message: ChatMessage };
+
+type SocketEvents = {
+	connect: () => void;
+	notification: (payload: Notification) => void;
+	newMessage: (message: ChatMessage) => void;
+};
+
+type EmitFn = {
+	(event: 'joinRoom', payload: JoinRoomPayload, callback?: (res: JoinRoomAck) => void): void;
+	(
+		event: 'sendMessage',
+		payload: SendMessagePayload,
+		callback?: (res: SendMessageAck) => void,
+	): void;
+};
+
+export type MockSocketClient = {
+	id: string;
+	on: <K extends keyof SocketEvents>(eventName: K, listener: SocketEvents[K]) => MockSocketClient;
+	off: <K extends keyof SocketEvents>(
+		eventName: K,
+		listener: SocketEvents[K],
+	) => MockSocketClient;
+	emit: EmitFn;
+	disconnect: () => void;
+	connected: boolean;
+};
+
+const extractRoomId = (payload: JoinRoomPayload): number =>
+	typeof payload === 'number' ? payload : payload.roomId;
+
+const emitNotification = (
+	roomId: number,
+	content: string,
+	nickname: string,
+	notifyListeners: Array<(payload: Notification) => void>,
+) => {
+	const room = mockChatRooms.find((item) => item.roomId === roomId);
+	if (!room || room.chatType !== 'lesson') return;
+
+	const notification: Notification = {
+		id: Date.now(),
+		type: 'NEW_CHAT',
+		message: content,
+		description: content,
+		roomId,
+		linkId: room.lessonId,
+		linkType: 'LESSON',
+		senderNickname: nickname,
+		createdAt: new Date().toISOString(),
+		isRead: false,
+		readAt: null,
+	};
+
+	notifyListeners.forEach((listener) => listener(notification));
+};
+
+export const createMockSocket = (): MockSocketClient => {
+	const id = `mock_socket_${Math.random().toString(36).slice(2, 11)}`;
+	let activeRoomId: number | null = null;
+
+	const userId = 46;
+	const nickname = '테스트 유저';
+	const profileImage = 'https://i.pravatar.cc/150?img=46';
+
+	const connectListeners: Array<() => void> = [];
+	const notificationListeners: Array<(payload: Notification) => void> = [];
+	const newMessageListeners: Array<(message: ChatMessage) => void> = [];
+
+	const on: MockSocketClient['on'] = (eventName, listener) => {
+		if (eventName === 'connect') {
+			connectListeners.push(listener as () => void);
+			return client;
 		}
-		this.events[eventName].push(listener);
-		return this;
-	}
 
-	emit(eventName: string, ...args: any[]): boolean {
-		if (this.events[eventName]) {
-			this.events[eventName].forEach((listener) => listener(...args));
-			return true;
+		if (eventName === 'notification') {
+			notificationListeners.push(listener as (payload: Notification) => void);
+			return client;
 		}
-		return false;
-	}
-}
 
-class MockSocket extends CustomEventEmitter {
-	public id: string;
-	private roomId: number | null = null;
-	private userId = 46;
-	private nickname = '테스트유저';
-	private profileImage = 'https://i.pravatar.cc/150?img=46';
+		newMessageListeners.push(listener as (message: ChatMessage) => void);
+		return client;
+	};
 
-	constructor() {
-		super();
-		this.id = `mock_socket_${Math.random().toString(36).slice(2, 11)}`;
-	}
+	const off: MockSocketClient['off'] = (eventName, listener) => {
+		if (eventName === 'connect') {
+			const idx = connectListeners.indexOf(listener as () => void);
+			if (idx >= 0) connectListeners.splice(idx, 1);
+			return client;
+		}
 
-	private extractRoomId(value: number | { roomId: number }): number {
-		return typeof value === 'number' ? value : value.roomId;
-	}
+		if (eventName === 'notification') {
+			const idx = notificationListeners.indexOf(listener as (payload: Notification) => void);
+			if (idx >= 0) notificationListeners.splice(idx, 1);
+			return client;
+		}
 
-	joinRoom(payload: number | { roomId: number }, callback?: (res: any) => void) {
-		const roomId = this.extractRoomId(payload);
-		this.roomId = roomId;
-		if (callback) callback({ status: 'success', roomId });
-	}
+		const idx = newMessageListeners.indexOf(listener as (message: ChatMessage) => void);
+		if (idx >= 0) newMessageListeners.splice(idx, 1);
+		return client;
+	};
 
-	sendMessage(
-		payload: {
-			roomId?: number;
-			meetingId?: number;
-			content: string;
-		},
-		callback?: (res: any) => void,
-	) {
-		const roomId = payload.roomId ?? payload.meetingId ?? this.roomId;
+	function emit(
+		event: 'joinRoom',
+		payload: JoinRoomPayload,
+		callback?: (res: JoinRoomAck) => void,
+	): void;
+	function emit(
+		event: 'sendMessage',
+		payload: SendMessagePayload,
+		callback?: (res: SendMessageAck) => void,
+	): void;
+	function emit(
+		event: 'joinRoom' | 'sendMessage',
+		payload: JoinRoomPayload | SendMessagePayload,
+		callback?: ((res: JoinRoomAck) => void) | ((res: SendMessageAck) => void),
+	): void {
+		if (event === 'joinRoom') {
+			const roomId = extractRoomId(payload as JoinRoomPayload);
+			activeRoomId = roomId;
+			if (callback) {
+				(callback as (res: JoinRoomAck) => void)({ status: 'success', roomId });
+			}
+			return;
+		}
+
+		const messagePayload = payload as SendMessagePayload;
+		const roomId = messagePayload.roomId ?? messagePayload.meetingId ?? activeRoomId;
 		if (!roomId) return;
 
 		const newMessage: ChatMessage = {
 			id: Date.now(),
 			roomId,
 			meetingId: roomId,
-			senderId: this.userId,
-			content: payload.content,
+			senderId: userId,
+			content: messagePayload.content,
 			createdAt: new Date().toISOString(),
 			sender: {
-				id: this.userId,
-				nickname: this.nickname,
-				image: this.profileImage,
+				id: userId,
+				nickname,
+				image: profileImage,
 			},
 		};
 
@@ -73,56 +160,39 @@ class MockSocket extends CustomEventEmitter {
 		}
 		mockChatMessages[roomId].push(newMessage);
 
-		const room = mockChatRooms.find((r) => r.roomId === roomId);
+		const room = mockChatRooms.find((item) => item.roomId === roomId);
 		if (room) {
 			room.lastMessage = {
-				sender: this.nickname,
+				sender: nickname,
 				content: newMessage.content,
 				createdAt: newMessage.createdAt,
 			};
 		}
 
-		this.emit('newMessage', newMessage);
-		if (callback) callback({ status: 'sent', message: newMessage });
-	}
+		newMessageListeners.forEach((listener) => listener(newMessage));
+		emitNotification(roomId, newMessage.content, nickname, notificationListeners);
 
-	disconnect() {
-		this.roomId = null;
-	}
-
-	handleClientEmit(event: string, ...args: any[]) {
-		const payload = args[0];
-		const callback =
-			typeof args[args.length - 1] === 'function' ? args[args.length - 1] : undefined;
-
-		switch (event) {
-			case 'joinRoom':
-				this.joinRoom(payload, callback);
-				break;
-			case 'sendMessage':
-				this.sendMessage(payload, callback);
-				break;
-			default:
-				break;
+		if (callback) {
+			(callback as (res: SendMessageAck) => void)({ status: 'sent', message: newMessage });
 		}
 	}
 
-	simulateConnection() {
-		setTimeout(() => {
-			this.emit('connect');
-		}, 100);
-	}
-}
+	const disconnect = () => {
+		activeRoomId = null;
+	};
 
-export const createMockSocket = () => {
-	const mockSocket = new MockSocket();
-	mockSocket.simulateConnection();
-
-	return {
-		id: mockSocket.id,
-		on: mockSocket.on.bind(mockSocket),
-		emit: mockSocket.handleClientEmit.bind(mockSocket),
-		disconnect: mockSocket.disconnect.bind(mockSocket),
+	const client: MockSocketClient = {
+		id,
+		on,
+		off,
+		emit,
+		disconnect,
 		connected: true,
 	};
+
+	setTimeout(() => {
+		connectListeners.forEach((listener) => listener());
+	}, 100);
+
+	return client;
 };

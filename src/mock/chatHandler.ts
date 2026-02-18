@@ -55,7 +55,7 @@ const joinRoom = http.post(`${CHAT_API_URL}/chats/rooms/join`, async ({ request 
 			roomId,
 			chatType: 'lesson',
 			lessonId: body.lessonId,
-			title: `Lesson ${body.lessonId} inquiry`,
+			title: `클래스 ${body.lessonId} 문의`,
 			image: null,
 			memberCount: 2,
 			hostId: lessonChatParticipants.mentor.id,
@@ -66,7 +66,7 @@ const joinRoom = http.post(`${CHAT_API_URL}/chats/rooms/join`, async ({ request 
 			{
 				id: Date.now() + 1,
 				roomId,
-				content: `Lesson ${body.lessonId} inquiry chat started.`,
+				content: `클래스 ${body.lessonId} 문의 채팅이 시작되었어요.`,
 				senderId: lessonChatParticipants.mentor.id,
 				createdAt: new Date().toISOString(),
 				sender: lessonChatParticipants.mentor,

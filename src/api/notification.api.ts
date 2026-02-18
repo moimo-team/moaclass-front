@@ -2,9 +2,18 @@ import type { Notification } from '@/models/notification.model';
 
 import { apiClient } from './client';
 
-// TODO: URL 수정
-export const fetchNotifications = async (): Promise<Notification[]> => {
-	const response = await apiClient.get<Notification[]>('/notifications');
+export interface FetchNotificationsParams {
+	page?: number;
+	limit?: number;
+}
+
+export const fetchNotifications = async (
+	params: FetchNotificationsParams = {},
+): Promise<Notification[]> => {
+	const { page = 1, limit = 10 } = params;
+	const response = await apiClient.get<Notification[]>('/notifications', {
+		params: { page, limit },
+	});
 	return response.data;
 };
 

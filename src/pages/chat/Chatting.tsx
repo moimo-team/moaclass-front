@@ -272,7 +272,7 @@ const Chatting = () => {
 						selectedRoomId={selectedRoom?.roomId}
 					/>
 					<LessonChatMessageSection
-						selectedRoom={selectedLessonRoom}
+						selectedRoom={selectedRoom}
 						messages={messages}
 						sendMessage={handleSendMessage}
 						inputValue={inputValue}

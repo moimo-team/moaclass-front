@@ -8,9 +8,15 @@ import { formatRelativeTime } from '@/utils/dateFormat';
 
 export interface NotificationItemProps {
 	notification: Notification;
-	onClick: (notificationId: number) => void;
+	onClick: (notification: Notification) => void;
 	onMarkAsRead: (notificationId: number) => void;
 }
+
+const getNotificationTitle = (notification: Notification) =>
+	notification.lessonTitle || notification.message || 'Notification';
+
+const getNotificationBody = (notification: Notification) =>
+	notification.message || notification.description || '';
 
 export const NotificationItem = ({
 	notification,
@@ -19,7 +25,7 @@ export const NotificationItem = ({
 }: NotificationItemProps) => {
 	return (
 		<DropdownMenuItem
-			onClick={() => onClick(notification.id)}
+			onClick={() => onClick(notification)}
 			className={cn('flex items-start gap-3 p-3 cursor-pointer w-full')}
 		>
 			{/* 붉은 점 */}
@@ -36,7 +42,7 @@ export const NotificationItem = ({
 							notification.isRead ? 'text-gray-500' : 'text-foreground',
 						)}
 					>
-						{notification.lessonTitle}
+						{getNotificationTitle(notification)}
 					</span>
 					<span
 						className={cn(
@@ -53,7 +59,7 @@ export const NotificationItem = ({
 						notification.isRead ? 'text-gray-500' : 'text-gray-600',
 					)}
 				>
-					{notification.description}
+					{getNotificationBody(notification)}
 				</p>
 			</div>
 

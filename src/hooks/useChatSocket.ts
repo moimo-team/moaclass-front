@@ -1,43 +1,31 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-import { io } from 'socket.io-client';
-
-import type { createMockSocket } from '@/mock/mockData/socketMock';
+import { getChatSocket, initChatSocket, type ChatSocket } from '@/lib/chatSocket';
+import type { MockSocketClient } from '@/mock/mockData/socketMock';
 import type { ChatMessage } from '@/models/chat.model';
 import { useAuthStore } from '@/store/authStore';
-
-import type { Socket } from 'socket.io-client';
-
-type MockSocketType = ReturnType<typeof createMockSocket>;
 
 const isMockingEnabled =
 	import.meta.env.DEV && (import.meta.env.VITE_ENABLE_MOCK || 'true') === 'true';
 
-const getSocketInstance = async (
-	accessToken: string | null,
-): Promise<Socket | MockSocketType | null> => {
-	if (isMockingEnabled) {
-		const { createMockSocket } = await import('@/mock/mockData/socketMock');
-		return createMockSocket();
+const isSocketIoClient = (socket: ChatSocket): socket is Exclude<ChatSocket, MockSocketClient> => {
+	return 'io' in socket;
+};
+
+const attachNewMessageListener = (socket: ChatSocket, listener: (message: ChatMessage) => void) => {
+	if (isSocketIoClient(socket)) {
+		socket.on('newMessage', listener);
+		return () => socket.off('newMessage', listener);
 	}
 
-	if (!accessToken) return null;
-
-	return io(import.meta.env.VITE_SOCKET_URL, {
-		auth: { token: accessToken },
-		transports: ['websocket'],
-		reconnection: true,
-		reconnectionAttempts: 5,
-	});
+	socket.on('newMessage', listener);
+	return () => socket.off('newMessage', listener);
 };
 
 export const useChatSocket = (
 	selectedRoomId: number | null,
 	onNewMessage: (message: ChatMessage) => void,
 ) => {
-	const socketRef = useRef<Socket | MockSocketType | null>(null);
-	const selectedRoomIdRef = useRef<number | null>(selectedRoomId);
-
 	const onNewMessageRef = useRef(onNewMessage);
 	const { accessToken, userId } = useAuthStore();
 
@@ -46,67 +34,47 @@ export const useChatSocket = (
 	}, [onNewMessage]);
 
 	useEffect(() => {
-		selectedRoomIdRef.current = selectedRoomId;
-	}, [selectedRoomId]);
+		if (!accessToken) return;
 
-	useEffect(() => {
-		if (socketRef.current) return;
+		let detached = false;
+		let teardown: (() => void) | undefined;
 
-		const initSocket = async () => {
-			const socket = await getSocketInstance(accessToken);
-			if (!socket) return;
+		const setup = async () => {
+			const socket = await initChatSocket(accessToken);
+			if (!socket || detached) return;
 
-			socketRef.current = socket;
-
-			if (selectedRoomIdRef.current) {
-				socket.emit(
-					'joinRoom',
-					{ roomId: selectedRoomIdRef.current },
-					(_response: unknown) => {},
-				);
-			}
-
-			socket.on('connect', () => {});
-			socket.on('disconnect', (_reason: string) => {});
-			socket.on('connect_error', (error: Error) => {
-				console.error('Socket connection error:', error);
-			});
-
-			socket.on('newMessage', (message: ChatMessage) => {
-				if (!onNewMessageRef.current) return;
+			const onMessage = (message: ChatMessage) => {
 				onNewMessageRef.current(message);
-			});
+			};
+
+			teardown = attachNewMessageListener(socket, onMessage);
 		};
 
-		initSocket();
+		void setup();
 
 		return () => {
-			if (socketRef.current) {
-				socketRef.current.disconnect();
-				socketRef.current = null;
-			}
+			detached = true;
+			if (teardown) teardown();
 		};
 	}, [accessToken]);
 
 	useEffect(() => {
-		const socket = socketRef.current;
-		if (!socket || !selectedRoomId) {
-			return;
-		}
+		if (!selectedRoomId || !accessToken) return;
 
-		socket.emit('joinRoom', { roomId: selectedRoomId }, (_response: unknown) => {});
-	}, [selectedRoomId]);
+		const joinSelectedRoom = async () => {
+			const socket = getChatSocket() ?? (await initChatSocket(accessToken));
+			if (!socket) return;
+			socket.emit('joinRoom', { roomId: selectedRoomId });
+		};
+
+		void joinSelectedRoom();
+	}, [accessToken, selectedRoomId]);
 
 	const sendMessage = useCallback(
 		(content: string) => {
-			if (socketRef.current && selectedRoomId && (userId || isMockingEnabled)) {
-				socketRef.current.emit(
-					'sendMessage',
-					{ roomId: selectedRoomId, content },
-					(_response: unknown) => {},
-				);
-			} else {
-				console.error('Cannot send message: Missing socket, roomId, or userId');
+			const socket = getChatSocket();
+			if (socket && selectedRoomId && (userId || isMockingEnabled)) {
+				socket.emit('sendMessage', { roomId: selectedRoomId, content });
 			}
 		},
 		[selectedRoomId, userId],
