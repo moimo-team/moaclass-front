@@ -291,8 +291,6 @@ function CreateClassModal({
 			formData.append('maxParticipants', data.maxParticipants.toString());
 			formData.append('regionId', data.regionId.toString());
 			formData.append('address', data.address);
-			formData.append('latitude', data.latitude.toString());
-			formData.append('longitude', data.longitude.toString());
 			formData.append('detailAddress', data.detailAddress || '');
 			formData.append('directionsText', data.directionsText || '');
 			formData.append('reservationLeadDays', data.reservationLeadDays.toString());
