@@ -26,8 +26,8 @@ export const fetchTeacherProfile = async (userId: number): Promise<TeacherProfil
 };
 
 // 프로필 삭제
-export const deleteTeacherProfile = async (userId: number): Promise<void> => {
-	await apiClient.delete(`/teachers/${userId}`);
+export const deleteTeacherProfile = async (): Promise<void> => {
+	await apiClient.delete('/teachers');
 };
 
 // 클래스 조회
