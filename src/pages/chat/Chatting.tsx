@@ -61,7 +61,11 @@ const Chatting = () => {
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const queryClient = useQueryClient();
 
-	const { data: chatRooms, isLoading } = useQuery({
+	const {
+		data: chatRooms,
+		isLoading,
+		refetch: refetchChatRooms,
+	} = useQuery({
 		queryKey: ['chatRooms', userId],
 		queryFn: getMyChatRooms,
 		enabled: !!userId,
@@ -190,6 +194,14 @@ const Chatting = () => {
 			scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
 		}
 	}, [messages]);
+
+	useEffect(() => {
+		const targetRoomId = locationState?.roomId;
+		if (!targetRoomId || !chatRooms) return;
+		if (chatRooms.some((room) => getRoomIdFromRoom(room) === targetRoomId)) return;
+
+		void refetchChatRooms();
+	}, [locationState?.roomId, chatRooms, refetchChatRooms]);
 
 	const handleSendMessage = () => {
 		if (!inputValue.trim()) return;

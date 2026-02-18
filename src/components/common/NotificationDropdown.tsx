@@ -14,8 +14,9 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMarkAllAsReadMutation, useMarkAsReadMutation } from '@/hooks/useNotificationMutations';
 import { useNotificationQuery } from '@/hooks/useNotificationQuery';
+import { resetAllNewChatRooms, resetNewChatByRoom } from '@/lib/newChatNotificationState';
 import type { ChatType } from '@/models/chat.model';
-import type { Notification } from '@/models/notification.model';
+import { isNewChatNotification, type Notification } from '@/models/notification.model';
 
 const mapLinkTypeToChatType = (linkType?: string): ChatType | undefined => {
 	if (linkType === 'MEETING') return 'meeting';
@@ -30,17 +31,19 @@ export const NotificationDropdown = () => {
 	const markAsReadMutation = useMarkAsReadMutation();
 	const markAllAsReadMutation = useMarkAllAsReadMutation();
 
-	const handleNotificationClick = (notification: Notification) => {
+	const markAsReadWithReset = (notification: Notification) => {
 		markAsReadMutation.mutate(notification.id);
+		if (isNewChatNotification(notification)) {
+			resetNewChatByRoom(notification.roomId);
+		}
+	};
 
+	const executeNotificationAction = (notification: Notification) => {
 		if (notification.type !== 'NEW_CHAT') return;
-
 		const chatType = mapLinkTypeToChatType(notification.linkType);
 
 		if (notification.roomId) {
-			navigate('/chats', {
-				state: { roomId: notification.roomId, chatType },
-			});
+			navigate('/chats', { state: { roomId: notification.roomId, chatType } });
 			return;
 		}
 
@@ -56,6 +59,16 @@ export const NotificationDropdown = () => {
 		}
 
 		navigate('/chats');
+	};
+
+	const handleNotificationClick = (notification: Notification) => {
+		markAsReadWithReset(notification);
+		executeNotificationAction(notification);
+	};
+
+	const handleMarkAllRead = () => {
+		markAllAsReadMutation.mutate();
+		resetAllNewChatRooms();
 	};
 
 	const unreadCount = notifications?.filter((n) => !n.isRead).length ?? 0;
@@ -94,7 +107,7 @@ export const NotificationDropdown = () => {
 						variant="ghost"
 						size="sm"
 						className="h-auto p-1 text-xs"
-						onClick={() => markAllAsReadMutation.mutate()}
+						onClick={handleMarkAllRead}
 						disabled={unreadCount === 0 || markAllAsReadMutation.isPending || isError}
 					>
 						전체 읽음
@@ -103,7 +116,7 @@ export const NotificationDropdown = () => {
 				<DropdownMenuSeparator />
 				{isError ? (
 					<DropdownMenuLabel className="text-center text-red-500">
-						알림을 불러오는 데 실패했습니다.
+						알림을 불러오지 못했습니다.
 					</DropdownMenuLabel>
 				) : notifications && notifications.length > 0 ? (
 					notifications.map((notification) => (
@@ -111,7 +124,7 @@ export const NotificationDropdown = () => {
 							key={notification.id}
 							notification={notification}
 							onClick={handleNotificationClick}
-							onMarkAsRead={(id) => markAsReadMutation.mutate(id)}
+							onMarkAsRead={markAsReadWithReset}
 						/>
 					))
 				) : (

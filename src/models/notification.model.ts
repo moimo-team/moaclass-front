@@ -38,3 +38,14 @@ export interface Notification {
 	readAt: string | null;
 	isRead: boolean;
 }
+
+export type NewChatNotification = Notification & {
+	type: 'NEW_CHAT';
+	roomId: number;
+};
+
+export const isNewChatNotification = (
+	notification: Notification,
+): notification is NewChatNotification => {
+	return notification.type === 'NEW_CHAT' && typeof notification.roomId === 'number';
+};

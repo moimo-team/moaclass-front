@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 
 import {
 	DEFAULT_NOTIFICATION_LIMIT,
@@ -12,6 +11,8 @@ import type { MockSocketClient } from '@/mock/mockData/socketMock';
 import type { Notification } from '@/models/notification.model';
 import { useAuthStore } from '@/store/authStore';
 
+const MAX_STORED_NOTIFICATIONS = 10;
+
 const normalizeIncomingNotification = (payload: Notification): Notification => ({
 	...payload,
 	message: payload.message ?? payload.description ?? '',
@@ -19,6 +20,25 @@ const normalizeIncomingNotification = (payload: Notification): Notification => (
 	isRead: false,
 	readAt: null,
 });
+
+const trimNotifications = (notifications: Notification[]): Notification[] => {
+	const next = [...notifications];
+
+	while (next.length > MAX_STORED_NOTIFICATIONS) {
+		let readIndex = -1;
+		for (let i = next.length - 1; i >= 0; i -= 1) {
+			if (next[i].isRead) {
+				readIndex = i;
+				break;
+			}
+		}
+
+		// Remove oldest read first; if none are read, remove oldest item.
+		next.splice(readIndex >= 0 ? readIndex : next.length - 1, 1);
+	}
+
+	return next;
+};
 
 const isSocketIoClient = (socket: ChatSocket): socket is Exclude<ChatSocket, MockSocketClient> => {
 	return 'io' in socket;
@@ -59,15 +79,9 @@ export const useGlobalChatSocket = () => {
 					(oldData) => {
 						const prev = oldData ?? [];
 						if (prev.some((n) => n.id === incoming.id)) return prev;
-						return [incoming, ...prev];
+						return trimNotifications([incoming, ...prev]);
 					},
 				);
-
-				if (incoming.type === 'NEW_CHAT') {
-					const sender = incoming.senderNickname ?? 'New message';
-					const message = incoming.message ?? incoming.description ?? '';
-					toast.info(`${sender}: ${message}`);
-				}
 			};
 
 			teardown = attachNotificationListener(socket, onNotification);

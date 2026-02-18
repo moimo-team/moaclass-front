@@ -1,3 +1,4 @@
+import { markNewChatEmitted, shouldEmitNewChat } from '@/lib/newChatNotificationState';
 import { mockChatMessages, mockChatRooms } from '@/mock/mockData/chatMock';
 import type { ChatMessage } from '@/models/chat.model';
 import type { Notification } from '@/models/notification.model';
@@ -42,7 +43,7 @@ export type MockSocketClient = {
 const extractRoomId = (payload: JoinRoomPayload): number =>
 	typeof payload === 'number' ? payload : payload.roomId;
 
-const emitNotification = (
+const emitNewChatNotification = (
 	roomId: number,
 	content: string,
 	nickname: string,
@@ -50,6 +51,7 @@ const emitNotification = (
 ) => {
 	const room = mockChatRooms.find((item) => item.roomId === roomId);
 	if (!room || room.chatType !== 'lesson') return;
+	if (!shouldEmitNewChat(roomId)) return;
 
 	const notification: Notification = {
 		id: Date.now(),
@@ -60,12 +62,14 @@ const emitNotification = (
 		linkId: room.lessonId,
 		linkType: 'LESSON',
 		senderNickname: nickname,
+		lessonTitle: room.title,
 		createdAt: new Date().toISOString(),
 		isRead: false,
 		readAt: null,
 	};
 
 	notifyListeners.forEach((listener) => listener(notification));
+	markNewChatEmitted(roomId);
 };
 
 export const createMockSocket = (): MockSocketClient => {
@@ -170,7 +174,7 @@ export const createMockSocket = (): MockSocketClient => {
 		}
 
 		newMessageListeners.forEach((listener) => listener(newMessage));
-		emitNotification(roomId, newMessage.content, nickname, notificationListeners);
+		emitNewChatNotification(roomId, newMessage.content, nickname, notificationListeners);
 
 		if (callback) {
 			(callback as (res: SendMessageAck) => void)({ status: 'sent', message: newMessage });

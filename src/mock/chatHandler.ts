@@ -4,6 +4,8 @@ import { CHAT_API_URL } from '@/config/chatConfig';
 
 import { lessonChatParticipants, mockChatMessages, mockChatRooms } from './mockData/chatMock';
 
+const DEFAULT_STUDENT_ID = lessonChatParticipants.studentA.id;
+
 const getMyChatRooms = http.get(`${CHAT_API_URL}/chats/rooms/me`, async () => {
 	await delay(300);
 	return HttpResponse.json(mockChatRooms);
@@ -41,8 +43,10 @@ const joinRoom = http.post(`${CHAT_API_URL}/chats/rooms/join`, async ({ request 
 	}
 
 	if (body.lessonId) {
-		// lessonId 단위로 1:1 문의 채팅방 1개를 재사용
-		const existingLessonRoom = mockChatRooms.find((room) => room.lessonId === body.lessonId);
+		const studentId = body.studentId ?? DEFAULT_STUDENT_ID;
+		const existingLessonRoom = mockChatRooms.find(
+			(room) => room.lessonId === body.lessonId && room.studentId === studentId,
+		);
 		if (existingLessonRoom) {
 			return HttpResponse.json({
 				roomId: existingLessonRoom.roomId,
@@ -55,7 +59,8 @@ const joinRoom = http.post(`${CHAT_API_URL}/chats/rooms/join`, async ({ request 
 			roomId,
 			chatType: 'lesson',
 			lessonId: body.lessonId,
-			title: `클래스 ${body.lessonId} 문의`,
+			studentId,
+			title: `레슨 ${body.lessonId} 문의 (학생 ${studentId})`,
 			image: null,
 			memberCount: 2,
 			hostId: lessonChatParticipants.mentor.id,
@@ -66,7 +71,7 @@ const joinRoom = http.post(`${CHAT_API_URL}/chats/rooms/join`, async ({ request 
 			{
 				id: Date.now() + 1,
 				roomId,
-				content: `클래스 ${body.lessonId} 문의 채팅이 시작되었어요.`,
+				content: `레슨 ${body.lessonId} 문의 채팅이 시작되었어요.`,
 				senderId: lessonChatParticipants.mentor.id,
 				createdAt: new Date().toISOString(),
 				sender: lessonChatParticipants.mentor,

@@ -30,10 +30,16 @@ const lessonMentor: MessageSender = {
 	image: 'https://i.pravatar.cc/150?img=30',
 };
 
-const lessonMentee: MessageSender = {
+const lessonStudentA: MessageSender = {
 	id: 200,
-	nickname: '모멘티(학생)',
+	nickname: '모멘티A(학생)',
 	image: 'https://i.pravatar.cc/150?img=45',
+};
+
+const lessonStudentB: MessageSender = {
+	id: 201,
+	nickname: '모멘티B(학생)',
+	image: 'https://i.pravatar.cc/150?img=46',
 };
 
 export const mockUsers = [meetingUser1, meetingUser2, meetingUser3];
@@ -58,8 +64,13 @@ const generateMeetingMessages = (roomId: number, count: number): ChatMessage[] =
 	});
 };
 
-const generateLessonMessages = (roomId: number, lessonId: number, count: number): ChatMessage[] => {
-	const senders = [lessonMentor, lessonMentee];
+const generateLessonMessages = (
+	roomId: number,
+	lessonId: number,
+	student: MessageSender,
+	count: number,
+): ChatMessage[] => {
+	const senders = [lessonMentor, student];
 	return Array.from({ length: count }, (_, i) => {
 		const sender = senders[i % 2];
 		return {
@@ -80,15 +91,15 @@ export const mockChatMessages: Record<number, ChatMessage[]> = {
 	1: generateMeetingMessages(1, 10),
 	2: generateMeetingMessages(2, 8),
 	3: generateMeetingMessages(3, 6),
-	101: generateLessonMessages(101, 1, 6),
-	102: generateLessonMessages(102, 2, 6),
+	101: generateLessonMessages(101, 1, lessonStudentA, 6),
+	102: generateLessonMessages(102, 1, lessonStudentB, 6),
 };
 
 const buildLastMessage = (roomId: number) => {
 	const messages = mockChatMessages[roomId];
 	const lastMessage = messages[messages.length - 1];
 	return {
-		sender: lastMessage.sender?.nickname ?? '알 수 없음',
+		sender: lastMessage.sender?.nickname ?? '사용자',
 		content: lastMessage.content,
 		createdAt: lastMessage.createdAt,
 	};
@@ -107,13 +118,24 @@ const meetingRooms: ChatRoom[] = [1, 2, 3].map((roomId, i) => ({
 }));
 
 const lessonRooms: ChatRoom[] = [
-	{ roomId: 101, lessonId: 1 },
-	{ roomId: 102, lessonId: 2 },
-].map(({ roomId, lessonId }) => ({
+	{
+		roomId: 101,
+		lessonId: 1,
+		studentId: lessonStudentA.id,
+		studentName: lessonStudentA.nickname,
+	},
+	{
+		roomId: 102,
+		lessonId: 1,
+		studentId: lessonStudentB.id,
+		studentName: lessonStudentB.nickname,
+	},
+].map(({ roomId, lessonId, studentId, studentName }) => ({
 	roomId,
 	chatType: 'lesson' as const,
 	lessonId,
-	title: `레슨 ${lessonId} 문의`,
+	studentId,
+	title: `레슨 ${lessonId} 문의 (${studentName})`,
 	memberCount: 2,
 	image: faker.image.urlLoremFlickr({ category: 'people' }),
 	lastMessage: buildLastMessage(roomId),
@@ -125,5 +147,6 @@ export const mockChatRooms: ChatRoom[] = [...meetingRooms, ...lessonRooms];
 
 export const lessonChatParticipants = {
 	mentor: lessonMentor,
-	mentee: lessonMentee,
+	studentA: lessonStudentA,
+	studentB: lessonStudentB,
 };

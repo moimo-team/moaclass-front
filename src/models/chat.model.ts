@@ -32,6 +32,7 @@ export interface ChatRoom {
 	chatType?: ChatType;
 	meetingId?: number;
 	lessonId?: number;
+	studentId?: number;
 	title: string;
 	image: string | null;
 	memberCount: number;
