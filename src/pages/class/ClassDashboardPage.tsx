@@ -15,13 +15,17 @@ const ClassDashboardPage = () => {
 
 	// 프로필 유무에 따라 초기 탭 설정
 	const [activeTab, setActiveTab] = useState<TabType>('profile');
+	const [isInitialCheckDone, setIsInitialCheckDone] = useState(false);
 
-	// 프로필 로딩 완료 후 탭 자동 업데이트
+	// 프로필 로딩 완료 후 최초 1회만 탭 자동 업데이트
 	useEffect(() => {
-		if (!isLoading && teacherProfile && activeTab === 'profile') {
-			setActiveTab('classes');
+		if (!isLoading && !isInitialCheckDone) {
+			if (teacherProfile) {
+				setActiveTab('classes');
+			}
+			setIsInitialCheckDone(true);
 		}
-	}, [teacherProfile, isLoading, activeTab]);
+	}, [teacherProfile, isLoading, isInitialCheckDone]);
 
 	const tabs = [
 		{ id: 'profile' as TabType, label: '모멘토 프로필' },
@@ -57,7 +61,7 @@ const ClassDashboardPage = () => {
 			{/* 우측 컨텐츠 영역 - 브라우저 전체 스크롤 사용 */}
 			<main className="flex-1 bg-white">
 				<div className="max-w-[1400px] mx-auto p-10">
-					{activeTab === 'profile' && <TeacherProfilePage />}
+					{activeTab === 'profile' && <TeacherProfilePage userId={userId ?? undefined} />}
 					{activeTab === 'classes' && <ClassManagementPage />}
 				</div>
 			</main>
