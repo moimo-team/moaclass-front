@@ -20,13 +20,14 @@ import { useAuthQuery } from '@/hooks/useAuthQuery';
 import { useAuthStore } from '@/store/authStore';
 
 export const ProfileDropdownNext = () => {
-	const { nickname } = useAuthStore();
+	const { nickname, setIsLoggingOut } = useAuthStore();
 	const logoutMutation = useLogoutMutation();
 	const router = useRouter();
 
 	const handleLogout = async () => {
+		setIsLoggingOut(true);
 		await logoutMutation.mutateAsync();
-		router.push('/');
+		router.replace('/');
 	};
 
 	const { data: userData } = useAuthQuery();

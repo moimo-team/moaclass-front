@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import {
@@ -30,6 +29,12 @@ export const useLoginMutation = () => {
 		mutationFn: async (data: LoginFormValues) => {
 			return await login(data);
 		},
+		// meta: {
+		// 	errorMessages: {
+		// 		401: '아이디 또는 비밀번호가 틀렸습니다.',
+		// 		default: '로그인 중 오류가 발생했습니다.',
+		// 	},
+		// },
 		onSuccess: (data) => {
 			// 로그인 성공 시 전역 상태 업데이트
 			storeLogin(
@@ -97,7 +102,7 @@ export const useKakaoLoginMutation = () => {
 
 // 로그아웃 Mutation
 export const useLogoutMutation = () => {
-	const { storeLogout } = useAuthStore();
+	const { storeLogout, setIsLoggingOut } = useAuthStore();
 	const queryClient = useQueryClient();
 
 	return useMutation({
@@ -105,9 +110,12 @@ export const useLogoutMutation = () => {
 			return await logout();
 		},
 		onSuccess: () => {
-			// 로그아웃 성공 시 전역 상태 업데이트 및 캐시 전체 삭제
-			storeLogout();
-			queryClient.clear();
+			setIsLoggingOut(true);
+			// 비동기로 상태 해제를 밀어넣어 ProtectedRoute가 로딩 상태를 먼저 반영하게 함
+			setTimeout(() => {
+				storeLogout();
+				queryClient.clear();
+			}, 0);
 		},
 	});
 };
@@ -188,16 +196,20 @@ export const useResetPasswordMutation = () => {
 // 회원 탈퇴
 export const useDeleteUserMutation = () => {
 	const queryClient = useQueryClient();
-	const navigate = useNavigate();
 	return useMutation({
 		mutationFn: async () => {
 			return await deleteUser();
 		},
+		meta: { useBackendError: true },
 		onSuccess: () => {
-			const { storeLogout } = useAuthStore.getState();
-			storeLogout();
-			queryClient.clear();
-			navigate('/');
+			const { storeLogout, setIsLoggingOut } = useAuthStore.getState();
+			setIsLoggingOut(true);
+
+			setTimeout(() => {
+				storeLogout();
+				queryClient.clear();
+			}, 0);
+
 			toast.success('회원탈퇴가 완료되었습니다.');
 		},
 	});

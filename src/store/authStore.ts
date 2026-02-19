@@ -10,12 +10,14 @@ interface StoreState {
 	email: string | null;
 	accessToken: string | null;
 	isTeacher: boolean;
+	isLoggingOut: boolean;
 	storeLogin: (
 		user: { id: number; nickname: string; email: string; teacherProfile: boolean },
 		accessToken: string,
 	) => void;
 	storeLogout: () => void;
 	setAccessToken: (token: string) => void;
+	setIsLoggingOut: (isLoggingOut: boolean) => void;
 }
 
 // export const useAuthStore = create<StoreState>((set) => ({
@@ -38,6 +40,7 @@ export const useAuthStore = create<StoreState>()(
 			email: null,
 			accessToken: null,
 			isTeacher: false,
+			isLoggingOut: false,
 			storeLogin: (
 				user: { id: number; nickname: string; email: string; teacherProfile: boolean },
 				accessToken: string,
@@ -49,6 +52,7 @@ export const useAuthStore = create<StoreState>()(
 					email: user.email,
 					accessToken,
 					isTeacher: user.teacherProfile,
+					isLoggingOut: false,
 				}),
 			storeLogout: () => {
 				disconnectChatSocket();
@@ -59,10 +63,14 @@ export const useAuthStore = create<StoreState>()(
 					email: null,
 					accessToken: null,
 					isTeacher: false,
+					isLoggingOut: false,
 				});
 			},
 			setAccessToken: (accessToken: string) => {
 				set(() => ({ accessToken }));
+			},
+			setIsLoggingOut: (isLoggingOut: boolean) => {
+				set({ isLoggingOut });
 			},
 		}),
 		{

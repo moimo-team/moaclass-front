@@ -64,7 +64,7 @@ const login = http.post(`${httpUrl}/users/login`, async ({ request }) => {
 });
 
 // 구글 로그인
-const googleLogin = http.post(`${httpUrl}/users/login/google`, async ({ request }) => {
+const googleLogin = http.post(`${httpUrl}/users/login/google`, async () => {
 	try {
 		// const { code, redirectUri } = (await request.json()) as any;
 		await delay(1000);
@@ -237,6 +237,11 @@ const verifyResetCode = http.post(`${httpUrl}/users/password-reset/verify`, asyn
 	await delay(1000);
 
 	// 저장소에서 해당 코드 찾기
+	if (!code) {
+		return new HttpResponse(JSON.stringify({ message: '인증코드가 필요합니다.' }), {
+			status: 400,
+		});
+	}
 	const storedData = resetCodeStore.get(code);
 
 	if (!storedData) {
@@ -285,6 +290,11 @@ const resetPassword = http.put(`${httpUrl}/users/password-reset/confirm`, async 
 	await delay(1000);
 
 	// resetToken 검증
+	if (!resetToken) {
+		return new HttpResponse(JSON.stringify({ message: '토큰이 필요합니다.' }), {
+			status: 400,
+		});
+	}
 	const tokenData = resetTokenStore.get(resetToken);
 
 	if (!tokenData) {
@@ -310,17 +320,18 @@ const resetPassword = http.put(`${httpUrl}/users/password-reset/confirm`, async 
 
 	// 사용 완료된 토큰 및 코드 삭제
 	resetTokenStore.delete(resetToken);
-	resetCodeStore.delete(resetCode);
+	if (resetCode) {
+		resetCodeStore.delete(resetCode);
+	}
 
 	return HttpResponse.json({ message: '비밀번호가 성공적으로 변경되었습니다.' }, { status: 200 });
 });
 
 // 토큰 갱신 핸들러
-const refresh = http.post(`${httpUrl}/users/refresh`, async ({ request }) => {
-	const cookies = request.headers.get('cookie');
+const refresh = http.post(`${httpUrl}/auth/refresh`, async ({ cookies }) => {
 	await delay(500);
 
-	if (cookies?.includes('refreshToken=mock-refresh-token')) {
+	if (cookies.refreshToken === 'mock-refresh-token') {
 		return HttpResponse.json(
 			{
 				accessToken: 'new-mock-jwt-token',
@@ -387,6 +398,7 @@ const userUpdate = http.put(`${httpUrl}/users`, async ({ request }) => {
 		}
 
 		const formData = await request.formData();
+		const nickname = formData.get('nickname') as string;
 		const bio = formData.get('bio') as string;
 		const regionId = formData.get('regionId') as string;
 		const rawInterests = formData.getAll('interests');
@@ -410,6 +422,7 @@ const userUpdate = http.put(`${httpUrl}/users`, async ({ request }) => {
 		const file = formData.get('file');
 
 		console.log('User Update (Token Based):', {
+			nickname,
 			bio,
 			regionId,
 			interests,
@@ -419,6 +432,7 @@ const userUpdate = http.put(`${httpUrl}/users`, async ({ request }) => {
 
 		// Mock 상태 업데이트
 		const updatedInfo: any = {
+			nickname: nickname || userStore.userInfo.nickname,
 			bio: bio || userStore.userInfo.bio,
 			region: {
 				id: Number(regionId),
@@ -459,12 +473,39 @@ const deleteUser = http.delete(`${httpUrl}/users`, async ({ request }) => {
 	try {
 		const authHeader = request.headers.get('Authorization');
 		if (!authHeader) {
-			return new HttpResponse(null, { status: 401 });
+			return new HttpResponse(
+				JSON.stringify({
+					message: 'Unauthorized',
+				}),
+				{ status: 401 },
+			);
 		}
 
 		console.log('User Delete (Token Based):', {
 			token: authHeader,
 		});
+
+		// [테스트용] 닉네임에 특정 키워드가 포함된 경우 실패를 반환하도록 설정
+		const errorCases = [
+			'수강 예정인 클래스가 있어 탈퇴할 수 없습니다.',
+			'진행 예정인 모임의 호스트이므로 탈퇴할 수 없습니다.',
+			'참여 예정인 모임이 있어 탈퇴할 수 없습니다.',
+			'수강 예정인 학생이 있는 클래스가 있어 탈퇴할 수 없습니다.',
+			'이미 탈퇴했거나 존재하지 않는 사용자입니다.',
+		];
+
+		// 닉네임이 'error'를 포함하는 경우 랜덤하게 실패를 반환 (테스트 용도)
+		if (userStore.userInfo.nickname?.includes('error')) {
+			const randomMessage = errorCases[Math.floor(Math.random() * errorCases.length)];
+			return HttpResponse.json(
+				{
+					statusCode: 400,
+					message: randomMessage,
+					error: 'Bad Request',
+				},
+				{ status: 400 },
+			);
+		}
 
 		// Mock 상태 업데이트
 		userStore.setUserInfo({});
