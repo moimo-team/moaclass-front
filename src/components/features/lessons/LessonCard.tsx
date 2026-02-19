@@ -34,6 +34,15 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 		}
 	};
 
+	// 렌더링 최적화를 위해 변수로 분리 (any 제거)
+	const getImageUrl = (image: string | { src: string } | unknown): string => {
+		if (typeof image === 'string') return image;
+		if (image && typeof image === 'object' && 'src' in image) {
+			return (image as { src: string }).src;
+		}
+		return String(image || '');
+	};
+
 	return (
 		<Link
 			to={href}
@@ -48,7 +57,7 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 				{/* 상단: 클래스 사진  */}
 				<div className="relative w-full aspect-[4/2.8] overflow-hidden bg-muted">
 					<img
-						src={lesson.representativeImage || defaultLessonImage}
+						src={getImageUrl(lesson.representativeImage || defaultLessonImage)}
 						alt={title}
 						className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
 					/>
@@ -106,7 +115,7 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 					<div className="flex items-center gap-2 pt-3 border-t border-gray-50 mt-auto">
 						<div className="w-5 h-5 rounded-full overflow-hidden border border-gray-100 shrink-0">
 							<img
-								src={lesson.teacher.image || defaultProfileImage}
+								src={getImageUrl(lesson.teacher.image || defaultProfileImage)}
 								alt={lesson.teacher.nickname || '모멘토'}
 								className="w-full h-full object-cover"
 							/>

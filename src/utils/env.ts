@@ -19,9 +19,9 @@ const getEnv = (key: string, defaultValue: string = ''): string => {
 		? key.replace('VITE_', 'NEXT_PUBLIC_')
 		: `NEXT_PUBLIC_${key}`;
 
-	if (nextPublicEnv[nextKey]) return nextPublicEnv[nextKey] as string;
+	if (nextPublicEnv[nextKey]) return (nextPublicEnv[nextKey] as string).trim();
 	if (typeof process !== 'undefined' && process.env && process.env[key]) {
-		return process.env[key] as string;
+		return (process.env[key] as string).trim();
 	}
 
 	// 2. Vite 환경 변수 확인 (에러 방지를 위해 try-catch 및 타입 캐스팅 사용)
@@ -31,7 +31,7 @@ const getEnv = (key: string, defaultValue: string = ''): string => {
 		// @ts-expect-error - import.meta.env may not exist in non-Vite environments
 		const viteEnv = import.meta.env;
 		if (viteEnv) {
-			return (viteEnv[key] || viteEnv[`VITE_${key}`] || defaultValue) as string;
+			return ((viteEnv[key] || viteEnv[`VITE_${key}`] || defaultValue) as string).trim();
 		}
 	} catch (e) {
 		// Next.js 환경 등에서는 import.meta.env 접근 시 에러가 날 수 있음
@@ -70,7 +70,11 @@ export function getNextPublicEnv(key: string, defaultValue: string = ''): string
 export const ENV = {
 	API_URL: getEnv('VITE_API_URL', '/api'),
 	SOCKET_URL: getEnv('VITE_SOCKET_URL', 'https://moaclass-back.onrender.com'),
-	ENABLE_MOCK: getEnv('VITE_ENABLE_MOCK', 'true') === 'true',
+	ENABLE_MOCK: (() => {
+		const raw = getEnv('VITE_ENABLE_MOCK', 'true');
+		const value = raw.split('#')[0].trim();
+		return value === 'true';
+	})(),
 	GOOGLE_CLIENT_ID: getEnv('VITE_GOOGLE_CLIENT_ID'),
 	KAKAO_CLIENT_ID: getEnv('VITE_KAKAO_CLIENT_ID'),
 	KAKAO_REDIRECT_URI: getEnv('VITE_KAKAO_REDIRECT_URI'),

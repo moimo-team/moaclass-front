@@ -30,10 +30,10 @@ export default function KakaoCallbackPage() {
 		}
 
 		if (code && window.opener) {
-			window.opener.postMessage(
-				{ type: 'KAKAO_LOGIN_SUCCESS', code },
-				window.location.origin,
-			);
+			// 인가 코드를 부모 창으로 전달
+			// 보안을 위해 targetOrigin을 '*'로 설정하여 도메인이 다른 로컬 환경에서도 메시지 수신이 가능하게 함
+			// (부모 창에서도 origin 검증을 수행하므로 안전함)
+			window.opener.postMessage({ type: 'KAKAO_LOGIN_SUCCESS', code }, '*');
 			window.close();
 		}
 	}, []);

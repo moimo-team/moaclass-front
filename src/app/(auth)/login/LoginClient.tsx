@@ -105,7 +105,11 @@ const LoginClient = () => {
 	// 카카오 로그인(팝업 + postMessage 방식)
 	const handleKakaoLogin = () => {
 		const KAKAO_CLIENT_ID = ENV.KAKAO_CLIENT_ID;
-		const KAKAO_REDIRECT_URI = ENV.KAKAO_REDIRECT_URI;
+		// 현재 접속한 도메인(localhost 또는 vercel)에 맞춰 리다이렉트 URI 동적 생성
+		const KAKAO_REDIRECT_URI =
+			typeof window !== 'undefined'
+				? `${window.location.origin}/oauth/kakao/callback`
+				: ENV.KAKAO_REDIRECT_URI;
 
 		const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}&response_type=code`;
 
