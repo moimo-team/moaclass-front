@@ -41,7 +41,7 @@ export default async function Image({ params }: { params: { meetingId: string } 
 
 	try {
 		const meeting = await getMeetingById(meetingId);
-		const title = meeting?.title?.trim() || '모아클래스 모임';
+		const title = meeting?.title?.trim() || '모아클 모임';
 		const dateText = meeting?.meetingDate
 			? new Date(meeting.meetingDate).toLocaleString('ko-KR')
 			: null;
@@ -66,7 +66,7 @@ export default async function Image({ params }: { params: { meetingId: string } 
 				<div style={{ fontSize: 52, fontWeight: 800, lineHeight: 1.25, maxWidth: 1000 }}>
 					{title}
 				</div>
-				<div style={{ fontSize: 28, fontWeight: 600, opacity: 0.9 }}>모아클래스 모임</div>
+				<div style={{ fontSize: 28, fontWeight: 600, opacity: 0.9 }}>모아클 모임</div>
 				{dateText && <div style={{ fontSize: 24, opacity: 0.85 }}>{dateText}</div>}
 				{addressText && (
 					<div style={{ fontSize: 22, opacity: 0.8, maxWidth: 1000 }}>{addressText}</div>
@@ -75,6 +75,6 @@ export default async function Image({ params }: { params: { meetingId: string } 
 			size,
 		);
 	} catch {
-		return renderFallback('모아클래스 모암');
+		return renderFallback('모아클 모암');
 	}
 }

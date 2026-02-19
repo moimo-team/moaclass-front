@@ -27,7 +27,7 @@ const renderFallback = (title: string) =>
 			}}
 		>
 			<div style={{ fontSize: 56, fontWeight: 800 }}>{title}</div>
-			<div style={{ fontSize: 28, opacity: 0.9 }}>모아클래스</div>
+			<div style={{ fontSize: 28, opacity: 0.9 }}>모아클</div>
 		</div>,
 		size,
 	);
@@ -67,7 +67,7 @@ export default async function Image({ params }: { params: { lessonId: string } }
 					{title}
 				</div>
 				<div style={{ fontSize: 28, fontWeight: 600, opacity: 0.9 }}>
-					모아클래스 {price ? `| ${price}` : ''}
+					모아클 {price ? `| ${price}` : ''}
 				</div>
 			</div>,
 			size,

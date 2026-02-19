@@ -5,6 +5,7 @@ import { createPageMetadata } from '@/utils/metadata';
 export const metadata = createPageMetadata({
 	title: '홈',
 	description: '모아클래스에서 다양한 강의를 만나보세요.',
+	canonical: '/',
 });
 
 export default function Page() {

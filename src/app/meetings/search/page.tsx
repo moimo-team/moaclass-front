@@ -1,16 +1,14 @@
 import { Suspense } from 'react';
 
+import MeetingsSearchClient from '@/app/meetings/search/MeetingsSearchClient';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { createPageMetadata } from '@/utils/metadata';
 
-import MeetingsSearchClient from './MeetingsSearchClient';
-
-/**
- * SEO 담당자 전용: 메타데이터 설정 위치
- * export const metadata: Metadata = { ... }
- *
- * 동적 메타데이터가 필요한 경우 generateMetadata 함수를 사용하세요.
- * export async function generateMetadata({ searchParams }: Props): Promise<Metadata> { ... }
- */
+export const metadata = createPageMetadata({
+	title: '모임 검색',
+	description: '키워드로 원하는 모임을 검색해보세요.',
+	canonical: '/meetings/search',
+});
 
 export default function MeetingsSearchPage() {
 	return (

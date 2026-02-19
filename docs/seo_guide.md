@@ -65,11 +65,12 @@
 
 ### 2.4 현재 구현 상태 전제
 
-- `src/utils/metadata.ts`는 공통 조립 유틸이며 현재 파라미터는 `title`/`description`/`image`만 지원합니다.
-- `metadataBase`는 아직 `src/app/layout.tsx`에 설정되어 있지 않습니다.
-- `robots.ts`, `sitemap.ts`, `opengraph-image.tsx`는 아직 없습니다(3번 섹션 생성 대상).
-- `src/app/lessons/[lessonId]/page.tsx`는 `generateMetadata`가 있으나 임시 문자열 기반이고 `await params`를 사용 중입니다.
-- `src/app/meetings/[meetingId]/page.tsx`는 `generateMetadata`가 아직 구현되지 않았습니다.
+- `src/utils/metadata.ts`는 공통 조립 유틸이며 현재 파라미터는 `title`/`description`/`image`/`canonical`/`noindex`를 지원합니다.
+- `metadataBase`는 `src/app/layout.tsx`에 설정되어 있습니다.
+- `src/app/robots.ts`, `src/app/sitemap.ts`, `src/app/lessons/[lessonId]/opengraph-image.tsx`, `src/app/meetings/[meetingId]/opengraph-image.tsx`가 생성되어 있습니다.
+- `src/app/lessons/[lessonId]/page.tsx`는 `fetchLesson` 기반 `generateMetadata`가 적용되어 있습니다.
+- `src/app/meetings/[meetingId]/page.tsx`는 `getMeetingById` 기반 `generateMetadata`가 적용되어 있습니다.
+- `(auth)`/`mypage`/운영 페이지는 `createPageMetadata(..., noindex: true)`로 인덱싱 제외 정책을 적용했습니다.
 
 ### 2.5 소스 오브 트루스 규칙
 
@@ -102,8 +103,7 @@ Next.js는 `src/app`에 약속된 파일을 두면 자동으로 SEO 파일을 �
 
 #### 현재 상태 (프로젝트 기준)
 
-- `src/app/robots.ts` 파일이 아직 없음
-- 1순위 작업으로 생성 필요
+- `src/app/robots.ts` 파일이 생성되어 운영 규칙이 반영된 상태입니다.
 
 #### 권장 규칙 (MoaClass, App Router 기준)
 
@@ -152,8 +152,8 @@ export default function robots(): MetadataRoute.Robots {
 
 #### 현재 상태 (프로젝트 기준)
 
-- `src/app/sitemap.ts` 파일이 아직 없음
-- 1순위 작업으로 생성 필요
+- `src/app/sitemap.ts` 파일이 생성되어 정적 라우트 사이트맵이 동작 중입니다.
+- 동적 라우트(lessons/meetings)는 API 연결 상태에 따라 추가되며, 테스트/배포 API URL 점검이 필요합니다.
 
 #### 권장 규칙 (MoaClass, App Router 기준)
 
@@ -248,8 +248,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 #### 현재 상태 (프로젝트 기준)
 
-- `src/app/lessons/[lessonId]/opengraph-image.tsx` 파일이 아직 없음
-- 1순위 작업으로 생성 필요
+- `src/app/lessons/[lessonId]/opengraph-image.tsx` 파일이 생성되어 레슨 상세 동적 OG 이미지가 동작합니다.
+- 추가로 `src/app/meetings/[meetingId]/opengraph-image.tsx`도 생성되어 모임 상세 동적 OG 이미지가 동작합니다.
 
 ```tsx
 import { ImageResponse } from 'next/og';
@@ -321,7 +321,7 @@ export default async function Image({ params }: { params: { lessonId: string } }
 
 - `src/utils/metadata.ts`는 **메타데이터 조립 유틸**이며, 동적 데이터 조회 실행 위치가 아닙니다.
 - 동적 SEO는 반드시 `src/app/**/page.tsx`의 `generateMetadata`에서 처리합니다.
-- 현재 `createPageMetadata`는 `title`/`description`/`image`만 지원하므로, canonical/robots는 페이지에서 직접 병합합니다.
+- `createPageMetadata`는 `title`/`description`/`image`/`canonical`/`noindex`를 지원합니다.
 
 ### 4.1 현재 코드 상태 체크 (프로젝트 기준)
 
@@ -333,19 +333,13 @@ export default async function Image({ params }: { params: { lessonId: string } }
 
 #### 보강이 필요한 페이지
 
-1. `src/app/lessons/[lessonId]/page.tsx`
+1. `src/app/(auth)/**`, `src/app/mypage/**`
 
-- `generateMetadata`는 존재하지만 현재 임시 문자열 기반
-- 실데이터(`fetchLesson`) + canonical + 오류 fallback(`noindex`) 필요
+- 현재는 noindex 적용이 완료되었으며, 신규 페이지 추가 시 동일 정책을 유지해야 합니다.
 
-2. `src/app/meetings/[meetingId]/page.tsx`
+2. 공개 페이지의 메타 카피(문구) 품질
 
-- `generateMetadata` 미구현
-- `getMeetingById` 기반 동적 메타데이터 신규 추가 필요
-
-3. `src/app/lessons/page.tsx`, `src/app/meetings/page.tsx`, `src/app/meetings/search/page.tsx`
-
-- 메타데이터 안내 주석만 있고 실제 `metadata` export 미적용
+- 구현은 완료되었으므로, 전환율/검색 클릭률 기준으로 title/description 문구를 주기적으로 개선합니다.
 
 ### 4.2 구현 시 주의사항 (현재 코드베이스 기준)
 
@@ -725,15 +719,9 @@ canonical은 중복 URL로 분산되는 SEO 신호를 한 URL로 모으는 기�
 
 ### 7.1 현재 상태 (프로젝트 기준)
 
-- `src/app/layout.tsx`에 `metadataBase`가 아직 없음
-- canonical이 실제로 적용된 주요 공개 페이지가 거의 없음
-- 특히 아래 페이지는 우선 보강 대상:
-    - `src/app/page.tsx`
-    - `src/app/lessons/page.tsx`
-    - `src/app/meetings/page.tsx`
-    - `src/app/meetings/search/page.tsx`
-    - `src/app/lessons/[lessonId]/page.tsx`
-    - `src/app/meetings/[meetingId]/page.tsx`
+- `src/app/layout.tsx`에 `metadataBase`가 적용되어 있습니다.
+- 홈/목록/상세의 canonical 기본 적용이 완료되었습니다.
+- 필터 쿼리 URL은 canonical을 기본 path로 고정하는 정책을 유지합니다.
 
 ### 7.2 canonical 정책 (MoaClass)
 
@@ -847,7 +835,8 @@ Open Graph는 카카오톡/슬랙/디스코드 공유 카드 품질을 직접 �
 ### 8.1 현재 상태 (프로젝트 기준)
 
 - `src/app/layout.tsx`에는 전역 fallback OG가 있음
-- `src/app/lessons/[lessonId]/opengraph-image.tsx`는 아직 없음
+- `src/app/lessons/[lessonId]/opengraph-image.tsx`가 적용됨
+- `src/app/meetings/[meetingId]/opengraph-image.tsx`가 적용됨
 - `src/app/page.tsx`, `src/app/lessons/page.tsx`, `src/app/meetings/page.tsx`, `src/app/meetings/search/page.tsx`는 수동 OG 보강 필요
 - `src/app/interests/page.tsx`, `src/app/moimer-intro/page.tsx`도 수동 OG 보강 대상
 
