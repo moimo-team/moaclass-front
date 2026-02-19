@@ -18,11 +18,11 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: {
+			'@pages': path.resolve(__dirname, './src/v-pages'),
+			'@/pages': path.resolve(__dirname, './src/v-pages'),
 			'@': path.resolve(__dirname, './src'),
 			'@components': path.resolve(__dirname, './src/components'),
 			'@features': path.resolve(__dirname, './src/components/features'),
-			'@pages': path.resolve(__dirname, './src/v-pages'),
-			'@/pages': path.resolve(__dirname, './src/v-pages'),
 			'@store': path.resolve(__dirname, './src/store'),
 			'@utils': path.resolve(__dirname, './src/utils'),
 			'@hooks': path.resolve(__dirname, './src/hooks'),
