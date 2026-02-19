@@ -1,4 +1,4 @@
-import type { Notification } from '@/models/notification.model';
+import type { FetchNotificationsResponse } from '@/models/notification.model';
 
 import { apiClient } from './client';
 
@@ -9,9 +9,9 @@ export interface FetchNotificationsParams {
 
 export const fetchNotifications = async (
 	params: FetchNotificationsParams = {},
-): Promise<Notification[]> => {
+): Promise<FetchNotificationsResponse> => {
 	const { page = 1, limit = 10 } = params;
-	const response = await apiClient.get<Notification[]>('/notifications', {
+	const response = await apiClient.get<FetchNotificationsResponse>('/notifications', {
 		params: { page, limit },
 	});
 	return response.data;

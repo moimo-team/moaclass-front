@@ -1,3 +1,5 @@
+import type { PaginationMeta } from '@/models/pagination.model';
+
 export type NotificationType =
 	| 'PARTICIPATION_REQUEST' // 참가 신청
 	| 'PARTICIPATION_ACCEPTED' // 참가 수락
@@ -49,3 +51,8 @@ export const isNewChatNotification = (
 ): notification is NewChatNotification => {
 	return notification.type === 'NEW_CHAT' && typeof notification.roomId === 'number';
 };
+
+export interface FetchNotificationsResponse {
+	data: Notification[];
+	meta: PaginationMeta;
+}

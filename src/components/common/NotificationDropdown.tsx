@@ -27,7 +27,7 @@ const mapLinkTypeToChatType = (linkType?: string): ChatType | undefined => {
 
 export const NotificationDropdown = () => {
 	const navigate = useNavigate();
-	const { data: notifications, isLoading, isError } = useNotificationQuery();
+	const { notifications, isLoading, isError } = useNotificationQuery();
 
 	const markAsReadMutation = useMarkAsReadMutation();
 	const markAllAsReadMutation = useMarkAllAsReadMutation();

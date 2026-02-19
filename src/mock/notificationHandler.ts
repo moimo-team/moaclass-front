@@ -70,7 +70,15 @@ export const notificationHandlers = [
 			(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
 		);
 
-		return HttpResponse.json(paginate(sorted, page, limit));
+		return HttpResponse.json({
+			data: paginate(sorted, page, limit),
+			meta: {
+				page,
+				limit,
+				totalCount: sorted.length,
+				totalPages: Math.ceil(sorted.length / limit),
+			},
+		});
 	}),
 
 	http.patch('/api/notifications/:notificationId/read', ({ params }) => {
