@@ -20,7 +20,9 @@ export const metadata: Metadata = {
 	},
 	description: '모아클 - 모여라 아! 이거다 싶은 클래스',
 	icons: {
-		icon: '/moaclass-icon.svg',
+		icon: ['/favicon.ico', '/moaclass-icon.svg'],
+		shortcut: '/favicon.ico',
+		apple: '/moaclass-icon.svg',
 	},
 	openGraph: {
 		type: 'website',
