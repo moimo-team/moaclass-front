@@ -10,7 +10,7 @@ import type {
 
 export const fetchLatestLessons = async (): Promise<Lesson[]> => {
 	const response = await apiClient.get<FetchLessonsResponse>('/lessons', {
-		params: { limit: 10 },
+		params: { limit: 10, sort: 'LATEST', page: 1 },
 	});
 	return response.data.data;
 };
