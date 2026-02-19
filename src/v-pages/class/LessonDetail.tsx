@@ -21,7 +21,7 @@ import { formatFullDateTime } from '@/utils/dateFormat';
 
 export interface LessonDetailProps {
 	lessonId: string;
-	navigate: (path: string) => void;
+	navigate: (path: string, options?: { state?: unknown }) => void;
 	onBack?: () => void;
 	LoginRequiredDialogComponent: React.ComponentType<{
 		open: boolean;
@@ -33,7 +33,7 @@ export interface LessonDetailProps {
 export const LessonDetailContent = ({
 	lessonId,
 	navigate,
-	onBack,
+	onBack: _onBack,
 	LoginRequiredDialogComponent,
 	useApplicationConfirmationHook,
 }: LessonDetailProps) => {
@@ -68,7 +68,7 @@ export const LessonDetailContent = ({
 		lessonDetail,
 	});
 
-	const likeMutation = useLessonLikeMutation([['lesson', Number(lessonId)]]);
+	const likeMutation = useLessonLikeMutation();
 
 	const handleWishlistToggle = () => {
 		if (!isLoggedIn) {
@@ -155,8 +155,9 @@ export const LessonDetailContent = ({
 							address={lessonDetail.address}
 							detailAddress={lessonDetail.detailAddress}
 							directionsText={lessonDetail.directionsText}
-							navigate={navigate}
-							reviews={reviewsData || []}
+							navigate={navigate as ReturnType<typeof useNavigate>}
+							reviewAiSummary={lessonDetail.reviewAiSummary}
+							reviews={reviewsData?.data ?? []}
 						/>
 					</div>
 

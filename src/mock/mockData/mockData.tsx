@@ -308,6 +308,8 @@ export const mockParticipants: Record<number, ParticipationDetail[]> = myMeeting
 
 export const mockLessonDetail: LessonDetail = {
 	...mockLessons[0], // 기본 데이터는 mockLessons의 첫번째 아이템을 재사용
+	reviewAiSummary:
+		'수강생들은 설명이 쉽고 친절하다는 점을 가장 많이 언급했습니다.\n실습 위주의 진행과 즉각적인 피드백이 특히 도움이 됐다는 후기가 많았습니다.\n일부 후기는 마무리 Q&A 시간을 조금 더 늘려주면 좋겠다고 제안했습니다.',
 
 	// 상세 페이지에만 필요한 images 필드 추가
 	images: Array.from({ length: faker.number.int({ min: 3, max: 6 }) }, (_, i) => ({

@@ -27,6 +27,7 @@ interface LessonTabContentProps {
 	detailAddress: string;
 	directionsText: string;
 	navigate: ReturnType<typeof useNavigate>;
+	reviewAiSummary: string | null;
 	reviews: Review[];
 }
 
@@ -44,9 +45,11 @@ export const LessonTabContent = ({
 	detailAddress,
 	directionsText,
 	navigate,
+	reviewAiSummary,
 	reviews,
 }: LessonTabContentProps) => {
 	const [isMapReady, setIsMapReady] = useState(false);
+	const hasReviewAiSummary = Boolean(reviewAiSummary?.trim());
 
 	useEffect(() => {
 		if (typeof window === 'undefined' || !window.kakao?.maps) return;
@@ -181,7 +184,24 @@ export const LessonTabContent = ({
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
 							<CardTitle className="text-xl font-bold">후기</CardTitle>
 						</CardHeader>
-						<CardContent className="p-6">
+						<CardContent className="p-6 space-y-4">
+							{hasReviewAiSummary && (
+								<Card className="border border-border/70 bg-secondary/10">
+									<CardHeader className="pb-2">
+										<CardTitle className="text-lg font-semibold">
+											AI 리뷰 요약
+										</CardTitle>
+									</CardHeader>
+									<CardContent className="pt-0">
+										<p className="text-sm text-muted-foreground mb-2">
+											모멘티들이 작성한 리뷰를 AI로 요약한 내용입니다.
+										</p>
+										<div className="text-base text-foreground whitespace-pre-wrap leading-relaxed">
+											{reviewAiSummary}
+										</div>
+									</CardContent>
+								</Card>
+							)}
 							<ReviewList reviews={reviews} />
 						</CardContent>
 					</Card>

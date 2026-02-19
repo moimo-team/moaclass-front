@@ -22,10 +22,11 @@ export const useLessonLikeMutation = () => {
 	return useMutation<void, Error, ToggleLikeVariables, LessonLikeMutationContext>({
 		mutationFn: async ({ lessonId, newIsLiked }: ToggleLikeVariables) => {
 			if (newIsLiked) {
-				return addLike(lessonId);
-			} else {
-				return cancelLike(lessonId);
+				await addLike(lessonId);
+				return;
 			}
+
+			await cancelLike(lessonId);
 		},
 		onMutate: async ({ lessonId, newIsLiked }) => {
 			// 1. 진행 중인 쿼리 취소 및 이전 데이터 백업
