@@ -29,10 +29,18 @@ const cancelSchema = z.object({
 
 export type CancelFormValues = z.infer<typeof cancelSchema>;
 
-const CancelClass = () => {
-	const { enrollmentId } = useParams();
-	const navigate = useNavigate();
-	const { data: cancelClassInfo, isLoading } = useCancelClassQuery(Number(enrollmentId));
+export interface CancelClassProps {
+	enrollmentId?: string;
+	onBack?: () => void;
+	onNavigateToList?: () => void;
+}
+
+export const CancelClassContent = ({
+	enrollmentId: propEnrollmentId,
+	onBack,
+	onNavigateToList,
+}: CancelClassProps) => {
+	const { data: cancelClassInfo, isLoading } = useCancelClassQuery(Number(propEnrollmentId));
 	const { mutateAsync: cancelClass } = useCancelClassMutation();
 
 	const {
@@ -65,10 +73,7 @@ const CancelClass = () => {
 		return (
 			<div className="flex flex-col items-center justify-center min-h-screen">
 				<p className="text-gray-500 mb-4">해당 주문 내역을 찾을 수 없습니다.</p>
-				<ActionButton
-					label="목록으로 돌아가기"
-					onClick={() => navigate('/mypage/class/orders')}
-				/>
+				<ActionButton label="목록으로 돌아가기" onClick={onNavigateToList} />
 			</div>
 		);
 	}
@@ -76,7 +81,7 @@ const CancelClass = () => {
 	// 수강 취소 핸들러
 	const onSubmit = async (data: CancelFormValues) => {
 		await cancelClass({
-			enrollmentId: Number(enrollmentId),
+			enrollmentId: Number(propEnrollmentId),
 			data,
 		});
 	};
@@ -86,7 +91,7 @@ const CancelClass = () => {
 			{/* Header */}
 			<header className="flex items-center p-4 border-b border-gray-100">
 				<button
-					onClick={() => navigate(-1)}
+					onClick={onBack}
 					className="mr-2 hover:bg-gray-50 p-1 rounded-full transition-colors"
 				>
 					<ChevronLeft className="w-6 h-6 text-gray-600" />
@@ -287,6 +292,19 @@ const CancelClass = () => {
 				</section>
 			</div>
 		</div>
+	);
+};
+
+const CancelClass = () => {
+	const { enrollmentId } = useParams();
+	const navigate = useNavigate();
+
+	return (
+		<CancelClassContent
+			enrollmentId={enrollmentId}
+			onBack={() => navigate(-1)}
+			onNavigateToList={() => navigate('/mypage/class/orders')}
+		/>
 	);
 };
 

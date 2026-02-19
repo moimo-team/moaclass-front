@@ -5,7 +5,7 @@ import { useLayoutEffect, useMemo, useState, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Router } from 'react-router-dom';
 
-import type { NavigationType } from 'react-router-dom';
+import type { NavigationType, To } from 'react-router-dom';
 
 /**
  * Next.js 환경에서 react-router-dom의 Link 컴포넌트가 작동하도록 해주는 어댑터입니다.
@@ -47,18 +47,18 @@ export default function NextRouterAdapter({ children }: { children: React.ReactN
 	// custom navigator 구현 (React Router Link 클릭 -> Next.js router.push)
 	const navigator = useMemo(
 		() => ({
-			createHref: (to: any) => {
+			createHref: (to: To) => {
 				if (typeof to === 'string') return to;
 				return to.pathname + (to.search || '') + (to.hash || '');
 			},
-			push: (to: any) => {
+			push: (to: To) => {
 				const href =
 					typeof to === 'string' ? to : to.pathname + (to.search || '') + (to.hash || '');
 				startTransition(() => {
 					router.push(href);
 				});
 			},
-			replace: (to: any) => {
+			replace: (to: To) => {
 				const href =
 					typeof to === 'string' ? to : to.pathname + (to.search || '') + (to.hash || '');
 				startTransition(() => {

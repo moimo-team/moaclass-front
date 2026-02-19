@@ -16,8 +16,8 @@ const getEnv = (key: string, defaultValue: string = ''): string => {
 	// 2. Vite 환경 변수 확인 (에러 방지를 위해 try-catch 및 타입 캐스팅 사용)
 	try {
 		// Next.js 빌드 타임에 import.meta 참조 에러가 날 수 있으므로 체크
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
+
+		// @ts-expect-error - import.meta.env may not exist in non-Vite environments
 		const viteEnv = import.meta.env;
 		if (viteEnv) {
 			return (viteEnv[key] || viteEnv[`VITE_${key}`] || defaultValue) as string;
@@ -38,8 +38,7 @@ const isDevelopment = (): boolean => {
 
 	// Vite 환경
 	try {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
+		// @ts-expect-error - import.meta.env may not exist in non-Vite environments
 		return import.meta.env.MODE === 'development';
 	} catch (e) {
 		return false;

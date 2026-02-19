@@ -5,17 +5,17 @@ import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useInterestQuery } from '@/hooks/useInterestQuery';
 
-const Interests = () => {
-	const { data: interests, isLoading, error } = useInterestQuery();
-	const navigate = useNavigate();
+export interface InterestsProps {
+	onBack: () => void;
+	onTopicClick: (interestId: number) => void;
+}
 
-	const handleBack = () => {
-		navigate(-1);
-	};
+export const InterestsContent = ({ onBack, onTopicClick }: InterestsProps) => {
+	const { data: interests, isLoading, error } = useInterestQuery();
 
 	if (isLoading) {
 		return (
-			<div className="w-full h-full pt-10 bg-white overflow-y-auto max-w-screen-xl mx-auto px-4 md:px-8">
+			<div className="w-full h-full pt-10 bg-white overflow-y-auto max-w-7xl mx-auto px-4 md:px-8">
 				<div className="flex items-center gap-2 mb-8">
 					<Skeleton className="w-10 h-10 rounded-full" />
 					<Skeleton className="h-8 w-48" />
@@ -35,10 +35,10 @@ const Interests = () => {
 	if (error) return <div>Error loading interests: {error.message}</div>;
 
 	return (
-		<div className="w-full h-full pt-10 bg-white overflow-y-auto max-w-screen-xl mx-auto px-4 md:px-8">
+		<div className="w-full h-full pt-10 bg-white overflow-y-auto max-w-7xl mx-auto px-4 md:px-8">
 			<div className="flex items-center gap-2 mb-8">
 				<button
-					onClick={handleBack}
+					onClick={onBack}
 					className="p-1 hover:bg-gray-100 rounded-full transition-colors"
 					aria-label="뒤로 가기"
 				>
@@ -52,12 +52,26 @@ const Interests = () => {
 					<TopicCard
 						key={interest.id}
 						topicName={interest.name}
-						to={`/meetings?interestFilter=${interest.id}`}
+						onClick={() => onTopicClick(interest.id)}
 					/>
 				))}
 			</div>
 		</div>
 	);
+};
+
+const Interests = () => {
+	const navigate = useNavigate();
+
+	const handleBack = () => {
+		navigate(-1);
+	};
+
+	const handleTopicClick = (id: number) => {
+		navigate(`/meetings?interestFilter=${id}`);
+	};
+
+	return <InterestsContent onBack={handleBack} onTopicClick={handleTopicClick} />;
 };
 
 export default Interests;

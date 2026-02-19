@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react';
 
+import { useNavigate } from 'react-router-dom';
+
 import { useTeacherProfileQuery } from '@/hooks/useTeacherProfileMutations';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 
-import ClassManagementPage from './manage/ClassManagementPage';
+import { ClassManagementContent } from './manage/ClassManagementPage';
 import TeacherProfilePage from './teacher/TeacherProfilePage';
 
 type TabType = 'profile' | 'classes';
 
-const ClassDashboardPage = () => {
+export interface ClassDashboardProps {
+	onNavigate: (path: string) => void;
+}
+
+export const ClassDashboardContent = ({ onNavigate }: ClassDashboardProps) => {
 	const userId = useAuthStore((state) => state.userId);
 	const { data: teacherProfile, isLoading } = useTeacherProfileQuery(userId ?? undefined);
 
@@ -31,7 +37,7 @@ const ClassDashboardPage = () => {
 	return (
 		<div className="flex min-h-screen w-full bg-white">
 			{/* 좌측 사이드바 - sticky로 고정 */}
-			<aside className="w-52 border-r border-gray-100 flex-shrink-0 z-20 h-screen sticky top-0 bg-white">
+			<aside className="w-52 border-r border-gray-100 shrink-0 z-20 h-screen sticky top-0 bg-white">
 				<div className="p-8">
 					<h1 className="text-3xl font-bold text-gray-900 tracking-tight">클래스</h1>
 					<h1 className="text-3xl font-bold text-gray-900 tracking-tight">대시보드</h1>
@@ -58,11 +64,17 @@ const ClassDashboardPage = () => {
 			<main className="flex-1 bg-white">
 				<div className="max-w-[1400px] mx-auto p-10">
 					{activeTab === 'profile' && <TeacherProfilePage />}
-					{activeTab === 'classes' && <ClassManagementPage />}
+					{activeTab === 'classes' && <ClassManagementContent onNavigate={onNavigate} />}
 				</div>
 			</main>
 		</div>
 	);
+};
+
+const ClassDashboardPage = () => {
+	const navigate = useNavigate();
+
+	return <ClassDashboardContent onNavigate={(path) => navigate(path)} />;
 };
 
 export default ClassDashboardPage;

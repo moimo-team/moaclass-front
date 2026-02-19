@@ -306,4 +306,11 @@ const Chatting = () => {
 	);
 };
 
+const Chatting = () => {
+	const location = useLocation();
+	const initialMeetingId = location.state?.meetingId;
+
+	return <ChattingContent initialMeetingId={initialMeetingId} />;
+};
+
 export default Chatting;

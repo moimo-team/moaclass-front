@@ -13,11 +13,13 @@ import { Button } from '@/components/ui/button';
 import { usePayPreviewQuery } from '@/hooks/usePayQuery';
 import { useAuthStore } from '@/store/authStore';
 
-const ClassPayment = () => {
-	const [searchParams] = useSearchParams();
-	// TODO: 실서버 연결 및 링크 연결 후 테스트 값 지울 것
-	const scheduleId = Number(searchParams.get('scheduleId') || '1');
-	const quantity = Number(searchParams.get('quantity') || '1');
+export interface ClassPaymentProps {
+	scheduleId: number;
+	quantity: number;
+	onBack?: () => void;
+}
+
+export const ClassPaymentContent = ({ scheduleId, quantity, onBack }: ClassPaymentProps) => {
 	const { userId, email, nickname } = useAuthStore();
 	const { data: payPreview, isLoading: isPayPreviewLoading } = usePayPreviewQuery({
 		scheduleId,
@@ -33,7 +35,7 @@ const ClassPayment = () => {
 		<div className="w-full max-w-5xl mx-auto p-4 md:p-6 pb-20">
 			{/* Header */}
 			<header className="flex items-center gap-2 mb-6">
-				<Button variant="ghost" size="icon" className="h-8 w-8">
+				<Button variant="ghost" size="icon" className="h-8 w-8" onClick={onBack}>
 					<ChevronLeft className="h-5 w-5" />
 				</Button>
 				<h1 className="text-xl font-bold">클래스 결제 페이지</h1>
@@ -42,10 +44,7 @@ const ClassPayment = () => {
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 				{/* Left Column */}
 				<div className="space-y-6">
-					{/* Class Ticket Info */}
-					<TicketSection lesson={payPreview.lesson} />
-
-					{/* Contact Info */}
+					<TicketSection lesson={payPreview.lessons} />
 					<ContactSection user={{ email: email || '', nickname: nickname || '' }} />
 				</div>
 
@@ -127,13 +126,21 @@ const ClassPayment = () => {
 					{/* Payment Info */}
 					<PayInfoSection
 						payPreview={payPreview}
-						scheduleId={Number(scheduleId)}
+						scheduleId={scheduleId}
 						userId={userId || 0}
 					/>
 				</div>
 			</div>
 		</div>
 	);
+};
+
+const ClassPayment = () => {
+	const [searchParams] = useSearchParams();
+	const scheduleId = Number(searchParams.get('scheduleId') || '1');
+	const quantity = Number(searchParams.get('quantity') || '1');
+
+	return <ClassPaymentContent scheduleId={scheduleId} quantity={quantity} />;
 };
 
 export default ClassPayment;

@@ -4,7 +4,7 @@ import { formatFullDateTime } from '@/utils/dateFormat';
 import { PaySectionCard } from './PaySectionCard';
 
 interface TicketSectionProps {
-	lesson: PayPreviewResponse['lesson'];
+	lesson: PayPreviewResponse['lessons'];
 }
 
 export const TicketSection = ({ lesson }: TicketSectionProps) => {
