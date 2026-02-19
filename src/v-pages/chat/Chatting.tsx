@@ -46,7 +46,11 @@ const resolveChatType = (room: ChatRoom): ChatType => {
 	return 'meeting';
 };
 
-const Chatting = () => {
+interface ChattingContentProps {
+	initialMeetingId?: number | string | null;
+}
+
+export const ChattingContent = ({ initialMeetingId }: ChattingContentProps) => {
 	const { userId } = useAuthStore();
 	const location = useLocation();
 	const locationState = (location.state as ChatLocationState) ?? null;
@@ -84,8 +88,12 @@ const Chatting = () => {
 		if (!useInitialRouteSelection) return null;
 		if (locationState?.chatType === 'lesson') return null;
 
-		if (locationState?.meetingId) {
-			return meetingRooms.find((room) => room.meetingId === locationState.meetingId) ?? null;
+		const targetMeetingId = initialMeetingId
+			? Number(initialMeetingId)
+			: locationState?.meetingId;
+
+		if (targetMeetingId) {
+			return meetingRooms.find((room) => room.meetingId === targetMeetingId) ?? null;
 		}
 
 		if (locationState?.roomId) {
@@ -95,7 +103,7 @@ const Chatting = () => {
 		}
 
 		return null;
-	}, [useInitialRouteSelection, locationState, meetingRooms, chatRooms]);
+	}, [useInitialRouteSelection, locationState, meetingRooms, chatRooms, initialMeetingId]);
 
 	const initialLessonRoomFromRoute = useMemo(() => {
 		if (!useInitialRouteSelection) return null;
@@ -308,7 +316,8 @@ const Chatting = () => {
 
 const Chatting = () => {
 	const location = useLocation();
-	const initialMeetingId = location.state?.meetingId;
+	const locationState = location.state as ChatLocationState;
+	const initialMeetingId = locationState?.meetingId;
 
 	return <ChattingContent initialMeetingId={initialMeetingId} />;
 };
