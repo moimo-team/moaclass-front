@@ -6,12 +6,15 @@ import type {
 
 import { apiClient } from './client';
 
+/**
+ * 클래스 일정 목록 조회
+ * (백엔드 개발중)
+ */
 export const fetchLessonSchedules = async (lessonId: number): Promise<LessonSchedule[]> => {
 	const { data } = await apiClient.get<LessonSchedule[]>(`/lessons/${lessonId}/schedules`);
 	return data;
 };
 
-// 백엔드가 배열로 받으므로 개별/반복 등록 모두 단일 POST
 export const createSchedules = async (
 	lessonId: number,
 	schedulesData: CreateScheduleRequest[],
@@ -19,16 +22,19 @@ export const createSchedules = async (
 	await apiClient.post(`/lessons/${lessonId}/schedules`, schedulesData);
 };
 
-// 신청자가 있으면 400 에러 반환
 export const deleteSchedule = async (scheduleId: number): Promise<void> => {
 	await apiClient.delete(`/lessons/schedules/${scheduleId}`);
 };
 
-export const deleteSchedules = async (scheduleIds: number[]): Promise<void> => {
-	await apiClient.delete('/lessons/schedules', { data: { scheduleIds } });
+/**
+ * 다수 일정 삭제
+ * 백엔드 사양에 다수 삭제 API가 없으므로 프론트엔드에서 병렬 처리합니다.
+ */
+export const deleteSchedules = async (scheduleIds: number[]): Promise<void[]> => {
+	return Promise.all(scheduleIds.map((id) => deleteSchedule(id)));
 };
 
-// 특정 일정의 신청자 목록 조회
+// 특정 일정의 신청자(모멘티) 목록 조회
 export const fetchScheduleParticipants = async (
 	scheduleId: number,
 ): Promise<ScheduleParticipant[]> => {

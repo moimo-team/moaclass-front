@@ -4,25 +4,25 @@ import type {
 	FetchLessonsResponse,
 	Lesson,
 	LessonDetail,
-	LessonCreateScheduleRequest,
 } from '@/models/lesson.model';
 
 // --- 클래스 조회(GET) 관련 ---
 
 export const fetchLatestLessons = async (): Promise<Lesson[]> => {
-	const response = await apiClient.get<Lesson[]>('/lessons/latest');
-	return response.data;
+	const response = await apiClient.get<FetchLessonsResponse>('/lessons', {
+		params: { limit: 10 },
+	});
+	return response.data.data;
 };
 
-export const fetchLessons = async (
-	mappedParams: FetchLessonsParams,
-): Promise<FetchLessonsResponse> => {
+export const fetchLessons = async (params: FetchLessonsParams): Promise<FetchLessonsResponse> => {
 	const queryParams = new URLSearchParams();
 
-	Object.entries(mappedParams).forEach(([key, value]) => {
-		if (value === undefined || value === null) return;
+	Object.entries(params).forEach(([key, value]) => {
+		if (value === undefined || value === null || value === '') return;
 
-		// 배열인 경우 쉼표로 구분된 하나의 쿼리 파라미터로 추가
+		// 백엔드 DTO의 @Transform(라인 41, 62 등) 로직에 맞춰
+		// 배열 데이터는 쉼표로 구분된 하나의 문자열로 직렬화하여 전송합니다.
 		if (Array.isArray(value)) {
 			queryParams.append(key, value.map(String).join(','));
 		} else {
@@ -31,9 +31,9 @@ export const fetchLessons = async (
 	});
 
 	const queryString = queryParams.toString();
-	const url = queryString ? `/lessons?${queryString}` : '/lessons';
-
-	const response = await apiClient.get<FetchLessonsResponse>(url);
+	const response = await apiClient.get<FetchLessonsResponse>(
+		queryString ? `/lessons?${queryString}` : '/lessons',
+	);
 	return response.data;
 };
 
@@ -67,28 +67,5 @@ export const updateLesson = async (lessonId: number, formData: FormData) => {
 // 3. 레슨 삭제
 export const deleteLesson = async (lessonId: number) => {
 	const response = await apiClient.delete(`/lessons/${lessonId}`);
-	return response.data;
-};
-
-// --- 클래스 일정 관련 ---
-
-// 4. 클래스 일정 추가
-export const addLessonSchedule = async (lessonId: number, data: LessonCreateScheduleRequest[]) => {
-	const response = await apiClient.post(`/lessons/${lessonId}/schedules`, data);
-	return response.data;
-};
-
-// 5. 클래스 일정 수정
-export const updateLessonSchedule = async (
-	scheduleId: number,
-	data: LessonCreateScheduleRequest,
-) => {
-	const response = await apiClient.put(`/lessons/schedules/${scheduleId}`, data);
-	return response.data;
-};
-
-// 6. 레슨 일정 삭제
-export const deleteLessonSchedule = async (scheduleId: number) => {
-	const response = await apiClient.delete(`/lessons/schedules/${scheduleId}`);
 	return response.data;
 };
