@@ -43,7 +43,6 @@ function MeetingDetailPage() {
 	const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [showJoinConfirm, setShowJoinConfirm] = useState(false);
-	const [isPending, setIsPending] = useState(false);
 
 	// 모임 신청 mutation
 	const joinMeetingMutation = useJoinMeetingMutation();
@@ -85,14 +84,10 @@ function MeetingDetailPage() {
 			)
 		: false;
 
-	useEffect(() => {
-		if (meetingId && pendingMeetings) {
-			const isAlreadyApplied = pendingMeetings.some(
-				(meeting) => meeting.meetingId === Number(meetingId),
-			);
-			setIsPending(isAlreadyApplied);
-		}
-	}, [meetingId, pendingMeetings]);
+	const isPending =
+		meetingId && pendingMeetings
+			? pendingMeetings.some((meeting) => meeting.meetingId === Number(meetingId))
+			: false;
 
 	// 신청자 알림 토스트
 	const { data: participations } = useParticipationsQuery(Number(meetingId));
@@ -131,7 +126,6 @@ function MeetingDetailPage() {
 		if (!meetingId) return;
 		try {
 			await joinMeetingMutation.mutateAsync(Number(meetingId));
-			setIsPending(true);
 			toast.success('모임 신청이 완료되었습니다. 모이머의 승인을 기다려주세요!');
 			setShowJoinConfirm(false);
 		} catch (error: unknown) {
@@ -145,7 +139,6 @@ function MeetingDetailPage() {
 				toast.error(errorMessage || '모임 신청에 실패했습니다');
 			} else if (err.response?.status === 409) {
 				toast.warning('이미 신청한 모임입니다');
-				setIsPending(true);
 			} else if (err.response?.status === 410) {
 				toast.error('삭제된 모임입니다');
 			} else {

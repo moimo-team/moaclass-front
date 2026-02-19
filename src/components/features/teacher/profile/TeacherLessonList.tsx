@@ -13,7 +13,7 @@ export const TeacherLessonList: React.FC<TeacherLessonListProps> = ({ lessons, i
 	return (
 		<section className="space-y-6">
 			<div className="flex items-center justify-between">
-				<h2 className="text-2xl font-bold text-gray-900">클래스 목록</h2>
+				<h2 className="text-2xl font-bold text-gray-900">운영중인 클래스 목록</h2>
 				<span className="text-sm text-gray-500">총 {lessons.length}개</span>
 			</div>
 

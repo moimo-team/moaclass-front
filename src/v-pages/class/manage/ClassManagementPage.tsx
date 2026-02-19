@@ -30,6 +30,7 @@ export const ClassManagementContent = ({ onNavigate }: ClassManagementProps) => 
 	const [createModalOpen, setCreateModalOpen] = useState(false);
 	const [profileAlertOpen, setProfileAlertOpen] = useState(false);
 	const [editingClassId, setEditingClassId] = useState<number | null>(null);
+	const [editingIsDraft, setEditingIsDraft] = useState(false);
 	const [duplicatingClassId, setDuplicatingClassId] = useState<number | null>(null);
 	const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
 
@@ -38,9 +39,14 @@ export const ClassManagementContent = ({ onNavigate }: ClassManagementProps) => 
 		isLoading,
 		isError,
 	} = useQuery<FetchLessonsResponse>({
-		queryKey: ['lessons', 'manage-list'],
-		queryFn: () => fetchLessons({}),
+		queryKey: ['lessons', 'manage-list', userId],
+		queryFn: () =>
+			fetchLessons({
+				userId: userId ?? undefined,
+				status: ['ACTIVE', 'INACTIVE', 'DRAFT', 'DUPLICATED'],
+			}),
 		refetchOnMount: 'always',
+		enabled: !!userId,
 	});
 
 	const { mutate: deleteLesson } = useDeleteLessonMutation();
@@ -48,8 +54,9 @@ export const ClassManagementContent = ({ onNavigate }: ClassManagementProps) => 
 
 	const lessons = lessonsResponse?.data ?? [];
 
-	const handleEdit = (id: number) => {
+	const handleEdit = (id: number, status: string) => {
 		setEditingClassId(id);
+		setEditingIsDraft(status === 'DRAFT');
 		setCreateModalOpen(true);
 	};
 
@@ -117,6 +124,7 @@ export const ClassManagementContent = ({ onNavigate }: ClassManagementProps) => 
 	const handleModalClose = () => {
 		setCreateModalOpen(false);
 		setEditingClassId(null);
+		setEditingIsDraft(false);
 		setDuplicatingClassId(null);
 	};
 
@@ -156,7 +164,7 @@ export const ClassManagementContent = ({ onNavigate }: ClassManagementProps) => 
 					<ClassManageCard
 						key={lesson.id}
 						lesson={lesson}
-						onEdit={() => handleEdit(lesson.id)}
+						onEdit={() => handleEdit(lesson.id, lesson.status)}
 						onDelete={() => handleDeleteClick(lesson.id)}
 						onDuplicate={() => handleDuplicate(lesson.id)}
 						onManage={() => handleManage(lesson.id)}
@@ -208,6 +216,7 @@ export const ClassManagementContent = ({ onNavigate }: ClassManagementProps) => 
 				onOpenChange={handleModalClose}
 				classId={editingClassId || duplicatingClassId || undefined}
 				isDuplicating={!!duplicatingClassId}
+				isDraft={editingIsDraft}
 			/>
 
 			{/* 프로필 미등록 안내 */}

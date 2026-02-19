@@ -122,7 +122,8 @@ export interface FetchLessonsParams {
 	maxPrice?: number;
 	sort?: string;
 	maxParticipants?: number;
-	status?: string;
+	status?: string | string[];
+	userId?: number;
 }
 
 export interface FetchLessonsResponse {

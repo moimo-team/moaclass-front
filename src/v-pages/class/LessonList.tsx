@@ -68,6 +68,7 @@ const LessonListPage: React.FC = () => {
 			] as [number, number],
 		};
 		setAllFilters(filtersFromUrl);
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setIsInitialized(true);
 	}, [searchParams, setAllFilters]);
 

@@ -3,13 +3,10 @@ import type {
 	CreateScheduleRequest,
 	ScheduleParticipant,
 } from '@/models/schedule.model';
+import { toLocalISOString } from '@/utils/dateFormat';
 
 import { apiClient } from './client';
 
-/**
- * 클래스 일정 목록 조회
- * (백엔드 개발중)
- */
 export const fetchLessonSchedules = async (lessonId: number): Promise<LessonSchedule[]> => {
 	const { data } = await apiClient.get<LessonSchedule[]>(`/lessons/${lessonId}/schedules`);
 	return data;
@@ -19,7 +16,11 @@ export const createSchedules = async (
 	lessonId: number,
 	schedulesData: CreateScheduleRequest[],
 ): Promise<void> => {
-	await apiClient.post(`/lessons/${lessonId}/schedules`, schedulesData);
+	const normalized = schedulesData.map((s) => ({
+		startAt: toLocalISOString(s.startAt),
+		endAt: toLocalISOString(s.endAt),
+	}));
+	await apiClient.post(`/lessons/${lessonId}/schedules`, normalized);
 };
 
 export const deleteSchedule = async (scheduleId: number): Promise<void> => {

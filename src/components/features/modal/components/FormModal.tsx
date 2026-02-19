@@ -8,9 +8,11 @@ interface FormModalProps {
 	isOpen: boolean;
 	onClose: () => void;
 	onSubmit?: (e: React.FormEvent) => void;
+	onDraft?: () => void;
 	title: string;
 	children: ReactNode;
 	submitButtonText?: string;
+	draftButtonText?: string;
 	isSubmitDisabled?: boolean;
 	isLoading?: boolean;
 	loadingComponent?: ReactNode;
@@ -28,9 +30,11 @@ export const FormModal = ({
 	isOpen,
 	onClose,
 	onSubmit,
+	onDraft,
 	title,
 	children,
-	submitButtonText,
+	submitButtonText = '저장하기',
+	draftButtonText,
 	isSubmitDisabled = false,
 	isLoading = false,
 	loadingComponent,
@@ -47,13 +51,25 @@ export const FormModal = ({
 			{/* 고정된 버튼 */}
 			{showFooter && (
 				<div className="px-6 py-4 border-t">
-					<Button
-						type="submit"
-						disabled={isSubmitDisabled || isLoading}
-						className="w-full h-12 bg-primary hover:bg-primary/80 text-white font-bold rounded-lg shadow-sm disabled:bg-gray-200 disabled:text-gray-400 border-none"
-					>
-						{isLoading ? '처리 중...' : submitButtonText}
-					</Button>
+					<div className={cn('gap-4', onDraft ? 'grid grid-cols-2' : 'flex')}>
+						{onDraft && (
+							<Button
+								type="button"
+								onClick={onDraft}
+								disabled={isLoading}
+								className="h-12 bg-white hover:bg-gray-50 text-gray-700 font-bold rounded-lg border border-gray-200 shadow-sm"
+							>
+								{isLoading ? '처리 중...' : draftButtonText || '임시저장'}
+							</Button>
+						)}
+						<Button
+							type="submit"
+							disabled={isSubmitDisabled || isLoading}
+							className="w-full h-12 bg-primary hover:bg-primary/80 text-white font-bold rounded-lg shadow-sm disabled:bg-gray-200 disabled:text-gray-400 border-none"
+						>
+							{isLoading ? '처리 중...' : submitButtonText}
+						</Button>
+					</div>
 				</div>
 			)}
 		</>

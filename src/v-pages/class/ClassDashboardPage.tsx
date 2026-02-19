@@ -25,6 +25,7 @@ export const ClassDashboardContent = ({ onNavigate }: ClassDashboardProps) => {
 	// 프로필 로딩 완료 후 탭 자동 업데이트
 	useEffect(() => {
 		if (!isLoading && teacherProfile && activeTab === 'profile') {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setActiveTab('classes');
 		}
 	}, [teacherProfile, isLoading, activeTab]);

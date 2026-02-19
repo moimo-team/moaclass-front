@@ -97,13 +97,17 @@ export const ClassManageCard = ({
 							>
 								클래스 복제
 							</DropdownMenuItem>
-							<DropdownMenuItem
-								onClick={onToggleStatus}
-								className="cursor-pointer font-medium"
-							>
-								{lesson.status === 'ACTIVE' ? '휴면' : '휴면 해제'}
-							</DropdownMenuItem>
-							<div className="h-px bg-gray-100 my-1" />
+							{lesson.status !== 'DRAFT' && (
+								<>
+									<DropdownMenuItem
+										onClick={onToggleStatus}
+										className="cursor-pointer font-medium"
+									>
+										{lesson.status === 'ACTIVE' ? '휴면' : '휴면 해제'}
+									</DropdownMenuItem>
+									<div className="h-px bg-gray-100 my-1" />
+								</>
+							)}
 							<DropdownMenuItem
 								onClick={onDelete}
 								className="text-destructive cursor-pointer font-bold"
