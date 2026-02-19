@@ -6,8 +6,7 @@ import type { ChatMessage } from '@/models/chat.model';
 import { useAuthStore } from '@/store/authStore';
 import { ENV } from '@/utils/env';
 
-const isMockingEnabled =
-	import.meta.env.DEV && (import.meta.env.VITE_ENABLE_MOCK || 'true') === 'true';
+const isMockingEnabled = ENV.ENABLE_MOCK;
 
 const isSocketIoClient = (socket: ChatSocket): socket is Exclude<ChatSocket, MockSocketClient> => {
 	return 'io' in socket;

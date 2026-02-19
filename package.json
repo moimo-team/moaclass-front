@@ -6,8 +6,8 @@
 	"scripts": {
 		"dev": "vite",
 		"dev:next": "next dev",
-		"build": "tsc && vite build",
-		"build:next": "next build",
+		"build:vite": "tsc && vite build",
+		"build": "next build",
 		"start:next": "next start",
 		"lint": "eslint .",
 		"lint:next": "next lint",

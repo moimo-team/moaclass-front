@@ -49,27 +49,30 @@ function KakaoMapSearch({ onPlaceSelect, defaultValue = '', className }: KakaoMa
 		setIsSearching(true);
 		const ps = new window.kakao.maps.services.Places();
 
-		ps.keywordSearch(keyword, (data: any[], status: any) => {
-			setIsSearching(false);
+		ps.keywordSearch(
+			keyword,
+			(data: kakao.maps.services.PlaceResult[], status: kakao.maps.services.Status) => {
+				setIsSearching(false);
 
-			if (status === window.kakao.maps.services.Status.OK) {
-				const places: PlaceInfo[] = data.map((place) => ({
-					placeName: place.place_name,
-					address: place.address_name,
-					roadAddress: place.road_address_name || place.address_name,
-					lat: parseFloat(place.y),
-					lng: parseFloat(place.x),
-				}));
-				setSearchResults(places);
-				setShowResults(true);
-			} else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
-				toast.warning('검색 결과가 없습니다');
-				setSearchResults([]);
-			} else {
-				toast.error('검색 중 오류가 발생했습니다');
-				setSearchResults([]);
-			}
-		});
+				if (status === window.kakao.maps.services.Status.OK) {
+					const places: PlaceInfo[] = data.map((place) => ({
+						placeName: place.place_name,
+						address: place.address_name,
+						roadAddress: place.road_address_name || place.address_name,
+						lat: parseFloat(place.y),
+						lng: parseFloat(place.x),
+					}));
+					setSearchResults(places);
+					setShowResults(true);
+				} else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
+					toast.warning('검색 결과가 없습니다');
+					setSearchResults([]);
+				} else {
+					toast.error('검색 중 오류가 발생했습니다');
+					setSearchResults([]);
+				}
+			},
+		);
 	};
 
 	const handleSelectPlace = (place: PlaceInfo) => {
@@ -130,7 +133,7 @@ function KakaoMapSearch({ onPlaceSelect, defaultValue = '', className }: KakaoMa
 			{selectedPlace && (
 				<div className="mt-3 p-3 bg-primary/10 rounded-lg border border-primary/20">
 					<div className="flex items-start gap-2">
-						<MapPin className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+						<MapPin className="h-4 w-4 text-primary mt-0.5 shrink-0" />
 						<div className="flex-1 min-w-0">
 							<p className="font-medium text-sm text-foreground">
 								{selectedPlace.placeName}
@@ -154,7 +157,7 @@ function KakaoMapSearch({ onPlaceSelect, defaultValue = '', className }: KakaoMa
 							className="w-full p-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors"
 						>
 							<div className="flex items-start gap-2">
-								<MapPin className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+								<MapPin className="h-4 w-4 text-primary mt-0.5 shrink-0" />
 								<div className="flex-1 min-w-0">
 									<p className="font-medium text-sm text-foreground">
 										{place.placeName}

@@ -1,18 +1,20 @@
 'use client';
 
-import { useLayoutEffect, useMemo, useState, useTransition } from 'react';
+import { Suspense, useLayoutEffect, useMemo, useState, useTransition } from 'react';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Router } from 'react-router-dom';
 
-import type { NavigationType } from 'react-router-dom';
+import type { NavigationType, To } from 'react-router-dom';
 
 /**
  * Next.js 환경에서 react-router-dom의 Link 컴포넌트가 작동하도록 해주는 어댑터입니다.
  * shared 컴포넌트들이 react-router-dom에 의존하고 있을 때, 코드를 수정하지 않고
  * Next.js의 라우팅 시스템과 연동하기 위해 사용합니다.
+ * useSearchParams()를 사용하는 실제 로직을 담은 내부 컴포넌트입니다.
+ * Next.js 빌드 시 CSR Bailout을 방지하기 위해 Suspense로 감싸져야 합니다.
  */
-export default function NextRouterAdapter({ children }: { children: React.ReactNode }) {
+function NextRouterContent({ children }: { children: React.ReactNode }) {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
@@ -47,18 +49,18 @@ export default function NextRouterAdapter({ children }: { children: React.ReactN
 	// custom navigator 구현 (React Router Link 클릭 -> Next.js router.push)
 	const navigator = useMemo(
 		() => ({
-			createHref: (to: any) => {
+			createHref: (to: To) => {
 				if (typeof to === 'string') return to;
 				return to.pathname + (to.search || '') + (to.hash || '');
 			},
-			push: (to: any) => {
+			push: (to: To) => {
 				const href =
 					typeof to === 'string' ? to : to.pathname + (to.search || '') + (to.hash || '');
 				startTransition(() => {
 					router.push(href);
 				});
 			},
-			replace: (to: any) => {
+			replace: (to: To) => {
 				const href =
 					typeof to === 'string' ? to : to.pathname + (to.search || '') + (to.hash || '');
 				startTransition(() => {
@@ -77,5 +79,16 @@ export default function NextRouterAdapter({ children }: { children: React.ReactN
 		<Router location={state.location} navigationType={state.action} navigator={navigator}>
 			{children}
 		</Router>
+	);
+}
+
+/**
+ * Next.js 환경에서 react-router-dom의 Link 컴포넌트가 작동하도록 해주는 어댑터입니다.
+ */
+export default function NextRouterAdapter({ children }: { children: React.ReactNode }) {
+	return (
+		<Suspense fallback={null}>
+			<NextRouterContent>{children}</NextRouterContent>
+		</Suspense>
 	);
 }

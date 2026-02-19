@@ -17,53 +17,45 @@ interface MSWProviderProps {
  * - 개발 환경에서만 동작하며, ENABLE_MOCK이 true일 때만 활성화됩니다.
  */
 export default function MSWProvider({ children }: MSWProviderProps) {
-	const [mswReady, setMswReady] = useState(!ENV.IS_DEV || !ENV.ENABLE_MOCK);
+	const [mswReady, setMswReady] = useState(true);
+	const [isMounted, setIsMounted] = useState(false);
+
+	const needsMocking = ENV.ENABLE_MOCK && ENV.IS_DEV;
 
 	useEffect(() => {
-		// 디버깅: 환경 변수 확인
-		console.log('[MSW Debug] ENV.IS_DEV:', ENV.IS_DEV);
-		console.log('[MSW Debug] ENV.ENABLE_MOCK:', ENV.ENABLE_MOCK);
-		console.log('[MSW Debug] process.env.NODE_ENV:', process.env.NODE_ENV);
-		console.log(
-			'[MSW Debug] process.env.NEXT_PUBLIC_ENABLE_MOCK:',
-			process.env.NEXT_PUBLIC_ENABLE_MOCK,
-		);
+		setIsMounted(true);
 
 		const initMSW = async () => {
-			if (!ENV.IS_DEV || !ENV.ENABLE_MOCK) {
-				console.log(
-					'[MSW] Skipping MSW initialization. IS_DEV:',
-					ENV.IS_DEV,
-					'ENABLE_MOCK:',
-					ENV.ENABLE_MOCK,
-				);
+			if (!needsMocking) {
 				setMswReady(true);
 				return;
 			}
 
 			try {
-				console.log('[MSW] Starting MSW initialization...');
 				const { worker } = await import('@/mock/browser');
-
-				console.log('[MSW] Worker imported, starting...');
 				await worker.start({
 					onUnhandledRequest: 'bypass',
 				});
-
-				console.log('[MSW] Mock Service Worker initialized for Next.js');
 				setMswReady(true);
 			} catch (error) {
 				console.error('[MSW] Failed to initialize MSW:', error);
-				// 에러가 발생해도 앱은 계속 실행
 				setMswReady(true);
 			}
 		};
 
-		initMSW();
-	}, []);
+		if (needsMocking) {
+			setMswReady(false);
+			initMSW();
+		}
+	}, [needsMocking]);
 
-	// MSW 초기화 전에는 렌더링하지 않음
-	if (!mswReady) {
+	// 1. 하이드레이션 에러 방지: 서버와 첫 렌더링 결과는 항상 동일하게 children을 반환
+	if (!isMounted) {
+		return <>{children}</>;
+	}
+
+	// 2. 클라이언트 마운트 이후 MSW 초기화 대기 중이면 스피너 표시
+	if (needsMocking && !mswReady) {
 		return <LoadingSpinner />;
 	}
 

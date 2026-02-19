@@ -1,3 +1,5 @@
+import type { PaginationMeta } from '@/models/pagination.model';
+
 export interface TeacherReview {
 	id: number;
 	lessonId: number;
@@ -11,12 +13,7 @@ export interface TeacherReview {
 
 export interface TeacherReviewsResponse {
 	data: TeacherReview[];
-	meta: {
-		totalCount: number;
-		page: number;
-		limit: number;
-		totalPages: number;
-	};
+	meta: PaginationMeta;
 }
 
 export interface FetchTeacherReviewsParams {
