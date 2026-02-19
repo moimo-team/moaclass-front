@@ -2,14 +2,14 @@ import { io } from 'socket.io-client';
 
 import { CHAT_API_URL } from '@/config/chatConfig';
 import type { createMockSocket } from '@/mock/mockData/socketMock';
+import { ENV } from '@/utils/env';
 
 import type { Socket } from 'socket.io-client';
 
 type MockSocketType = ReturnType<typeof createMockSocket>;
 export type ChatSocket = Socket | MockSocketType;
 
-const isMockingEnabled =
-	import.meta.env.DEV && (import.meta.env.VITE_ENABLE_MOCK || 'true') === 'true';
+const isMockingEnabled = ENV.ENABLE_MOCK;
 
 let socketInstance: ChatSocket | null = null;
 
@@ -22,7 +22,7 @@ const createSocket = async (accessToken: string): Promise<ChatSocket> => {
 		return createMockSocket();
 	}
 
-	const socketUrl = ensureChatsNamespace(import.meta.env.VITE_SOCKET_URL || CHAT_API_URL);
+	const socketUrl = ensureChatsNamespace(ENV.SOCKET_URL || CHAT_API_URL);
 
 	return io(socketUrl, {
 		auth: { token: accessToken },
