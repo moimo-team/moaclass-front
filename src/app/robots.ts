@@ -1,3 +1,5 @@
+import { SITE_URL, toAbsoluteUrl } from '@/constants/site';
+
 import type { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
@@ -19,7 +21,7 @@ export default function robots(): MetadataRoute.Robots {
 				'/user-info',
 			],
 		},
-		sitemap: 'https://www.moaclass.com/sitemap.xml',
-		host: 'https://www.moaclass.com',
+		sitemap: toAbsoluteUrl('/sitemap.xml'),
+		host: SITE_URL,
 	};
 }

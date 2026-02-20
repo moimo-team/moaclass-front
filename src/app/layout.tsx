@@ -3,6 +3,7 @@ import Script from 'next/script';
 import Footer from '@/components/common/Footer';
 import HeaderNext from '@/components/common/next/HeaderNext';
 import Providers from '@/components/providers/Providers';
+import { SITE_URL } from '@/constants/site';
 
 import type { Metadata, Viewport } from 'next';
 import '@/index.css';
@@ -13,7 +14,7 @@ import '@/index.css';
  * - Vite 환경과 충돌하지 않도록 src/app 내부에 위치합니다.
  */
 export const metadata: Metadata = {
-	metadataBase: new URL('https://www.moaclass.com'),
+	metadataBase: new URL(SITE_URL),
 	title: {
 		default: '모아클',
 		template: '%s | 모아클',
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
 		type: 'website',
 		locale: 'ko_KR',
 		siteName: '모아클',
-		url: 'https://www.moaclass.com',
+		url: SITE_URL,
 		title: '모아클',
 		description: '모아클 - 모여라 아! 이거다 싶은 클래스',
 		images: [

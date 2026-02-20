@@ -1,8 +1,8 @@
+import { toAbsoluteUrl } from '@/constants/site';
 import type { PaginationMeta } from '@/models/pagination.model';
 
 import type { MetadataRoute } from 'next';
 
-const BASE_URL = 'https://www.moaclass.com';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'https://moaclass-back.onrender.com';
 
 type ApiListResponse<T> = {
@@ -63,7 +63,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		'/moimer-intro',
 		'/interests',
 	].map((route) => ({
-		url: `${BASE_URL}${route}`,
+		url: toAbsoluteUrl(route),
 		lastModified: now,
 		changeFrequency: route === '' ? 'daily' : 'weekly',
 		priority: route === '' ? 1 : 0.8,
@@ -75,14 +75,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	]);
 
 	const lessonRoutes: MetadataRoute.Sitemap = lessons.map((lesson) => ({
-		url: `${BASE_URL}/lessons/${lesson.id}`,
+		url: toAbsoluteUrl(`/lessons/${lesson.id}`),
 		lastModified: toValidDate(lesson.updatedAt ?? lesson.createdAt),
 		changeFrequency: 'weekly',
 		priority: 0.7,
 	}));
 
 	const meetingRoutes: MetadataRoute.Sitemap = meetings.map((meeting) => ({
-		url: `${BASE_URL}/meetings/${meeting.meetingId}`,
+		url: toAbsoluteUrl(`/meetings/${meeting.meetingId}`),
 		lastModified: toValidDate(meeting.meetingDate),
 		changeFrequency: 'weekly',
 		priority: 0.6,

@@ -1,5 +1,6 @@
 import { fetchLesson } from '@/api/lesson.api';
 import LessonClient from '@/app/lessons/[lessonId]/LessonClient';
+import { toAbsoluteUrl } from '@/constants/site';
 import { createPageMetadata } from '@/utils/metadata';
 
 import type { Metadata } from 'next';
@@ -40,5 +41,49 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function LessonDetailPage({ params }: Props) {
 	const { lessonId } = await params;
-	return <LessonClient lessonId={lessonId} />;
+	const id = Number(lessonId);
+	let lessonJsonLd: Record<string, unknown> | null = null;
+
+	if (Number.isFinite(id)) {
+		try {
+			const lesson = await fetchLesson(id);
+			lessonJsonLd = {
+				'@context': 'https://schema.org',
+				'@type': 'Course',
+				name: lesson.title,
+				description: lesson.description || '모아클래스 클래스 상세 페이지',
+				image: lesson.representativeImage ? [lesson.representativeImage] : undefined,
+				url: toAbsoluteUrl(`/lessons/${id}`),
+				provider: {
+					'@type': 'Organization',
+					name: '모아클래스',
+					sameAs: toAbsoluteUrl('/'),
+				},
+				offers: {
+					'@type': 'Offer',
+					price:
+						typeof lesson.discountedPrice === 'number'
+							? lesson.discountedPrice
+							: lesson.price,
+					priceCurrency: 'KRW',
+					availability: 'https://schema.org/InStock',
+					url: toAbsoluteUrl(`/lessons/${id}`),
+				},
+			};
+		} catch {
+			lessonJsonLd = null;
+		}
+	}
+
+	return (
+		<>
+			{lessonJsonLd && (
+				<script
+					type="application/ld+json"
+					dangerouslySetInnerHTML={{ __html: JSON.stringify(lessonJsonLd) }}
+				/>
+			)}
+			<LessonClient lessonId={lessonId} />
+		</>
+	);
 }
