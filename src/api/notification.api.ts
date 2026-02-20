@@ -2,7 +2,6 @@ import { apiClient } from '@/api/client';
 import type {
 	FetchNotificationsResponse,
 	NotificationListItemDto,
-	NotificationSocketPayload,
 	NotificationUiItem,
 } from '@/models/notification.model';
 
@@ -75,15 +74,4 @@ export const markAllNotificationsAsRead = async (): Promise<{
 }> => {
 	const response = await apiClient.patch('/notifications/read-all');
 	return response.data;
-};
-
-export const mapSocketPayloadToNotification = (
-	payload: NotificationSocketPayload,
-): NotificationUiItem => {
-	return {
-		...payload,
-		isRead: false,
-		readAt: null,
-		createdAt: new Date().toISOString(),
-	};
 };
