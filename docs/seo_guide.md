@@ -1436,3 +1436,58 @@ function ReviewSection() {
 3. 운영 기준
 
 - 가이드 문서(`seo_guide.md`)와 실제 구현 상태가 일치
+
+---
+
+## 15. 배포 후 SEO 점검 체크리스트 (운영용)
+
+### A. 접근/응답 확인
+
+- [ ] 운영 도메인 기준 `https://www.moaclass.com/robots.txt` 정상 응답 확인
+- [ ] 운영 도메인 기준 `https://www.moaclass.com/sitemap.xml` 정상 응답 확인
+- [ ] `robots.txt`의 `Sitemap` 경로가 실제 sitemap URL과 일치
+- [ ] `sitemap.xml`에 공개 페이지 URL이 누락 없이 포함됨
+
+### B. 메타데이터 렌더 확인
+
+- [ ] 홈(`/`)의 `<title>`, `description`, `canonical` 확인
+- [ ] 레슨 목록(`/lessons`)과 모임 목록(`/meetings`)의 메타데이터 확인
+- [ ] 레슨 상세(`/lessons/{lessonId}`)의 동적 title/description/canonical 확인
+- [ ] 모임 상세(`/meetings/{meetingId}`)의 동적 title/description/canonical 확인
+- [ ] 비공개/인증 페이지(`chats`, `mypage`, `payments` 등)에 `noindex` 적용 확인
+
+### C. Open Graph/공유 미리보기
+
+- [ ] 전역 fallback OG 이미지/제목/설명 정상 출력 확인
+- [ ] 레슨 상세 `opengraph-image` 생성 URL 정상 응답 확인
+- [ ] 모임 상세 `opengraph-image` 생성 URL 정상 응답 확인
+- [ ] 카카오톡/슬랙에 URL 공유 시 썸네일/제목/설명이 의도대로 표시되는지 확인
+- [ ] 공유 캐시 이슈 발생 시 플랫폼 디버거로 강제 갱신 후 재확인
+
+### D. 구조화 데이터(JSON-LD) 검증
+
+- [ ] 레슨 상세 `Course` JSON-LD 검증 완료 (Rich Results Test)
+- [ ] 모임 상세 `Event` JSON-LD 검증 완료 (Rich Results Test)
+- [ ] 홈/소개/목록 페이지 JSON-LD 문법 오류 없음
+- [ ] 필수 속성 누락 경고(가격, 날짜, 위치 등) 없는지 확인
+
+### E. 검색엔진 등록/색인
+
+- [ ] Google Search Console 속성 등록 및 사이트맵 제출
+- [ ] 네이버 서치어드바이저 등록 및 사이트맵 제출
+- [ ] Bing Webmaster 등록 및 사이트맵 제출
+- [ ] URL 검사(수집/색인)로 홈, 레슨 상세, 모임 상세 대표 URL 확인
+
+### F. 성능 및 크롤링 품질
+
+- [ ] Lighthouse(모바일) SEO/성능 재측정
+- [ ] Core Web Vitals(LCP, CLS, INP) 기준치 확인
+- [ ] `next/image` 적용 페이지에서 외부 이미지 도메인 누락 에러 없음
+- [ ] 크롤링 차단 정책과 실제 공개/비공개 라우트 정책이 일치
+
+### G. 운영 모니터링 (배포 후 1~2주)
+
+- [ ] Search Console 색인 커버리지 오류/제외 사유 주 2회 점검
+- [ ] 성능 급락 URL(상세 페이지) 모니터링 및 원인 기록
+- [ ] 공유 미리보기 이슈 재발 여부 모니터링
+- [ ] 신규 페이지 추가 시 metadata/canonical/JSON-LD 체크 절차 준수

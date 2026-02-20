@@ -2,7 +2,15 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
 	images: {
-		domains: ['localhost', 'moaclass-back.vercel.app', 'moaclass-back.onrender.com'],
+		domains: [
+			'localhost',
+			'moaclass-back.vercel.app',
+			'moaclass-back.onrender.com',
+			'picsum.photos',
+			'avatars.githubusercontent.com',
+			'cdn.jsdelivr.net',
+			'loremflickr.com', // 외부 이미지 호스트를 images 허용 목록에 등록
+		],
 	},
 	async rewrites() {
 		return [
@@ -14,3 +22,4 @@ const nextConfig: NextConfig = {
 	},
 };
 export default nextConfig;
+
