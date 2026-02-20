@@ -102,7 +102,7 @@ export const useKakaoLoginMutation = () => {
 
 // 로그아웃 Mutation
 export const useLogoutMutation = () => {
-	const { storeLogout, setIsLoggingOut } = useAuthStore();
+	const { storeLogout } = useAuthStore();
 	const queryClient = useQueryClient();
 
 	return useMutation({
@@ -110,12 +110,9 @@ export const useLogoutMutation = () => {
 			return await logout();
 		},
 		onSuccess: () => {
-			setIsLoggingOut(true);
-			// 비동기로 상태 해제를 밀어넣어 ProtectedRoute가 로딩 상태를 먼저 반영하게 함
-			setTimeout(() => {
-				storeLogout();
-				queryClient.clear();
-			}, 0);
+			storeLogout();
+			queryClient.clear();
+			queryClient.invalidateQueries({ queryKey: ['authUser'] });
 		},
 	});
 };
@@ -195,6 +192,7 @@ export const useResetPasswordMutation = () => {
 
 // 회원 탈퇴
 export const useDeleteUserMutation = () => {
+	const { storeLogout } = useAuthStore();
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async () => {
@@ -202,13 +200,9 @@ export const useDeleteUserMutation = () => {
 		},
 		meta: { useBackendError: true },
 		onSuccess: () => {
-			const { storeLogout, setIsLoggingOut } = useAuthStore.getState();
-			setIsLoggingOut(true);
-
-			setTimeout(() => {
-				storeLogout();
-				queryClient.clear();
-			}, 0);
+			storeLogout();
+			queryClient.clear();
+			queryClient.invalidateQueries({ queryKey: ['authUser'] });
 
 			toast.success('회원탈퇴가 완료되었습니다.');
 		},

@@ -11,7 +11,6 @@ import ConfirmDialog from '@/components/features/modal/ConfirmDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useDeleteUserMutation } from '@/hooks/useAuthMutations';
 import { useAuthQuery } from '@/hooks/useAuthQuery';
-import { useAuthStore } from '@/store/authStore';
 
 interface MypageSidebarNextProps {
 	onMenuItemClick?: () => void;
@@ -22,13 +21,11 @@ export const MypageSidebarNext = ({ onMenuItemClick }: MypageSidebarNextProps) =
 	const { mutateAsync: deleteUser } = useDeleteUserMutation();
 	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 	const pathname = usePathname();
-	const { setIsLoggingOut } = useAuthStore();
 	const router = useRouter();
 
 	if (!user) return null;
 
 	const handleDeleteUser = async () => {
-		setIsLoggingOut(true);
 		await deleteUser();
 		setIsConfirmOpen(false);
 		router.replace('/');
