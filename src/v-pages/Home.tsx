@@ -18,11 +18,10 @@ function Home() {
 				<CategorySection />
 				{/* TODO: LikeMeetingList(좋아요순), 특정 카테고리 몇 개 추가 */}
 				<NewLessonList />
-				{/* TODO: 후기 리스트 추가 후 mock 데이터 삭제 */}
 				<ReviewListSection />
 				{isLoggedIn && (
 					<>
-						{/* TODO: 리스트 삭제 or 그대로 사용할지 회의 */}
+						{/* TODO: 리스트 삭제 */}
 						<JoinedMeetingsList />
 						<HostedMeetingsList />
 						<PendingMeetingsList />
