@@ -11,10 +11,10 @@ import { userStore } from './mockData/userMock';
 
 // 일반 로그인 핸들러
 const login = http.post(`${httpUrl}/users/login`, async ({ request }) => {
-	const { email, password } = (await request.json()) as any;
+	const { email } = (await request.json()) as any;
 	await delay(1000);
 
-	if (email === 'moimo@email.com' && password === '12345678') {
+	if (email === 'moimo@email.com') {
 		return HttpResponse.json(
 			{
 				user: {
@@ -36,7 +36,7 @@ const login = http.post(`${httpUrl}/users/login`, async ({ request }) => {
 		);
 	}
 
-	if (email === 'newuser@email.com' && password === '12345678') {
+	if (email === 'newuser@email.com') {
 		return HttpResponse.json(
 			{
 				user: {
@@ -147,7 +147,7 @@ const logout = http.post(`${httpUrl}/users/logout`, async () => {
 
 // 회원가입 핸들러
 const join = http.post(`${httpUrl}/users/register`, async ({ request }) => {
-	const { email, password, nickname } = (await request.json()) as any;
+	const { email, nickname } = (await request.json()) as any;
 	await delay(1000);
 	return HttpResponse.json(
 		{
@@ -155,7 +155,6 @@ const join = http.post(`${httpUrl}/users/register`, async ({ request }) => {
 			user: {
 				id: 3,
 				email: email,
-				password: password,
 				nickname: nickname,
 				bio: null,
 				resetCode: null,

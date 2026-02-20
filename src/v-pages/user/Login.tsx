@@ -26,10 +26,10 @@ import { ENV } from '@/utils/env';
 // zod schema 정의
 export const loginSchema = z.object({
 	email: z.string().min(1, '이메일을 입력해주세요.').email('이메일 형식이 올바르지 않습니다.'),
-	password: z
-		.string()
-		.min(1, '비밀번호를 입력해주세요.')
-		.min(8, '비밀번호는 최소 8자 이상이어야 합니다.'),
+	// password: z
+	// 	.string()
+	// 	.min(1, '비밀번호를 입력해주세요.')
+	// 	.min(8, '비밀번호는 최소 8자 이상이어야 합니다.'),
 });
 
 // zod schema에서 추출한 타입
@@ -52,7 +52,6 @@ const Login = () => {
 		resolver: zodResolver(loginSchema),
 		defaultValues: {
 			email: '',
-			password: '',
 		},
 	});
 
@@ -212,7 +211,7 @@ const Login = () => {
 											</p>
 										)}
 									</div>
-									<div className="grid gap-2">
+									{/* <div className="grid gap-2">
 										<Label
 											htmlFor="password"
 											className="text-sm font-medium text-muted-foreground mr-auto"
@@ -230,7 +229,7 @@ const Login = () => {
 												{errors.password.message}
 											</p>
 										)}
-									</div>
+									</div> */}
 									{errors.root && (
 										<p className="text-sm text-destructive">
 											{errors.root.message}

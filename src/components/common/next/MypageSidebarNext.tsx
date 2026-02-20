@@ -26,9 +26,9 @@ export const MypageSidebarNext = ({ onMenuItemClick }: MypageSidebarNextProps) =
 	if (!user) return null;
 
 	const handleDeleteUser = async () => {
+		router.replace('/');
 		await deleteUser();
 		setIsConfirmOpen(false);
-		router.replace('/');
 	};
 
 	const isActive = (path: string) => pathname === path;

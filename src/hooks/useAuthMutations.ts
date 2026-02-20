@@ -14,10 +14,10 @@ import {
 	verifyResetCode,
 	deleteUser,
 } from '@/api/auth.api';
-import type { FindPasswordFormValues } from '@/pages/user/FindPassword';
-import type { JoinFormValues } from '@/pages/user/Join';
-import type { LoginFormValues } from '@/pages/user/Login';
-import type { ResetPasswordFormValues } from '@/pages/user/ResetPassword';
+import type { FindPasswordFormValues } from '@/app/(auth)/find-password/FindPasswordClient';
+import type { JoinFormValues } from '@/app/(auth)/join/JoinClient';
+import type { LoginFormValues } from '@/app/(auth)/login/LoginClient';
+import type { ResetPasswordFormValues } from '@/app/(auth)/reset-password/ResetPasswordClient';
 import { useAuthStore } from '@/store/authStore';
 
 // 로그인 Mutation
