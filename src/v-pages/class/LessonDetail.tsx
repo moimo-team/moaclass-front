@@ -122,11 +122,11 @@ export const LessonDetailContent = ({
 	}
 
 	return (
-		<div className="flex flex-col min-h-screen bg-background pt-12">
+		<article className="flex flex-col min-h-screen bg-background pt-12">
 			<div className="flex-1 w-full max-w-7xl mx-auto pb-8 px-4 md:px-6 lg:px-8">
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
 					{/* 왼쪽 메인 컨테이너 */}
-					<div className="md:col-span-2 space-y-8">
+					<section className="md:col-span-2 space-y-8" aria-label="클래스 상세 정보">
 						<LessonGallery title={lessonDetail.title} images={lessonDetail.images} />
 						<LessonHeader
 							title={lessonDetail.title}
@@ -158,29 +158,31 @@ export const LessonDetailContent = ({
 							navigate={navigate}
 							reviews={reviewsData || []}
 						/>
-					</div>
+					</section>
 
 					{/* 결제 섹션 */}
-					<LessonReservationSidebar
-						reservationLeadDays={lessonDetail.reservationLeadDays}
-						price={lessonDetail.price}
-						discountRate={lessonDetail.discountRate}
-						discountedPrice={lessonDetail.discountedPrice}
-						isLoggedIn={isLoggedIn}
-						today={new Date()}
-						threeMonthsLater={(() => {
-							const d = new Date();
-							d.setMonth(d.getMonth() + 3);
-							return d;
-						})()}
-						schedules={lessonDetail.schedules}
-						maxParticipants={lessonDetail.maxParticipants}
-						onWishlistToggle={handleWishlistToggle}
-						onInquiry={handleInquiry}
-						onApplyLesson={onApplyLessonFromSidebar}
-						showLoginPrompt={setShowLoginPrompt}
-						isLiked={lessonDetail.isLiked}
-					/>
+					<aside aria-label="클래스 예약 정보">
+						<LessonReservationSidebar
+							reservationLeadDays={lessonDetail.reservationLeadDays}
+							price={lessonDetail.price}
+							discountRate={lessonDetail.discountRate}
+							discountedPrice={lessonDetail.discountedPrice}
+							isLoggedIn={isLoggedIn}
+							today={new Date()}
+							threeMonthsLater={(() => {
+								const d = new Date();
+								d.setMonth(d.getMonth() + 3);
+								return d;
+							})()}
+							schedules={lessonDetail.schedules}
+							maxParticipants={lessonDetail.maxParticipants}
+							onWishlistToggle={handleWishlistToggle}
+							onInquiry={handleInquiry}
+							onApplyLesson={onApplyLessonFromSidebar}
+							showLoginPrompt={setShowLoginPrompt}
+							isLiked={lessonDetail.isLiked}
+						/>
+					</aside>
 				</div>
 			</div>
 
@@ -197,7 +199,7 @@ export const LessonDetailContent = ({
 				cancelText="취소"
 				onConfirm={confirmApplyAction}
 			/>
-		</div>
+		</article>
 	);
 };
 

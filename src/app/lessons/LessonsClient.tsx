@@ -118,16 +118,18 @@ export function LessonsClient() {
 	};
 
 	return (
-		<div className="container mx-auto py-8">
+		<section className="container mx-auto py-8" aria-label="클래스 목록 페이지">
 			<h1 className="text-3xl font-bold mb-6">클래스 목록</h1>
 
-			<LessonFilterSection
-				showCloseButton={false}
-				onSearch={handleSearchClick}
-				onReset={handleResetAllFilters}
-			/>
+			<section aria-label="클래스 필터">
+				<LessonFilterSection
+					showCloseButton={false}
+					onSearch={handleSearchClick}
+					onReset={handleResetAllFilters}
+				/>
+			</section>
 
-			<div className="my-8 flex justify-end">
+			<section className="my-8 flex justify-end" aria-label="정렬 옵션">
 				<Select
 					value={selectedSort || 'LATEST'}
 					onValueChange={(value: string) => setSelectedSort(value as SortEnum)}
@@ -147,24 +149,24 @@ export function LessonsClient() {
 						)}
 					</SelectContent>
 				</Select>
-			</div>
+			</section>
 
-			<div className="my-8">
+			<section className="my-8" aria-label="클래스 목록 결과">
 				<LessonListDisplay
 					lessons={data?.data || []}
 					isLoading={isLoading}
 					isError={isError}
 					emptyMessage="조건에 맞는 클래스가 없습니다."
 				/>
-			</div>
+			</section>
 
-			<div className="flex justify-center mt-8">
+			<section className="flex justify-center mt-8" aria-label="페이지네이션">
 				<PaginationComponent
 					page={currentPage}
 					totalPages={totalPages}
 					setPage={handlePageChange}
 				/>
-			</div>
-		</div>
+			</section>
+		</section>
 	);
 }
