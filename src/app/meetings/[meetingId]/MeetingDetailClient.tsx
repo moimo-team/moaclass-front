@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 
 import { MapPin, Calendar, Users } from 'lucide-react';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -186,25 +187,16 @@ function MeetingDetailClient() {
 								</span>
 							</div>
 						)}
-						{meetingDetail.meetingImage ? (
-							<img
-								src={meetingDetail.meetingImage}
-								alt={meetingDetail.title}
-								className={cn(
-									'w-full h-full object-cover',
-									isClosed && 'grayscale-[0.5]',
-								)}
-							/>
-						) : (
-							<img
-								src={moimoMeeting}
-								alt={meetingDetail.title}
-								className={cn(
-									'w-full h-full object-cover',
-									isClosed && 'grayscale-[0.5]',
-								)}
-							/>
-						)}
+						<Image
+							src={meetingDetail.meetingImage || moimoMeeting}
+							alt={meetingDetail.title}
+							fill
+							sizes="(max-width: 768px) 100vw, 50vw"
+							className={cn(
+								'w-full h-full object-cover',
+								isClosed && 'grayscale-[0.5]',
+							)}
+						/>
 					</figure>
 
 					{/* 정보 */}

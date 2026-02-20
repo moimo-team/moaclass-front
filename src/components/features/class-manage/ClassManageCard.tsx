@@ -1,4 +1,5 @@
 import { MoreVertical } from 'lucide-react';
+import Image from 'next/image';
 
 import { ClassInfoBody } from '@/components/common/ClassInfoBody';
 import { Badge } from '@/components/ui/badge';
@@ -121,11 +122,13 @@ export const ClassManageCard = ({
 						</span>
 					</div>
 				)}
-				<img
+				<Image
 					src={lesson.representativeImage}
 					alt={lesson.title}
+					fill
+					sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
 					className={cn(
-						'w-full h-full object-cover transition-transform duration-700 group-hover:scale-110',
+						'object-cover transition-transform duration-700 group-hover:scale-110',
 						lesson.status === 'INACTIVE' && 'grayscale-[0.5]',
 					)}
 				/>

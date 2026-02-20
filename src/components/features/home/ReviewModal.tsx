@@ -1,5 +1,6 @@
 import React from 'react';
 
+import Image from 'next/image';
 import { Link } from 'react-router-dom';
 
 import defaultMeetingImage from '@/assets/images/moimo-meetings.png';
@@ -24,9 +25,11 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ open, onOpenChange, review })
 			{/* 상단: 리뷰 이미지 */}
 			<DialogContent className="w-full max-w-2xl h-[90vh] p-0 flex flex-col gap-0 overflow-hidden sm:rounded-lg">
 				<div className="relative w-full h-1/2 bg-gray-100 shrink-0 overflow-hidden">
-					<img
+					<Image
 						src={displayImage}
 						alt={review.lessonTitle}
+						fill
+						sizes="(max-width: 1024px) 100vw, 50vw"
 						className="w-full h-full object-cover"
 					/>
 				</div>
