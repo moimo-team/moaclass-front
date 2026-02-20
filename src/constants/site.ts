@@ -1,4 +1,4 @@
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.moaclass.com';
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://moaclass.vercel.app';
 
 export const toAbsoluteUrl = (path: string): string => {
 	if (path.startsWith('http://') || path.startsWith('https://')) {

@@ -1,6 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useEffect } from 'react';
+
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 export default function KakaoCallbackClient() {
 	useEffect(() => {
@@ -28,8 +30,8 @@ export default function KakaoCallbackClient() {
 
 	return (
 		<div className="flex items-center justify-center min-h-screen">
-			<div className="text-center">
-				<p className="text-lg text-muted-foreground">로그인 처리 중...</p>
+			<div className="text-center space-y-4">
+				<LoadingSpinner />
 			</div>
 		</div>
 	);
