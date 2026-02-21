@@ -2,6 +2,8 @@ import { http, HttpResponse } from 'msw';
 
 import type { Notification } from '@/models/notification.model';
 
+import { httpUrl } from './mockData/mockData';
+
 const initialNotifications: Notification[] = [
 	{
 		id: 1,
@@ -61,7 +63,7 @@ const paginate = (items: Notification[], page: number, limit: number) => {
 };
 
 export const notificationHandlers = [
-	http.get('/api/notifications', ({ request }) => {
+	http.get(`${httpUrl}/notifications`, ({ request }) => {
 		const url = new URL(request.url);
 		const page = Number(url.searchParams.get('page') ?? 1);
 		const limit = Number(url.searchParams.get('limit') ?? 10);
@@ -81,7 +83,7 @@ export const notificationHandlers = [
 		});
 	}),
 
-	http.patch('/api/notifications/:notificationId/read', ({ params }) => {
+	http.patch(`${httpUrl}/notifications/:notificationId/read`, ({ params }) => {
 		const notificationId = Number(params.notificationId);
 		mockNotifications = mockNotifications.map((notif) =>
 			notif.id === notificationId
@@ -91,7 +93,7 @@ export const notificationHandlers = [
 		return HttpResponse.json({ success: true });
 	}),
 
-	http.patch('/api/notifications/read-all', () => {
+	http.patch(`${httpUrl}/notifications/read-all`, () => {
 		mockNotifications = mockNotifications.map((notif) => ({
 			...notif,
 			isRead: true,
@@ -100,7 +102,7 @@ export const notificationHandlers = [
 		return HttpResponse.json({ success: true });
 	}),
 
-	http.post('/api/notifications', async ({ request }) => {
+	http.post(`${httpUrl}/notifications`, async ({ request }) => {
 		const payload = (await request.json()) as Omit<
 			Notification,
 			'id' | 'createdAt' | 'isRead' | 'readAt'
@@ -119,7 +121,7 @@ export const notificationHandlers = [
 		return HttpResponse.json(newNotification, { status: 201 });
 	}),
 
-	http.delete('/api/notifications/:notificationId', ({ params }) => {
+	http.delete(`${httpUrl}/notifications/:notificationId`, ({ params }) => {
 		const notificationId = Number(params.notificationId);
 		const before = mockNotifications.length;
 		mockNotifications = mockNotifications.filter((notif) => notif.id !== notificationId);
