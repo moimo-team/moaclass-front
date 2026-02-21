@@ -13,11 +13,11 @@ interface ProtectedRouteNextProps {
 
 const ProtectedRouteNext = ({ children }: ProtectedRouteNextProps) => {
 	const { isLoggedIn } = useAuthStore();
-	const { isLoading, isFetching } = useAuthQuery();
+	const { isLoading } = useAuthQuery();
 	const router = useRouter();
 
-	// 1. 인증 정보 확인 중일 때 (최초 로딩 또는 페이지 새로고침 시 검증 중)
-	if (isLoading || isFetching) {
+	// 인증 정보 확인 중이거나 로그아웃 중일 때
+	if (isLoading) {
 		return <LoadingSpinner />;
 	}
 
