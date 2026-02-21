@@ -2,19 +2,37 @@ import { Suspense } from 'react';
 
 import { LessonsClient } from '@/app/lessons/LessonsClient';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { toAbsoluteUrl } from '@/constants/site';
+import { createPageMetadata } from '@/utils/metadata';
 
-/**
- * SEO 담당자 전용: 메타데이터 설정 위치
- * export const metadata: Metadata = { ... }
- *
- * 동적 메타데이터가 필요한 경우 generateMetadata 함수를 사용하세요.
- * export async function generateMetadata({ searchParams }: Props): Promise<Metadata> { ... }
- */
+// 필터링된 페이지를 노출시키지 않아서 정적 메타데이터 사용
+export const metadata = createPageMetadata({
+	title: '클래스 목록',
+	description: '모아클래스에서 다양한 클래스를 찾아보세요.',
+	canonical: '/lessons',
+});
 
 export default function LessonsPage() {
+	const lessonsJsonLd = {
+		'@context': 'https://schema.org',
+		'@type': 'CollectionPage',
+		name: '클래스 목록',
+		url: toAbsoluteUrl('/lessons'),
+		mainEntity: {
+			'@type': 'ItemList',
+			name: '모아클래스 클래스 목록',
+		},
+	};
+
 	return (
-		<Suspense fallback={<LoadingSpinner />}>
-			<LessonsClient />
-		</Suspense>
+		<>
+			<script
+				type="application/ld+json"
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(lessonsJsonLd) }}
+			/>
+			<Suspense fallback={<LoadingSpinner />}>
+				<LessonsClient />
+			</Suspense>
+		</>
 	);
 }

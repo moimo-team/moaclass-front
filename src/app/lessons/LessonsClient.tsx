@@ -72,8 +72,9 @@ export function LessonsClient() {
 			] as [number, number],
 		};
 		setAllFilters(filtersFromUrl);
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setIsInitialized(true);
-	}, [searchParams, setAllFilters]);
+	}, [searchParams, setAllFilters, setIsInitialized]);
 
 	const currentPage = Number(searchParams.get('page')) || 1;
 
@@ -118,17 +119,22 @@ export function LessonsClient() {
 	};
 
 	return (
-		<div className="container mx-auto py-8">
+		<section className="container mx-auto py-8" aria-label="클래스 목록 페이지">
 			<h1 className="text-3xl font-bold mb-6">클래스 목록</h1>
 
-			<LessonFilterSection
-				showCloseButton={false}
-				onSearch={handleSearchClick}
-				onReset={handleResetAllFilters}
-			/>
+			<section aria-label="클래스 필터">
+				<LessonFilterSection
+					showCloseButton={false}
+					onSearch={handleSearchClick}
+					onReset={handleResetAllFilters}
+				/>
+			</section>
 
-			<div className="my-8 flex justify-end">
-				<Select onValueChange={(value: string) => setSelectedSort(value as SortEnum)}>
+			<section className="my-8 flex justify-end" aria-label="정렬 옵션">
+				<Select
+					value={selectedSort || 'LATEST'}
+					onValueChange={(value: string) => setSelectedSort(value as SortEnum)}
+				>
 					<SelectTrigger className="w-[180px]">
 						<SelectValue placeholder="정렬 기준" />
 					</SelectTrigger>
@@ -140,24 +146,24 @@ export function LessonsClient() {
 						))}
 					</SelectContent>
 				</Select>
-			</div>
+			</section>
 
-			<div className="my-8">
+			<section className="my-8" aria-label="클래스 목록 결과">
 				<LessonListDisplay
 					lessons={data?.data || []}
 					isLoading={isLoading}
 					isError={isError}
 					emptyMessage="조건에 맞는 클래스가 없습니다."
 				/>
-			</div>
+			</section>
 
-			<div className="flex justify-center mt-8">
+			<section className="flex justify-center mt-8" aria-label="페이지네이션">
 				<PaginationComponent
 					page={currentPage}
 					totalPages={totalPages}
 					setPage={handlePageChange}
 				/>
-			</div>
-		</div>
+			</section>
+		</section>
 	);
 }

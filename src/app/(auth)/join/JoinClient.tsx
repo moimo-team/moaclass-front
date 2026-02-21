@@ -17,26 +17,22 @@ import {
 } from '@/hooks/useAuthMutations';
 
 // zod schema 정의
-export const joinSchema = z
-	.object({
-		email: z
-			.string()
-			.min(1, '이메일을 입력해주세요.')
-			.email('이메일 형식이 올바르지 않습니다.'),
-		nickname: z.string().min(1, '닉네임을 입력해주세요.'),
-		password: z
-			.string()
-			.min(1, '비밀번호를 입력해주세요.')
-			.min(8, '비밀번호는 최소 8자 이상이어야 합니다.'),
-		passwordConfirm: z
-			.string()
-			.min(1, '비밀번호를 입력해주세요.')
-			.min(8, '비밀번호는 최소 8자 이상이어야 합니다.'),
-	})
-	.refine((data) => data.password === data.passwordConfirm, {
-		message: '비밀번호가 일치하지 않습니다.',
-		path: ['passwordConfirm'],
-	});
+export const joinSchema = z.object({
+	email: z.string().min(1, '이메일을 입력해주세요.').email('이메일 형식이 올바르지 않습니다.'),
+	nickname: z.string().min(1, '닉네임을 입력해주세요.'),
+	// password: z
+	// 	.string()
+	// 	.min(1, '비밀번호를 입력해주세요.')
+	// 	.min(8, '비밀번호는 최소 8자 이상이어야 합니다.'),
+	// passwordConfirm: z
+	// 	.string()
+	// 	.min(1, '비밀번호를 입력해주세요.')
+	// 	.min(8, '비밀번호는 최소 8자 이상이어야 합니다.'),
+});
+// .refine((data) => data.password === data.passwordConfirm, {
+// 	message: '비밀번호가 일치하지 않습니다.',
+// 	path: ['passwordConfirm'],
+// });
 
 // zod schema에서 추출한 타입
 export type JoinFormValues = z.infer<typeof joinSchema>;
@@ -58,21 +54,19 @@ const JoinClient = () => {
 		resolver: zodResolver(joinSchema),
 		defaultValues: {
 			email: '',
-			password: '',
-			passwordConfirm: '',
 		},
 	});
 
 	const onSubmit = async (data: JoinFormValues) => {
-		if (!emailCheckMutation.isSuccess) {
-			toast.error('이메일 중복 확인을 해주세요.');
-			return;
-		}
+		// if (!emailCheckMutation.isSuccess) {
+		// 	toast.error('이메일 중복 확인을 해주세요.');
+		// 	return;
+		// }
 
-		if (!nicknameCheckMutation.isSuccess) {
-			toast.error('닉네임 중복 확인을 해주세요.');
-			return;
-		}
+		// if (!nicknameCheckMutation.isSuccess) {
+		// 	toast.error('닉네임 중복 확인을 해주세요.');
+		// 	return;
+		// }
 
 		try {
 			await joinMutation(data);
@@ -143,14 +137,14 @@ const JoinClient = () => {
 										placeholder="moimo@email.com"
 										className="h-12 border-input focus-visible:ring-primary flex-1"
 									/>
-									<Button
+									{/* <Button
 										type="button"
 										onClick={handleCheckEmail}
 										disabled={emailCheckMutation.isPending}
 										className="h-12 px-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-[8px] transition-colors shadow-none border-none shrink-0"
 									>
 										{emailCheckMutation.isPending ? '확인중...' : '중복확인'}
-									</Button>
+									</Button> */}
 								</div>
 								{errors.email ? (
 									<p className="text-sm text-destructive">
@@ -181,14 +175,14 @@ const JoinClient = () => {
 										placeholder="노래하는햄스터"
 										className="h-12 border-input focus-visible:ring-primary flex-1"
 									/>
-									<Button
+									{/* <Button
 										type="button"
 										onClick={handleCheckNickname}
 										disabled={nicknameCheckMutation.isPending}
 										className="h-12 px-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-[8px] transition-colors shadow-none border-none shrink-0"
 									>
 										{nicknameCheckMutation.isPending ? '확인중...' : '중복확인'}
-									</Button>
+									</Button> */}
 								</div>
 								{errors.nickname ? (
 									<p className="text-sm text-destructive">
@@ -205,7 +199,7 @@ const JoinClient = () => {
 								) : null}
 							</div>
 
-							<div className="grid gap-2">
+							{/* <div className="grid gap-2">
 								<Label
 									htmlFor="password"
 									className="text-sm font-medium text-muted-foreground mr-auto"
@@ -243,7 +237,7 @@ const JoinClient = () => {
 										{errors.passwordConfirm.message}
 									</p>
 								)}
-							</div>
+							</div> */}
 
 							{errors.root && (
 								<p className="text-sm text-destructive">{errors.root.message}</p>

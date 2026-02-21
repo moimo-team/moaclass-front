@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { IoIosHeartEmpty, IoIosHeart } from 'react-icons/io';
 import { IoLocationOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
@@ -34,6 +35,15 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 		}
 	};
 
+	// 렌더링 최적화를 위해 변수로 분리 (any 제거)
+	const getImageUrl = (image: string | { src: string } | unknown): string => {
+		if (typeof image === 'string') return image;
+		if (image && typeof image === 'object' && 'src' in image) {
+			return (image as { src: string }).src;
+		}
+		return String(image || '');
+	};
+
 	return (
 		<Link
 			to={href}
@@ -47,9 +57,11 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 			>
 				{/* 상단: 클래스 사진  */}
 				<div className="relative w-full aspect-[4/2.8] overflow-hidden bg-muted">
-					<img
+					<Image
 						src={lesson.representativeImage || defaultLessonImage}
 						alt={title}
+						fill
+						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
 						className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
 					/>
 
@@ -105,9 +117,11 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 					{/* 모멘토 프로필 */}
 					<div className="flex items-center gap-2 pt-3 border-t border-gray-50 mt-auto">
 						<div className="w-5 h-5 rounded-full overflow-hidden border border-gray-100 shrink-0">
-							<img
+							<Image
 								src={lesson.teacher.image || defaultProfileImage}
 								alt={lesson.teacher.nickname || '모멘토'}
+								width={20}
+								height={20}
 								className="w-full h-full object-cover"
 							/>
 						</div>

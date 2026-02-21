@@ -27,6 +27,7 @@ interface LessonTabContentProps {
 	detailAddress: string;
 	directionsText: string;
 	navigate: ReturnType<typeof useNavigate>;
+	reviewAiSummary: string | null;
 	reviews: Review[];
 }
 
@@ -44,9 +45,11 @@ export const LessonTabContent = ({
 	detailAddress,
 	directionsText,
 	navigate,
+	reviewAiSummary,
 	reviews,
 }: LessonTabContentProps) => {
 	const [isMapReady, setIsMapReady] = useState(false);
+	const hasReviewAiSummary = Boolean(reviewAiSummary?.trim());
 
 	useEffect(() => {
 		if (typeof window === 'undefined' || !window.kakao?.maps) return;
@@ -60,7 +63,10 @@ export const LessonTabContent = ({
 	return (
 		<>
 			{/* 탭 네비게이션 */}
-			<div className="sticky top-0 bg-background z-10 border-b border-border/50">
+			<nav
+				className="sticky top-0 bg-background z-10 border-b border-border/50"
+				aria-label="클래스 상세 탭"
+			>
 				<div className="flex overflow-x-auto scrollbar-hide py-2">
 					{tabTitles.map((tab) => (
 						<Button
@@ -76,10 +82,10 @@ export const LessonTabContent = ({
 						</Button>
 					))}
 				</div>
-			</div>
+			</nav>
 
 			{/* 클래스 정보 섹션 */}
-			<div className="space-y-8">
+			<div className="space-y-8" aria-label="클래스 상세 콘텐츠">
 				<section id="intro" ref={(el) => onSectionRef('intro', el)}>
 					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
@@ -181,7 +187,24 @@ export const LessonTabContent = ({
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
 							<CardTitle className="text-xl font-bold">후기</CardTitle>
 						</CardHeader>
-						<CardContent className="p-6">
+						<CardContent className="p-6 space-y-4">
+							{hasReviewAiSummary && (
+								<Card className="border border-border/70 bg-secondary/10">
+									<CardHeader className="pb-2">
+										<CardTitle className="text-lg font-semibold">
+											AI 리뷰 요약
+										</CardTitle>
+									</CardHeader>
+									<CardContent className="pt-0">
+										<p className="text-sm text-muted-foreground mb-2">
+											모멘티들이 작성한 리뷰를 AI로 요약한 내용입니다.
+										</p>
+										<div className="text-base text-foreground whitespace-pre-wrap leading-relaxed">
+											{reviewAiSummary}
+										</div>
+									</CardContent>
+								</Card>
+							)}
 							<ReviewList reviews={reviews} />
 						</CardContent>
 					</Card>

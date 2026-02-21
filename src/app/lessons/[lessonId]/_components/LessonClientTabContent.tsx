@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 
+import Image from 'next/image';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 
 import defaultProfileImage from '@/assets/images/profile.png';
@@ -120,9 +121,11 @@ export const LessonClientTabContent = ({
 						<CardContent className="p-6">
 							{teacher && (
 								<div className="flex items-center gap-4 mb-6 p-4 border rounded-lg bg-secondary/10">
-									<img
+									<Image
 										src={teacher.image || defaultProfileImage}
 										alt={teacher.nickname}
+										width={80}
+										height={80}
 										className="w-20 h-20 rounded-full object-cover border border-border shrink-0"
 									/>
 									<div className="flex-1">
