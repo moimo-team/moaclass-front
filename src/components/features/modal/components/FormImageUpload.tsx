@@ -3,6 +3,7 @@
 import { forwardRef } from 'react';
 
 import { Upload, Camera, X } from 'lucide-react';
+import Image from 'next/image';
 import { toast } from 'sonner';
 
 import FileDragAndDrop from '@/components/common/FileDragAndDrop';
@@ -153,9 +154,12 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 					<div className="relative">
 						<div className="w-32 h-32 rounded-full overflow-hidden border-2 border-gray-200">
 							{previewImage ? (
-								<img
+								<Image
 									src={previewImage}
 									alt="Profile Preview"
+									width={128}
+									height={128}
+									unoptimized
 									className="w-full h-full object-cover"
 								/>
 							) : (
@@ -203,9 +207,12 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 						{/* 이미지 미리보기 (있을 경우) */}
 						{previewImage && (
 							<div className="relative group w-full">
-								<img
+								<Image
 									src={previewImage}
 									alt="Preview"
+									width={1200}
+									height={920}
+									unoptimized
 									className={cn(
 										'w-full h-92 object-cover border-2 border-gray-200',
 										shape === 'circle' ? 'rounded-full' : 'rounded-lg',
@@ -279,9 +286,12 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 						<div className="grid grid-cols-5 gap-3">
 							{previewImages.map((image, index) => (
 								<div key={index} className="relative group">
-									<img
+									<Image
 										src={image}
 										alt={`이미지 ${index + 1}`}
+										width={320}
+										height={320}
+										unoptimized
 										className="w-full aspect-square object-cover rounded-lg border-2 border-gray-200"
 									/>
 									{!readOnly && (

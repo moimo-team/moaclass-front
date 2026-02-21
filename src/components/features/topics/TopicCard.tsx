@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Link } from 'react-router-dom';
 
 import { interestImageMap } from '@/utils/interestImageMap';
@@ -17,9 +18,15 @@ function TopicCard({
 }: TopicCardProps) {
 	const content = (
 		<>
-			<div className="w-full aspect-square rounded-full bg-secondary flex items-center justify-center overflow-hidden mb-2 border border-yellow-500">
+			<div className="relative w-full aspect-square rounded-full bg-secondary flex items-center justify-center overflow-hidden mb-2 border border-yellow-500">
 				{imageUrl ? (
-					<img src={imageUrl} alt={topicName} className="w-full h-full object-cover" />
+					<Image
+						src={imageUrl}
+						alt={topicName}
+						fill
+						sizes="120px"
+						className="w-full h-full object-cover"
+					/>
 				) : (
 					<span className="font-semibold text-primary-foreground text-xl">
 						{topicName.charAt(0)}

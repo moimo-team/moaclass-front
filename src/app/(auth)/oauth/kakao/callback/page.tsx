@@ -1,6 +1,12 @@
-'use client';
+import { createPageMetadata } from '@/utils/metadata';
 
-import { useEffect } from 'react';
+import KakaoCallbackClient from './KakaoCallbackClient';
+
+export const metadata = createPageMetadata({
+	title: '카카오 로그인 콜백',
+	description: '카카오 로그인 콜백 페이지',
+	noindex: true,
+});
 
 /**
  * 카카오 로그인 팝업 콜백 페이지
@@ -41,17 +47,6 @@ export default function KakaoCallbackPage() {
 		}
 	}, []);
 
-	return (
-		<div className="flex items-center justify-center min-h-screen">
-			<div className="text-center">
-				<p className="text-lg text-muted-foreground">로그인 처리 중...</p>
-			</div>
-		</div>
-	);
+export default function KakaoCallbackPage() {
+	return <KakaoCallbackClient />;
 }
-
-/**
- * SEO: 콜백 페이지는 검색 엔진 노출이 불필요하므로 인덱싱을 차단합니다.
- * (Next.js Metadata API는 서버 컴포넌트에서만 사용 가능하므로,
- * 만약 메타데이터 설정이 필요하다면 이 파일을 Client Component와 분리해야 합니다.)
- */

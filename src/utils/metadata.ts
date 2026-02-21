@@ -3,26 +3,36 @@ import type { Metadata } from 'next';
 type MetadataParams = {
 	title: string;
 	description: string;
-	image?: string; // 선택적 이미지 경로
+	image?: string;
+	canonical?: string;
+	noindex?: boolean;
 };
 
 /**
- * 페이지별 메타데이터 생성 함수
+ * 페이지별 메타데이터 공통 생성 함수
  *
- * Next.js의 metadata 병합 규칙:
- * - 페이지에서 title을 문자열로 설정하면 layout의 template이 무시됩니다
- * - 따라서 여기서 직접 template을 적용한 완전한 title을 반환합니다
+ * Next.js metadata 병합 규칙:
+ * - layout.tsx에 title.template이 있으면 페이지 title 문자열과 조합됩니다.
+ * - 따라서 여기서는 페이지 고유 title만 받고, 브랜드 suffix는 layout에서 일괄 처리합니다.
  */
-export function createPageMetadata({ title, description, image }: MetadataParams): Metadata {
-	const fullTitle = `${title} | 모아클`;
+export function createPageMetadata({
+	title,
+	description,
+	image,
+	canonical,
+	noindex,
+}: MetadataParams): Metadata {
+	const ogTitle = `${title} | 모아클래스`;
 
 	return {
-		title: fullTitle, // layout template 대신 직접 완전한 title 생성
+		title,
 		description,
 		openGraph: {
-			title: fullTitle,
+			title: ogTitle,
 			description,
 			...(image && { images: [image] }),
 		},
+		...(canonical && { alternates: { canonical } }),
+		...(noindex && { robots: { index: false, follow: false } }),
 	};
 }

@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 import type { PayPreviewResponse } from '@/models/pay.model';
 import { formatFullDateTime } from '@/utils/dateFormat';
 
@@ -11,11 +13,13 @@ export const TicketSection = ({ lesson }: TicketSectionProps) => {
 	return (
 		<PaySectionCard title="클래스 티켓 정보">
 			<div className="space-y-4">
-				<div className="aspect-video rounded-lg overflow-hidden bg-muted">
-					<img
+				<div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+					<Image
 						src={lesson.representativeImage}
 						alt="Class Thumbnail"
-						className="w-full h-full object-cover"
+						fill
+						sizes="(max-width: 768px) 100vw, 50vw"
+						className="object-cover"
 					/>
 				</div>
 				<div className="space-y-3 text-sm">

@@ -74,10 +74,10 @@ const MeetingsSearchClient = () => {
 	const meetings = meetingsResponse?.data || [];
 
 	return (
-		<div className="space-y-4 bg-card pt-4">
+		<section className="space-y-4 bg-card pt-4" aria-label="모임 검색 페이지">
 			<h1 className="text-3xl font-bold p-4">모임 검색 결과</h1>
 
-			<div className="px-4">
+			<section className="px-4" aria-label="검색 폼">
 				<form onSubmit={handleSearch} className="flex gap-3 w-full max-w-2xl pl-4 pb-4">
 					<Input
 						type="text"
@@ -93,26 +93,26 @@ const MeetingsSearchClient = () => {
 						찾기
 					</Button>
 				</form>
-			</div>
+			</section>
 
 			{isLoading && <LoadingSpinner />}
 			{isError && <p className="text-center text-red-500">검색 중 에러가 발생했습니다.</p>}
 
 			{!isLoading && !isError && meetings.length > 0 && (
-				<div className="max-w-6xl mx-auto">
+				<section className="max-w-6xl mx-auto" aria-label="검색 결과">
 					<p className="px-4 pb-8 text-lg">
 						총 <span className="font-bold">{meetingsResponse?.meta.totalCount}</span>
 						개의 모임을 찾았습니다.
 					</p>
 					<MeetingList meetings={meetings} />
-				</div>
+				</section>
 			)}
 
 			{!isLoading && !isError && meetings.length === 0 && keyword && (
 				<p className="text-center py-16">'{keyword}'에 대한 검색 결과가 없습니다.</p>
 			)}
 
-			<div className="py-8">
+			<section className="py-8" aria-label="페이지네이션">
 				{meetings.length > 0 && (
 					<PaginationComponent
 						totalPages={totalPages}
@@ -124,8 +124,8 @@ const MeetingsSearchClient = () => {
 						isLastPage={isLastPage}
 					/>
 				)}
-			</div>
-		</div>
+			</section>
+		</section>
 	);
 };
 

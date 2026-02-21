@@ -87,23 +87,25 @@ const MeetingsClient = () => {
 	const meetings = meetingsResponse?.data || [];
 
 	return (
-		<div className="space-y-4 bg-card">
+		<section className="space-y-4 bg-card" aria-label="모임 목록 페이지">
 			<h1 className="text-3xl font-bold py-8 px-4">원하는 모임 찾기</h1>
 
-			<MeetingFilterControls
-				filters={filters}
-				limit={limit}
-				interestsData={interestsData}
-				isInterestsLoading={isInterestsLoading}
-				handleSortChange={(v: SortType) => handleFilterChange('sort', v)}
-				handleInterestFilterChange={(v: InterestFilterType) =>
-					handleFilterChange('interestFilter', v)
-				}
-				handleFinishedFilterChange={(v: FinishedFilterType) =>
-					handleFilterChange('finishedFilter', v)
-				}
-				handleLimitChange={(v: number) => handleFilterChange('limit', v)}
-			/>
+			<section aria-label="모임 필터">
+				<MeetingFilterControls
+					filters={filters}
+					limit={limit}
+					interestsData={interestsData}
+					isInterestsLoading={isInterestsLoading}
+					handleSortChange={(v: SortType) => handleFilterChange('sort', v)}
+					handleInterestFilterChange={(v: InterestFilterType) =>
+						handleFilterChange('interestFilter', v)
+					}
+					handleFinishedFilterChange={(v: FinishedFilterType) =>
+						handleFilterChange('finishedFilter', v)
+					}
+					handleLimitChange={(v: number) => handleFilterChange('limit', v)}
+				/>
+			</section>
 
 			{isLoading && (
 				<div className="w-full max-w-6xl mx-auto py-8">
@@ -119,16 +121,16 @@ const MeetingsClient = () => {
 			)}
 
 			{!isLoading && !isError && meetings.length > 0 && (
-				<div className="max-w-6xl mx-auto">
+				<section className="max-w-6xl mx-auto" aria-label="모임 목록 결과">
 					<MeetingList meetings={meetings} />
-				</div>
+				</section>
 			)}
 
 			{!isLoading && !isError && meetings.length === 0 && (
 				<p className="text-center py-16">해당 조건의 모임이 없습니다.</p>
 			)}
 
-			<div className="py-8">
+			<section className="py-8" aria-label="페이지네이션">
 				{meetings.length > 0 && (
 					<PaginationComponent
 						totalPages={totalPages}
@@ -140,8 +142,8 @@ const MeetingsClient = () => {
 						isLastPage={isLastPage}
 					/>
 				)}
-			</div>
-		</div>
+			</section>
+		</section>
 	);
 };
 

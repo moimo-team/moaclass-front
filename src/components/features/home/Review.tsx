@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 import defaultMeetingImage from '@/assets/images/moimo-meetings.png';
 import StarRating from '@/components/common/StarRating';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,7 +34,13 @@ const ReviewCard = ({
 		>
 			{/* 상단: 후기 이미지*/}
 			<div className="relative w-full h-[70%]">
-				<img src={displayImage} alt={lessonTitle} className="w-full h-full object-cover" />
+				<Image
+					src={displayImage}
+					alt={lessonTitle}
+					fill
+					sizes="(max-width: 768px) 100vw, 33vw"
+					className="w-full h-full object-cover"
+				/>
 			</div>
 
 			{/* 중간: 별점 */}
