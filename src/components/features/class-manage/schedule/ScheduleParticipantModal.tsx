@@ -32,7 +32,7 @@ export const ScheduleParticipantModal = ({
 	const navigate = useNavigate();
 	const { data: participants, isLoading } = useQuery<ScheduleParticipant[]>({
 		queryKey: ['scheduleParticipants', scheduleId],
-		queryFn: () => fetchScheduleParticipants(scheduleId!),
+		queryFn: () => fetchScheduleParticipants(lessonId, scheduleId!),
 		enabled: !!scheduleId && isOpen,
 	});
 
