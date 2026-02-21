@@ -28,7 +28,7 @@ export function formatFullDateTime(dateString: string): string {
 	const weekday = weekdays[date.getDay()];
 	const hours = date.getHours();
 	const minutes = date.getMinutes();
-	return `${year}. ${month}. ${day} (${weekday}) ${hours}:${minutes.toString().padStart(2, '0')}`;
+	return `${year}. ${month}. ${day}. (${weekday}) ${hours}:${minutes.toString().padStart(2, '0')}`;
 }
 
 /**

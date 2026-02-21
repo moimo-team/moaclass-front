@@ -7,7 +7,10 @@ import { createTeacherProfile, fetchTeacherProfile, updateTeacherProfile } from 
 export const useTeacherProfileQuery = (userId?: number) => {
 	return useQuery({
 		queryKey: ['teacherProfile', userId],
-		queryFn: () => fetchTeacherProfile(userId!),
+		queryFn: async () => {
+			if (!userId) throw new Error('UserId is required');
+			return fetchTeacherProfile(userId);
+		},
 		enabled: !!userId,
 	});
 };

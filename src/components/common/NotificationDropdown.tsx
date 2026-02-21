@@ -116,7 +116,9 @@ export const NotificationDropdown = () => {
 		resetAllNewChatRooms();
 	};
 
-	const unreadCount = notifications?.filter((n) => !n.isRead).length ?? 0;
+	const unreadCount = Array.isArray(notifications)
+		? notifications.filter((n) => !n.isRead).length
+		: 0;
 
 	if (isLoading) {
 		return (
@@ -163,7 +165,7 @@ export const NotificationDropdown = () => {
 					<DropdownMenuLabel className="text-center text-red-500">
 						알림을 불러오지 못했습니다.
 					</DropdownMenuLabel>
-				) : notifications && notifications.length > 0 ? (
+				) : Array.isArray(notifications) && notifications.length > 0 ? (
 					notifications.map((notification) => (
 						<NotificationItem
 							key={notification.id}
