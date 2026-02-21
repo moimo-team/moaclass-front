@@ -17,13 +17,6 @@ const applyLikeStatus = (lessons: Lesson[]): Lesson[] => {
 };
 
 export const lessonHandlers = [
-	http.get(`${httpUrl}/lessons`, async () => {
-		await delay(500);
-		const latestLessons = mockLessons.slice(0, 5);
-		const lessonsWithStatus = applyLikeStatus(latestLessons);
-		return HttpResponse.json(lessonsWithStatus, { status: 200 });
-	}),
-
 	http.get(`${httpUrl}/lessons`, async ({ request }) => {
 		await delay(500);
 
