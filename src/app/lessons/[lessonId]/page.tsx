@@ -1,27 +1,89 @@
+import { fetchLesson } from '@/api/lesson.api';
 import LessonClient from '@/app/lessons/[lessonId]/LessonClient';
+import { toAbsoluteUrl } from '@/constants/site';
 import { createPageMetadata } from '@/utils/metadata';
 
 import type { Metadata } from 'next';
 
 type Props = {
-	params: { lessonId: string };
+	params: Promise<{ lessonId: string }>;
 };
 
-// SEO: 동적 메타데이터 생성
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const { lessonId } = await params;
+	const id = Number(lessonId);
 
-	// 실제 데이터 페칭 로직이 필요하지만, 현재는 Mock 데이터 기반이거나 클라이언트 사이드 데이터 위주이므로
-	// 우선 기본적인 타이틀 설정만 적용하고, 추후 API 호출을 통해 동적 데이터를 가져오도록 구현합니다.
-	// 실제 구현 예시: const lesson = await fetchLesson(lessonId);
+	if (!Number.isFinite(id)) {
+		return createPageMetadata({
+			title: '클래스를 찾을 수 없습니다',
+			description: '유효하지 않은 클래스 경로입니다.',
+			noindex: true,
+		});
+	}
 
-	return createPageMetadata({
-		title: `클래스 상세 ${lessonId}`,
-		description: `클래스 상세 ${lessonId}`,
-	});
+	try {
+		const lesson = await fetchLesson(id);
+
+		return createPageMetadata({
+			title: lesson.title,
+			description: lesson.description || '모아클래스 클래스 상세 페이지입니다.',
+			image: lesson.representativeImage,
+			canonical: `/lessons/${id}`,
+		});
+	} catch {
+		return createPageMetadata({
+			title: '클래스를 찾을 수 없습니다',
+			description: '요청한 클래스를 찾지 못했습니다.',
+			noindex: true,
+		});
+	}
 }
 
 export default async function LessonDetailPage({ params }: Props) {
 	const { lessonId } = await params;
-	return <LessonClient lessonId={lessonId} />;
+	const id = Number(lessonId);
+	let lessonJsonLd: Record<string, unknown> | null = null;
+
+	if (Number.isFinite(id)) {
+		try {
+			const lesson = await fetchLesson(id);
+			lessonJsonLd = {
+				'@context': 'https://schema.org',
+				'@type': 'Course',
+				name: lesson.title,
+				description: lesson.description || '모아클래스 클래스 상세 페이지',
+				image: lesson.representativeImage ? [lesson.representativeImage] : undefined,
+				url: toAbsoluteUrl(`/lessons/${id}`),
+				provider: {
+					'@type': 'Organization',
+					name: '모아클래스',
+					sameAs: toAbsoluteUrl('/'),
+				},
+				offers: {
+					'@type': 'Offer',
+					price:
+						typeof lesson.discountedPrice === 'number'
+							? lesson.discountedPrice
+							: lesson.price,
+					priceCurrency: 'KRW',
+					availability: 'https://schema.org/InStock',
+					url: toAbsoluteUrl(`/lessons/${id}`),
+				},
+			};
+		} catch {
+			lessonJsonLd = null;
+		}
+	}
+
+	return (
+		<>
+			{lessonJsonLd && (
+				<script
+					type="application/ld+json"
+					dangerouslySetInnerHTML={{ __html: JSON.stringify(lessonJsonLd) }}
+				/>
+			)}
+			<LessonClient lessonId={lessonId} />
+		</>
+	);
 }

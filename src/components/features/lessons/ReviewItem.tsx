@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 
+import Image from 'next/image';
+
 import StarRating from '@/components/common/StarRating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
@@ -82,9 +84,12 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({ review }) => {
 			{/* 오른쪽: 후기 이미지 */}
 			<div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
 				{review.representativeImage ? (
-					<img
+					<Image
 						src={review.representativeImage}
 						alt="Review Image"
+						width={128}
+						height={128}
+						sizes="(max-width: 640px) 96px, 128px"
 						className="w-full h-full object-cover rounded-md border border-border"
 					/>
 				) : (

@@ -63,7 +63,10 @@ export const LessonTabContent = ({
 	return (
 		<>
 			{/* 탭 네비게이션 */}
-			<div className="sticky top-0 bg-background z-10 border-b border-border/50">
+			<nav
+				className="sticky top-0 bg-background z-10 border-b border-border/50"
+				aria-label="클래스 상세 탭"
+			>
 				<div className="flex overflow-x-auto scrollbar-hide py-2">
 					{tabTitles.map((tab) => (
 						<Button
@@ -79,10 +82,10 @@ export const LessonTabContent = ({
 						</Button>
 					))}
 				</div>
-			</div>
+			</nav>
 
 			{/* 클래스 정보 섹션 */}
-			<div className="space-y-8">
+			<div className="space-y-8" aria-label="클래스 상세 콘텐츠">
 				<section id="intro" ref={(el) => onSectionRef('intro', el)}>
 					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">

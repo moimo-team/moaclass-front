@@ -62,12 +62,12 @@ export const ClassDashboardContent = ({ onNavigate }: ClassDashboardProps) => {
 			</aside>
 
 			{/* 우측 컨텐츠 영역 - 브라우저 전체 스크롤 사용 */}
-			<main className="flex-1 bg-white">
+			<section className="flex-1 bg-white" aria-label="클래스 대시보드 콘텐츠">
 				<div className="max-w-[1400px] mx-auto p-10">
 					{activeTab === 'profile' && <TeacherProfilePage />}
 					{activeTab === 'classes' && <ClassManagementContent onNavigate={onNavigate} />}
 				</div>
-			</main>
+			</section>
 		</div>
 	);
 };

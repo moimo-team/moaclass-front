@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { AiOutlineTeam } from 'react-icons/ai';
 import { IoLocationOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
@@ -48,33 +49,20 @@ function MeetingCard({ meeting, imageUrl, className, hasPendingApplicants }: Mee
 							</span>
 						</div>
 					)}
-					{imageUrl ? (
-						<img
-							src={imageUrl}
-							alt={title}
-							className={cn(
-								'w-full h-full object-cover',
-								isMeetingClosed(
-									meeting.currentParticipants,
-									meeting.maxParticipants,
-									meeting.meetingDate,
-								) && 'grayscale-[0.5]',
-							)}
-						/>
-					) : (
-						<img
-							src={defaultMeetingImage}
-							alt={title}
-							className={cn(
-								'w-full h-full object-cover',
-								isMeetingClosed(
-									meeting.currentParticipants,
-									meeting.maxParticipants,
-									meeting.meetingDate,
-								) && 'grayscale-[0.5]',
-							)}
-						/>
-					)}
+					<Image
+						src={imageUrl || defaultMeetingImage}
+						alt={title}
+						fill
+						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+						className={cn(
+							'w-full h-full object-cover',
+							isMeetingClosed(
+								meeting.currentParticipants,
+								meeting.maxParticipants,
+								meeting.meetingDate,
+							) && 'grayscale-[0.5]',
+						)}
+					/>
 				</div>
 
 				{/* 중간: 모임 제목 */}

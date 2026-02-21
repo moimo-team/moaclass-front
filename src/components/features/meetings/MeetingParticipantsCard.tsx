@@ -89,9 +89,9 @@ export function MeetingParticipantsCard({
 				</CardHeader>
 
 				<CardContent className="p-6">
-					<div className="flex gap-6">
+					<section className="flex gap-6" aria-label="모임 참여자 목록">
 						{/* 왼쪽: 모이머 (호스트) */}
-						<div className="flex-shrink-0 w-[200px]">
+						<section className="flex-shrink-0 w-[200px]" aria-label="모임장 정보">
 							<div className="border-r border-border/30 pr-6">
 								<div
 									onClick={() => handleUserClick(finalHost.userId)}
@@ -131,19 +131,19 @@ export function MeetingParticipantsCard({
 									</div>
 								</div>
 							</div>
-						</div>
+						</section>
 
 						{/* 오른쪽: 모이미들 (게스트) */}
-						<div className="flex-1">
+						<section className="flex-1" aria-label="참여자 정보">
 							{guests.length === 0 ? (
 								<div className="flex items-center justify-center h-full text-muted-foreground">
 									아직 참여한 모이미가 없습니다.
 								</div>
 							) : (
 								<>
-									<div className="grid grid-cols-5 gap-2">
+									<ul className="grid grid-cols-5 gap-2">
 										{visibleGuests.map((guest) => (
-											<div
+											<li
 												key={guest.userId}
 												onClick={() => handleUserClick(guest.userId)}
 												className="flex flex-col items-center gap-2 p-2 hover:bg-muted/30 cursor-pointer transition-colors rounded-lg"
@@ -169,9 +169,9 @@ export function MeetingParticipantsCard({
 														모이미
 													</Badge>
 												</div>
-											</div>
+											</li>
 										))}
-									</div>
+									</ul>
 
 									{/* 더보기 버튼 */}
 									{guests.length > 10 && (
@@ -194,8 +194,8 @@ export function MeetingParticipantsCard({
 									)}
 								</>
 							)}
-						</div>
-					</div>
+						</section>
+					</section>
 				</CardContent>
 			</Card>
 

@@ -78,7 +78,7 @@ function HeaderNext() {
 	const handleCloseFilter = () => setIsFilterOpen(false);
 
 	return (
-		<div className="w-full h-[80px] bg-card sticky top-0 z-50 shrink-0 border-b border-gray-300">
+		<header className="w-full h-[80px] bg-card sticky top-0 z-50 shrink-0 border-b border-gray-300">
 			<div className="flex items-center w-full h-full max-w-7xl mx-auto px-4 md:px-8">
 				{/* 로고 */}
 				<Button
@@ -111,31 +111,33 @@ function HeaderNext() {
 				</form>
 
 				{/* 우측 메뉴 (로그인/프로필) */}
-				{isLoggedIn ? (
-					<div className="ml-auto flex items-center gap-3 md:gap-4">
-						<Button
-							asChild
-							size="default"
-							variant="ghost"
-							className="cursor-pointer hover:bg-medium text-base border border-gray-300"
-						>
-							<Link href="/classes-manage">클래스 관리</Link>
-						</Button>
-						<NotificationDropdown />
-						<ProfileDropdownNext />
-					</div>
-				) : (
-					<div className="login ml-auto">
-						<Button
-							asChild
-							size="default"
-							variant="ghost"
-							className="cursor-pointer hover:bg-medium text-base"
-						>
-							<Link href="/login">로그인</Link>
-						</Button>
-					</div>
-				)}
+				<nav aria-label="주요 메뉴" className="ml-auto">
+					{isLoggedIn ? (
+						<div className="flex items-center gap-3 md:gap-4">
+							<Button
+								asChild
+								size="default"
+								variant="ghost"
+								className="cursor-pointer hover:bg-medium text-base border border-gray-300"
+							>
+								<Link href="/classes-manage">클래스 관리</Link>
+							</Button>
+							<NotificationDropdown />
+							<ProfileDropdownNext />
+						</div>
+					) : (
+						<div className="login">
+							<Button
+								asChild
+								size="default"
+								variant="ghost"
+								className="cursor-pointer hover:bg-medium text-base"
+							>
+								<Link href="/login">로그인</Link>
+							</Button>
+						</div>
+					)}
+				</nav>
 			</div>
 
 			{/* 필터 섹션 (조건부 렌더링) */}
@@ -147,7 +149,7 @@ function HeaderNext() {
 					/>
 				</div>
 			)}
-		</div>
+		</header>
 	);
 }
 
