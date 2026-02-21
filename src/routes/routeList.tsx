@@ -109,7 +109,7 @@ export const routeList = [
 				),
 			},
 			{
-				path: '/classes-manage',
+				path: '/lessons/manage',
 				element: (
 					<ProtectedRoute>
 						<ClassDashboardPage />

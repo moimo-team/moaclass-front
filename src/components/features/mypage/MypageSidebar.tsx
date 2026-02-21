@@ -169,7 +169,7 @@ export const MypageSidebar = ({ onMenuItemClick }: MypageSidebarProps) => {
 							<h3 className="text-lg font-bold text-gray-900 mb-4">모멘토</h3>
 							<div className="flex flex-col gap-3 pl-2">
 								<NavLink
-									to="/classes-manage"
+									to="/lessons/manage"
 									onClick={onMenuItemClick}
 									className={({ isActive }) =>
 										`transition-colors ${

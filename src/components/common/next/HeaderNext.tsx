@@ -120,7 +120,7 @@ function HeaderNext() {
 								variant="ghost"
 								className="cursor-pointer hover:bg-medium text-base border border-gray-300"
 							>
-								<Link href="/classes-manage">클래스 관리</Link>
+								<Link href="/lessons/manage">클래스 관리</Link>
 							</Button>
 							<NotificationDropdown />
 							<ProfileDropdownNext />
