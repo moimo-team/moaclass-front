@@ -1,6 +1,6 @@
 import type { PaginationMeta } from '@/models/pagination.model';
 import type { Review } from '@/models/review.model';
-import type { LessonScheduleStatus, Schedule } from '@/models/schedule.model';
+import type { Schedule } from '@/models/schedule.model';
 
 export type Level = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
@@ -129,60 +129,4 @@ export interface FetchLessonsParams {
 export interface FetchLessonsResponse {
 	data: Lesson[];
 	meta: PaginationMeta;
-}
-
-// --- 클래스 등록 관련 Request 인터페이스 ---
-
-// 통합된 클래스 생성/수정 요청 타입 (FormData로 변환 전의 원본 객체 타입으로 활용 가능)
-export interface LessonCreateRequest {
-	title: string;
-	description: string;
-	curriculum: string;
-	lessonCategoryId: number;
-	subCategoryIds: number[];
-	level: Level;
-	durationMin: number;
-	price: number;
-	discountRate: number;
-	discountedPrice: number;
-	maxParticipants: number;
-	regionId: number;
-	address: string;
-	latitude: number;
-	longitude: number;
-	detailAddress?: string;
-	directionsText?: string;
-	reservationLeadDays: number;
-	representativeImage?: File; // 파일 객체
-	lessonImages?: File[]; // 파일 객체 배열
-}
-
-// --- 클래스 일정 관련 타입 ---
-export interface LessonSchedule {
-	id: number;
-	lessonId: number;
-	startAt: string;
-	endAt: string;
-	currentParticipants: number;
-	status: LessonScheduleStatus;
-	createdAt: string;
-	updatedAt: string;
-}
-
-export interface LessonCreateScheduleRequest {
-	startAt: string;
-	endAt: string;
-}
-
-// 빌드 에러 방지를 위한 추가 타입
-export interface ClassCardData {
-	id: number;
-	title: string;
-	category: string;
-	thumbnailImage: string;
-	status: LessonStatus;
-	createdAt: string;
-	price: number;
-	discountRate: number;
-	discountedPrice: number;
 }
