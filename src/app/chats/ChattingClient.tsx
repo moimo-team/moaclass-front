@@ -2,12 +2,27 @@
 
 import { useSearchParams } from 'next/navigation';
 
+import type { ChatType } from '@/models/chat.model';
 import { ChattingContent } from '@/pages/chat/Chatting';
+
+const toNumber = (value: string | null): number | undefined => {
+	if (!value) return undefined;
+	const parsed = Number(value);
+	return Number.isFinite(parsed) ? parsed : undefined;
+};
 
 export default function ChattingClient() {
 	const searchParams = useSearchParams();
-	// Next.js에서는 location state 대신 쿼리 파라미터를 사용하여 특정 채팅방 진입 대응
-	const meetingIdFromQuery = searchParams.get('meetingId');
+	const chatTypeValue = searchParams.get('chatType');
+	const chatType: ChatType | undefined =
+		chatTypeValue === 'meeting' || chatTypeValue === 'lesson' ? chatTypeValue : undefined;
 
-	return <ChattingContent initialMeetingId={meetingIdFromQuery} />;
+	return (
+		<ChattingContent
+			initialRoomId={toNumber(searchParams.get('roomId'))}
+			initialChatType={chatType}
+			initialMeetingId={toNumber(searchParams.get('meetingId'))}
+			initialLessonId={toNumber(searchParams.get('lessonId'))}
+		/>
+	);
 }
