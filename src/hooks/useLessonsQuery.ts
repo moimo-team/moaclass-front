@@ -22,3 +22,31 @@ export const useLessonsQuery = (params: FetchLessonsParams, page: number, enable
 
 	return { ...queryResult, queryKey };
 };
+
+interface UseHomeLessonSectionQueryOptions {
+	limit?: number;
+	enabled?: boolean;
+}
+
+export const useHomeLessonSectionQuery = (
+	params: FetchLessonsParams,
+	options: UseHomeLessonSectionQueryOptions = {},
+) => {
+	const { limit = 10, enabled = true } = options;
+	const queryParams: FetchLessonsParams & { limit: number; page: number } = {
+		...params,
+		limit,
+		page: 1,
+		status: 'ACTIVE',
+		sort: params.sort ?? 'LATEST',
+	};
+
+	return useQuery<Lesson[], Error>({
+		queryKey: ['lessons', 'home-section', queryParams],
+		queryFn: async () => {
+			const response = await fetchLessons(queryParams);
+			return response.data;
+		},
+		enabled,
+	});
+};

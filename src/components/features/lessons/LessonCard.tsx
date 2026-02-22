@@ -1,4 +1,4 @@
-import Image from 'next/image';
+﻿import Image from 'next/image';
 import { IoIosHeartEmpty, IoIosHeart } from 'react-icons/io';
 import { IoLocationOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
@@ -95,7 +95,9 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 
 						<ClassInfoBody
 							title={title}
-							category={lesson.classCategory?.name || '전체'}
+							category={
+								lesson.lessonCategoryName || lesson.classCategory?.name || '전체'
+							}
 							price={lesson.price}
 							discountRate={lesson.discountRate}
 							discountedPrice={lesson.discountedPrice}

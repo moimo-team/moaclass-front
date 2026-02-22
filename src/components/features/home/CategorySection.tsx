@@ -21,7 +21,6 @@ const CategorySection = ({ className }: CategorySectionProps) => {
 		: (categories || []).map((category) => ({
 				key: category.id,
 				label: category.name,
-				// TODO: 소분류 카테고리 추가되면 주소 수정
 				href: `/lessons?categoryId=${category.id}`,
 			}));
 
