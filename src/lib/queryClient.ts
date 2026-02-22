@@ -45,6 +45,12 @@ export const queryClient = new QueryClient({
 			}
 
 			// 2. 상황별(상태 코드별) 프론트엔드 메시지 매핑 확인
+			// meta: {
+			// 	errorMessages: {
+			// 		401: '아이디 또는 비밀번호가 틀렸습니다.',
+			// 		default: '로그인 중 오류가 발생했습니다.',
+			// 	},
+			// },
 			if (!message && mutation.meta?.errorMessages) {
 				const errorMessages = mutation.meta.errorMessages as Record<
 					number | string,
