@@ -1,6 +1,6 @@
 import defaultMeetingImage from '@/assets/images/moimo-meetings.png';
 import type { Meeting } from '@/models/meeting.model';
-import type { ReviewInfo } from '@/models/review.model';
+import type { MyReviewItem } from '@/models/review.model';
 
 // Review 인터페이스 정의 (Moimo용)
 export interface MeetingReview {
@@ -109,21 +109,18 @@ export const mockReviews: MeetingReview[] = [
 	},
 ];
 
-export const mockMyReviews: ReviewInfo[] = [
-	{
-		id: 106,
-		user: {
-			id: 1,
-			nickname: '나 (Mock User)',
-			profileImage: null,
-		},
-		lessonId: 3,
-		rating: 4.5,
-		content:
-			'테스트용 고정 리뷰입니다. lessonId 3번에 대한 리뷰 수정 기능 확인을 위해 작성되었습니다.',
-		representativeImage: 'https://placehold.co/400x300?text=Mock+Review+3',
-		images: ['https://placehold.co/400x300?text=Mock+Review+3'],
-		createdAt: new Date().toISOString(),
-		updatedAt: new Date().toISOString(),
-	},
-];
+export const mockMyReview: MyReviewItem = {
+	id: 12,
+	lessonId: 3,
+	lessonTitle: '레슨타이틀',
+	rating: 4.5,
+	content: '좋은 수업이었어요.',
+	image1: 'https://picsum.photos/id/64/300/300',
+	image2: 'https://picsum.photos/id/65/300/300',
+	image3: null,
+	image4: null,
+	image5: null,
+	image6: null,
+	image7: null,
+	image8: null,
+};

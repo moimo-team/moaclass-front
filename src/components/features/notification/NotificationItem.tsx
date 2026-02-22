@@ -2,25 +2,20 @@ import { FaCircle } from 'react-icons/fa';
 
 import { Button } from '@/components/ui/button';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { resolveNotificationTitle } from '@/constants/notificationActions';
+import { resolveNotificationMessage } from '@/constants/notificationMessages';
 import { cn } from '@/lib/utils';
-import type { Notification } from '@/models/notification.model';
+import type { NotificationUiItem } from '@/models/notification.model';
 import { formatRelativeTime } from '@/utils/dateFormat';
 
 export interface NotificationItemProps {
-	notification: Notification;
-	onClick: (notification: Notification) => void;
-	onMarkAsRead: (notification: Notification) => void;
+	notification: NotificationUiItem;
+	onClick: (notification: NotificationUiItem) => void;
+	onMarkAsRead: (notification: NotificationUiItem) => void;
 }
 
-const getNotificationTitle = (notification: Notification) =>
-	notification.type === 'NEW_CHAT'
-		? `[${notification.linkType === 'MEETING' ? '모임 채팅' : '클래스 문의'}] ${
-				notification.lessonTitle || '채팅방'
-			}${notification.senderNickname ? ` · ${notification.senderNickname}님` : ''} 새 메시지`
-		: notification.lessonTitle || notification.message || 'Notification';
-
-const getNotificationBody = (notification: Notification) =>
-	notification.message || notification.description || '';
+const getNotificationBody = (notification: NotificationUiItem) =>
+	resolveNotificationMessage(notification);
 
 export const NotificationItem = ({
 	notification,
@@ -30,27 +25,27 @@ export const NotificationItem = ({
 	return (
 		<DropdownMenuItem
 			onClick={() => onClick(notification)}
-			className={cn('flex items-start gap-3 p-3 cursor-pointer w-full')}
+			className={cn('flex w-full cursor-pointer items-start gap-3 p-3')}
 		>
 			{/* 붉은 점 */}
-			<div className="w-2 h-2 mt-1">
-				{!notification.isRead && <FaCircle className="w-full h-full text-red-500" />}
+			<div className="mt-1 h-2 w-2">
+				{!notification.isRead && <FaCircle className="h-full w-full text-red-500" />}
 			</div>
 
 			{/* 메세지 섹션 */}
-			<div className="flex-grow flex flex-col gap-1">
-				<div className="flex justify-between items-baseline">
+			<div className="flex flex-grow flex-col gap-1">
+				<div className="flex items-baseline justify-between">
 					<span
 						className={cn(
-							'font-semibold text-sm line-clamp-1',
+							'line-clamp-1 text-sm font-semibold',
 							notification.isRead ? 'text-gray-500' : 'text-foreground',
 						)}
 					>
-						{getNotificationTitle(notification)}
+						{resolveNotificationTitle(notification)}
 					</span>
 					<span
 						className={cn(
-							'text-xs flex-shrink-0 ml-2',
+							'ml-2 flex-shrink-0 text-xs',
 							notification.isRead ? 'text-gray-500' : 'text-gray-400',
 						)}
 					>
@@ -59,7 +54,7 @@ export const NotificationItem = ({
 				</div>
 				<p
 					className={cn(
-						'text-xs line-clamp-2',
+						'line-clamp-2 text-xs',
 						notification.isRead ? 'text-gray-500' : 'text-gray-600',
 					)}
 				>
@@ -68,7 +63,7 @@ export const NotificationItem = ({
 			</div>
 
 			{/* 읽음 버튼 */}
-			<div className="w-10 flex-shrink-0 flex justify-end self-center">
+			<div className="flex w-10 flex-shrink-0 justify-end self-center">
 				{!notification.isRead && (
 					<Button
 						variant="ghost"
