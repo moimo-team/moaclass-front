@@ -138,11 +138,11 @@ const createQueryClient = () =>
 		},
 	});
 
-const renderWithQueryClient = () => {
+const renderWithQueryClient = (props: Partial<Parameters<typeof ChattingContent>[0]> = {}) => {
 	const queryClient = createQueryClient();
 	return render(
 		<QueryClientProvider client={queryClient}>
-			<ChattingContent />
+			<ChattingContent {...props} />
 		</QueryClientProvider>,
 	);
 };
@@ -229,6 +229,23 @@ describe('ChattingContent', () => {
 		});
 
 		renderWithQueryClient();
+
+		await waitFor(() => {
+			expect(getRoomMessages).toHaveBeenCalledWith(meetingRoom2.roomId);
+			expect(screen.getByTestId('selected-meeting')).toHaveTextContent(
+				String(meetingRoom2.meetingId),
+			);
+		});
+	});
+
+	it('auto selects room from query props and loads history', async () => {
+		mockUseLocation.mockReturnValue({ state: null });
+
+		renderWithQueryClient({
+			initialRoomId: meetingRoom2.roomId,
+			initialChatType: 'meeting',
+			initialMeetingId: meetingRoom2.meetingId,
+		});
 
 		await waitFor(() => {
 			expect(getRoomMessages).toHaveBeenCalledWith(meetingRoom2.roomId);

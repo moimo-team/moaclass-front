@@ -26,6 +26,22 @@ const mapLinkTypeToChatType = (linkType?: string): ChatType | undefined => {
 	return undefined;
 };
 
+const buildChatsUrl = (params: {
+	roomId?: number;
+	chatType?: ChatType;
+	meetingId?: number;
+	lessonId?: number;
+}) => {
+	const search = new URLSearchParams();
+	if (typeof params.roomId === 'number') search.set('roomId', String(params.roomId));
+	if (params.chatType) search.set('chatType', params.chatType);
+	if (typeof params.meetingId === 'number') search.set('meetingId', String(params.meetingId));
+	if (typeof params.lessonId === 'number') search.set('lessonId', String(params.lessonId));
+
+	const query = search.toString();
+	return query ? `/chats?${query}` : '/chats';
+};
+
 export const NotificationDropdown = () => {
 	const navigate = useNavigate();
 	const { notifications, isLoading, isError } = useNotificationQuery();
@@ -44,28 +60,33 @@ export const NotificationDropdown = () => {
 		const chatType = mapLinkTypeToChatType(notification.linkType);
 
 		if (notification.roomId) {
-			navigate('/chats', { state: { roomId: notification.roomId, chatType } });
+			navigate(
+				buildChatsUrl({
+					roomId: notification.roomId,
+					chatType,
+				}),
+			);
 			return;
 		}
 
 		if (notification.linkId && chatType === 'lesson') {
 			try {
 				const room = await joinChatRoom({ lessonId: notification.linkId });
-				navigate('/chats', {
-					state: {
+				navigate(
+					buildChatsUrl({
 						chatType: 'lesson',
 						roomId: room.roomId,
 						lessonId: notification.linkId,
-					},
-				});
+					}),
+				);
 				return;
 			} catch {
-				navigate('/chats', {
-					state: {
+				navigate(
+					buildChatsUrl({
 						chatType: 'lesson',
 						lessonId: notification.linkId,
-					},
-				});
+					}),
+				);
 				return;
 			}
 		}
@@ -73,21 +94,21 @@ export const NotificationDropdown = () => {
 		if (notification.linkId && chatType === 'meeting') {
 			try {
 				const room = await joinChatRoom({ meetingId: notification.linkId });
-				navigate('/chats', {
-					state: {
+				navigate(
+					buildChatsUrl({
 						chatType: 'meeting',
 						roomId: room.roomId,
 						meetingId: notification.linkId,
-					},
-				});
+					}),
+				);
 				return;
 			} catch {
-				navigate('/chats', {
-					state: {
+				navigate(
+					buildChatsUrl({
 						chatType: 'meeting',
 						meetingId: notification.linkId,
-					},
-				});
+					}),
+				);
 				return;
 			}
 		}

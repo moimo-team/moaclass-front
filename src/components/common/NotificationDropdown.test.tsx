@@ -166,9 +166,7 @@ describe('NotificationDropdown', () => {
 
 		expect(mockMarkAsReadMutate).toHaveBeenCalledWith(20);
 		expect(mockResetNewChatByRoom).toHaveBeenCalledWith(101);
-		expect(mockNavigate).toHaveBeenCalledWith('/chats', {
-			state: { roomId: 101, chatType: 'lesson' },
-		});
+		expect(mockNavigate).toHaveBeenCalledWith('/chats?roomId=101&chatType=lesson');
 	});
 
 	it('handles NEW_CHAT without roomId (lesson) with join success', async () => {
@@ -187,9 +185,9 @@ describe('NotificationDropdown', () => {
 
 		await waitFor(() => {
 			expect(mockJoinChatRoom).toHaveBeenCalledWith({ lessonId: 55 });
-			expect(mockNavigate).toHaveBeenCalledWith('/chats', {
-				state: { chatType: 'lesson', roomId: 300, lessonId: 55 },
-			});
+			expect(mockNavigate).toHaveBeenCalledWith(
+				'/chats?roomId=300&chatType=lesson&lessonId=55',
+			);
 		});
 	});
 
@@ -208,9 +206,7 @@ describe('NotificationDropdown', () => {
 		await userEvent.click(screen.getByText('item-22'));
 
 		await waitFor(() => {
-			expect(mockNavigate).toHaveBeenCalledWith('/chats', {
-				state: { chatType: 'lesson', lessonId: 56 },
-			});
+			expect(mockNavigate).toHaveBeenCalledWith('/chats?chatType=lesson&lessonId=56');
 		});
 	});
 
@@ -230,9 +226,9 @@ describe('NotificationDropdown', () => {
 
 		await waitFor(() => {
 			expect(mockJoinChatRoom).toHaveBeenCalledWith({ meetingId: 57 });
-			expect(mockNavigate).toHaveBeenCalledWith('/chats', {
-				state: { chatType: 'meeting', roomId: 301, meetingId: 57 },
-			});
+			expect(mockNavigate).toHaveBeenCalledWith(
+				'/chats?roomId=301&chatType=meeting&meetingId=57',
+			);
 		});
 	});
 
@@ -251,9 +247,7 @@ describe('NotificationDropdown', () => {
 		await userEvent.click(screen.getByText('item-24'));
 
 		await waitFor(() => {
-			expect(mockNavigate).toHaveBeenCalledWith('/chats', {
-				state: { chatType: 'meeting', meetingId: 58 },
-			});
+			expect(mockNavigate).toHaveBeenCalledWith('/chats?chatType=meeting&meetingId=58');
 		});
 	});
 
