@@ -15,26 +15,22 @@ import {
 } from '@/hooks/useAuthMutations';
 
 // zod schema 정의
-export const joinSchema = z
-	.object({
-		email: z
-			.string()
-			.min(1, '이메일을 입력해주세요.')
-			.email('이메일 형식이 올바르지 않습니다.'),
-		nickname: z.string().min(1, '닉네임을 입력해주세요.'),
-		password: z
-			.string()
-			.min(1, '비밀번호를 입력해주세요.')
-			.min(8, '비밀번호는 최소 8자 이상이어야 합니다.'),
-		passwordConfirm: z
-			.string()
-			.min(1, '비밀번호를 입력해주세요.')
-			.min(8, '비밀번호는 최소 8자 이상이어야 합니다.'),
-	})
-	.refine((data) => data.password === data.passwordConfirm, {
-		message: '비밀번호가 일치하지 않습니다.',
-		path: ['passwordConfirm'],
-	});
+export const joinSchema = z.object({
+	email: z.string().min(1, '이메일을 입력해주세요.').email('이메일 형식이 올바르지 않습니다.'),
+	nickname: z.string().min(1, '닉네임을 입력해주세요.'),
+	// 	password: z
+	// 		.string()
+	// 		.min(1, '비밀번호를 입력해주세요.')
+	// 		.min(8, '비밀번호는 최소 8자 이상이어야 합니다.'),
+	// 	passwordConfirm: z
+	// 		.string()
+	// 		.min(1, '비밀번호를 입력해주세요.')
+	// 		.min(8, '비밀번호는 최소 8자 이상이어야 합니다.'),
+	// })
+	// .refine((data) => data.password === data.passwordConfirm, {
+	// 	message: '비밀번호가 일치하지 않습니다.',
+	// 	path: ['passwordConfirm'],
+});
 
 // zod schema에서 추출한 타입
 export type JoinFormValues = z.infer<typeof joinSchema>;
@@ -56,8 +52,6 @@ const Join = () => {
 		resolver: zodResolver(joinSchema),
 		defaultValues: {
 			email: '',
-			password: '',
-			passwordConfirm: '',
 		},
 	});
 
@@ -237,7 +231,7 @@ const Join = () => {
 								) : null}
 							</div>
 							{/* 비밀번호 입력 섹션 */}
-							<div className="grid gap-2">
+							{/* <div className="grid gap-2">
 								<Label
 									htmlFor="password"
 									className="text-sm font-medium text-muted-foreground mr-auto"
@@ -255,9 +249,9 @@ const Join = () => {
 										{errors.password.message}
 									</p>
 								)}
-							</div>
+							</div> */}
 							{/* 비밀번호 확인 섹션 */}
-							<div className="grid gap-2">
+							{/* <div className="grid gap-2">
 								<Label
 									htmlFor="passwordConfirm"
 									className="text-sm font-medium text-muted-foreground mr-auto"
@@ -275,7 +269,7 @@ const Join = () => {
 										{errors.passwordConfirm.message}
 									</p>
 								)}
-							</div>
+							</div> */}
 							{errors.root && (
 								<p className="text-sm text-destructive">{errors.root.message}</p>
 							)}

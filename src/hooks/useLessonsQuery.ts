@@ -5,7 +5,7 @@ import type { FetchLessonsParams, FetchLessonsResponse, Lesson } from '@/models/
 
 export const useLatestLessonsQuery = () => {
 	return useQuery<Lesson[], Error>({
-		queryKey: ['lessons', 'latest'],
+		queryKey: ['lessons', 'latest', { limit: 10, sort: 'LATEST', page: 1 }],
 		queryFn: fetchLatestLessons,
 	});
 };

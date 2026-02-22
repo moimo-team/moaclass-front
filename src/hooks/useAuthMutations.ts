@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import {
@@ -15,10 +14,10 @@ import {
 	verifyResetCode,
 	deleteUser,
 } from '@/api/auth.api';
-import type { FindPasswordFormValues } from '@/pages/user/FindPassword';
-import type { JoinFormValues } from '@/pages/user/Join';
-import type { LoginFormValues } from '@/pages/user/Login';
-import type { ResetPasswordFormValues } from '@/pages/user/ResetPassword';
+import type { FindPasswordFormValues } from '@/app/(auth)/find-password/FindPasswordClient';
+import type { JoinFormValues } from '@/app/(auth)/join/JoinClient';
+import type { LoginFormValues } from '@/app/(auth)/login/LoginClient';
+import type { ResetPasswordFormValues } from '@/app/(auth)/reset-password/ResetPasswordClient';
 import { useAuthStore } from '@/store/authStore';
 
 // 로그인 Mutation
@@ -30,6 +29,12 @@ export const useLoginMutation = () => {
 		mutationFn: async (data: LoginFormValues) => {
 			return await login(data);
 		},
+		// meta: {
+		// 	errorMessages: {
+		// 		401: '아이디 또는 비밀번호가 틀렸습니다.',
+		// 		default: '로그인 중 오류가 발생했습니다.',
+		// 	},
+		// },
 		onSuccess: (data) => {
 			// 로그인 성공 시 전역 상태 업데이트
 			storeLogin(
@@ -105,9 +110,9 @@ export const useLogoutMutation = () => {
 			return await logout();
 		},
 		onSuccess: () => {
-			// 로그아웃 성공 시 전역 상태 업데이트 및 캐시 전체 삭제
 			storeLogout();
 			queryClient.clear();
+			queryClient.invalidateQueries({ queryKey: ['authUser'] });
 		},
 	});
 };
@@ -187,17 +192,18 @@ export const useResetPasswordMutation = () => {
 
 // 회원 탈퇴
 export const useDeleteUserMutation = () => {
+	const { storeLogout } = useAuthStore();
 	const queryClient = useQueryClient();
-	const navigate = useNavigate();
 	return useMutation({
 		mutationFn: async () => {
 			return await deleteUser();
 		},
+		meta: { useBackendError: true },
 		onSuccess: () => {
-			const { storeLogout } = useAuthStore.getState();
 			storeLogout();
 			queryClient.clear();
-			navigate('/');
+			queryClient.invalidateQueries({ queryKey: ['authUser'] });
+
 			toast.success('회원탈퇴가 완료되었습니다.');
 		},
 	});

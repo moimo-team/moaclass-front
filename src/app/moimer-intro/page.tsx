@@ -1,15 +1,34 @@
 import MoimerIntroClient from '@/app/moimer-intro/MoimerIntroClient';
+import { faqs } from '@/constants/moimerIntroData';
+import { createPageMetadata } from '@/utils/metadata';
 
-import type { Metadata } from 'next';
-
-/**
- * SEO 담당자 전용: 메타데이터 설정 위치
- */
-export const metadata: Metadata = {
-	title: '모이머 안내 | 모아클',
+export const metadata = createPageMetadata({
+	title: '모이머 안내',
 	description: '모이머 신청하고 나만의 모임을 만들어보세요.',
-};
+	canonical: '/moimer-intro',
+});
 
 export default function Page() {
-	return <MoimerIntroClient />;
+	const faqJsonLd = {
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: faqs.map((faq) => ({
+			'@type': 'Question',
+			name: faq.question,
+			acceptedAnswer: {
+				'@type': 'Answer',
+				text: faq.answer,
+			},
+		})),
+	};
+
+	return (
+		<>
+			<script
+				type="application/ld+json"
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+			/>
+			<MoimerIntroClient />
+		</>
+	);
 }

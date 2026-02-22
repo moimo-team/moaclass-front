@@ -25,8 +25,8 @@ export const ProfileDropdownNext = () => {
 	const router = useRouter();
 
 	const handleLogout = async () => {
+		router.replace('/');
 		await logoutMutation.mutateAsync();
-		router.push('/');
 	};
 
 	const { data: userData } = useAuthQuery();

@@ -165,11 +165,11 @@ function MeetingDetailPage() {
 	}
 
 	return (
-		<div className="flex flex-col min-h-screen bg-background pt-12">
+		<article className="flex flex-col min-h-screen bg-background pt-12">
 			<div className="flex-1 w-full max-w-5xl mx-auto pb-8 space-y-8 px-4 md:px-0">
 				<div className="flex flex-col md:flex-row gap-8 md:gap-12">
 					{/* 이미지 */}
-					<div className="relative w-full md:w-1/2 aspect-square rounded-2xl overflow-hidden bg-muted flex-shrink-0 shadow-sm border border-border/50">
+					<figure className="relative w-full md:w-1/2 aspect-square rounded-2xl overflow-hidden bg-muted flex-shrink-0 shadow-sm border border-border/50">
 						{isClosed && (
 							<div className="absolute inset-0 z-10 bg-black/40 flex items-center justify-center">
 								<span className="bg-black/60 text-white px-3 py-1.5 rounded-full text-sm font-bold border border-white/20">
@@ -196,10 +196,13 @@ function MeetingDetailPage() {
 								)}
 							/>
 						)}
-					</div>
+					</figure>
 
 					{/* 정보 */}
-					<div className="flex-1 flex flex-col h-full min-h-[500px] justify-between py-2">
+					<section
+						className="flex-1 flex flex-col h-full min-h-[500px] justify-between py-2"
+						aria-label="모임 상세 정보"
+					>
 						<div>
 							<div className="flex items-start justify-between pb-8">
 								<div className="flex items-center gap-2 mb-2">
@@ -273,63 +276,69 @@ function MeetingDetailPage() {
 								}
 							/>
 						</div>
-					</div>
+					</section>
 				</div>
 				{/* 설명 */}
-				<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
-					<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
-						<CardTitle className="text-xl font-bold">우리 모임은요...</CardTitle>
-					</CardHeader>
-					<CardContent className="p-6">
-						<div
-							ref={descriptionRef}
-							className={`text-base text-foreground whitespace-pre-wrap leading-relaxed transition-all duration-300 ${
-								isDescriptionExpanded ? '' : 'max-h-48 overflow-hidden'
-							}`}
-						>
-							{meetingDetail.description}
-						</div>
-						{showExpandButton && (
-							<button
-								onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-								className="mt-4 text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+				<section aria-label="모임 소개">
+					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
+						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
+							<CardTitle className="text-xl font-bold">우리 모임은요...</CardTitle>
+						</CardHeader>
+						<CardContent className="p-6">
+							<div
+								ref={descriptionRef}
+								className={`text-base text-foreground whitespace-pre-wrap leading-relaxed transition-all duration-300 ${
+									isDescriptionExpanded ? '' : 'max-h-48 overflow-hidden'
+								}`}
 							>
-								{isDescriptionExpanded ? '접기' : '더보기'}
-							</button>
-						)}
-					</CardContent>
-				</Card>
+								{meetingDetail.description}
+							</div>
+							{showExpandButton && (
+								<button
+									onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+									className="mt-4 text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+								>
+									{isDescriptionExpanded ? '접기' : '더보기'}
+								</button>
+							)}
+						</CardContent>
+					</Card>
+				</section>
 
 				{/* 참여자 */}
-				<MeetingParticipantsCard
-					meetingId={Number(meetingId)}
-					host={meetingDetail.host}
-					currentParticipants={meetingDetail.currentParticipants || 1}
-					maxParticipants={meetingDetail.maxParticipants}
-				/>
+				<section aria-label="참여자 정보">
+					<MeetingParticipantsCard
+						meetingId={Number(meetingId)}
+						host={meetingDetail.host}
+						currentParticipants={meetingDetail.currentParticipants || 1}
+						maxParticipants={meetingDetail.maxParticipants}
+					/>
+				</section>
 
 				{/* 지도 */}
-				<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
-					<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
-						<CardTitle className="text-xl font-bold">여기에서 만나요!</CardTitle>
-					</CardHeader>
-					<CardContent className="p-0">
-						<div className="w-full h-96 bg-muted">
-							<KakaoMapView
-								lat={meetingDetail.location.lat}
-								lng={meetingDetail.location.lng}
-								placeName={meetingDetail.location.address}
-								level={3}
-							/>
-						</div>
-						<div className="p-4 bg-card border-t border-border/50">
-							<p className="text-base font-medium text-foreground flex items-center gap-2">
-								<MapPin className="w-5 h-5 text-primary" />
-								{meetingDetail.location.address}
-							</p>
-						</div>
-					</CardContent>
-				</Card>
+				<section aria-label="모임 위치">
+					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
+						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
+							<CardTitle className="text-xl font-bold">여기에서 만나요!</CardTitle>
+						</CardHeader>
+						<CardContent className="p-0">
+							<div className="w-full h-96 bg-muted">
+								<KakaoMapView
+									lat={meetingDetail.location.lat}
+									lng={meetingDetail.location.lng}
+									placeName={meetingDetail.location.address}
+									level={3}
+								/>
+							</div>
+							<div className="p-4 bg-card border-t border-border/50">
+								<p className="text-base font-medium text-foreground flex items-center gap-2">
+									<MapPin className="w-5 h-5 text-primary" />
+									{meetingDetail.location.address}
+								</p>
+							</div>
+						</CardContent>
+					</Card>
+				</section>
 			</div>
 			<MeetingActionButtons
 				meetingId={Number(meetingId)}
@@ -367,7 +376,7 @@ function MeetingDetailPage() {
 			/>
 
 			{/* 삭제 확인 모달 */}
-		</div>
+		</article>
 	);
 }
 

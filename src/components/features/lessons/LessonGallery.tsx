@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 
+import Image from 'next/image';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 import moimoMeeting from '@/assets/images/moimo-meetings.png';
@@ -41,9 +42,11 @@ export const LessonGallery = ({ title, images }: LessonGalleryProps) => {
 			{/* 이미지 섹션 */}
 			<section>
 				<div className="relative w-full aspect-video md:aspect-[16/9] rounded-xl overflow-hidden bg-muted shadow-sm border border-border/50">
-					<img
+					<Image
 						src={currentMainImage}
 						alt={title}
+						fill
+						sizes="(max-width: 768px) 100vw, 1200px"
 						className="w-full h-full object-cover transition-opacity duration-300 ease-in-out"
 					/>
 					{images && images.length > 1 && (
@@ -71,10 +74,12 @@ export const LessonGallery = ({ title, images }: LessonGalleryProps) => {
 					<div className="mt-4 relative">
 						<div className="flex space-x-2 overflow-x-auto py-2 scrollbar-hide">
 							{images.map((img, index) => (
-								<img
+								<Image
 									key={img.id}
 									src={img.image}
 									alt={title}
+									width={96}
+									height={64}
 									className={cn(
 										'w-24 h-16 object-cover rounded-md cursor-pointer border-2 transition-all duration-200',
 										activeIndex === index

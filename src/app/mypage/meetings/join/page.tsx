@@ -1,12 +1,12 @@
+import { createPageMetadata } from '@/utils/metadata';
+
 import JoinedMeetingClient from './JoinedMeetingClient';
 
-/**
- * SEO 담당자 전용: 메타데이터 설정 위치
- * 개인정보가 포함된 페이지이므로 인덱싱 차단(noindex) 설정을 권장합니다.
- * export const metadata: Metadata = {
- *   robots: { index: false, follow: false },
- * }
- */
+export const metadata = createPageMetadata({
+	title: '참여한 모임',
+	description: '참여 중인 모임 목록 페이지',
+	noindex: true,
+});
 
 export default function JoinedMeetingPage() {
 	return <JoinedMeetingClient />;

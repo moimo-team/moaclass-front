@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { FileText, Pencil, MessageCircle, X } from 'lucide-react';
+import Image from 'next/image';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -76,9 +77,12 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
 						)}
 						onClick={() => navigate(`/lessons/${order.lessonId}`)}
 					>
-						<img
+						<Image
 							src={order.image}
 							alt={order.title}
+							width={192}
+							height={128}
+							sizes="(max-width: 640px) 100vw, 192px"
 							className="w-full h-full object-cover transition-transform hover:scale-105"
 						/>
 					</div>

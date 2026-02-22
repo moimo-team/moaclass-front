@@ -30,7 +30,7 @@ export const MoimerIntroContent = ({ isLoggedIn, onOpenLoginPrompt }: MoimerIntr
 	};
 
 	return (
-		<div className="flex flex-col min-h-screen bg-card">
+		<article className="flex flex-col min-h-screen bg-card" aria-label="모이머 소개">
 			<InfoSection
 				title="모이머가 뭔가요?"
 				description={`모이머란 모임을 개설하고 관리하는 모임장입니다.\n단순히 모임을 만드는 사람을 넘어,\n사람들을 연결하고 의미 있는 경험을 만들어가는 리더입니다.\n\n모임의 주제를 정하고,\n참여자들이 즐겁고 유익한 시간을 보낼 수 있도록 준비하는 역할을 합니다.\n또한 모임이 원활하게 진행될 수 있도록\n분위기를 이끌어가는 것도 모이머의 중요한 역할입니다.\n\n모이모에서는 모이머를 위한 다양한 지원과 가이드를 제공하고 있으니\n부담 없이 모이머에 도전해보세요!`}
@@ -70,7 +70,7 @@ export const MoimerIntroContent = ({ isLoggedIn, onOpenLoginPrompt }: MoimerIntr
 			</FixedBottomButton>
 
 			<MoimerApplicationModal open={isModalOpen} onOpenChange={setIsModalOpen} />
-		</div>
+		</article>
 	);
 };
 
