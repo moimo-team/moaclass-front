@@ -114,10 +114,22 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 	// 데이터 로드 시 폼 초기화
 	useEffect(() => {
 		if (existingReview && open) {
+			// image1~image8 개별 필드에서 null을 제외한 URL 배열 생성
+			const existingImages = [
+				existingReview.image1,
+				existingReview.image2,
+				existingReview.image3,
+				existingReview.image4,
+				existingReview.image5,
+				existingReview.image6,
+				existingReview.image7,
+				existingReview.image8,
+			].filter((img): img is string => img !== null && img !== undefined);
+
 			reset({
 				rating: existingReview.rating,
 				content: existingReview.content,
-				images: existingReview.images || [],
+				images: existingImages,
 				imageFiles: [],
 			});
 		} else if (!open) {
@@ -179,10 +191,28 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 		formData.append('rating', data.rating.toString());
 		formData.append('content', data.content);
 
-		if (data.imageFiles && data.imageFiles.length > 0) {
-			data.imageFiles.forEach((file, i) => {
-				formData.append(`image${i + 1}`, file);
+		// 이미지 처리
+		// - 수정 모드: images 배열에서 기존 URL(파일 아님)을 image1~8로 전송 + imageFiles는 신규 파일
+		// - 작성 모드: imageFiles만 전송
+		if (isEditMode) {
+			// 기존 URL(http로 시작)과 신규 파일(imageFiles) 구분
+			const existingUrls = data.images.filter((img) => img.startsWith('http'));
+			const newFiles = data.imageFiles ?? [];
+
+			// 기존 URL을 image1부터 순서대로 전송
+			existingUrls.forEach((url, i) => {
+				formData.append(`image${i + 1}`, url);
 			});
+			// 신규 파일은 기존 URL 다음 순서로 이어서 전송
+			newFiles.forEach((file, i) => {
+				formData.append(`image${existingUrls.length + i + 1}`, file);
+			});
+		} else {
+			if (data.imageFiles && data.imageFiles.length > 0) {
+				data.imageFiles.forEach((file, i) => {
+					formData.append(`image${i + 1}`, file);
+				});
+			}
 		}
 
 		if (isEditMode && existingReview && existingReview.id !== undefined) {

@@ -127,7 +127,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
 								onClick={() => onDetailClick?.(order)}
 							/>
 							<ActionButton
-								label="후기 작성"
+								label={hasReview ? '리뷰 수정' : '리뷰 작성'}
 								theme="primary"
 								icon={
 									<Pencil
