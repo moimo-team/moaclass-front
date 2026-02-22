@@ -5,20 +5,31 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import PaginationComponent from '@/components/common/PaginationComponent';
 import LessonCard from '@/components/features/lessons/LessonCard';
-import { useCancelLikeMutation } from '@/hooks/useLikeMutations';
-import { useWishlistQuery } from '@/hooks/useWishlistQuery';
+import { useLessonsQuery } from '@/hooks/useLessonsQuery';
+import { usePagination } from '@/hooks/usePagination';
+import { useAuthStore } from '@/store/authStore';
 import { scrollToTop } from '@/utils/setScrollTo';
 
 const ITEMS_PER_PAGE = 6;
 
 const WishList = () => {
 	const [page, setPage] = useState(1);
-	const { wishlist, totalPages, isLoading, isError, error, totalCount } = useWishlistQuery(
+	const { userId } = useAuthStore();
+	const { data, isLoading, isError, error } = useLessonsQuery(
+		{ isLiked: true, limit: ITEMS_PER_PAGE },
 		page,
-		ITEMS_PER_PAGE,
+		!!userId,
 	);
 
-	const cancelLikeMutation = useCancelLikeMutation();
+	const { totalPages } = usePagination({
+		page,
+		limit: ITEMS_PER_PAGE,
+		totalCount: data?.meta?.totalCount ?? 0,
+		apiTotalPages: data?.meta?.totalPages ?? 1,
+	});
+
+	const lessons = data?.data ?? [];
+	const totalCount = data?.meta?.totalCount ?? 0;
 
 	// 화면을 최상단으로 스크롤
 	useEffect(() => {
@@ -37,12 +48,6 @@ const WishList = () => {
 		);
 	}
 
-	const handleToggleLike = async (lessonId: number, isLiked: boolean) => {
-		if (isLiked) {
-			await cancelLikeMutation.mutateAsync(lessonId);
-		}
-	};
-
 	return (
 		<div className="max-w-6xl mx-auto w-full p-6 space-y-6 bg-white min-h-screen">
 			{/* 헤더 영역 */}
@@ -58,9 +63,9 @@ const WishList = () => {
 			{/* 위시리스트 그리드 */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 				<AnimatePresence mode="popLayout">
-					{wishlist.map((wishLesson) => (
+					{lessons.map((lesson) => (
 						<motion.div
-							key={wishLesson.id}
+							key={lesson.id}
 							layout
 							initial={{ opacity: 0, scale: 0.9 }}
 							animate={{ opacity: 1, scale: 1 }}
@@ -68,17 +73,14 @@ const WishList = () => {
 							transition={{ duration: 0.2 }}
 							className="w-full"
 						>
-							<LessonCard
-								lesson={wishLesson}
-								onToggleLike={() => handleToggleLike(wishLesson.id, true)}
-							/>
+							<LessonCard lesson={lesson} />
 						</motion.div>
 					))}
 				</AnimatePresence>
 			</div>
 
 			{/* 빈 상태 */}
-			{wishlist.length === 0 && (
+			{lessons.length === 0 && (
 				<div className="flex flex-col items-center justify-center py-32 text-gray-400">
 					<p className="text-lg font-medium">찜한 클래스가 없습니다.</p>
 					<p className="text-sm">마음에 드는 클래스를 직접 찜해보세요!</p>

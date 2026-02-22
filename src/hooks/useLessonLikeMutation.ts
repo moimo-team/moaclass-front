@@ -58,6 +58,19 @@ export const useLessonLikeMutation = () => {
 							'data' in oldData &&
 							Array.isArray(oldData.data)
 						) {
+							// isLiked=true 필터 쿼리(위시리스트)에서 좋아요 취소 시 항목 즉시 제거
+							const params = queryKey[2] as Record<string, unknown> | undefined;
+							if (params?.isLiked === true && !newIsLiked) {
+								return {
+									...oldData,
+									data: oldData.data.filter((lesson) => lesson.id !== lessonId),
+									meta: {
+										...oldData.meta,
+										totalCount: Math.max(0, oldData.meta.totalCount - 1),
+									},
+								};
+							}
+
 							return {
 								...oldData,
 								data: oldData.data.map((lesson) =>
