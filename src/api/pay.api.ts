@@ -41,6 +41,7 @@ export interface PayInfoValues {
 	scheduleId: number;
 	finalPrice: number;
 	couponId: number | null;
+	email: string;
 }
 
 export interface CreatePaymentResponse {

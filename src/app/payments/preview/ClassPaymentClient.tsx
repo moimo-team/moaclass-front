@@ -7,7 +7,7 @@ import { ClassPaymentContent } from '@/pages/pay/ClassPayment';
 export default function ClassPaymentClient() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const scheduleId = Number(searchParams.get('scheduleId') || '0');
+	const scheduleId = Number(searchParams.get('scheduleId') || '1');
 	const quantity = Number(searchParams.get('quantity') || '1');
 
 	if (!scheduleId) {

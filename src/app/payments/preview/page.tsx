@@ -1,4 +1,7 @@
+import { Suspense } from 'react';
+
 import ClassPaymentClient from '@/app/payments/preview/ClassPaymentClient';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ProtectedRouteNext from '@/components/common/next/ProtectedRouteNext';
 import { createPageMetadata } from '@/utils/metadata';
 
@@ -11,7 +14,9 @@ export const metadata = createPageMetadata({
 export default function Page() {
 	return (
 		<ProtectedRouteNext>
-			<ClassPaymentClient />
+			<Suspense fallback={<LoadingSpinner />}>
+				<ClassPaymentClient />
+			</Suspense>
 		</ProtectedRouteNext>
 	);
 }

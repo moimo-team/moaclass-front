@@ -20,7 +20,8 @@ export interface ClassPaymentProps {
 }
 
 export const ClassPaymentContent = ({ scheduleId, quantity, onBack }: ClassPaymentProps) => {
-	const { userId, email, nickname } = useAuthStore();
+	const { userId, email: initialEmail, nickname } = useAuthStore();
+	const [userEmail, setUserEmail] = useState(initialEmail || '');
 	const { data: payPreview, isLoading: isPayPreviewLoading } = usePayPreviewQuery({
 		scheduleId,
 		quantity,
@@ -45,7 +46,10 @@ export const ClassPaymentContent = ({ scheduleId, quantity, onBack }: ClassPayme
 				{/* Left Column */}
 				<div className="space-y-6">
 					<TicketSection lesson={payPreview.lessons} />
-					<ContactSection user={{ email: email || '', nickname: nickname || '' }} />
+					<ContactSection
+						user={{ email: userEmail, nickname: nickname || '' }}
+						onEmailChange={setUserEmail}
+					/>
 				</div>
 
 				{/* Right Column */}
@@ -128,6 +132,7 @@ export const ClassPaymentContent = ({ scheduleId, quantity, onBack }: ClassPayme
 						payPreview={payPreview}
 						scheduleId={scheduleId}
 						userId={userId || 0}
+						email={userEmail}
 					/>
 				</div>
 			</div>
