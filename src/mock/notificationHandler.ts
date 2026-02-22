@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw';
-import { httpUrl } from './mockData/mockData';
+
 import type { NotificationListItemDto, NotificationType } from '@/models/notification.model';
+
+import { httpUrl } from './mockData/mockData';
 
 const now = new Date();
 

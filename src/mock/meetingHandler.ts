@@ -42,7 +42,7 @@ export const meetingHandler = [
 				},
 				{ status: 201 },
 			);
-		} catch (error) {
+		} catch {
 			return HttpResponse.json({ message: '잘못된 요청입니다.' }, { status: 400 });
 		}
 	}),
@@ -82,7 +82,7 @@ export const meetingHandler = [
 				},
 				{ status: 200 },
 			);
-		} catch (error) {
+		} catch {
 			return HttpResponse.json({ message: '잘못된 요청입니다.' }, { status: 400 });
 		}
 	}),

@@ -83,7 +83,7 @@ const Join = () => {
 	};
 
 	// 이메일 중복 확인
-	const handleCheckEmail = async () => {
+	const handleCheckEmail = () => {
 		const email = getValues('email');
 
 		// 이메일 유효성 검사
@@ -108,15 +108,13 @@ const Join = () => {
 		// 이메일 형식이 올바르면 react-hook-form 에러 클리어
 		clearErrors('email');
 
-		try {
-			await emailCheckMutation.mutateAsync(email);
-		} catch (error) {
-			// 에러는 mutation에서 자동으로 처리됨
-		}
+		// mutateAsync 대신 mutate를 사용해 불필요한 async-await 제거
+		emailCheckMutation.mutate(email);
+		// 에러는 mutation에서 자동으로 처리됨
 	};
 
 	// 닉네임 중복 확인
-	const handleCheckNickname = async () => {
+	const handleCheckNickname = () => {
 		const nickname = getValues('nickname');
 
 		// 닉네임 유효성 검사
@@ -131,11 +129,9 @@ const Join = () => {
 		// 닉네임 형식이 올바르면 react-hook-form 에러 클리어
 		clearErrors('nickname');
 
-		try {
-			await nicknameCheckMutation.mutateAsync(nickname);
-		} catch (error) {
-			// 에러는 mutation에서 자동으로 처리됨
-		}
+		// mutateAsync 대신 mutate를 사용해 불필요한 async-await 제거
+		nicknameCheckMutation.mutate(nickname);
+		// 에러는 mutation에서 자동으로 처리됨
 	};
 
 	return (

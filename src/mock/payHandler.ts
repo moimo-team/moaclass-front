@@ -18,7 +18,7 @@ const getPayPreview = http.get(`${httpUrl}/payments/preview`, async ({ request }
 		const _quantity = Number(url.searchParams.get('quantity')) || 1; // 기본값 1
 
 		return HttpResponse.json(payPreviewMock, { status: 200 });
-	} catch (_error) {
+	} catch {
 		return HttpResponse.json({ message: '잘못된 요청입니다.' }, { status: 400 });
 	}
 });
@@ -49,7 +49,7 @@ const calculateCouponDiscount = http.post(
 				},
 				{ status: 200 },
 			);
-		} catch (error) {
+		} catch {
 			return HttpResponse.json(
 				{ message: '쿠폰 계산 중 오류가 발생했습니다.' },
 				{ status: 500 },
@@ -110,7 +110,7 @@ const createEnrollment = http.post(`${httpUrl}/enrollments`, async ({ request })
 			},
 			{ status: 201 },
 		);
-	} catch (_error) {
+	} catch {
 		return HttpResponse.json({ message: '결제 생성 중 오류가 발생했습니다.' }, { status: 500 });
 	}
 });

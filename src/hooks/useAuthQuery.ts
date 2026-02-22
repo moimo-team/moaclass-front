@@ -37,7 +37,7 @@ export const useAuthQuery = () => {
 					storeLogout();
 				}
 				return null;
-			} catch (error) {
+			} catch {
 				if (isLoggedIn) {
 					storeLogout();
 				}

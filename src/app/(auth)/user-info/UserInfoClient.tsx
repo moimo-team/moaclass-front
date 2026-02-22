@@ -74,7 +74,7 @@ const UserInfoClient = () => {
 			await userUpdateMutation.mutateAsync(formData);
 			toast.success('프로필 등록이 완료되었습니다.');
 			router.push('/');
-		} catch (error) {
+		} catch {
 			setError('root', {
 				type: 'manual',
 				message: '프로필 등록에 실패했습니다',

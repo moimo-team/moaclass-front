@@ -35,15 +35,6 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 		}
 	};
 
-	// 렌더링 최적화를 위해 변수로 분리 (any 제거)
-	const getImageUrl = (image: string | { src: string } | unknown): string => {
-		if (typeof image === 'string') return image;
-		if (image && typeof image === 'object' && 'src' in image) {
-			return (image as { src: string }).src;
-		}
-		return String(image || '');
-	};
-
 	return (
 		<Link
 			to={href}
