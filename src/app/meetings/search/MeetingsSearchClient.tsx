@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSearchMeetingsQuery } from '@/hooks/useMeetingsQuery';
 import { usePagination } from '@/hooks/usePagination';
+import { scrollToTop } from '@/utils/setScrollTo';
 
 const MeetingsSearchClient = () => {
 	const searchParams = useSearchParams();
@@ -43,7 +44,7 @@ const MeetingsSearchClient = () => {
 	}, [keyword]);
 
 	useEffect(() => {
-		window.scrollTo({ top: 0, behavior: 'smooth' });
+		scrollToTop();
 	}, [page, keyword]);
 
 	const {

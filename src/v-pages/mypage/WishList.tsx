@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -7,18 +7,23 @@ import PaginationComponent from '@/components/common/PaginationComponent';
 import LessonCard from '@/components/features/lessons/LessonCard';
 import { useCancelLikeMutation } from '@/hooks/useLikeMutations';
 import { useWishlistQuery } from '@/hooks/useWishlistQuery';
-import { convertWishlistItemToLesson } from '@/models/wishlist.model';
+import { scrollToTop } from '@/utils/setScrollTo';
 
 const ITEMS_PER_PAGE = 6;
 
 const WishList = () => {
 	const [page, setPage] = useState(1);
-	const { wishlist, totalPages, isLoading, isError, error } = useWishlistQuery(
+	const { wishlist, totalPages, isLoading, isError, error, totalCount } = useWishlistQuery(
 		page,
 		ITEMS_PER_PAGE,
 	);
 
 	const cancelLikeMutation = useCancelLikeMutation();
+
+	// 화면을 최상단으로 스크롤
+	useEffect(() => {
+		scrollToTop();
+	}, [page]);
 
 	if (isLoading) {
 		return <LoadingSpinner />;
@@ -46,8 +51,8 @@ const WishList = () => {
 			</div>
 
 			<p className="text-gray-500 mb-6 font-medium">
-				총 <span className="text-primary font-bold">{wishlist.length}</span>개의 찜한
-				클래스가 있습니다.
+				총 <span className="text-primary font-bold">{totalCount}</span>개의 찜한 클래스가
+				있습니다.
 			</p>
 
 			{/* 위시리스트 그리드 */}
@@ -55,7 +60,7 @@ const WishList = () => {
 				<AnimatePresence mode="popLayout">
 					{wishlist.map((wishLesson) => (
 						<motion.div
-							key={wishLesson.lessonId}
+							key={wishLesson.id}
 							layout
 							initial={{ opacity: 0, scale: 0.9 }}
 							animate={{ opacity: 1, scale: 1 }}
@@ -64,8 +69,8 @@ const WishList = () => {
 							className="w-full"
 						>
 							<LessonCard
-								lesson={convertWishlistItemToLesson(wishLesson)}
-								onToggleLike={() => handleToggleLike(wishLesson.lessonId, true)}
+								lesson={wishLesson}
+								onToggleLike={() => handleToggleLike(wishLesson.id, true)}
 							/>
 						</motion.div>
 					))}
