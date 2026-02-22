@@ -10,7 +10,12 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import type { Schedule } from '@/models/schedule.model';
-import { toYYYYMMDD, formatDateToYYYYMMDD_DOT, formatTime } from '@/utils/dateFormat';
+import {
+	formatDateKeyLocal,
+	formatDateToYYYYMMDD_DOT,
+	formatTime,
+	toYYYYMMDD,
+} from '@/utils/dateFormat';
 
 interface LessonReservationSidebarProps {
 	reservationLeadDays: number;
@@ -45,9 +50,25 @@ export const LessonReservationSidebar = ({
 	maxParticipants,
 	isLiked,
 }: LessonReservationSidebarProps) => {
+	const parseDateKeyToDate = (dateKey: string): Date => {
+		const [year, month, day] = dateKey.split('-').map(Number);
+		return new Date(year, month - 1, day);
+	};
+
 	const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined);
 	const [headcount, setHeadcount] = useState(1);
 	const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+	const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
+
+	const availableScheduleDates = useMemo(
+		() =>
+			new Set(
+				schedules
+					.filter((schedule) => schedule.status === 'RECRUITING')
+					.map((schedule) => toYYYYMMDD(schedule.startAt)),
+			),
+		[schedules],
+	);
 
 	const filteredSchedules = useMemo(() => {
 		if (selectedDate) {
@@ -56,11 +77,9 @@ export const LessonReservationSidebar = ({
 		return [];
 	}, [selectedDate, schedules]);
 
-	const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
-
 	const handleDateSelect = (date: Date | undefined) => {
 		if (date) {
-			setSelectedDate(toYYYYMMDD(date.toISOString()));
+			setSelectedDate(formatDateKeyLocal(date));
 			setSelectedScheduleId(null);
 			setIsCalendarOpen(false);
 		} else {
@@ -129,10 +148,16 @@ export const LessonReservationSidebar = ({
 							<PopoverContent className="w-auto p-4" align="start">
 								<Calendar
 									mode="single"
-									selected={selectedDate ? new Date(selectedDate) : undefined}
+									selected={
+										selectedDate ? parseDateKeyToDate(selectedDate) : undefined
+									}
 									onSelect={handleDateSelect}
 									initialFocus
 									disabled={(date) => date < today || date > threeMonthsLater}
+									modifiers={{
+										hasSchedule: (date) =>
+											availableScheduleDates.has(formatDateKeyLocal(date)),
+									}}
 									numberOfMonths={2}
 								/>
 							</PopoverContent>
@@ -215,7 +240,7 @@ export const LessonReservationSidebar = ({
 					<div className="text-right mb-4">
 						{discountRate > 0 && (
 							<div className="flex items-center justify-end gap-2 text-muted-foreground line-through text-sm">
-								<span>{price.toLocaleString()}원</span>
+								<span>{(price * headcount).toLocaleString()}원</span>
 								<span className="text-red-500 font-semibold">{discountRate}%</span>
 							</div>
 						)}

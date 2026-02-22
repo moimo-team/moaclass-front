@@ -78,6 +78,14 @@ export function toYYYYMMDD(dateString: string): string {
 	return `${year}-${month}-${day}`;
 }
 
+export function formatDateKeyLocal(date: Date): string {
+	const year = date.getFullYear();
+	const month = (date.getMonth() + 1).toString().padStart(2, '0');
+	const day = date.getDate().toString().padStart(2, '0');
+
+	return `${year}-${month}-${day}`;
+}
+
 /**
  * ISO 날짜 문자열을 "YYYY.MM.DD" 형식으로 변환
  * @param dateString - ISO 형식의 날짜 문자열
