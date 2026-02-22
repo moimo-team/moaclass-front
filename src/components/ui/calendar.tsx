@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { ko } from 'date-fns/locale';
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { DayPicker, getDefaultClassNames } from 'react-day-picker';
 
@@ -24,6 +25,7 @@ function Calendar({
 
 	return (
 		<DayPicker
+			locale={props.locale ?? ko}
 			showOutsideDays={showOutsideDays}
 			className={cn(
 				'bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent',
@@ -33,7 +35,8 @@ function Calendar({
 			)}
 			captionLayout={captionLayout}
 			formatters={{
-				formatMonthDropdown: (date) => date.toLocaleString('default', { month: 'short' }),
+				formatMonthDropdown: (date) => `${date.getMonth() + 1}월`,
+				formatCaption: (date) => `${date.getFullYear()}년 ${date.getMonth() + 1}월`,
 				...formatters,
 			}}
 			classNames={{
