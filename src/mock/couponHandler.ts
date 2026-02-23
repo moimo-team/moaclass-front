@@ -82,4 +82,74 @@ const getAvailableCoupons = http.get(`${httpUrl}/coupons/available`, async ({ re
 	return HttpResponse.json(joinedCoupons, { status: 200 });
 });
 
-export const couponHandlers = [getUserCoupons, getAvailableCoupons];
+const issueCoupon = http.post(`${httpUrl}/coupons/issue`, async ({ request }) => {
+	await delay(300);
+
+	const token = request.headers.get('Authorization');
+	if (!token) {
+		return HttpResponse.json({ message: '?좏겙???놁뒿?덈떎.' }, { status: 401 });
+	}
+
+	try {
+		const payload = (await request.json()) as { userId: number; couponId: number };
+		const { userId, couponId } = payload;
+
+		if (!userId || !couponId) {
+			return HttpResponse.json(
+				{ message: '?붿껌 媛믪씠 ?щ컮瑜댁? ?딆뒿?덈떎.' },
+				{ status: 400 },
+			);
+		}
+
+		const existing = userCouponsData.find(
+			(coupon) => coupon.userId === userId && coupon.couponId === couponId,
+		);
+		if (existing) {
+			return HttpResponse.json(
+				{ message: '?대? 諛쒓툒???덉쓣 荑좏룿?낅땲??' },
+				{ status: 409 },
+			);
+		}
+
+		const targetCoupon = coupons.find((coupon) => coupon.id === couponId);
+		if (!targetCoupon) {
+			return HttpResponse.json(
+				{ message: '議댁옱?섏? ?딆뒗 荑좏룿?낅땲??' },
+				{ status: 404 },
+			);
+		}
+
+		const nextId = Math.max(...userCouponsData.map((coupon) => coupon.id), 0) + 1;
+		const issuedAt = new Date().toISOString();
+		const issuedCoupon = {
+			id: nextId,
+			userId,
+			couponId,
+			isUsed: false,
+			usedAt: '',
+			issuedAt,
+		};
+
+		userCouponsData.push(issuedCoupon);
+		targetCoupon.currentUsage += 1;
+
+		return HttpResponse.json(
+			{
+				id: issuedCoupon.id,
+				userId: issuedCoupon.userId,
+				couponId: issuedCoupon.couponId,
+				isUsed: issuedCoupon.isUsed,
+				usedAt: null,
+				issuedAt: issuedCoupon.issuedAt,
+			},
+			{ status: 200 },
+		);
+	} catch {
+		return HttpResponse.json(
+			{ message: '荑좏룿 諛쒓툒 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.' },
+			{ status: 500 },
+		);
+	}
+});
+
+export const couponHandlers = [getUserCoupons, getAvailableCoupons, issueCoupon];

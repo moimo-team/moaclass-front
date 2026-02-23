@@ -1,17 +1,9 @@
 import { useEffect, useState } from 'react';
 
 import Autoplay from 'embla-carousel-autoplay';
-import { Link } from 'react-router-dom';
+import { Check, Loader2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -22,12 +14,46 @@ import {
 	CarouselPrevious,
 	type CarouselApi,
 } from '@/components/ui/carousel';
+import { useIssueCouponMutation } from '@/hooks/useCouponMutations';
+import { useUserCouponsQuery } from '@/hooks/useCouponQuery';
+import { useAuthStore } from '@/store/authStore';
+
+const BANNER_COUPON_ID = 4;
+const BANNER_COUPON_CODE = 'NEW_SEMESTER_2026';
+
+const getStatusCode = (error: unknown): number | undefined => {
+	if (typeof error !== 'object' || error === null || !('response' in error)) {
+		return undefined;
+	}
+
+	const response = error.response;
+	if (typeof response !== 'object' || response === null || !('status' in response)) {
+		return undefined;
+	}
+
+	const status = response.status;
+	return typeof status === 'number' ? status : undefined;
+};
 
 function Banner() {
 	const negativeMarginClasses = '-mx-4 md:-mx-32';
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
-	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isCouponIssued, setIsCouponIssued] = useState(false);
+	const { isLoggedIn, userId } = useAuthStore();
+	const { data: userCoupons = [] } = useUserCouponsQuery();
+	const issueCouponMutation = useIssueCouponMutation();
+	const navigate = useNavigate();
+
+	const hasIssuedCouponFromServer =
+		isLoggedIn &&
+		userCoupons.some(
+			(coupon) =>
+				coupon.couponId === BANNER_COUPON_ID ||
+				coupon.id === BANNER_COUPON_ID ||
+				coupon.code === BANNER_COUPON_CODE,
+		);
+	const hasIssuedCoupon = isCouponIssued || hasIssuedCouponFromServer;
 
 	useEffect(() => {
 		if (!api) {
@@ -45,8 +71,38 @@ function Banner() {
 		};
 	}, [api]);
 
+	useEffect(() => {
+		if (hasIssuedCouponFromServer) {
+			setIsCouponIssued(true);
+		}
+	}, [hasIssuedCouponFromServer]);
+
 	const handleDotClick = (index: number) => {
 		api?.scrollTo(index);
+	};
+
+	const handleCouponIssue = async () => {
+		if (!isLoggedIn || !userId) {
+			navigate('/login');
+			return;
+		}
+
+		if (hasIssuedCoupon) {
+			return;
+		}
+
+		try {
+			await issueCouponMutation.mutateAsync({
+				userId,
+				couponId: BANNER_COUPON_ID,
+			});
+			setIsCouponIssued(true);
+		} catch (error) {
+			const statusCode = getStatusCode(error);
+			if (statusCode === 409 || statusCode === 400) {
+				setIsCouponIssued(true);
+			}
+		}
 	};
 
 	const bannerItems = [
@@ -57,17 +113,30 @@ function Banner() {
 					<div className="absolute bottom-16 flex flex-col items-center gap-4">
 						<div className="text-center">
 							<h2 className="text-xl md:text-2xl font-bold text-primary">
-								새해 맞이 원데이 클래스
+								새학기 맞이 원데이 클래스
 							</h2>
 							<p className="text-2xl md:text-3xl font-bold text-primary">
 								10% 할인 쿠폰 증정
 							</p>
 						</div>
 						<Button
-							onClick={() => setIsModalOpen(true)}
+							onClick={handleCouponIssue}
+							disabled={issueCouponMutation.isPending || hasIssuedCoupon}
 							className="bg-primary hover:bg-primary/90 text-white"
 						>
-							쿠폰 받기
+							{hasIssuedCoupon ? (
+								<>
+									<Check className="mr-2 h-4 w-4" />
+									발급 완료
+								</>
+							) : issueCouponMutation.isPending ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									쿠폰 발급 중
+								</>
+							) : (
+								'쿠폰 받기'
+							)}
 						</Button>
 					</div>
 				</div>
@@ -80,7 +149,7 @@ function Banner() {
 					<div className="absolute bottom-16 flex flex-col items-center gap-4">
 						<div className="text-center">
 							<h2 className="text-xl md:text-2xl font-bold text-green-800">
-								일일 모임 구경하기
+								원데이 모임 구경하기
 							</h2>
 							<p className="text-2xl md:text-3xl font-bold text-foreground">
 								다양한 주제의 모임으로 일상을 특별하게!
@@ -116,67 +185,49 @@ function Banner() {
 	];
 
 	return (
-		<>
-			<div className={`relative w-screen ${negativeMarginClasses}`}>
-				<Carousel
-					setApi={setApi}
-					plugins={[
-						Autoplay({
-							delay: 5000,
-							stopOnInteraction: true,
-						}),
-					]}
-					opts={{
-						align: 'start',
-						loop: true,
-					}}
-					className="w-full"
-				>
-					<CarouselContent>
-						{bannerItems.map((item) => (
-							<CarouselItem key={item.id}>
-								<Card className="border-none">
-									<CardContent className="flex h-80 items-center justify-center p-0">
-										{item.content}
-									</CardContent>
-								</Card>
-							</CarouselItem>
-						))}
-					</CarouselContent>
-					<CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10" />
-					<CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10" />
-				</Carousel>
-
-				<div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-					{bannerItems.map((_, index) => (
-						<button
-							key={index}
-							onClick={() => handleDotClick(index)}
-							className={`w-2 h-2 rounded-full ${
-								current === index ? 'bg-gray-800' : 'bg-gray-400'
-							}`}
-							aria-label={`Go to slide ${index + 1}`}
-						/>
+		<div className={`relative w-screen ${negativeMarginClasses}`}>
+			<Carousel
+				setApi={setApi}
+				plugins={[
+					Autoplay({
+						delay: 5000,
+						stopOnInteraction: true,
+					}),
+				]}
+				opts={{
+					align: 'start',
+					loop: true,
+				}}
+				className="w-full"
+			>
+				<CarouselContent>
+					{bannerItems.map((item) => (
+						<CarouselItem key={item.id}>
+							<Card className="border-none">
+								<CardContent className="flex h-80 items-center justify-center p-0">
+									{item.content}
+								</CardContent>
+							</Card>
+						</CarouselItem>
 					))}
-				</div>
-			</div>
+				</CarouselContent>
+				<CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10" />
+				<CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10" />
+			</Carousel>
 
-			{/* TODO: 하드코딩된 데이터 제거 */}
-			<AlertDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>쿠폰 발급 성공</AlertDialogTitle>
-						<AlertDialogDescription>
-							'새해 맞이 원데이 클래스 10% 할인 쿠폰'이 발급되었습니다. 마이페이지에서
-							확인해보세요!
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogAction>확인</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-		</>
+			<div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+				{bannerItems.map((_, index) => (
+					<button
+						key={index}
+						onClick={() => handleDotClick(index)}
+						className={`w-2 h-2 rounded-full ${
+							current === index ? 'bg-gray-800' : 'bg-gray-400'
+						}`}
+						aria-label={`Go to slide ${index + 1}`}
+					/>
+				))}
+			</div>
+		</div>
 	);
 }
 
