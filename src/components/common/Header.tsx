@@ -1,7 +1,10 @@
+'use client';
+
 import { useState } from 'react';
 
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { IoIosSearch } from 'react-icons/io';
-import { Link, useNavigate } from 'react-router-dom';
 
 import { NotificationDropdown } from '@/components/common/NotificationDropdown';
 import { ProfileDropdown } from '@/components/common/ProfileDropdown';
@@ -13,7 +16,7 @@ import { useFilterStore } from '@/store/filterStore';
 
 function Header() {
 	const { isLoggedIn } = useAuthStore();
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	const [searchTopic, setSearchTopic] = useState('');
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -24,7 +27,7 @@ function Header() {
 		event.preventDefault();
 		if (!searchTopic.trim()) return;
 
-		navigate(`/lessons?keyword=${encodeURIComponent(searchTopic)}`);
+		router.push(`/lessons?keyword=${encodeURIComponent(searchTopic)}`);
 		setIsFilterOpen(false);
 	};
 
@@ -50,7 +53,6 @@ function Header() {
 			params.append('difficulty', filterStore.selectedDifficulty.join(','));
 		}
 
-		// 인원 처리 ("10+" 같은 문자열에서 숫자 추출)
 		if (filterStore.selectedPersonnel) {
 			const personnel = filterStore.selectedPersonnel.replace(/\D/g, '');
 			if (personnel) params.append('personnel', personnel);
@@ -66,8 +68,7 @@ function Header() {
 			params.append('maxPrice', String(filterStore.priceRange[1]));
 		}
 
-		// TODO: URL 확정되면 수정
-		navigate(`/lessons?${params.toString()}`);
+		router.push(`/lessons?${params.toString()}`);
 		setIsFilterOpen(false);
 	};
 
@@ -75,19 +76,17 @@ function Header() {
 	const handleCloseFilter = () => setIsFilterOpen(false);
 
 	return (
-		<div className="w-full h-[80px] bg-card sticky top-0 z-50 shrink-0 border-b border-gray-300 relative">
-			<div className="flex items-center w-full h-full max-w-screen-xl mx-auto px-4 md:px-8">
-				{/* 로고 */}
+		<header className="w-full h-[80px] bg-card sticky top-0 z-50 shrink-0 border-b border-gray-300">
+			<div className="flex items-center w-full h-full max-w-7xl mx-auto px-4 md:px-8">
 				<Button
 					asChild
 					size="lg"
 					variant="ghost"
 					className="cursor-pointer hover:bg-medium font-bold text-2xl p-0"
 				>
-					<Link to="/">모아클</Link>
+					<Link href="/">모아클</Link>
 				</Button>
 
-				{/* 검색창 */}
 				<form onSubmit={handleTextSearch} className="relative ml-8 w-full max-w-xs">
 					<Input
 						type="text"
@@ -107,35 +106,35 @@ function Header() {
 					</Button>
 				</form>
 
-				{/* 우측 메뉴 (로그인/프로필) */}
-				{isLoggedIn ? (
-					<div className="ml-auto flex items-center gap-3 md:gap-4">
-						<Button
-							asChild
-							size="default"
-							variant="ghost"
-							className="cursor-pointer hover:bg-medium text-base border border-gray-300"
-						>
-							<Link to="/classes-manage">클래스 관리</Link>
-						</Button>
-						<NotificationDropdown />
-						<ProfileDropdown />
-					</div>
-				) : (
-					<div className="login ml-auto">
-						<Button
-							asChild
-							size="default"
-							variant="ghost"
-							className="cursor-pointer hover:bg-medium text-base"
-						>
-							<Link to="/login">로그인</Link>
-						</Button>
-					</div>
-				)}
+				<nav aria-label="주요 메뉴" className="ml-auto">
+					{isLoggedIn ? (
+						<div className="flex items-center gap-3 md:gap-4">
+							<Button
+								asChild
+								size="default"
+								variant="ghost"
+								className="cursor-pointer hover:bg-medium text-base border border-gray-300"
+							>
+								<Link href="/classes-manage">클래스 관리</Link>
+							</Button>
+							<NotificationDropdown />
+							<ProfileDropdown />
+						</div>
+					) : (
+						<div className="login">
+							<Button
+								asChild
+								size="default"
+								variant="ghost"
+								className="cursor-pointer hover:bg-medium text-base"
+							>
+								<Link href="/login">로그인</Link>
+							</Button>
+						</div>
+					)}
+				</nav>
 			</div>
 
-			{/* 필터 섹션 (조건부 렌더링) */}
 			{isFilterOpen && (
 				<div className="absolute top-[80px] left-0 right-0 z-40 bg-card shadow-lg">
 					<LessonFilterSection
@@ -144,7 +143,7 @@ function Header() {
 					/>
 				</div>
 			)}
-		</div>
+		</header>
 	);
 }
 

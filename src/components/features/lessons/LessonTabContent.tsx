@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 
 import { ReviewList } from '@components/features/lessons/ReviewList';
+import Image from 'next/image';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 
 import defaultProfileImage from '@/assets/images/profile.png';
@@ -10,8 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { TeacherProfile } from '@/models/lesson.model';
 import type { Review } from '@/models/review.model';
-
-import type { useNavigate } from 'react-router-dom';
 
 interface LessonTabContentProps {
 	activeTab: string;
@@ -26,7 +25,7 @@ interface LessonTabContentProps {
 	address: string;
 	detailAddress: string;
 	directionsText: string;
-	navigate: ReturnType<typeof useNavigate>;
+	navigate: (path: string) => void;
 	reviewAiSummary: string | null;
 	reviews: Review[];
 }
@@ -50,30 +49,54 @@ export const LessonTabContent = ({
 }: LessonTabContentProps) => {
 	const [isMapReady, setIsMapReady] = useState(false);
 	const hasReviewAiSummary = Boolean(reviewAiSummary?.trim());
+	const teacherProfileImage =
+		teacher?.image && teacher.image.trim().length > 0 ? teacher.image : defaultProfileImage;
 
 	useEffect(() => {
-		if (typeof window === 'undefined' || !window.kakao?.maps) return;
+		if (typeof window === 'undefined') return;
 
-		// Next.js환경(autoload=false)과 Vite환경 모두 호환되도록 명시적 로드 처리
-		window.kakao.maps.load(() => {
-			setIsMapReady(true);
-		});
+		let isCancelled = false;
+
+		const tryLoadMap = () => {
+			if (!window.kakao?.maps) return false;
+			window.kakao.maps.load(() => {
+				if (!isCancelled) {
+					setIsMapReady(true);
+				}
+			});
+			return true;
+		};
+
+		if (tryLoadMap()) {
+			return () => {
+				isCancelled = true;
+			};
+		}
+
+		const retryTimer = window.setTimeout(() => {
+			tryLoadMap();
+		}, 300);
+
+		return () => {
+			isCancelled = true;
+			window.clearTimeout(retryTimer);
+		};
 	}, []);
 
 	return (
 		<>
 			{/* 탭 네비게이션 */}
 			<nav
-				className="sticky top-0 bg-background z-10 border-b border-border/50"
+				className="sticky top-[80px] z-20 rounded-b-xl border border-border/60 bg-muted shadow-sm"
 				aria-label="클래스 상세 탭"
 			>
-				<div className="flex overflow-x-auto scrollbar-hide py-2">
+				<div className="flex items-center gap-1 overflow-x-auto scrollbar-hide px-2 py-2 sm:px-4 sm:py-3 lg:px-6">
 					{tabTitles.map((tab) => (
 						<Button
 							key={tab.id}
 							variant="ghost"
 							className={cn(
-								'whitespace-nowrap rounded-none border-b-2 border-transparent px-2 sm:px-4 py-2 text-base sm:text-lg font-medium text-muted-foreground transition-colors hover:text-foreground',
+								'whitespace-nowrap rounded-none border-b-2 border-transparent px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:px-4 sm:py-2.5 sm:text-base lg:px-5',
 								activeTab === tab.id && 'border-primary text-foreground',
 							)}
 							onClick={() => handleTabClick(tab.id)}
@@ -120,9 +143,11 @@ export const LessonTabContent = ({
 						<CardContent className="p-6">
 							{teacher && (
 								<div className="flex items-center gap-4 mb-6 p-4 border rounded-lg bg-secondary/10">
-									<img
-										src={teacher.image || defaultProfileImage}
+									<Image
+										src={teacherProfileImage}
 										alt={teacher.nickname}
+										width={80}
+										height={80}
 										className="w-20 h-20 rounded-full object-cover border border-border flex-shrink-0"
 									/>
 									<div className="flex-1">
