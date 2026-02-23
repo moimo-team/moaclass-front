@@ -75,7 +75,7 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 		defaultValues: {
 			title: '',
 			description: '',
-			interestId: undefined as any,
+			interestId: undefined as number | undefined,
 			maxParticipants: 15,
 			meetingDate: undefined,
 			meetingHour: '3',
@@ -139,7 +139,7 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 				reset({
 					title: '',
 					description: '',
-					interestId: undefined as any,
+					interestId: undefined as number | undefined,
 					maxParticipants: 15,
 					meetingDate: undefined,
 					meetingHour: '12',
@@ -327,7 +327,7 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 					minute={meetingMinute}
 					period={meetingPeriod}
 					onDateChange={(date) =>
-						setValue('meetingDate', date as any, { shouldValidate: true })
+						setValue('meetingDate', date!, { shouldValidate: true })
 					}
 					onHourChange={(hour) => setValue('meetingHour', hour)}
 					onMinuteChange={(minute) => setValue('meetingMinute', minute)}
