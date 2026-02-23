@@ -4,7 +4,6 @@ import DateTimePicker from '@components/common/DateTimePicker';
 import FormField from '@components/common/FormField';
 import LoadingSpinner from '@components/common/LoadingSpinner';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -16,12 +15,10 @@ import { FormImageUpload } from '@/components/features/modal/components/FormImag
 import { FormInput } from '@/components/features/modal/components/FormInput';
 import { FormModal } from '@/components/features/modal/components/FormModal';
 import { FormTextarea } from '@/components/features/modal/components/FormTextarea';
-import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { useInterestQuery } from '@/hooks/useInterestQuery';
 import { useCreateMeetingMutation, useUpdateMeetingMutation } from '@/hooks/useMeetingMutations';
 import { useMeetingQuery } from '@/hooks/useMeetingQuery';
-import { cn } from '@/lib/utils';
 import type { PlaceInfo } from '@/models/kakao-maps.model';
 import type { Meeting, MeetingDetail } from '@/models/meeting.model';
 import { combineDateAndTime, parseToTimeComponents } from '@/utils/dateFormat';
@@ -53,7 +50,6 @@ interface CreateMeetingModalProps {
 
 function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalProps) {
 	const navigate = useNavigate();
-	const { data: interests } = useInterestQuery();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [previewImage, setPreviewImage] = useState<string | null>(null);
 	const [isFormReady, setIsFormReady] = useState(false);
@@ -79,7 +75,7 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 		defaultValues: {
 			title: '',
 			description: '',
-			interestId: undefined,
+			interestId: undefined as any,
 			maxParticipants: 15,
 			meetingDate: undefined,
 			meetingHour: '3',
@@ -94,7 +90,7 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 	const updateMeetingMutation = useUpdateMeetingMutation();
 
 	// 폼 데이터 감시
-	const selectedInterestId = watch('interestId');
+	const interestId = watch('interestId');
 	const maxParticipants = watch('maxParticipants');
 	const meetingDate = watch('meetingDate');
 	const meetingHour = watch('meetingHour');
@@ -143,7 +139,7 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 				reset({
 					title: '',
 					description: '',
-					interestId: undefined,
+					interestId: undefined as any,
 					maxParticipants: 15,
 					meetingDate: undefined,
 					meetingHour: '12',
@@ -158,7 +154,7 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 		} else {
 			setIsFormReady(false);
 		}
-	}, [open, meeting, meetingDetail, interests, reset]);
+	}, [open, meeting, meetingDetail, reset]);
 
 	// 이미지 변경 핸들러 (FormImageUpload 컴포넌트에서 검증 처리)
 	const handleImageChange = (dataUrl: string, file: File) => {
@@ -169,22 +165,6 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 	// 장소 선택 핸들러
 	const handlePlaceSelect = (place: PlaceInfo) => {
 		setValue('address', place.roadAddress || place.address, { shouldValidate: true });
-	};
-
-	// 관심사 토글
-	const toggleInterest = (interestId: number) => {
-		setValue(
-			'interestId',
-			selectedInterestId === interestId ? (0 as unknown as number) : interestId,
-			{
-				shouldValidate: true,
-			},
-		);
-		// interestId는 0이 될 수 없으므로 0을 임시로 쓰거나,
-		// z.number().optional()로 스키마를 되어 있다면 undefined가 가능함.
-		// 하지만 스키마에는 z.number()이므로 일단 interestId 혹은 undefined 처리가 필요함.
-		// 스키마가 z.number()면 undefined를 넣으면 에러가 날 텐데,
-		// 기존 코드도 undefined를 넣으려고 했음.
 	};
 
 	const onSubmit = async (data: MeetingFormValues) => {
@@ -211,9 +191,9 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 			const formData = new FormData();
 			formData.append('title', data.title);
 			formData.append('description', data.description);
+			formData.append('categoryId', String(data.interestId));
 			formData.append('maxParticipants', String(data.maxParticipants));
 			formData.append('meetingDate', formattedDate);
-			formData.append('interestId', String(data.interestId));
 			formData.append('address', data.address);
 
 			if (data.meetingImageFile) {
@@ -302,23 +282,23 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 			/>
 
 			{/* 관심사 선택 */}
-			<FormField label="관심사" description="모임과 관련된 관심사를 선택해주세요">
+			<FormField label="관심사" description="어떤 주제의 모임인가요?">
 				<div className="flex flex-wrap gap-2">
-					{interests?.map((interest) => (
-						<Badge
+					{useInterestQuery().data?.map((interest) => (
+						<button
 							key={interest.id}
-							variant={selectedInterestId === interest.id ? 'default' : 'outline'}
-							className={cn(
-								'cursor-pointer transition-colors px-4 py-2 text-sm',
-								selectedInterestId === interest.id
-									? 'bg-primary text-primary-foreground hover:bg-primary/90'
-									: 'hover:bg-secondary',
-							)}
-							onClick={() => toggleInterest(interest.id)}
+							type="button"
+							onClick={() =>
+								setValue('interestId', interest.id, { shouldValidate: true })
+							}
+							className={`px-4 py-2 rounded-full border text-sm transition-all ${
+								interestId === interest.id
+									? 'bg-primary text-primary-foreground border-primary'
+									: 'bg-background text-foreground hover:border-primary'
+							}`}
 						>
 							{interest.name}
-							{selectedInterestId === interest.id && <X className="ml-1 h-3 w-3" />}
-						</Badge>
+						</button>
 					))}
 				</div>
 				{errors.interestId && (
