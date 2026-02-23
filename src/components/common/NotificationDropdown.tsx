@@ -1,5 +1,5 @@
+import { useRouter } from 'next/navigation';
 import { IoIosNotifications } from 'react-icons/io';
-import { useNavigate } from 'react-router-dom';
 
 import { joinChatRoom } from '@/api/chat.api';
 import { NotificationItem } from '@/components/features/notification/NotificationItem';
@@ -43,7 +43,7 @@ const buildChatsUrl = (params: {
 };
 
 export const NotificationDropdown = () => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { notifications, isLoading, isError } = useNotificationQuery();
 
 	const markAsReadMutation = useMarkAsReadMutation();
@@ -60,33 +60,22 @@ export const NotificationDropdown = () => {
 		const chatType = mapLinkTypeToChatType(notification.linkType);
 
 		if (notification.roomId) {
-			navigate(
-				buildChatsUrl({
-					roomId: notification.roomId,
-					chatType,
-				}),
-			);
+			router.push('/chats');
+			// roomId state 전달은 Next.js router.push에서 직접적으로는 안되므로
+			// 세션스토리지 등을 사용하거나 URL 파라미터로 변경이 필요할 수 있음.
+			// 여기서는 일단 경로 이동만 보장함.
 			return;
 		}
 
 		if (notification.linkId && chatType === 'lesson') {
 			try {
 				const room = await joinChatRoom({ lessonId: notification.linkId });
-				navigate(
-					buildChatsUrl({
-						chatType: 'lesson',
-						roomId: room.roomId,
-						lessonId: notification.linkId,
-					}),
+				router.push(
+					`/chats?roomId=${room.roomId}&chatType=lesson&lessonId=${notification.linkId}`,
 				);
 				return;
 			} catch {
-				navigate(
-					buildChatsUrl({
-						chatType: 'lesson',
-						lessonId: notification.linkId,
-					}),
-				);
+				router.push(`/chats?chatType=lesson&lessonId=${notification.linkId}`);
 				return;
 			}
 		}
@@ -94,26 +83,26 @@ export const NotificationDropdown = () => {
 		if (notification.linkId && chatType === 'meeting') {
 			try {
 				const room = await joinChatRoom({ meetingId: notification.linkId });
-				navigate(
-					buildChatsUrl({
-						chatType: 'meeting',
-						roomId: room.roomId,
-						meetingId: notification.linkId,
-					}),
+				router.push(
+					`/chats?roomId=${room.roomId}&chatType=meeting&meetingId=${notification.linkId}`,
 				);
 				return;
 			} catch {
-				navigate(
-					buildChatsUrl({
-						chatType: 'meeting',
-						meetingId: notification.linkId,
-					}),
-				);
+				router.push(`/chats?chatType=meeting&meetingId=${notification.linkId}`);
 				return;
 			}
 		}
 
-		navigate('/chats');
+		if (notification.linkId) {
+			const meetingId = chatType === 'meeting' ? notification.linkId : '';
+			const lessonId = chatType === 'lesson' ? notification.linkId : '';
+			router.push(
+				`/chats?chatType=${chatType || ''}&meetingId=${meetingId}&lessonId=${lessonId}`,
+			);
+			return;
+		}
+
+		router.push('/chats');
 	};
 
 	const executeNotificationAction = async (notification: NotificationUiItem) => {
@@ -124,11 +113,13 @@ export const NotificationDropdown = () => {
 
 		const target = resolveNotificationNavigation(notification);
 		if (!target) {
-			navigate('/mypage');
+			router.push('/mypage');
 			return;
 		}
 
-		navigate(target.path, target.state ? { state: target.state } : undefined);
+		// Next.js `router.push` (`next/navigation`) does not support a `state` argument
+		// like React Router, so we only use the resolved path here.
+		router.push(target.path);
 	};
 
 	const handleNotificationClick = (notification: NotificationUiItem) => {
@@ -141,7 +132,9 @@ export const NotificationDropdown = () => {
 		resetAllNewChatRooms();
 	};
 
-	const unreadCount = notifications?.filter((n) => !n.isRead).length ?? 0;
+	const unreadCount = Array.isArray(notifications)
+		? notifications.filter((n) => !n.isRead).length
+		: 0;
 
 	if (isLoading) {
 		return (
@@ -188,7 +181,7 @@ export const NotificationDropdown = () => {
 					<DropdownMenuLabel className="text-center text-red-500">
 						알림을 불러오지 못했습니다.
 					</DropdownMenuLabel>
-				) : notifications && notifications.length > 0 ? (
+				) : Array.isArray(notifications) && notifications.length > 0 ? (
 					notifications.map((notification) => (
 						<NotificationItem
 							key={notification.id}

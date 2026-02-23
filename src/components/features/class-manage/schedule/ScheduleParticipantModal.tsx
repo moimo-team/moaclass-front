@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { MessageSquare, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { joinChatRoom } from '@/api/chat.api';
@@ -29,10 +29,10 @@ export const ScheduleParticipantModal = ({
 	dateStr,
 	timeStr,
 }: ScheduleParticipantModalProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { data: participants, isLoading } = useQuery<ScheduleParticipant[]>({
 		queryKey: ['scheduleParticipants', scheduleId],
-		queryFn: () => fetchScheduleParticipants(scheduleId!),
+		queryFn: () => fetchScheduleParticipants(lessonId, scheduleId!),
 		enabled: !!scheduleId && isOpen,
 	});
 
@@ -40,9 +40,7 @@ export const ScheduleParticipantModal = ({
 		try {
 			const room = await joinChatRoom({ lessonId, studentId });
 			onClose();
-			navigate('/chats', {
-				state: { chatType: 'lesson', roomId: room.roomId, lessonId },
-			});
+			router.push(`/chats?chatType=lesson&roomId=${room.roomId}&lessonId=${lessonId}`);
 		} catch {
 			toast.error('문의 채팅방을 열지 못했습니다. 잠시 후 다시 시도해 주세요.');
 		}

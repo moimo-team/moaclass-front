@@ -37,10 +37,11 @@ export const deleteSchedules = async (scheduleIds: number[]): Promise<void[]> =>
 
 // 특정 일정의 신청자(모멘티) 목록 조회
 export const fetchScheduleParticipants = async (
+	lessonId: number,
 	scheduleId: number,
 ): Promise<ScheduleParticipant[]> => {
 	const { data } = await apiClient.get<ScheduleParticipant[]>(
-		`/lessons/schedules/${scheduleId}/participants`,
+		`/lessons/${lessonId}/schedules/${scheduleId}/participants`,
 	);
 	return data;
 };

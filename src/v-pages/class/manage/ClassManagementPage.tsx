@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 import { fetchLessons } from '@/api/lesson.api';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -10,17 +10,15 @@ import { CreateClassButton } from '@/components/features/class-manage/CreateClas
 import AlertNotification from '@/components/features/modal/AlertNotification';
 import ConfirmDialog from '@/components/features/modal/ConfirmDialog';
 import CreateClassModal from '@/components/features/modal/create/CreateClassModal';
+import { TeacherProfileModal } from '@/components/features/modal/profile/TeacherProfileModal';
 import { useDeleteLessonMutation } from '@/hooks/useLessonMutations';
 import { useTeacherProfileQuery } from '@/hooks/useTeacherProfileMutations';
 import { useToggleLessonStatusMutation } from '@/hooks/useToggleLessonStatusMutation';
 import type { Lesson, FetchLessonsResponse } from '@/models/lesson.model';
 import { useAuthStore } from '@/store/authStore';
 
-export interface ClassManagementProps {
-	onNavigate: (path: string) => void;
-}
-
-export const ClassManagementContent = ({ onNavigate }: ClassManagementProps) => {
+export const ClassManagementContent = () => {
+	const router = useRouter();
 	const userId = useAuthStore((state) => state.userId);
 	const { data: teacherProfile } = useTeacherProfileQuery(userId ?? undefined);
 
@@ -33,6 +31,7 @@ export const ClassManagementContent = ({ onNavigate }: ClassManagementProps) => 
 	const [editingIsDraft, setEditingIsDraft] = useState(false);
 	const [duplicatingClassId, setDuplicatingClassId] = useState<number | null>(null);
 	const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
+	const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
 	const {
 		data: lessonsResponse,
@@ -95,11 +94,11 @@ export const ClassManagementContent = ({ onNavigate }: ClassManagementProps) => 
 	};
 
 	const handleManage = (id: number) => {
-		onNavigate(`/lessons/${id}/schedule`);
+		router.push(`/lessons/${id}/schedule`);
 	};
 
 	const handleViewClass = (id: number) => {
-		onNavigate(`/lessons/${id}`);
+		router.push(`/lessons/${id}`);
 	};
 
 	const handleToggleStatus = (id: number) => {
@@ -142,7 +141,101 @@ export const ClassManagementContent = ({ onNavigate }: ClassManagementProps) => 
 
 	if (isError) {
 		return (
-			<div className="py-10 text-center text-red-500">클래스 목록을 불러오지 못했습니다.</div>
+			<div className="py-20 text-center">
+				<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 text-red-500 mb-4">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+					>
+						<circle cx="12" cy="12" r="10" />
+						<line x1="12" y1="8" x2="12" y2="12" />
+						<line x1="12" y1="16" x2="12.01" y2="16" />
+					</svg>
+				</div>
+				<h3 className="text-xl font-bold text-gray-900 mb-2">
+					클래스 목록을 불러오지 못했습니다.
+				</h3>
+				<p className="text-gray-500 mb-6">잠시 후 다시 시도해주세요.</p>
+				<button
+					onClick={() => window.location.reload()}
+					className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+				>
+					다시 시도하기
+				</button>
+			</div>
+		);
+	}
+
+	// 멘토 프로필이 없는 경우 안내 화면 표시
+	if (!isLoading && !teacherProfile) {
+		return (
+			<div className="w-full max-w-2xl mx-auto py-16 text-center">
+				<div className="relative w-full aspect-video rounded-3xl overflow-hidden mb-10 shadow-2xl shadow-primary/10 border border-white/20">
+					<img
+						src="https://images.unsplash.com/photo-1544717305-27a734ef4164?auto=format&fit=crop&q=80&w=800&h=450"
+						alt="Mentor Profile Required"
+						className="w-full h-full object-cover"
+						onError={(e) => {
+							(e.target as HTMLImageElement).src =
+								'https://placehold.co/800x450/4f46e5/ffffff?text=Create+Your+Profile';
+						}}
+					/>
+					<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-8 text-left">
+						<span className="inline-block px-3 py-1 rounded-full bg-primary/20 backdrop-blur-md text-primary-foreground text-xs font-bold mb-3 border border-primary/30">
+							STEP 01
+						</span>
+						<h2 className="text-3xl font-bold text-white mb-2">
+							클래스 운영을 위한 첫걸음
+						</h2>
+						<p className="text-white/80">
+							멋진 모멘토 프로필을 작성하고 당신의 재능을 나누어 보세요.
+						</p>
+					</div>
+				</div>
+
+				<h1 className="text-3xl font-nanum-bold mb-4 text-gray-900 leading-tight">
+					클래스 목록을 불러오기 위해서는
+					<br />
+					<span className="text-primary italic underline underline-offset-8">
+						모멘토 프로필
+					</span>
+					을 먼저 작성해야 해요.
+				</h1>
+
+				<p className="text-gray-500 mb-10 text-lg leading-relaxed">
+					프로필은 수강생들이 선생님을 처음 만나는 곳입니다.
+					<br />
+					신뢰감을 주는 활동명과 상세한 소개로 모멘토님의 매력을 보여주세요!
+				</p>
+
+				<div className="flex flex-col sm:flex-row gap-4 justify-center">
+					<button
+						onClick={() => setIsProfileModalOpen(true)}
+						className="px-10 py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary-hover hover:scale-105 transition-all shadow-lg shadow-primary/20"
+					>
+						지금 프로필 작성하기
+					</button>
+					<button
+						onClick={() => router.push('/')}
+						className="px-10 py-4 bg-white text-gray-600 border border-gray-200 rounded-2xl font-bold text-lg hover:bg-gray-50 transition-all"
+					>
+						나중에 하기
+					</button>
+				</div>
+
+				<TeacherProfileModal
+					isOpen={isProfileModalOpen}
+					onClose={() => setIsProfileModalOpen(false)}
+					profile={null}
+				/>
+			</div>
 		);
 	}
 
@@ -238,9 +331,7 @@ export const ClassManagementContent = ({ onNavigate }: ClassManagementProps) => 
 };
 
 const ClassManagementPage = () => {
-	const navigate = useNavigate();
-
-	return <ClassManagementContent onNavigate={(path) => navigate(path)} />;
+	return <ClassManagementContent />;
 };
 
 export default ClassManagementPage;

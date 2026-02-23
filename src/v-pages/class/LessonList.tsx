@@ -48,7 +48,7 @@ const LessonListPage: React.FC = () => {
 	const setAllFilters = useFilterStore((state) => state.setAllFilters);
 	const resetFilters = useFilterStore((state) => state.resetFilters);
 	const getFetchLessonsParams = useFilterStore((state) => state.getFetchLessonsParams);
-	const selectedSort = useFilterStore((state) => state.selectedSort);
+	/* const selectedSort = useFilterStore((state) => state.selectedSort); */
 	const setSelectedSort = useFilterStore((state) => state.setSelectedSort);
 
 	useEffect(() => {
@@ -120,23 +120,16 @@ const LessonListPage: React.FC = () => {
 			/>
 
 			<div className="my-8 flex justify-end">
-				<Select
-					value={selectedSort || 'LATEST'}
-					onValueChange={(value: string) => setSelectedSort(value as SortEnum)}
-				>
+				<Select onValueChange={(value: string) => setSelectedSort(value as SortEnum)}>
 					<SelectTrigger className="w-[180px]">
 						<SelectValue placeholder="정렬 기준" />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="LATEST">생성일 최신순</SelectItem>{' '}
-						{Object.entries(REVERSE_SORT_MAP).map(
-							([backendValue, frontendName]) =>
-								backendValue !== 'LATEST' && (
-									<SelectItem key={backendValue} value={backendValue as SortEnum}>
-										{frontendName}
-									</SelectItem>
-								),
-						)}
+						{Object.entries(REVERSE_SORT_MAP).map(([backendValue, frontendName]) => (
+							<SelectItem key={backendValue} value={backendValue as SortEnum}>
+								{frontendName}
+							</SelectItem>
+						))}
 					</SelectContent>
 				</Select>
 			</div>

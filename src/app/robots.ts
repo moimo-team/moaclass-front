@@ -11,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
 				'/chats/',
 				'/payments/',
 				'/mypage/',
-				'/lessons/manage/',
+				'/classes-manage/',
 				'/lessons/*/schedule',
 				'/login',
 				'/join',
