@@ -2,9 +2,13 @@
 
 import Autoplay from 'embla-carousel-autoplay';
 import { Check, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import LoginRequiredClientDialog from '@/app/lessons/[lessonId]/_components/LoginRequiredClientDialog';
+import bannerCookingImage from '@/assets/images/banner-cooking.webp';
+import bannerCouponImage from '@/assets/images/banner-coupon.webp';
+import bannerMeetingImage from '@/assets/images/banner-meeting.webp';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -15,12 +19,11 @@ import {
 	CarouselPrevious,
 	type CarouselApi,
 } from '@/components/ui/carousel';
+import { BANNER_COUPON_CODE, BANNER_COUPON_ID } from '@/constants/coupon';
 import { useIssueCouponMutation } from '@/hooks/useCouponMutations';
 import { useUserCouponsQuery } from '@/hooks/useCouponQuery';
 import { useAuthStore } from '@/store/authStore';
-
-export const BANNER_COUPON_ID = 4;
-export const BANNER_COUPON_CODE = 'NEW_SEMESTER_2026';
+export { BANNER_COUPON_ID, BANNER_COUPON_CODE };
 
 const getStatusCode = (error: unknown): number | undefined => {
 	if (typeof error !== 'object' || error === null || !('response' in error)) {
@@ -111,12 +114,14 @@ function Banner() {
 			id: 1,
 			content: (
 				<div className="w-full h-full bg-accent flex items-center justify-center relative">
-					<div className="absolute bottom-16 flex flex-col items-center gap-4">
+					<Image src={bannerCouponImage} alt="" fill priority className="object-cover" />
+					<div className="absolute inset-0 bg-black/45" />
+					<div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6">
 						<div className="text-center">
-							<h2 className="text-xl md:text-2xl font-bold text-primary">
+							<h2 className="text-xl md:text-2xl font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
 								새학기 맞이 원데이 클래스
 							</h2>
-							<p className="text-2xl md:text-3xl font-bold text-primary">
+							<p className="text-2xl md:text-3xl font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
 								10% 할인 쿠폰 증정
 							</p>
 						</div>
@@ -148,12 +153,14 @@ function Banner() {
 			id: 2,
 			content: (
 				<div className="w-full h-full bg-green-100 flex items-center justify-center relative">
-					<div className="absolute bottom-16 flex flex-col items-center gap-4">
+					<Image src={bannerMeetingImage} alt="" fill className="object-cover" />
+					<div className="absolute inset-0 bg-black/45" />
+					<div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6">
 						<div className="text-center">
-							<h2 className="text-xl md:text-2xl font-bold text-green-800">
+							<h2 className="text-xl md:text-2xl font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
 								원데이 모임 구경하기
 							</h2>
-							<p className="text-2xl md:text-3xl font-bold text-foreground">
+							<p className="text-2xl md:text-3xl font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
 								다양한 주제의 모임으로 일상을 특별하게!
 							</p>
 						</div>
@@ -170,17 +177,19 @@ function Banner() {
 			id: 3,
 			content: (
 				<div className="w-full h-full bg-yellow-100 flex items-center justify-center relative">
-					<div className="absolute bottom-16 flex flex-col items-center gap-4">
+					<Image src={bannerCookingImage} alt="" fill className="object-cover" />
+					<div className="absolute inset-0 bg-black/45" />
+					<div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6">
 						<div className="text-center">
-							<h2 className="text-xl md:text-2xl font-bold text-carrot">
+							<h2 className="text-xl md:text-2xl font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
 								쿠킹 클래스 찾기
 							</h2>
-							<p className="text-2xl md:text-3xl font-bold text-carrot">
+							<p className="text-2xl md:text-3xl font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
 								따뜻한 쿠킹으로 힐링하는 시간!
 							</p>
 						</div>
 						<Button className="bg-carrot hover:bg-carrot-hover text-white" asChild>
-							<Link href="/lessons?category=荑좏궧" data-testid="banner-lesson-link">
+							<Link href="/lessons?category=쿠킹" data-testid="banner-lesson-link">
 								클래스 구경하기
 							</Link>
 						</Button>
@@ -210,7 +219,7 @@ function Banner() {
 					{bannerItems.map((item) => (
 						<CarouselItem key={item.id}>
 							<Card className="border-none">
-								<CardContent className="flex h-80 items-center justify-center p-0">
+								<CardContent className="flex h-100 items-center justify-center p-0">
 									{item.content}
 								</CardContent>
 							</Card>
