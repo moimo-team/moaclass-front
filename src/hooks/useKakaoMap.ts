@@ -10,35 +10,28 @@ export function useKakaoMap(): UseKakaoMapReturn {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		// 이미 로드되어 있는지 확인
-		if (window.kakao && window.kakao.maps) {
-			if (window.kakao.maps.load) {
-				window.kakao.maps.load(() => {
-					setIsLoaded(true);
-				});
-			} else {
+		const initialize = () => {
+			window.kakao.maps.load(() => {
 				setIsLoaded(true);
-			}
+			});
+		};
+
+		// 1. 이미 load()가 실행 가능한 상태인 경우 즉시 초기화
+		if (window.kakao && window.kakao.maps && window.kakao.maps.load) {
+			initialize();
 			return;
 		}
 
-		// 로드 대기 (최대 5초)
+		// 2. SDK 스크립트 자체가 로드되길 대기 (최대 5초)
 		const checkInterval = setInterval(() => {
-			if (window.kakao && window.kakao.maps) {
-				if (window.kakao.maps.load) {
-					window.kakao.maps.load(() => {
-						setIsLoaded(true);
-						clearInterval(checkInterval);
-					});
-				} else {
-					setIsLoaded(true);
-					clearInterval(checkInterval);
-				}
+			if (window.kakao && window.kakao.maps && window.kakao.maps.load) {
+				initialize();
+				clearInterval(checkInterval);
 			}
 		}, 100);
 
 		const timeout = setTimeout(() => {
-			if (!window.kakao || !window.kakao.maps) {
+			if (!window.kakao?.maps?.load) {
 				setError('카카오맵 API를 불러올 수 없습니다');
 				clearInterval(checkInterval);
 			}
@@ -54,5 +47,5 @@ export function useKakaoMap(): UseKakaoMapReturn {
 }
 
 export function isKakaoMapLoaded(): boolean {
-	return !!(window.kakao && window.kakao.maps);
+	return !!(window.kakao && window.kakao.maps && window.kakao.maps.services);
 }
