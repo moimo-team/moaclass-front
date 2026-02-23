@@ -5,9 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import Banner from '@/components/features/home/banner';
-
-import type * as ReactRouterDom from 'react-router-dom';
+import Banner, { BANNER_COUPON_ID } from '@/components/features/home/banner';
 
 const mockMutateAsync = vi.fn();
 const mockNavigate = vi.fn();
@@ -36,8 +34,8 @@ vi.mock('@/store/authStore', () => ({
 	}),
 }));
 
-vi.mock('react-router-dom', async (importOriginal) => {
-	const actual = await importOriginal<typeof ReactRouterDom>();
+vi.mock('react-router-dom', async () => {
+	const actual = await vi.importActual('react-router-dom');
 	return {
 		...actual,
 		useNavigate: () => mockNavigate,
@@ -63,15 +61,19 @@ vi.mock('@/components/ui/button', () => ({
 		onClick,
 		disabled,
 		asChild,
+		...rest
 	}: {
 		children: ReactNode;
 		onClick?: () => void;
 		disabled?: boolean;
 		asChild?: boolean;
+		'data-testid'?: string;
 	}) => {
-		if (asChild) return <>{children}</>;
+		if (asChild) {
+			return <>{children}</>;
+		}
 		return (
-			<button type="button" onClick={onClick} disabled={disabled}>
+			<button type="button" onClick={onClick} disabled={disabled} {...rest}>
 				{children}
 			</button>
 		);
@@ -94,19 +96,19 @@ describe('Banner coupon issue flow', () => {
 			</MemoryRouter>,
 		);
 
-		await userEvent.click(screen.getByRole('button', { name: '쿠폰 받기' }));
+		await userEvent.click(screen.getByTestId('banner-coupon-button'));
 
 		expect(mockMutateAsync).not.toHaveBeenCalled();
 		expect(mockNavigate).toHaveBeenCalledWith('/login');
 	});
 
-	it('issues coupon when logged in and marks button as completed', async () => {
+	it('issues coupon once when logged in', async () => {
 		mockIsLoggedIn = true;
-		mockUserId = 1;
+		mockUserId = 7;
 		mockMutateAsync.mockResolvedValue({
 			id: 1,
-			userId: 1,
-			couponId: 4,
+			userId: 7,
+			couponId: BANNER_COUPON_ID,
 			isUsed: false,
 			usedAt: null,
 			issuedAt: '2026-02-23T00:00:00.000Z',
@@ -118,18 +120,23 @@ describe('Banner coupon issue flow', () => {
 			</MemoryRouter>,
 		);
 
-		await userEvent.click(screen.getByRole('button', { name: '쿠폰 받기' }));
+		const couponButton = screen.getByTestId('banner-coupon-button');
+		await userEvent.click(couponButton);
+		await userEvent.click(couponButton);
 
 		await waitFor(() => {
-			expect(mockMutateAsync).toHaveBeenCalledWith({ userId: 1, couponId: 4 });
-			expect(screen.getByRole('button', { name: '발급 완료' })).toBeDisabled();
+			expect(mockMutateAsync).toHaveBeenCalledTimes(1);
+			expect(mockMutateAsync).toHaveBeenCalledWith({
+				userId: 7,
+				couponId: BANNER_COUPON_ID,
+			});
 		});
 	});
 
-	it('disables button when coupon already exists from server response', () => {
+	it('disables coupon button when already issued from server data', () => {
 		mockIsLoggedIn = true;
-		mockUserId = 1;
-		mockUserCoupons = [{ couponId: 4 }];
+		mockUserId = 7;
+		mockUserCoupons = [{ couponId: BANNER_COUPON_ID }];
 
 		render(
 			<MemoryRouter>
@@ -137,12 +144,12 @@ describe('Banner coupon issue flow', () => {
 			</MemoryRouter>,
 		);
 
-		expect(screen.getByRole('button', { name: '발급 완료' })).toBeDisabled();
+		expect(screen.getByTestId('banner-coupon-button')).toBeDisabled();
 	});
 
-	it('marks button as completed when issue API responds with duplicate status', async () => {
+	it('marks coupon as issued when API returns duplicate response', async () => {
 		mockIsLoggedIn = true;
-		mockUserId = 1;
+		mockUserId = 7;
 		mockMutateAsync.mockRejectedValue({ response: { status: 409 } });
 
 		render(
@@ -151,17 +158,17 @@ describe('Banner coupon issue flow', () => {
 			</MemoryRouter>,
 		);
 
-		await userEvent.click(screen.getByRole('button', { name: '쿠폰 받기' }));
+		await userEvent.click(screen.getByTestId('banner-coupon-button'));
 
 		await waitFor(() => {
-			expect(screen.getByRole('button', { name: '발급 완료' })).toBeDisabled();
+			expect(screen.getByTestId('banner-coupon-button')).toBeDisabled();
 		});
 	});
 
-	it('disables button while issue mutation is pending', () => {
-		mockIsPending = true;
+	it('keeps button enabled when API fails with non-duplicate error', async () => {
 		mockIsLoggedIn = true;
-		mockUserId = 1;
+		mockUserId = 7;
+		mockMutateAsync.mockRejectedValue({ response: { status: 500 } });
 
 		render(
 			<MemoryRouter>
@@ -169,6 +176,25 @@ describe('Banner coupon issue flow', () => {
 			</MemoryRouter>,
 		);
 
-		expect(screen.getByRole('button', { name: '쿠폰 발급 중' })).toBeDisabled();
+		await userEvent.click(screen.getByTestId('banner-coupon-button'));
+
+		await waitFor(() => {
+			expect(mockMutateAsync).toHaveBeenCalledTimes(1);
+		});
+		expect(screen.getByTestId('banner-coupon-button')).not.toBeDisabled();
+	});
+
+	it('disables button while mutation is pending', () => {
+		mockIsPending = true;
+		mockIsLoggedIn = true;
+		mockUserId = 7;
+
+		render(
+			<MemoryRouter>
+				<Banner />
+			</MemoryRouter>,
+		);
+
+		expect(screen.getByTestId('banner-coupon-button')).toBeDisabled();
 	});
 });

@@ -18,8 +18,8 @@ import { useIssueCouponMutation } from '@/hooks/useCouponMutations';
 import { useUserCouponsQuery } from '@/hooks/useCouponQuery';
 import { useAuthStore } from '@/store/authStore';
 
-const BANNER_COUPON_ID = 4;
-const BANNER_COUPON_CODE = 'NEW_SEMESTER_2026';
+export const BANNER_COUPON_ID = 4;
+export const BANNER_COUPON_CODE = 'NEW_SEMESTER_2026';
 
 const getStatusCode = (error: unknown): number | undefined => {
 	if (typeof error !== 'object' || error === null || !('response' in error)) {
@@ -122,6 +122,7 @@ function Banner() {
 						<Button
 							onClick={handleCouponIssue}
 							disabled={issueCouponMutation.isPending || hasIssuedCoupon}
+							data-testid="banner-coupon-button"
 							className="bg-primary hover:bg-primary/90 text-white"
 						>
 							{hasIssuedCoupon ? (
@@ -156,7 +157,9 @@ function Banner() {
 							</p>
 						</div>
 						<Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
-							<Link to="/">구경하기</Link>
+							<Link to="/" data-testid="banner-meeting-link">
+								구경하기
+							</Link>
 						</Button>
 					</div>
 				</div>
@@ -176,7 +179,9 @@ function Banner() {
 							</p>
 						</div>
 						<Button className="bg-carrot hover:bg-carrot-hover text-white" asChild>
-							<Link to="/lessons?category=쿠킹">클래스 구경하기</Link>
+							<Link to="/lessons?category=쿠킹" data-testid="banner-lesson-link">
+								클래스 구경하기
+							</Link>
 						</Button>
 					</div>
 				</div>
