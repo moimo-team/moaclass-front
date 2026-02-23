@@ -12,15 +12,28 @@ export function useKakaoMap(): UseKakaoMapReturn {
 	useEffect(() => {
 		// 이미 로드되어 있는지 확인
 		if (window.kakao && window.kakao.maps) {
-			setIsLoaded(true);
+			if (window.kakao.maps.load) {
+				window.kakao.maps.load(() => {
+					setIsLoaded(true);
+				});
+			} else {
+				setIsLoaded(true);
+			}
 			return;
 		}
 
 		// 로드 대기 (최대 5초)
 		const checkInterval = setInterval(() => {
 			if (window.kakao && window.kakao.maps) {
-				setIsLoaded(true);
-				clearInterval(checkInterval);
+				if (window.kakao.maps.load) {
+					window.kakao.maps.load(() => {
+						setIsLoaded(true);
+						clearInterval(checkInterval);
+					});
+				} else {
+					setIsLoaded(true);
+					clearInterval(checkInterval);
+				}
 			}
 		}, 100);
 
