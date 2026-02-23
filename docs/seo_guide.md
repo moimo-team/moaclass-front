@@ -50,7 +50,7 @@
 
 - `src/app/chats/page.tsx`
 - `src/app/payments/preview/page.tsx`
-- `src/app/lessons/manage/page.tsx`
+- `src/app/classes-manage/page.tsx`
 - `src/app/lessons/[lessonId]/schedule/page.tsx`
 - `src/app/(auth)/**`
 - `src/app/mypage/**`
@@ -108,7 +108,7 @@ Next.js는 `src/app`에 약속된 파일을 두면 자동으로 SEO 파일을 �
 #### 권장 규칙 (MoaClass, App Router 기준)
 
 - 기본 허용: `/`
-- 기본 차단(비공개/인증/운영): `/mypage`, `/chats`, `/payments`, `/lessons/manage`, `/lessons/*/schedule`
+- 기본 차단(비공개/인증/운영): `/mypage`, `/chats`, `/payments`, `/classes-manage`, `/lessons/*/schedule`
 - 인증 관련 차단 권장: `/login`, `/join`, `/find-password`, `/reset-password`, `/oauth/kakao/callback`, `/user-info`
 - 주의: SEO 라우트 기준은 `src/app/**/page.tsx`이며 `src/routes/routeList.tsx`는 레거시 참조로만 사용
 
@@ -124,7 +124,7 @@ export default function robots(): MetadataRoute.Robots {
 				'/mypage/',
 				'/chats/',
 				'/payments/',
-				'/lessons/manage/',
+				'/classes-manage/',
 				'/lessons/*/schedule',
 				'/oauth/kakao/callback',
 				'/user-info',
@@ -159,7 +159,7 @@ export default function robots(): MetadataRoute.Robots {
 
 - 정적 라우트(공개 페이지): `/`, `/lessons`, `/meetings`, `/meetings/search`, `/moimer-intro`, `/interests`
 - 동적 라우트(공개 상세): `/lessons/[lessonId]`, `/meetings/[meetingId]`
-- 제외 라우트(비공개/인증/운영): `/mypage/**`, `/chats`, `/payments/**`, `/lessons/manage`, `/lessons/[lessonId]/schedule`, `/(auth)/**`
+- 제외 라우트(비공개/인증/운영): `/mypage/**`, `/chats`, `/payments/**`, `/classes-manage`, `/lessons/[lessonId]/schedule`, `/(auth)/**`
 
 ```ts
 import type { MetadataRoute } from 'next';
@@ -329,7 +329,7 @@ export default async function Image({ params }: { params: { lessonId: string } }
 
 - `src/app/page.tsx` (홈)
 - `src/app/interests/page.tsx`, `src/app/moimer-intro/page.tsx` (공개 정적 페이지)
-- `src/app/chats/page.tsx`, `src/app/payments/preview/page.tsx`, `src/app/lessons/manage/page.tsx`, `src/app/lessons/[lessonId]/schedule/page.tsx` (noindex 성격)
+- `src/app/chats/page.tsx`, `src/app/payments/preview/page.tsx`, `src/app/classes-manage/page.tsx`, `src/app/lessons/[lessonId]/schedule/page.tsx` (noindex 성격)
 
 #### 보강이 필요한 페이지
 

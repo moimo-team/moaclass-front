@@ -7,10 +7,10 @@ import type { Lesson, Level, TeacherProfile, LessonDetail } from '@/models/lesso
 import type { Meeting } from '@/models/meeting.model';
 import type { ParticipationDetail, ParticipationStatus } from '@/models/participation.model';
 import type { Review, UserProfileForReview } from '@/models/review.model';
+import { ENV } from '@/utils/env';
 import { interestImageMap } from '@/utils/interestImageMap';
 
-// export const httpUrl = ENV.API_URL;
-export const httpUrl = '/api';
+export const httpUrl = ENV.API_URL;
 
 export const interestCategories: Interest[] = [
 	{

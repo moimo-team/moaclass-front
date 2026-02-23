@@ -39,7 +39,7 @@ const TeacherProtectedRoute = ({ children }: TeacherProtectedRouteProps) => {
 					confirmText="이동하기"
 					cancelText="취소"
 					showCancel={true}
-					onConfirm={() => navigate('/lessons/manage')}
+					onConfirm={() => navigate('/classes-manage')}
 					onCancel={() => navigate('/mypage/profile')}
 				/>
 			</div>
