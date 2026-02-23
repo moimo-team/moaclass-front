@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
 			'loremflickr.com', // 외부 이미지 호스트를 images 허용 목록에 등록
 			'storage.googleapis.com',
 			'images.unsplash.com',
+			'example.com',
+			'lh3.googleusercontent.com',
 		],
 	},
 	async rewrites() {
