@@ -110,17 +110,20 @@ export const mockReviews: MeetingReview[] = [
 ];
 
 export const mockMyReview: MyReviewItem = {
-	id: 12,
-	lessonId: 3,
-	lessonTitle: '레슨타이틀',
-	rating: 4.5,
-	content: '좋은 수업이었어요.',
-	image1: 'https://picsum.photos/id/64/300/300',
-	image2: 'https://picsum.photos/id/65/300/300',
-	image3: null,
-	image4: null,
-	image5: null,
-	image6: null,
-	image7: null,
-	image8: null,
+	hasReview: true,
+	review: {
+		id: 12,
+		lessonId: 3,
+		lessonTitle: '레슨타이틀',
+		rating: 4.5,
+		content: '좋은 수업이었어요.',
+		image1: 'https://picsum.photos/id/64/300/300',
+		image2: 'https://picsum.photos/id/65/300/300',
+		image3: null,
+		image4: null,
+		image5: null,
+		image6: null,
+		image7: null,
+		image8: null,
+	},
 };
