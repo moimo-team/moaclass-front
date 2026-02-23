@@ -1,5 +1,7 @@
 'use client';
 
+import { motion } from 'framer-motion';
+
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
@@ -26,25 +28,33 @@ export const MainModeToggle = ({ mode, setMode }: MainModeToggleProps) => {
 						<TabsTrigger
 							value="lesson"
 							className={cn(
-								'text-xl font-nanum-bold transition-all relative pb-2 px-2 rounded-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none',
+								'text-xl font-nanum-bold transition-all relative pb-3 px-2 rounded-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none',
 								'text-gray-400 hover:text-gray-600',
 							)}
 						>
 							원데이 클래스
 							{mode === 'lesson' && (
-								<div className="absolute bottom-[-1px] left-0 right-0 h-1 bg-primary rounded-full transition-all" />
+								<motion.div
+									layoutId="mainModeUnderline"
+									className="absolute bottom-[-1px] left-0 right-0 h-1 bg-primary rounded-full z-10"
+									transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+								/>
 							)}
 						</TabsTrigger>
 						<TabsTrigger
 							value="meeting"
 							className={cn(
-								'text-xl font-nanum-bold transition-all relative pb-2 px-2 rounded-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none',
+								'text-xl font-nanum-bold transition-all relative pb-3 px-2 rounded-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none',
 								'text-gray-400 hover:text-gray-600',
 							)}
 						>
 							모임
 							{mode === 'meeting' && (
-								<div className="absolute bottom-[-1px] left-0 right-0 h-1 bg-primary rounded-full transition-all" />
+								<motion.div
+									layoutId="mainModeUnderline"
+									className="absolute bottom-[-1px] left-0 right-0 h-1 bg-primary rounded-full z-10"
+									transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+								/>
 							)}
 						</TabsTrigger>
 					</TabsList>

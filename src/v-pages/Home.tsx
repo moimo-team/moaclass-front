@@ -1,6 +1,7 @@
 ﻿import { useState } from 'react';
 
 import { useAuthStore } from '@store/authStore';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import Banner from '@/components/features/home/banner';
 import HostedMeetingsList from '@/components/features/home/HostedMeetingsList';
@@ -35,147 +36,163 @@ function Home() {
 				aria-label="메인 콘텐츠"
 				data-testid="home-main-content"
 			>
-				{activeMode === 'lesson' ? (
-					<div className="w-full animate-in fade-in duration-500">
-						<section
+				<AnimatePresence mode="wait">
+					{activeMode === 'lesson' ? (
+						<motion.div
+							key="lesson"
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -10 }}
+							transition={{ duration: 0.3, ease: 'easeInOut' }}
 							className="w-full"
-							aria-label="신규 클래스"
-							data-testid="home-section-new-lessons"
 						>
-							<NewLessonList />
-						</section>
-						<section
-							className="w-full"
-							aria-label="좋아요 많은 클래스"
-							data-testid="home-section-likes"
-						>
-							<HomeLessonSection
-								title="좋아요 많은 클래스"
-								seeMoreHref="/lessons?sort=LIKES"
-								queryParams={{ sort: 'LIKES' }}
-							/>
-						</section>
-						{experienceCategory && (
 							<section
 								className="w-full"
-								aria-label="체험 추천 클래스"
-								data-testid="home-section-experience"
+								aria-label="신규 클래스"
+								data-testid="home-section-new-lessons"
 							>
-								<HomeLessonSection
-									title="체험 추천 클래스"
-									seeMoreHref={`/lessons?categoryId=${experienceCategory.id}&sort=LATEST`}
-									queryParams={{
-										categoryId: experienceCategory.id,
-										sort: 'LATEST',
-									}}
-								/>
+								<NewLessonList />
 							</section>
-						)}
-						{handmadeCategory && (
 							<section
 								className="w-full"
-								aria-label="핸드메이드 추천 클래스"
-								data-testid="home-section-handmade"
+								aria-label="좋아요 많은 클래스"
+								data-testid="home-section-likes"
 							>
 								<HomeLessonSection
-									title="핸드메이드 추천 클래스"
-									seeMoreHref={`/lessons?categoryId=${handmadeCategory.id}&sort=LATEST`}
-									queryParams={{
-										categoryId: handmadeCategory.id,
-										sort: 'LATEST',
-									}}
+									title="좋아요 많은 클래스"
+									seeMoreHref="/lessons?sort=LIKES"
+									queryParams={{ sort: 'LIKES' }}
 								/>
 							</section>
-						)}
-						{isLoggedIn && userRegionId && userRegionName && (
-							<section
-								className="w-full"
-								aria-label="지역 추천 클래스"
-								data-testid="home-section-region"
-							>
-								<HomeLessonSection
-									title={`${userRegionName} 지역 추천 클래스`}
-									seeMoreHref={`/lessons?regionId=${userRegionId}&sort=LATEST`}
-									queryParams={{ regionId: [userRegionId], sort: 'LATEST' }}
-								/>
-							</section>
-						)}
-						<section
-							className="w-full"
-							aria-label="후기"
-							data-testid="home-section-review"
-						>
-							<ReviewListSection />
-						</section>
-					</div>
-				) : (
-					<div className="w-full animate-in fade-in duration-500">
-						<section
-							className="w-full"
-							aria-label="전체 모임"
-							data-testid="home-section-all-meetings"
-						>
-							<MeetingListSection
-								title="전체 모임"
-								seeMoreHref="/meetings"
-								queryOptions={{ page: 1, limit: 12, sort: 'NEW' }}
-							/>
-						</section>
-						{isLoggedIn && (
-							<>
+							{experienceCategory && (
 								<section
 									className="w-full"
-									aria-label="내 지역 인기 모임"
-									data-testid="home-section-popular-meetings"
+									aria-label="체험 추천 클래스"
+									data-testid="home-section-experience"
 								>
-									<MeetingListSection
-										title={`${userRegionName || '내 지역'} 인기 모임`}
-										seeMoreHref="/meetings"
-										queryOptions={{ page: 1, limit: 8, sort: 'UPDATE' }}
-										hideIfEmpty
+									<HomeLessonSection
+										title="체험 추천 클래스"
+										seeMoreHref={`/lessons?categoryId=${experienceCategory.id}&sort=LATEST`}
+										queryParams={{
+											categoryId: experienceCategory.id,
+											sort: 'LATEST',
+										}}
 									/>
 								</section>
-
+							)}
+							{handmadeCategory && (
 								<section
-									className="w-full mt-12"
-									aria-label="따끈따끈한 신규 모임"
-									data-testid="home-section-new-meetings"
+									className="w-full"
+									aria-label="핸드메이드 추천 클래스"
+									data-testid="home-section-handmade"
 								>
-									<MeetingListSection
-										title="따끈따끈한 신규 모임"
-										seeMoreHref="/meetings"
-										queryOptions={{ page: 1, limit: 8, sort: 'NEW' }}
-										hideIfEmpty
+									<HomeLessonSection
+										title="핸드메이드 추천 클래스"
+										seeMoreHref={`/lessons?categoryId=${handmadeCategory.id}&sort=LATEST`}
+										queryParams={{
+											categoryId: handmadeCategory.id,
+											sort: 'LATEST',
+										}}
 									/>
 								</section>
-
+							)}
+							{isLoggedIn && userRegionId && userRegionName && (
 								<section
-									className="w-full mt-12"
-									aria-label="참여 중인 모임"
-									data-testid="home-section-joined-meetings"
+									className="w-full"
+									aria-label="지역 추천 클래스"
+									data-testid="home-section-region"
 								>
-									<JoinedMeetingsList />
+									<HomeLessonSection
+										title={`${userRegionName} 지역 추천 클래스`}
+										seeMoreHref={`/lessons?regionId=${userRegionId}&sort=LATEST`}
+										queryParams={{ regionId: [userRegionId], sort: 'LATEST' }}
+									/>
 								</section>
+							)}
+							<section
+								className="w-full"
+								aria-label="후기"
+								data-testid="home-section-review"
+							>
+								<ReviewListSection />
+							</section>
+						</motion.div>
+					) : (
+						<motion.div
+							key="meeting"
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -10 }}
+							transition={{ duration: 0.3, ease: 'easeInOut' }}
+							className="w-full"
+						>
+							<section
+								className="w-full"
+								aria-label="전체 모임"
+								data-testid="home-section-all-meetings"
+							>
+								<MeetingListSection
+									title="전체 모임"
+									seeMoreHref="/meetings"
+									queryOptions={{ page: 1, limit: 12, sort: 'NEW' }}
+								/>
+							</section>
+							{isLoggedIn && (
+								<>
+									<section
+										className="w-full"
+										aria-label="내 지역 인기 모임"
+										data-testid="home-section-popular-meetings"
+									>
+										<MeetingListSection
+											title={`${userRegionName || '내 지역'} 인기 모임`}
+											seeMoreHref="/meetings"
+											queryOptions={{ page: 1, limit: 8, sort: 'UPDATE' }}
+											hideIfEmpty
+										/>
+									</section>
 
-								<section
-									className="w-full mt-12"
-									aria-label="주최 모임"
-									data-testid="home-section-hosted-meetings"
-								>
-									<HostedMeetingsList />
-								</section>
+									<section
+										className="w-full mt-12"
+										aria-label="따끈따끈한 신규 모임"
+										data-testid="home-section-new-meetings"
+									>
+										<MeetingListSection
+											title="따끈따끈한 신규 모임"
+											seeMoreHref="/meetings"
+											queryOptions={{ page: 1, limit: 8, sort: 'NEW' }}
+											hideIfEmpty
+										/>
+									</section>
 
-								<section
-									className="w-full mt-12"
-									aria-label="승인 대기 모임"
-									data-testid="home-section-pending-meetings"
-								>
-									<PendingMeetingsList />
-								</section>
-							</>
-						)}
-					</div>
-				)}
+									<section
+										className="w-full mt-12"
+										aria-label="참여 중인 모임"
+										data-testid="home-section-joined-meetings"
+									>
+										<JoinedMeetingsList />
+									</section>
+
+									<section
+										className="w-full mt-12"
+										aria-label="주최 모임"
+										data-testid="home-section-hosted-meetings"
+									>
+										<HostedMeetingsList />
+									</section>
+
+									<section
+										className="w-full mt-12"
+										aria-label="승인 대기 모임"
+										data-testid="home-section-pending-meetings"
+									>
+										<PendingMeetingsList />
+									</section>
+								</>
+							)}
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</section>
 		</>
 	);
