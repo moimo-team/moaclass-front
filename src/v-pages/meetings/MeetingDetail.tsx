@@ -25,12 +25,13 @@ import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 import { formatFullDateTime } from '@/utils/dateFormat';
 import { isMeetingClosed } from '@/utils/meetingUtils';
+import { scrollToTop } from '@/utils/setScrollTo';
 
 function MeetingDetailPage() {
 	const { meetingId } = useParams<{ meetingId: string }>();
 
 	useLayoutEffect(() => {
-		window.scrollTo(0, 0);
+		scrollToTop();
 	}, []);
 
 	const { data: meetingDetail, isLoading, error } = useMeetingQuery(Number(meetingId));
@@ -169,7 +170,7 @@ function MeetingDetailPage() {
 			<div className="flex-1 w-full max-w-5xl mx-auto pb-8 space-y-8 px-4 md:px-0">
 				<div className="flex flex-col md:flex-row gap-8 md:gap-12">
 					{/* 이미지 */}
-					<figure className="relative w-full md:w-1/2 aspect-square rounded-2xl overflow-hidden bg-muted flex-shrink-0 shadow-sm border border-border/50">
+					<figure className="relative w-full md:w-1/2 aspect-square rounded-2xl overflow-hidden bg-muted shrink-0 shadow-sm border border-border/50">
 						{isClosed && (
 							<div className="absolute inset-0 z-10 bg-black/40 flex items-center justify-center">
 								<span className="bg-black/60 text-white px-3 py-1.5 rounded-full text-sm font-bold border border-white/20">

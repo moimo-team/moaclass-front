@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 import { formatFullDateTime } from '@/utils/dateFormat';
 import { isMeetingClosed } from '@/utils/meetingUtils';
+import { scrollToTop } from '@/utils/setScrollTo';
 
 function MeetingDetailClient() {
 	const params = useParams();
@@ -35,7 +36,7 @@ function MeetingDetailClient() {
 	const router = useRouter();
 
 	useLayoutEffect(() => {
-		window.scrollTo(0, 0);
+		scrollToTop();
 	}, []);
 
 	const { data: meetingDetail, isLoading, error } = useMeetingQuery(meetingId);

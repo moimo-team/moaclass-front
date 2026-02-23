@@ -12,9 +12,6 @@ export const useWishlistQuery = (page: number = 1, limit: number = 8) => {
 	const queryResult = useQuery({
 		queryKey: ['wishlist', userId, page, limit],
 		queryFn: () => getWishlist(page, limit),
-		staleTime: 0,
-		gcTime: 1000 * 60 * 30,
-		retry: 1,
 		enabled: !!userId,
 	});
 
@@ -32,5 +29,6 @@ export const useWishlistQuery = (page: number = 1, limit: number = 8) => {
 		totalPages,
 		isFirstPage,
 		isLastPage,
+		totalCount: queryResult.data?.meta?.totalCount ?? 0,
 	};
 };
