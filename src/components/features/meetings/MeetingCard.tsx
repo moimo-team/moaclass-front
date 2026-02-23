@@ -73,13 +73,13 @@ function MeetingCard({ meeting, imageUrl, className, hasPendingApplicants }: Mee
 				</CardHeader>
 
 				{/* 하단: 위치 및 참여자 수 */}
-				<CardFooter className="p-3 pt-0 flex gap-4 items-center text-sm text-muted-foreground">
-					<div className="flex items-center">
-						<IoLocationOutline />
-						<span>{getDisplayAddress(address)}</span>
+				<CardFooter className="p-3 pt-0 flex gap-4 items-center text-sm text-muted-foreground border-t border-gray-50 mt-auto">
+					<div className="flex items-center gap-1.5 transition-colors">
+						<IoLocationOutline className="text-primary/70 shrink-0" size={16} />
+						<span className="line-clamp-1">{getDisplayAddress(address)}</span>
 					</div>
-					<div className="flex items-center">
-						<AiOutlineTeam />
+					<div className="flex items-center gap-1.5 transition-colors">
+						<AiOutlineTeam className="text-primary/70 shrink-0" size={16} />
 						<span>{currentParticipants} 명</span>
 					</div>
 				</CardFooter>

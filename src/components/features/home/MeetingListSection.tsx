@@ -1,7 +1,12 @@
+import { useState } from 'react';
+
 import { Link } from 'react-router-dom';
 
 import type { GetMeetingsParams } from '@/api/meeting.api';
 import MeetingList from '@/components/features/home/MeetingList';
+import LoginRequiredDialog from '@/components/features/login/LoginRequiredDialog';
+import CreateMeetingModal from '@/components/features/modal/create/CreateMeetingModal';
+import { Button } from '@/components/ui/button';
 import { useMeetingsQuery } from '@/hooks/useMeetingsQuery';
 import { useAuthStore } from '@/store/authStore';
 
@@ -20,12 +25,22 @@ function MeetingListSection({
 	seeMoreHref,
 	hideIfEmpty = false,
 }: MeetingListSectionProps) {
-	const { nickname } = useAuthStore();
+	const { nickname, isLoggedIn } = useAuthStore();
 	const { data: meetingsResponse, isLoading, isError } = useMeetingsQuery(queryOptions);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
 	const meetings = meetingsResponse?.data || [];
-	const safeNickname = nickname || '예비 모이머';
+	const safeNickname = nickname || '예비 모임장';
 	const finalTitle = title.replace('{nickname}', safeNickname);
+
+	const handleApplyClick = () => {
+		if (!isLoggedIn) {
+			setShowLoginPrompt(true);
+			return;
+		}
+		setIsModalOpen(true);
+	};
 
 	if (hideIfEmpty && !isLoading && meetings.length === 0) {
 		return null;
@@ -33,10 +48,24 @@ function MeetingListSection({
 
 	return (
 		<div className="w-full max-w-6xl mx-auto py-8 pt-12">
-			<div className="flex justify-between w-full mb-4">
-				<div className="text-xl font-bold ">{finalTitle}</div>
+			<div className="flex justify-between items-center w-full mb-6">
+				<div className="flex items-center gap-4">
+					<div className="text-2xl font-bold text-foreground">{finalTitle}</div>
+					{title === '전체 모임' && (
+						<Button
+							variant="outline"
+							onClick={handleApplyClick}
+							className="border-primary text-primary hover:bg-primary hover:text-white rounded-lg px-5 py-2 h-auto text-sm font-semibold transition-all shadow-sm active:scale-95"
+						>
+							모임 개설하기
+						</Button>
+					)}
+				</div>
 				{seeMoreHref && (
-					<Link to={seeMoreHref} className="text-sm cursor-pointer">
+					<Link
+						to={seeMoreHref}
+						className="text-sm cursor-pointer text-muted-foreground hover:text-primary transition-colors"
+					>
 						전체보기
 					</Link>
 				)}
@@ -53,8 +82,11 @@ function MeetingListSection({
 			)}
 			{!isLoading && !isError && meetings.length > 0 && <MeetingList meetings={meetings} />}
 			{!isLoading && !isError && meetings.length === 0 && (
-				<p className="text-center py-16">모임이 없습니다.</p>
+				<p className="text-center py-16 text-muted-foreground">모임이 없습니다.</p>
 			)}
+
+			<CreateMeetingModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+			<LoginRequiredDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
 		</div>
 	);
 }

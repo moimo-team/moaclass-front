@@ -261,15 +261,15 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 			isOpen={open}
 			onClose={() => onOpenChange(false)}
 			onSubmit={handleSubmit(onSubmit)}
-			title={meeting ? '모임 정보 수정하기' : '모이머 신청하기'}
+			title={meeting ? '모임 정보 수정하기' : '모임 개설하기'}
 			submitButtonText={
 				meeting
 					? updateMeetingMutation.isPending
 						? '수정 중...'
 						: '수정하기'
 					: createMeetingMutation.isPending
-						? '신청 중...'
-						: '신청하기'
+						? '개설 중...'
+						: '개설하기'
 			}
 			isSubmitDisabled={
 				!isValid || createMeetingMutation.isPending || updateMeetingMutation.isPending
