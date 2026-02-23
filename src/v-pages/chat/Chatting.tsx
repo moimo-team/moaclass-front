@@ -271,7 +271,7 @@ export const ChattingContent = ({
 						setChatType('lesson');
 					}}
 				>
-					클래스 채팅
+					클래스 채팅 문의
 				</button>
 			</div>
 
