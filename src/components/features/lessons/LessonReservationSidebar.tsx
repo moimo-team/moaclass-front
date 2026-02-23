@@ -1,4 +1,4 @@
-﻿import { useState, useMemo } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 
 import { FaRegHeart, FaHeart, FaCalendarAlt } from 'react-icons/fa';
 import { toast } from 'sonner';
@@ -79,6 +79,18 @@ export const LessonReservationSidebar = ({
 		return [];
 	}, [selectedDate, schedules]);
 
+	const selectedSchedule = useMemo(
+		() => schedules.find((schedule) => schedule.id === selectedScheduleId) ?? null,
+		[schedules, selectedScheduleId],
+	);
+	const selectedScheduleRemainingSlots = useMemo(() => {
+		if (!selectedSchedule) {
+			return null;
+		}
+		return Math.max(0, maxParticipants - selectedSchedule.currentParticipants);
+	}, [maxParticipants, selectedSchedule]);
+	const effectiveHeadcountMax = selectedScheduleRemainingSlots ?? maxParticipants;
+
 	const handleDateSelect = (date: Date | undefined) => {
 		if (date) {
 			setSelectedDate(formatDateKeyLocal(date));
@@ -91,8 +103,17 @@ export const LessonReservationSidebar = ({
 	};
 
 	const handleHeadcountChange = (amount: number) => {
-		setHeadcount((prev) => Math.max(1, Math.min(50, prev + amount)));
+		setHeadcount((prev) => Math.max(1, Math.min(effectiveHeadcountMax, prev + amount)));
 	};
+
+	useEffect(() => {
+		if (effectiveHeadcountMax <= 0) {
+			setHeadcount(1);
+			return;
+		}
+
+		setHeadcount((prev) => Math.min(prev, effectiveHeadcountMax));
+	}, [effectiveHeadcountMax, selectedScheduleId]);
 
 	const handleApplyClick = () => {
 		if (isOwnedByCurrentUser) {
@@ -106,8 +127,6 @@ export const LessonReservationSidebar = ({
 			toast.error('클래스 시간대를 선택해주세요.');
 			return;
 		}
-
-		const selectedSchedule = schedules.find((s) => s.id === selectedScheduleId);
 
 		if (!selectedSchedule) {
 			toast.error('선택된 시간대의 스케줄 정보를 찾을 수 없습니다.');
@@ -188,8 +207,15 @@ export const LessonReservationSidebar = ({
 													? 'secondary'
 													: 'outline'
 											}
-											className="w-full justify-between h-auto py-2 px-4 mb-2"
+											className={cn(
+												'w-full justify-between h-auto py-2 px-4 mb-2',
+												maxParticipants - schedule.currentParticipants <=
+													0 && 'bg-secondary/40',
+											)}
 											onClick={() => setSelectedScheduleId(schedule.id)}
+											disabled={
+												maxParticipants - schedule.currentParticipants <= 0
+											}
 										>
 											<span className="text-base">
 												{formatTime(schedule.startAt)} ~{' '}
@@ -198,9 +224,13 @@ export const LessonReservationSidebar = ({
 											<span
 												className={cn(
 													'text-sm',
-													selectedScheduleId === schedule.id
-														? 'text-secondary-foreground'
-														: 'text-muted-foreground',
+													maxParticipants -
+														schedule.currentParticipants <=
+														0
+														? 'text-destructive font-semibold'
+														: selectedScheduleId === schedule.id
+															? 'text-secondary-foreground'
+															: 'text-muted-foreground',
 												)}
 											>
 												{schedule.currentParticipants} / {maxParticipants}명
@@ -227,12 +257,17 @@ export const LessonReservationSidebar = ({
 
 					<div className="mb-6">
 						<p className="text-lg font-semibold mb-2">인원 선택</p>
+						{!selectedScheduleId && (
+							<p className="text-sm text-muted-foreground mb-2">
+								먼저 시간대를 선택해주세요.
+							</p>
+						)}
 						<div className="flex items-center justify-between border rounded-md p-2">
 							<Button
 								variant="ghost"
 								size="icon"
 								onClick={() => handleHeadcountChange(-1)}
-								disabled={headcount <= 1}
+								disabled={!selectedScheduleId || headcount <= 1}
 							>
 								-
 							</Button>
@@ -240,13 +275,18 @@ export const LessonReservationSidebar = ({
 								type="number"
 								value={headcount}
 								readOnly
+								disabled={!selectedScheduleId}
 								className="w-16 text-center text-lg font-semibold border-none focus-visible:ring-0"
 							/>
 							<Button
 								variant="ghost"
 								size="icon"
 								onClick={() => handleHeadcountChange(1)}
-								disabled={headcount >= 50}
+								disabled={
+									!selectedScheduleId ||
+									effectiveHeadcountMax <= 0 ||
+									headcount >= effectiveHeadcountMax
+								}
 							>
 								+
 							</Button>
@@ -290,7 +330,12 @@ export const LessonReservationSidebar = ({
 					<Button
 						className="w-full text-lg py-6 bg-primary text-primary-foreground hover:bg-primary/90 mt-3"
 						onClick={handleApplyClick}
-						disabled={!selectedScheduleId || isOwnedByCurrentUser}
+						disabled={
+							!selectedScheduleId ||
+							isOwnedByCurrentUser ||
+							(selectedScheduleRemainingSlots !== null &&
+								selectedScheduleRemainingSlots <= 0)
+						}
 					>
 						클래스 신청
 					</Button>
