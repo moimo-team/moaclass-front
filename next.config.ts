@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
 			'storage.googleapis.com',
 			'images.unsplash.com',
 			'lh3.googleusercontent.com',
+			'example.com',
 		],
 	},
 	async rewrites() {
