@@ -27,7 +27,7 @@ const LessonChatMessageSection: React.FC<LessonChatMessageSectionProps> = ({
 	if (!selectedRoom) {
 		return (
 			<div className="hidden lg:flex flex-col items-center justify-center h-full text-muted-foreground w-full lg:w-[70%]">
-				<p>레슨 채팅방을 선택하여 대화를 시작하세요.</p>
+				<p>클래스 채팅방을 선택하여 대화를 시작하세요.</p>
 			</div>
 		);
 	}

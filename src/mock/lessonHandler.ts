@@ -16,6 +16,18 @@ const applyLikeStatus = (lessons: Lesson[]): Lesson[] => {
 	}));
 };
 
+const parseMultiSearchParam = (url: URL, key: string): string[] => {
+	const rawValues = url.searchParams.getAll(key);
+	if (rawValues.length === 0) {
+		return [];
+	}
+
+	return rawValues
+		.flatMap((value) => value.split(','))
+		.map((value) => value.trim())
+		.filter(Boolean);
+};
+
 export const lessonHandlers = [
 	http.get(`${httpUrl}/lessons`, async ({ request }) => {
 		await delay(500);
@@ -25,9 +37,12 @@ export const lessonHandlers = [
 		const limit = Number(url.searchParams.get('limit') || '12');
 
 		// filterStore에서 보내는 파라미터 키와 일치시킴
-		const categoryId = Number(url.searchParams.get('categoryId') || '0');
-		const regionIds = url.searchParams.getAll('regionId').map(Number);
-		const levels = url.searchParams.getAll('level') as Level[];
+		const categoryIds = parseMultiSearchParam(url, 'categoryId').map(Number);
+		const categoryId = categoryIds[0] || 0;
+		const regionIds = parseMultiSearchParam(url, 'regionId').map(Number);
+		const levels = parseMultiSearchParam(url, 'level') as Level[];
+		const statuses = parseMultiSearchParam(url, 'status');
+		const days = parseMultiSearchParam(url, 'days');
 		const timeRange = url.searchParams.get('timeRange');
 		const minPrice = Number(url.searchParams.get('minPrice') || '0');
 		const maxPrice = Number(url.searchParams.get('maxPrice') || '500000');
@@ -46,6 +61,29 @@ export const lessonHandlers = [
 			.filter((lesson) => {
 				if (levels.length === 0) return true;
 				return levels.includes(lesson.level);
+			})
+			.filter((lesson) => {
+				if (statuses.length === 0) return true;
+				return statuses.includes(lesson.status);
+			})
+			.filter((lesson) => {
+				if (days.length === 0) return true;
+				const hasWeekday = lesson.schedules.some((schedule) => {
+					const day = new Date(schedule.startAt).getDay();
+					return day >= 1 && day <= 5;
+				});
+				const hasSaturday = lesson.schedules.some(
+					(schedule) => new Date(schedule.startAt).getDay() === 6,
+				);
+				const hasSunday = lesson.schedules.some(
+					(schedule) => new Date(schedule.startAt).getDay() === 0,
+				);
+				return days.some((day) => {
+					if (day === 'WEEKDAY') return hasWeekday;
+					if (day === 'SATURDAY') return hasSaturday;
+					if (day === 'SUNDAY') return hasSunday;
+					return false;
+				});
 			})
 			.filter((lesson) => {
 				if (!maxParticipants) return true;

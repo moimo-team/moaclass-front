@@ -62,5 +62,5 @@ export const LESSON_LIST_EMPTY_RESPONSE: FetchLessonsResponse = {
 };
 
 export const LESSON_SEARCH_PARAMS = new URLSearchParams(
-	'categoryId=10&regionId=1&sort=LIKES&page=2&minPrice=10000&maxPrice=50000',
+	'categoryId=10&regionId=1&sort=LIKES&page=2&minPrice=10000&maxPrice=50000&days=WEEKDAY&level=BEGINNER&status=ACTIVE',
 );

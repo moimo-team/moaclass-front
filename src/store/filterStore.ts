@@ -3,8 +3,7 @@ import { create } from 'zustand';
 import { DAYS_MAP } from '@/constants/dayConstants';
 import { REVERSE_LEVEL_MAP } from '@/constants/lessonConstants';
 import type { SortEnum } from '@/constants/sortConstants';
-import { STATUS_MAP } from '@/constants/statusConstants';
-import type { FetchLessonsParams } from '@/models/lesson.model';
+import type { FetchLessonsParams, LessonStatus } from '@/models/lesson.model';
 
 export interface FilterState {
 	selectedPersonnel: string;
@@ -13,9 +12,10 @@ export interface FilterState {
 	selectedRegions: string[];
 	selectedDays: string[];
 	selectedDifficulty: string[];
-	selectedStatus: string | null;
+	selectedStatus: LessonStatus | null;
 	selectedSort: SortEnum | null;
 	selectedCategories: string[];
+	selectedSubCategoryIds: number[];
 	activeMainCategoryId: number | null;
 	selectedMainCategory: string | null;
 
@@ -30,11 +30,11 @@ export interface FilterState {
 	toggleDay: (days: string[]) => void;
 	toggleDifficulty: (difficulty: string[]) => void;
 	toggleFilterArray: (key: keyof FilterState, value: string) => void;
-	toggleStatus: (status: string | null) => void;
+	toggleStatus: (status: LessonStatus | null) => void;
 	setSelectedSort: (sort: SortEnum | null) => void;
 
 	selectMainCategory: (category: { id: number; name: string }) => void;
-	toggleSubCategory: (subCategory: string) => void;
+	toggleSubCategory: (subCategory: string, subCategoryId?: number) => void;
 	removeCategoryBadge: (category: string) => void;
 
 	resetCategories: () => void;
@@ -59,6 +59,7 @@ const INITIAL_STATE = {
 	selectedStatus: null,
 	selectedSort: null,
 	selectedCategories: [],
+	selectedSubCategoryIds: [],
 	activeMainCategoryId: null,
 	selectedMainCategory: null,
 	regionIdMap: new Map<string, number>(),
@@ -116,16 +117,18 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 					selectedMainCategory: null,
 					activeMainCategoryId: null,
 					selectedCategories: [],
+					selectedSubCategoryIds: [],
 				};
 			}
 			return {
 				selectedMainCategory: category.name,
 				activeMainCategoryId: category.id,
 				selectedCategories: [category.name],
+				selectedSubCategoryIds: [],
 			};
 		}),
 
-	toggleSubCategory: (subCategory) =>
+	toggleSubCategory: (subCategory, subCategoryId) =>
 		set((state) => {
 			if (!state.selectedMainCategory) return state;
 			const currentSub = state.selectedCategories.filter(
@@ -135,7 +138,17 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 				? currentSub.filter((category) => category !== subCategory)
 				: [...currentSub, subCategory];
 
-			return { selectedCategories: [state.selectedMainCategory, ...newSub] };
+			const currentSubIds =
+				subCategoryId === undefined
+					? state.selectedSubCategoryIds
+					: state.selectedSubCategoryIds.includes(subCategoryId)
+						? state.selectedSubCategoryIds.filter((id) => id !== subCategoryId)
+						: [...state.selectedSubCategoryIds, subCategoryId];
+
+			return {
+				selectedCategories: [state.selectedMainCategory, ...newSub],
+				selectedSubCategoryIds: currentSubIds,
+			};
 		}),
 
 	removeCategoryBadge: (category) =>
@@ -145,12 +158,20 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 					selectedMainCategory: null,
 					activeMainCategoryId: null,
 					selectedCategories: [],
+					selectedSubCategoryIds: [],
 				};
 			}
+
+			const removedSubCategoryId = state.subCategoryIdMap.get(category);
+
 			return {
 				selectedCategories: state.selectedCategories.filter(
 					(selectedCategory) => selectedCategory !== category,
 				),
+				selectedSubCategoryIds:
+					removedSubCategoryId === undefined
+						? state.selectedSubCategoryIds
+						: state.selectedSubCategoryIds.filter((id) => id !== removedSubCategoryId),
 			};
 		}),
 
@@ -165,6 +186,7 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 	resetCategories: () =>
 		set({
 			selectedCategories: INITIAL_STATE.selectedCategories,
+			selectedSubCategoryIds: INITIAL_STATE.selectedSubCategoryIds,
 			activeMainCategoryId: INITIAL_STATE.activeMainCategoryId,
 			selectedMainCategory: INITIAL_STATE.selectedMainCategory,
 		}),
@@ -189,17 +211,8 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 			params.categoryId = state.activeMainCategoryId;
 		}
 
-		if (state.selectedMainCategory) {
-			const selectedSubCategoryNames = state.selectedCategories.filter(
-				(name) => name !== state.selectedMainCategory,
-			);
-			const selectedSubCategoryIds = selectedSubCategoryNames
-				.map((name) => state.subCategoryIdMap.get(name))
-				.filter((id): id is number => id !== undefined);
-
-			if (selectedSubCategoryIds.length > 0) {
-				params.subCategoryId = selectedSubCategoryIds;
-			}
+		if (state.selectedSubCategoryIds.length > 0) {
+			params.subCategoryId = state.selectedSubCategoryIds;
 		}
 
 		if (state.selectedDifficulty.length > 0) {
@@ -224,7 +237,7 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 		}
 
 		if (state.selectedStatus !== null) {
-			params.status = STATUS_MAP[state.selectedStatus as keyof typeof STATUS_MAP];
+			params.status = state.selectedStatus;
 		}
 
 		if (
