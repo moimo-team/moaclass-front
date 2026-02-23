@@ -72,11 +72,7 @@ const TeacherProfilePage = ({ userId: userIdProp }: TeacherProfilePageProps) => 
 	);
 
 	const handleDeleteConfirm = async () => {
-		try {
-			await deleteMutation.mutateAsync();
-		} catch (error) {
-			console.error('Failed to delete teacher profile:', error);
-		}
+		await deleteMutation.mutateAsync();
 	};
 
 	return (
