@@ -12,6 +12,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useDeleteUserMutation } from '@/hooks/useAuthMutations';
 import { useAuthQuery } from '@/hooks/useAuthQuery';
 
+import type { StaticImageData } from 'next/image';
+
 interface MypageSidebarNextProps {
 	onMenuItemClick?: () => void;
 }
@@ -45,7 +47,13 @@ export const MypageSidebarNext = ({ onMenuItemClick }: MypageSidebarNextProps) =
 				<div className="relative mb-4">
 					<Avatar className="w-24 h-24 border-2 border-gray-100 bg-white">
 						<AvatarImage
-							src={user.profileImage ? user.profileImage : defaultProfile}
+							src={
+								user.profileImage
+									? user.profileImage
+									: typeof defaultProfile === 'string'
+										? defaultProfile
+										: (defaultProfile as StaticImageData).src
+							}
 							alt={user.nickname || 'user'}
 							className="object-cover"
 						/>

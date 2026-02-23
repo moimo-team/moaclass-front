@@ -1,9 +1,10 @@
 import { useState } from 'react';
 
-import { Pencil, Plus } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ConfirmDialog from '@/components/features/modal/ConfirmDialog';
 import { TeacherProfileModal } from '@/components/features/modal/profile/TeacherProfileModal';
 import { TeacherLessonList } from '@/components/features/teacher/profile/TeacherLessonList';
 import { TeacherProfileBanner } from '@/components/features/teacher/profile/TeacherProfileBanner';
@@ -11,7 +12,10 @@ import { TeacherProfileSidebar } from '@/components/features/teacher/profile/Tea
 import { TeacherReviewList } from '@/components/features/teacher/profile/TeacherReviewList';
 import { Button } from '@/components/ui/button';
 import { useTeacherLessonsQuery } from '@/hooks/useTeacherLessonsQuery';
-import { useTeacherProfileQuery } from '@/hooks/useTeacherProfileMutations';
+import {
+	useDeleteTeacherProfileMutation,
+	useTeacherProfileQuery,
+} from '@/hooks/useTeacherProfileMutations';
 import { useTeacherReviewsQuery } from '@/hooks/useTeacherReviewsQuery';
 import { useAuthStore } from '@/store/authStore';
 
@@ -26,6 +30,9 @@ const TeacherProfilePage = ({ userId: userIdProp }: TeacherProfilePageProps) => 
 
 	const isMe = teacherId === currentUserId;
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+	const deleteMutation = useDeleteTeacherProfileMutation();
 
 	const { data: teacherProfile, isLoading: isLoadingProfile } = useTeacherProfileQuery(
 		teacherId || undefined,
@@ -64,6 +71,14 @@ const TeacherProfilePage = ({ userId: userIdProp }: TeacherProfilePageProps) => 
 		(r) => !!r.representativeImage,
 	);
 
+	const handleDeleteConfirm = async () => {
+		try {
+			await deleteMutation.mutateAsync();
+		} catch (error) {
+			console.error('Failed to delete teacher profile:', error);
+		}
+	};
+
 	return (
 		<div className="w-full bg-gray-50/50 min-h-screen">
 			<TeacherProfileBanner image={teacherProfile?.image} />
@@ -76,12 +91,22 @@ const TeacherProfilePage = ({ userId: userIdProp }: TeacherProfilePageProps) => 
 							<div className="relative group">
 								<TeacherProfileSidebar profile={teacherProfile} />
 								{isMe && (
-									<Button
-										onClick={() => setIsModalOpen(true)}
-										className="absolute top-4 right-4 rounded-full w-10 h-10 p-0 shadow-lg bg-white hover:bg-gray-100 text-gray-700 border border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity"
-									>
-										<Pencil className="w-4 h-4" />
-									</Button>
+									<div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+										<Button
+											onClick={() => setIsModalOpen(true)}
+											className="rounded-full w-10 h-10 p-0 shadow-lg bg-white hover:bg-gray-100 text-gray-700 border border-gray-100"
+											title="프로필 수정"
+										>
+											<Pencil className="w-4 h-4" />
+										</Button>
+										<Button
+											onClick={() => setIsDeleteDialogOpen(true)}
+											className="rounded-full w-10 h-10 p-0 shadow-lg bg-white hover:bg-red-50 text-red-500 border border-gray-100"
+											title="모멘토 탈퇴"
+										>
+											<Trash2 className="w-4 h-4" />
+										</Button>
+									</div>
 								)}
 							</div>
 						) : (
@@ -120,6 +145,16 @@ const TeacherProfilePage = ({ userId: userIdProp }: TeacherProfilePageProps) => 
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
 				profile={teacherProfile || null}
+			/>
+
+			<ConfirmDialog
+				open={isDeleteDialogOpen}
+				onOpenChange={setIsDeleteDialogOpen}
+				title="모멘토 탈퇴"
+				description={`정말로 모멘토 프로필을 삭제하시겠습니까?\n프로필 삭제 시 등록된 모든 클래스와 정보가 삭제되며 되돌릴 수 없습니다.`}
+				confirmText="탈퇴하기"
+				variant="destructive"
+				onConfirm={handleDeleteConfirm}
 			/>
 		</div>
 	);

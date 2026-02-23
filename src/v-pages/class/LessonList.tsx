@@ -47,7 +47,7 @@ const LessonListPage: React.FC = () => {
 	const setAllFilters = useFilterStore((state) => state.setAllFilters);
 	const resetFilters = useFilterStore((state) => state.resetFilters);
 	const getFetchLessonsParams = useFilterStore((state) => state.getFetchLessonsParams);
-	const selectedSort = useFilterStore((state) => state.selectedSort);
+	/* const selectedSort = useFilterStore((state) => state.selectedSort); */
 	const setSelectedSort = useFilterStore((state) => state.setSelectedSort);
 
 	useEffect(() => {

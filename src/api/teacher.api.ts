@@ -46,3 +46,11 @@ export const fetchTeacherReviews = async (
 	});
 	return response.data;
 };
+
+/**
+ * 모멘토 프로필 삭제
+ * DELETE /teachers
+ */
+export const deleteTeacherProfile = async (): Promise<void> => {
+	await apiClient.delete('/teachers');
+};

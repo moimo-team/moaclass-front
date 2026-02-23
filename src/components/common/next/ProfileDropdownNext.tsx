@@ -19,6 +19,8 @@ import { useLogoutMutation } from '@/hooks/useAuthMutations';
 import { useAuthQuery } from '@/hooks/useAuthQuery';
 import { useAuthStore } from '@/store/authStore';
 
+import type { StaticImageData } from 'next/image';
+
 export const ProfileDropdownNext = () => {
 	const { nickname } = useAuthStore();
 	const logoutMutation = useLogoutMutation();
@@ -37,7 +39,14 @@ export const ProfileDropdownNext = () => {
 			<DropdownMenuTrigger asChild>
 				<button className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-full">
 					<Avatar className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border-none bg-transparent">
-						<AvatarImage src={userProfileImage} alt="User Avatar" />
+						<AvatarImage
+							src={
+								typeof userProfileImage === 'string'
+									? userProfileImage
+									: (userProfileImage as StaticImageData).src
+							}
+							alt="User Avatar"
+						/>
 						<AvatarFallback className="bg-transparent">
 							<IoIosPerson className="w-7 h-7 text-foreground/80" />
 						</AvatarFallback>

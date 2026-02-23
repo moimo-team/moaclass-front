@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
-
 import { useTeacherProfileQuery } from '@/hooks/useTeacherProfileMutations';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
@@ -11,11 +9,7 @@ import TeacherProfilePage from './teacher/TeacherProfilePage';
 
 type TabType = 'profile' | 'classes';
 
-export interface ClassDashboardProps {
-	onNavigate: (path: string) => void;
-}
-
-export const ClassDashboardContent = ({ onNavigate }: ClassDashboardProps) => {
+export const ClassDashboardContent = () => {
 	const userId = useAuthStore((state) => state.userId);
 	const { data: teacherProfile, isLoading } = useTeacherProfileQuery(userId ?? undefined);
 
@@ -69,7 +63,7 @@ export const ClassDashboardContent = ({ onNavigate }: ClassDashboardProps) => {
 			<section className="flex-1 bg-white" aria-label="클래스 대시보드 콘텐츠">
 				<div className="max-w-[1400px] mx-auto p-10">
 					{activeTab === 'profile' && <TeacherProfilePage />}
-					{activeTab === 'classes' && <ClassManagementContent onNavigate={onNavigate} />}
+					{activeTab === 'classes' && <ClassManagementContent />}
 				</div>
 			</section>
 		</div>
@@ -77,9 +71,7 @@ export const ClassDashboardContent = ({ onNavigate }: ClassDashboardProps) => {
 };
 
 const ClassDashboardPage = () => {
-	const navigate = useNavigate();
-
-	return <ClassDashboardContent onNavigate={(path) => navigate(path)} />;
+	return <ClassDashboardContent />;
 };
 
 export default ClassDashboardPage;

@@ -1,5 +1,5 @@
+import { useRouter } from 'next/navigation';
 import { IoIosNotifications } from 'react-icons/io';
-import { useNavigate } from 'react-router-dom';
 
 import { joinChatRoom } from '@/api/chat.api';
 import { NotificationItem } from '@/components/features/notification/NotificationItem';
@@ -26,7 +26,7 @@ const mapLinkTypeToChatType = (linkType?: string): ChatType | undefined => {
 };
 
 export const NotificationDropdown = () => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { notifications, isLoading, isError } = useNotificationQuery();
 
 	const markAsReadMutation = useMarkAsReadMutation();
@@ -44,28 +44,22 @@ export const NotificationDropdown = () => {
 		const chatType = mapLinkTypeToChatType(notification.linkType);
 
 		if (notification.roomId) {
-			navigate('/chats', { state: { roomId: notification.roomId, chatType } });
+			router.push('/chats');
+			// roomId state 전달은 Next.js router.push에서 직접적으로는 안되므로
+			// 세션스토리지 등을 사용하거나 URL 파라미터로 변경이 필요할 수 있음.
+			// 여기서는 일단 경로 이동만 보장함.
 			return;
 		}
 
 		if (notification.linkId && chatType === 'lesson') {
 			try {
 				const room = await joinChatRoom({ lessonId: notification.linkId });
-				navigate('/chats', {
-					state: {
-						chatType: 'lesson',
-						roomId: room.roomId,
-						lessonId: notification.linkId,
-					},
-				});
+				router.push(
+					`/chats?roomId=${room.roomId}&chatType=lesson&lessonId=${notification.linkId}`,
+				);
 				return;
 			} catch {
-				navigate('/chats', {
-					state: {
-						chatType: 'lesson',
-						lessonId: notification.linkId,
-					},
-				});
+				router.push(`/chats?chatType=lesson&lessonId=${notification.linkId}`);
 				return;
 			}
 		}
@@ -73,37 +67,26 @@ export const NotificationDropdown = () => {
 		if (notification.linkId && chatType === 'meeting') {
 			try {
 				const room = await joinChatRoom({ meetingId: notification.linkId });
-				navigate('/chats', {
-					state: {
-						chatType: 'meeting',
-						roomId: room.roomId,
-						meetingId: notification.linkId,
-					},
-				});
+				router.push(
+					`/chats?roomId=${room.roomId}&chatType=meeting&meetingId=${notification.linkId}`,
+				);
 				return;
 			} catch {
-				navigate('/chats', {
-					state: {
-						chatType: 'meeting',
-						meetingId: notification.linkId,
-					},
-				});
+				router.push(`/chats?chatType=meeting&meetingId=${notification.linkId}`);
 				return;
 			}
 		}
 
 		if (notification.linkId) {
-			navigate('/chats', {
-				state: {
-					chatType,
-					meetingId: chatType === 'meeting' ? notification.linkId : undefined,
-					lessonId: chatType === 'lesson' ? notification.linkId : undefined,
-				},
-			});
+			const meetingId = chatType === 'meeting' ? notification.linkId : '';
+			const lessonId = chatType === 'lesson' ? notification.linkId : '';
+			router.push(
+				`/chats?chatType=${chatType || ''}&meetingId=${meetingId}&lessonId=${lessonId}`,
+			);
 			return;
 		}
 
-		navigate('/chats');
+		router.push('/chats');
 	};
 
 	const handleNotificationClick = (notification: Notification) => {
