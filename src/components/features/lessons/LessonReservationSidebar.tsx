@@ -1,6 +1,7 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
 
-import { FaRegHeart, FaHeart, FaCalendarAlt } from 'react-icons/fa';
+import { CalendarIcon } from 'lucide-react';
+import { FaRegHeart, FaHeart } from 'react-icons/fa';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -108,12 +109,14 @@ export const LessonReservationSidebar = ({
 
 	useEffect(() => {
 		if (effectiveHeadcountMax <= 0) {
-			setHeadcount(1);
+			if (headcount !== 1) setHeadcount(1);
 			return;
 		}
 
-		setHeadcount((prev) => Math.min(prev, effectiveHeadcountMax));
-	}, [effectiveHeadcountMax, selectedScheduleId]);
+		if (headcount > effectiveHeadcountMax) {
+			setHeadcount(effectiveHeadcountMax);
+		}
+	}, [effectiveHeadcountMax, headcount]);
 
 	const handleApplyClick = () => {
 		if (isOwnedByCurrentUser) {
@@ -163,7 +166,7 @@ export const LessonReservationSidebar = ({
 										!selectedDate && 'text-muted-foreground',
 									)}
 								>
-									<FaCalendarAlt className="mr-2 h-4 w-4 text-primary" />
+									<CalendarIcon className="mr-2 h-4 w-4 text-primary" />
 									{selectedDate
 										? formatDateToYYYYMMDD_DOT(selectedDate)
 										: '날짜 선택'}
