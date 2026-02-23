@@ -124,6 +124,8 @@ export interface FetchLessonsParams {
 	maxParticipants?: number;
 	status?: string | string[];
 	userId?: number;
+	isLiked?: boolean;
+	limit?: number;
 }
 
 export interface FetchLessonsResponse {

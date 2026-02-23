@@ -113,6 +113,8 @@ export const useLogoutMutation = () => {
 			storeLogout();
 			queryClient.clear();
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
+
+			toast.success('로그아웃되었습니다.');
 		},
 	});
 };

@@ -18,6 +18,7 @@ import { useLessonReviewsQuery } from '@/hooks/useLessonReviewsQuery';
 import { useLessonTabs } from '@/hooks/useLessonTabs';
 import { useAuthStore } from '@/store/authStore';
 import { formatFullDateTime } from '@/utils/dateFormat';
+import { scrollToTop } from '@/utils/setScrollTo';
 
 export interface LessonDetailProps {
 	lessonId: string;
@@ -38,7 +39,7 @@ export const LessonDetailContent = ({
 	useApplicationConfirmationHook,
 }: LessonDetailProps) => {
 	useLayoutEffect(() => {
-		window.scrollTo(0, 0);
+		scrollToTop();
 	}, []);
 
 	const { data: lessonDetail, isLoading, error } = useLessonQuery(Number(lessonId));

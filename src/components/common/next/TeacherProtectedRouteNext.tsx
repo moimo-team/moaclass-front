@@ -41,7 +41,7 @@ const TeacherProtectedRouteNext = ({ children }: TeacherProtectedRouteNextProps)
 					confirmText="이동하기"
 					cancelText="취소"
 					showCancel={true}
-					onConfirm={() => router.push('/lessons/manage')}
+					onConfirm={() => router.push('/classes-manage')}
 					onCancel={() => router.push('/mypage/profile')}
 				/>
 			</div>

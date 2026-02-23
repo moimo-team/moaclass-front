@@ -116,7 +116,7 @@ function Header() {
 							variant="ghost"
 							className="cursor-pointer hover:bg-medium text-base border border-gray-300"
 						>
-							<Link to="/lessons/manage">클래스 관리</Link>
+							<Link to="/classes-manage">클래스 관리</Link>
 						</Button>
 						<NotificationDropdown />
 						<ProfileDropdown />

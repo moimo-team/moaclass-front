@@ -13,16 +13,33 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
+import { resolveNotificationNavigation } from '@/constants/notificationActions';
 import { useMarkAllAsReadMutation, useMarkAsReadMutation } from '@/hooks/useNotificationMutations';
 import { useNotificationQuery } from '@/hooks/useNotificationQuery';
 import { resetAllNewChatRooms, resetNewChatByRoom } from '@/lib/newChatNotificationState';
 import type { ChatType } from '@/models/chat.model';
-import { isNewChatNotification, type Notification } from '@/models/notification.model';
+import { isNewChatNotification, type NotificationUiItem } from '@/models/notification.model';
 
 const mapLinkTypeToChatType = (linkType?: string): ChatType | undefined => {
 	if (linkType === 'MEETING') return 'meeting';
 	if (linkType === 'LESSON') return 'lesson';
 	return undefined;
+};
+
+const buildChatsUrl = (params: {
+	roomId?: number;
+	chatType?: ChatType;
+	meetingId?: number;
+	lessonId?: number;
+}) => {
+	const search = new URLSearchParams();
+	if (typeof params.roomId === 'number') search.set('roomId', String(params.roomId));
+	if (params.chatType) search.set('chatType', params.chatType);
+	if (typeof params.meetingId === 'number') search.set('meetingId', String(params.meetingId));
+	if (typeof params.lessonId === 'number') search.set('lessonId', String(params.lessonId));
+
+	const query = search.toString();
+	return query ? `/chats?${query}` : '/chats';
 };
 
 export const NotificationDropdown = () => {
@@ -32,15 +49,14 @@ export const NotificationDropdown = () => {
 	const markAsReadMutation = useMarkAsReadMutation();
 	const markAllAsReadMutation = useMarkAllAsReadMutation();
 
-	const markAsReadWithReset = (notification: Notification) => {
+	const markAsReadWithReset = (notification: NotificationUiItem) => {
 		markAsReadMutation.mutate(notification.id);
 		if (isNewChatNotification(notification)) {
 			resetNewChatByRoom(notification.roomId);
 		}
 	};
 
-	const executeNotificationAction = async (notification: Notification) => {
-		if (notification.type !== 'NEW_CHAT') return;
+	const executeNewChatAction = async (notification: NotificationUiItem) => {
 		const chatType = mapLinkTypeToChatType(notification.linkType);
 
 		if (notification.roomId) {
@@ -89,7 +105,24 @@ export const NotificationDropdown = () => {
 		router.push('/chats');
 	};
 
-	const handleNotificationClick = (notification: Notification) => {
+	const executeNotificationAction = async (notification: NotificationUiItem) => {
+		if (notification.type === 'NEW_CHAT') {
+			await executeNewChatAction(notification);
+			return;
+		}
+
+		const target = resolveNotificationNavigation(notification);
+		if (!target) {
+			router.push('/mypage');
+			return;
+		}
+
+		// Next.js `router.push` (`next/navigation`) does not support a `state` argument
+		// like React Router, so we only use the resolved path here.
+		router.push(target.path);
+	};
+
+	const handleNotificationClick = (notification: NotificationUiItem) => {
 		markAsReadWithReset(notification);
 		void executeNotificationAction(notification); // 반환 Promise를 기다리지 않아 void 추가
 	};
@@ -114,24 +147,24 @@ export const NotificationDropdown = () => {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<button className="relative focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-full">
-					<Avatar className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border-none bg-medium">
+				<button className="relative rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+					<Avatar className="cursor-pointer border-none bg-medium transition-colors hover:bg-accent hover:text-accent-foreground">
 						<AvatarImage alt="Notification Avatar" />
 						<AvatarFallback className="bg-medium">
 							<IoIosNotifications
-								className={`w-7 h-7 ${isError ? 'text-red-500' : 'text-foreground/80'}`}
+								className={`h-7 w-7 ${isError ? 'text-red-500' : 'text-foreground/80'}`}
 							/>
 						</AvatarFallback>
 					</Avatar>
 					{unreadCount > 0 && !isError && (
-						<span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white ring-2 ring-background">
+						<span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white ring-2 ring-background">
 							{unreadCount}
 						</span>
 					)}
 				</button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-80" align="end">
-				<DropdownMenuLabel className="flex justify-between items-center">
+				<DropdownMenuLabel className="flex items-center justify-between">
 					<span>최근 알림</span>
 					<Button
 						variant="ghost"

@@ -20,6 +20,7 @@ import { useLessonsQuery } from '@/hooks/useLessonsQuery';
 import type { FetchLessonsParams, Lesson } from '@/models/lesson.model';
 import { useFilterStore } from '@/store/filterStore';
 import type { FilterState } from '@/store/filterStore';
+import { scrollToTop } from '@/utils/setScrollTo';
 
 const LessonListDisplay: React.FC<{
 	lessons: Lesson[];
@@ -95,7 +96,7 @@ export function LessonsClient() {
 		const params = new URLSearchParams(searchParams.toString());
 		params.set('page', String(page));
 		updateUrl(params);
-		window.scrollTo(0, 0);
+		scrollToTop();
 	};
 
 	const handleSearchClick = (mappedParams: FetchLessonsParams) => {
@@ -115,7 +116,7 @@ export function LessonsClient() {
 	const handleResetAllFilters = () => {
 		resetFilters();
 		router.push('/lessons');
-		window.scrollTo(0, 0);
+		scrollToTop();
 	};
 
 	return (

@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 
 import { AxiosError } from 'axios';
 import { X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import type { CreatePaymentResponse } from '@/api/pay.api';
@@ -29,11 +29,12 @@ interface PayInfoSectionProps {
 	payPreview: PayPreviewResponse;
 	scheduleId: number;
 	userId: number;
+	email: string;
 }
 
-export const PayInfoSection = ({ payPreview, scheduleId, userId }: PayInfoSectionProps) => {
+export const PayInfoSection = ({ payPreview, scheduleId, userId, email }: PayInfoSectionProps) => {
 	const {
-		lesson,
+		lessons,
 		originalPrice,
 		quantity,
 		subtotal,
@@ -41,13 +42,15 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId }: PayInfoSectio
 		userPoints,
 		canPay: initialCanPay,
 	} = payPreview;
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
 	const [appliedCoupon, setAppliedCoupon] = useState<CouponInfo | null>(null);
 	const [successData, setSuccessData] = useState<CreatePaymentResponse | null>(null);
 	const [errorData, setErrorData] = useState<PayErrorResponse | null>(null);
-	const [isAlertOpen, setIsAlertOpen] = useState(false);
-	const [alertType, setAlertType] = useState<'SUCCESS' | 'ERROR' | null>(null);
+	const [paymentStatus, setPaymentStatus] = useState<{
+		isOpen: boolean;
+		type: 'SUCCESS' | 'ERROR' | null;
+	}>({ isOpen: false, type: null });
 
 	const { mutateAsync: createPayment } = usePayMutation();
 
@@ -88,28 +91,26 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId }: PayInfoSectio
 				scheduleId,
 				finalPrice: finalPrice,
 				couponId: appliedCoupon?.id || null,
+				email,
 			});
 
-			// 결제하기 성공 알림창
 			setSuccessData(payResult);
-			setAlertType('SUCCESS');
-			setIsAlertOpen(true);
+			setPaymentStatus({ isOpen: true, type: 'SUCCESS' });
 		} catch (error) {
 			console.error('handlePay error:', error);
-			setAlertType('ERROR');
 			if (error instanceof AxiosError) {
 				setErrorData(error.response?.data as PayErrorResponse);
 			}
-			setIsAlertOpen(true);
+			setPaymentStatus({ isOpen: true, type: 'ERROR' });
 		}
 	};
 
 	// 결제 성공 후 알림창이 닫히면 주문 내역 페이지로 이동
 	useEffect(() => {
-		if (!isAlertOpen && alertType === 'SUCCESS') {
-			navigate('/mypage/class/orders', { replace: true });
+		if (!paymentStatus.isOpen && paymentStatus.type === 'SUCCESS') {
+			router.replace('/mypage/class/orders');
 		}
-	}, [isAlertOpen, alertType, navigate]);
+	}, [paymentStatus.isOpen, paymentStatus.type, router]);
 
 	return (
 		<PaySectionCard title="결제 정보">
@@ -117,7 +118,7 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId }: PayInfoSectio
 				<div className="space-y-1">
 					<div className="flex justify-between items-center text-sm font-semibold">
 						<span>
-							{lesson.title} {quantity}매
+							{lessons.title} {quantity}매
 						</span>
 						<span>{originalPrice.toLocaleString()} 원</span>
 					</div>
@@ -186,21 +187,17 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId }: PayInfoSectio
 
 				{/* 결제 성공/실패 알림창 */}
 				<AlertNotification
-					open={isAlertOpen}
-					onOpenChange={setIsAlertOpen}
+					open={paymentStatus.isOpen}
+					onOpenChange={(open) => setPaymentStatus((prev) => ({ ...prev, isOpen: open }))}
 					title={
-						alertType === 'SUCCESS' ? '결제가 완료되었습니다.' : '결제에 실패했습니다.'
+						paymentStatus.type === 'SUCCESS'
+							? '결제가 완료되었습니다.'
+							: '결제에 실패했습니다.'
 					}
 					hasButton={true}
 					description={
-						alertType === 'SUCCESS' && successData ? (
+						paymentStatus.type === 'SUCCESS' && successData ? (
 							<div className="space-y-3 py-4">
-								<div className="flex justify-between items-center text-sm border-b border-border/40 pb-2">
-									<span className="text-muted-foreground">등록 번호</span>
-									<span className="font-semibold text-foreground">
-										{successData.enrollmentId}
-									</span>
-								</div>
 								<div className="flex justify-between items-center text-sm border-b border-border/40 pb-2">
 									<span className="text-muted-foreground">결제 금액</span>
 									<span className="font-bold text-carrot">
@@ -214,7 +211,7 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId }: PayInfoSectio
 									</span>
 								</div>
 							</div>
-						) : alertType === 'ERROR' ? (
+						) : paymentStatus.type === 'ERROR' ? (
 							<div className="space-y-3 py-4 text-left">
 								<p className="text-sm font-medium text-destructive text-center mb-2">
 									{errorData
@@ -222,11 +219,11 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId }: PayInfoSectio
 											PAY_ERROR_MESSAGES.DEFAULT
 										: PAY_ERROR_MESSAGES.DEFAULT}
 								</p>
-								{errorData?.requiredPoints && (
+								{errorData?.finalPrice && (
 									<div className="flex justify-between items-center text-xs border-t border-border/40 pt-2 text-muted-foreground">
 										<span>필요 포인트</span>
 										<span className="font-semibold text-foreground">
-											{errorData.requiredPoints.toLocaleString()} 원
+											{errorData.finalPrice.toLocaleString()} 원
 										</span>
 									</div>
 								)}

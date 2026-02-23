@@ -153,9 +153,9 @@ export const MypageSidebarNext = ({ onMenuItemClick }: MypageSidebarNextProps) =
 							<h3 className="text-lg font-bold text-gray-900 mb-4">모멘토</h3>
 							<div className="flex flex-col gap-3 pl-2">
 								<Link
-									href="/lessons/manage"
+									href="/classes-manage"
 									onClick={onMenuItemClick}
-									className={navItemClass('/lessons/manage')}
+									className={navItemClass('/classes-manage')}
 								>
 									클래스 관리
 								</Link>

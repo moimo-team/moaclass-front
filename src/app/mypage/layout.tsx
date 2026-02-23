@@ -38,12 +38,12 @@ const MypageLayout = ({ children }: { children: React.ReactNode }) => {
 				</div>
 
 				{/* Desktop leftSidebar - 마이페이지바 (LG 이상에서만 보임) */}
-				<div className="hidden lg:flex flex-1 shrink-0 flex-col overflow-hidden">
+				<div className="hidden lg:flex w-[280px] shrink-0 flex-col overflow-hidden">
 					<MypageSidebarNext />
 				</div>
 
 				{/* 메인 영역 - 스크롤 가능하도록 설정 */}
-				<div className="flex flex-col overflow-hidden grow-4 p-4 lg:p-0 lg:pl-12">
+				<div className="flex flex-col overflow-hidden flex-1 p-4 lg:p-0 lg:pl-12">
 					{children}
 				</div>
 			</div>

@@ -1,4 +1,4 @@
-import Image from 'next/image';
+﻿import Image from 'next/image';
 import { IoIosHeartEmpty, IoIosHeart } from 'react-icons/io';
 import { IoLocationOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
@@ -33,15 +33,6 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 		} else {
 			toggleLike({ lessonId: id, newIsLiked: !isLiked });
 		}
-	};
-
-	// 렌더링 최적화를 위해 변수로 분리 (any 제거)
-	const getImageUrl = (image: string | { src: string } | unknown): string => {
-		if (typeof image === 'string') return image;
-		if (image && typeof image === 'object' && 'src' in image) {
-			return (image as { src: string }).src;
-		}
-		return String(image || '');
 	};
 
 	return (
@@ -90,10 +81,10 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 						<div className="flex justify-between items-center text-[10px] text-gray-500 font-medium">
 							<div className="flex items-center gap-2">
 								<span className="flex items-center gap-0.5">
-									⭐ {lesson.rate.toFixed(1)}
+									⭐ {(lesson.rate ?? 0).toFixed(1)}
 								</span>
 								<span className="flex items-center gap-0.5">
-									❤️ {lesson.likeCount}
+									❤️ {lesson.likeCount ?? 0}
 								</span>
 							</div>
 							<div className="flex items-center gap-0.5">
@@ -105,9 +96,9 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 						<ClassInfoBody
 							title={title}
 							category={lesson.classCategory?.name || '전체'}
-							price={lesson.price}
-							discountRate={lesson.discountRate}
-							discountedPrice={lesson.discountedPrice}
+							price={lesson.price ?? 0}
+							discountRate={lesson.discountRate ?? 0}
+							discountedPrice={lesson.discountedPrice ?? 0}
 							showDate={false}
 							titleClassName="text-[16px] line-clamp-1"
 							className="gap-1.5"
@@ -118,15 +109,15 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 					<div className="flex items-center gap-2 pt-3 border-t border-gray-50 mt-auto">
 						<div className="w-5 h-5 rounded-full overflow-hidden border border-gray-100 shrink-0">
 							<Image
-								src={lesson.teacher.image || defaultProfileImage}
-								alt={lesson.teacher.nickname || '모멘토'}
+								src={lesson.teacher?.image || defaultProfileImage}
+								alt={lesson.teacher?.nickname || '모멘토'}
 								width={20}
 								height={20}
 								className="w-full h-full object-cover"
 							/>
 						</div>
 						<span className="text-xs font-medium text-gray-600 truncate">
-							{lesson.teacher.nickname || '모멘토'}
+							{lesson.teacher?.nickname || '모멘토'}
 						</span>
 					</div>
 				</div>

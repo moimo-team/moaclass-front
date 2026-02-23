@@ -411,7 +411,7 @@ const userUpdate = http.put(`${httpUrl}/users`, async ({ request }) => {
 			// JSON string 처리
 			try {
 				interests = JSON.parse(rawInterests[0] as string);
-			} catch (e) {
+			} catch {
 				interests = [rawInterests[0]];
 			}
 		} else {

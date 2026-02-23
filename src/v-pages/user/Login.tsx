@@ -69,7 +69,7 @@ const Login = () => {
 			} else {
 				navigate('/');
 			}
-		} catch (error) {
+		} catch {
 			setError('root', {
 				type: 'manual',
 				message: '로그인에 실패했습니다',

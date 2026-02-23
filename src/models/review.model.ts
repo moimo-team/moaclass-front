@@ -71,7 +71,4 @@ export interface LatestReviewListResponse {
 	meta: PaginationMeta;
 }
 
-export type ReviewInfo = Partial<Review> & {
-	userId?: number;
-	images?: string[];
-};
+export type MyReviewItem = Partial<LessonReviewListItemRaw>;

@@ -1,4 +1,4 @@
-import { MoreVertical } from 'lucide-react';
+﻿import { MoreVertical } from 'lucide-react';
 import Image from 'next/image';
 
 import { ClassInfoBody } from '@/components/common/ClassInfoBody';
@@ -142,7 +142,7 @@ export const ClassManageCard = ({
 			<div className="p-3 flex flex-col gap-2.5 bg-white shrink-0 border-t border-gray-50">
 				<ClassInfoBody
 					title={lesson.title}
-					category={lesson.classCategory?.name || '전체'}
+					category={lesson.lessonCategoryName || lesson.classCategory?.name || '전체'}
 					price={lesson.price}
 					discountRate={lesson.discountRate}
 					discountedPrice={lesson.discountedPrice}

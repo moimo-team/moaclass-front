@@ -47,19 +47,40 @@ const resolveChatType = (room: ChatRoom): ChatType => {
 };
 
 interface ChattingContentProps {
+	initialRoomId?: number;
+	initialChatType?: ChatType;
 	initialMeetingId?: number | string | null;
+	initialLessonId?: number | string | null;
 }
 
-export const ChattingContent = ({ initialMeetingId }: ChattingContentProps) => {
+const toNumber = (value?: number | string | null): number | undefined => {
+	if (typeof value === 'number') return Number.isFinite(value) ? value : undefined;
+	if (typeof value === 'string' && value.trim()) {
+		const parsed = Number(value);
+		return Number.isFinite(parsed) ? parsed : undefined;
+	}
+	return undefined;
+};
+
+export const ChattingContent = ({
+	initialRoomId,
+	initialChatType,
+	initialMeetingId,
+	initialLessonId,
+}: ChattingContentProps) => {
 	const { userId } = useAuthStore();
 	const location = useLocation();
 	const locationState = (location.state as ChatLocationState) ?? null;
+	const routeRoomId = toNumber(initialRoomId) ?? locationState?.roomId;
+	const routeMeetingId = toNumber(initialMeetingId) ?? locationState?.meetingId;
+	const routeLessonId = toNumber(initialLessonId) ?? locationState?.lessonId;
+	const routeChatType = initialChatType ?? locationState?.chatType;
 
 	const [selectedMeeting, setSelectedMeeting] = useState<ChatRoom | null>(null);
 	const [selectedLessonRoom, setSelectedLessonRoom] = useState<ChatRoom | null>(null);
 	const [useInitialRouteSelection, setUseInitialRouteSelection] = useState(true);
 	const [inputValue, setInputValue] = useState('');
-	const [chatType, setChatType] = useState<ChatType>(() => locationState?.chatType ?? 'meeting');
+	const [chatType, setChatType] = useState<ChatType>(() => routeChatType ?? 'meeting');
 
 	const [messages, setMessages] = useState<ChatMessage[]>([]);
 	const scrollRef = useRef<HTMLDivElement>(null);
@@ -86,42 +107,54 @@ export const ChattingContent = ({ initialMeetingId }: ChattingContentProps) => {
 
 	const initialMeetingRoomFromRoute = useMemo(() => {
 		if (!useInitialRouteSelection) return null;
-		if (locationState?.chatType === 'lesson') return null;
+		if (routeChatType === 'lesson') return null;
 
-		const targetMeetingId = initialMeetingId
-			? Number(initialMeetingId)
-			: locationState?.meetingId;
-
-		if (targetMeetingId) {
-			return meetingRooms.find((room) => room.meetingId === targetMeetingId) ?? null;
+		if (routeMeetingId) {
+			return meetingRooms.find((room) => room.meetingId === routeMeetingId) ?? null;
 		}
 
-		if (locationState?.roomId) {
+		if (routeRoomId) {
 			const targetRoom =
-				chatRooms?.find((room) => getRoomIdFromRoom(room) === locationState.roomId) ?? null;
+				chatRooms?.find((room) => getRoomIdFromRoom(room) === routeRoomId) ?? null;
 			return targetRoom && resolveChatType(targetRoom) === 'meeting' ? targetRoom : null;
 		}
 
 		return null;
-	}, [useInitialRouteSelection, locationState, meetingRooms, chatRooms, initialMeetingId]);
+	}, [
+		useInitialRouteSelection,
+		routeChatType,
+		routeMeetingId,
+		routeRoomId,
+		meetingRooms,
+		chatRooms,
+	]);
 
 	const initialLessonRoomFromRoute = useMemo(() => {
 		if (!useInitialRouteSelection) return null;
 
-		if (locationState?.chatType === 'lesson' && locationState.roomId) {
-			return (
-				lessonRooms.find((room) => getRoomIdFromRoom(room) === locationState.roomId) ?? null
-			);
+		if (routeChatType === 'lesson' && routeRoomId) {
+			return lessonRooms.find((room) => getRoomIdFromRoom(room) === routeRoomId) ?? null;
 		}
 
-		if (locationState?.roomId) {
+		if (routeLessonId) {
+			return lessonRooms.find((room) => room.lessonId === routeLessonId) ?? null;
+		}
+
+		if (routeRoomId) {
 			const targetRoom =
-				chatRooms?.find((room) => getRoomIdFromRoom(room) === locationState.roomId) ?? null;
+				chatRooms?.find((room) => getRoomIdFromRoom(room) === routeRoomId) ?? null;
 			return targetRoom && resolveChatType(targetRoom) === 'lesson' ? targetRoom : null;
 		}
 
 		return null;
-	}, [useInitialRouteSelection, locationState, lessonRooms, chatRooms]);
+	}, [
+		useInitialRouteSelection,
+		routeChatType,
+		routeRoomId,
+		routeLessonId,
+		lessonRooms,
+		chatRooms,
+	]);
 
 	const selectedRoom =
 		chatType === 'meeting'
@@ -211,12 +244,12 @@ export const ChattingContent = ({ initialMeetingId }: ChattingContentProps) => {
 	}, [messages]);
 
 	useEffect(() => {
-		const targetRoomId = locationState?.roomId;
+		const targetRoomId = routeRoomId;
 		if (!targetRoomId || !chatRooms) return;
 		if (chatRooms.some((room) => getRoomIdFromRoom(room) === targetRoomId)) return;
 
 		void refetchChatRooms();
-	}, [locationState?.roomId, chatRooms, refetchChatRooms]);
+	}, [routeRoomId, chatRooms, refetchChatRooms]);
 
 	const handleSendMessage = () => {
 		if (!inputValue.trim()) return;
@@ -317,9 +350,14 @@ export const ChattingContent = ({ initialMeetingId }: ChattingContentProps) => {
 const Chatting = () => {
 	const location = useLocation();
 	const locationState = location.state as ChatLocationState;
-	const initialMeetingId = locationState?.meetingId;
-
-	return <ChattingContent initialMeetingId={initialMeetingId} />;
+	return (
+		<ChattingContent
+			initialRoomId={locationState?.roomId}
+			initialChatType={locationState?.chatType}
+			initialMeetingId={locationState?.meetingId}
+			initialLessonId={locationState?.lessonId}
+		/>
+	);
 };
 
 export default Chatting;

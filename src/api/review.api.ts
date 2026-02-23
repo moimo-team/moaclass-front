@@ -5,7 +5,7 @@ import type {
 	LessonReviewListResponse,
 	LessonReviewListResponseRaw,
 	Review,
-	ReviewInfo,
+	MyReviewItem,
 } from '@/models/review.model';
 
 const getReviewImages = (review: LessonReviewListItemRaw): string[] =>
@@ -64,7 +64,7 @@ export const getLatestReviews = async (): Promise<LatestReviewListResponse> => {
 };
 
 export const writeReview = async (data: FormData) => {
-	const response = await apiClient.post<ReviewInfo>(`/reviews`, data, {
+	const response = await apiClient.post<MyReviewItem>(`/reviews`, data, {
 		headers: {
 			'Content-Type': 'multipart/form-data',
 		},
@@ -73,12 +73,12 @@ export const writeReview = async (data: FormData) => {
 };
 
 export const getMyReview = async (lessonId: number) => {
-	const response = await apiClient.get<ReviewInfo>(`/reviews/me/${lessonId}`);
+	const response = await apiClient.get<MyReviewItem>(`/reviews/me/${lessonId}`);
 	return response.data;
 };
 
 export const updateReview = async (reviewId: number, data: FormData) => {
-	const response = await apiClient.put<ReviewInfo>(`/reviews/${reviewId}`, data, {
+	const response = await apiClient.put<MyReviewItem>(`/reviews/${reviewId}`, data, {
 		headers: {
 			'Content-Type': 'multipart/form-data',
 		},

@@ -2,26 +2,39 @@ import { useEffect } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
 
+import { resolveNotificationMessage } from '@/constants/notificationMessages';
 import {
 	DEFAULT_NOTIFICATION_LIMIT,
 	DEFAULT_NOTIFICATION_PAGE,
 } from '@/hooks/useNotificationQuery';
 import { getChatSocket, initChatSocket, type ChatSocket } from '@/lib/chatSocket';
 import type { MockSocketClient } from '@/mock/mockData/socketMock';
-import type { Notification } from '@/models/notification.model';
+import type { NotificationSocketPayload, NotificationUiItem } from '@/models/notification.model';
 import { useAuthStore } from '@/store/authStore';
 
 const MAX_STORED_NOTIFICATIONS = 10;
 
-const normalizeIncomingNotification = (payload: Notification): Notification => ({
-	...payload,
-	message: payload.message ?? payload.description ?? '',
-	description: payload.description ?? payload.message ?? '',
-	isRead: false,
-	readAt: null,
-});
+const normalizeIncomingNotification = (payload: NotificationSocketPayload): NotificationUiItem => {
+	const message = resolveNotificationMessage(payload);
 
-const trimNotifications = (notifications: Notification[]): Notification[] => {
+	return {
+		id: payload.id,
+		type: payload.type,
+		message,
+		description: message,
+		linkId: payload.linkId,
+		linkType: payload.linkType,
+		roomId: payload.roomId,
+		senderNickname: payload.senderNickname,
+		lessonTitle: payload.lessonTitle,
+		meetingTitle: payload.meetingTitle,
+		isRead: false,
+		readAt: null,
+		createdAt: new Date().toISOString(),
+	};
+};
+
+const trimNotifications = (notifications: NotificationUiItem[]): NotificationUiItem[] => {
 	const next = [...notifications];
 
 	while (next.length > MAX_STORED_NOTIFICATIONS) {
@@ -33,7 +46,6 @@ const trimNotifications = (notifications: Notification[]): Notification[] => {
 			}
 		}
 
-		// Remove oldest read first; if none are read, remove oldest item.
 		next.splice(readIndex >= 0 ? readIndex : next.length - 1, 1);
 	}
 
@@ -46,7 +58,7 @@ const isSocketIoClient = (socket: ChatSocket): socket is Exclude<ChatSocket, Moc
 
 const attachNotificationListener = (
 	socket: ChatSocket,
-	listener: (payload: Notification) => void,
+	listener: (payload: NotificationSocketPayload) => void,
 ) => {
 	if (isSocketIoClient(socket)) {
 		socket.on('notification', listener);
@@ -71,10 +83,10 @@ export const useGlobalChatSocket = () => {
 			const socket = await initChatSocket(accessToken);
 			if (!socket || detached) return;
 
-			const onNotification = (payload: Notification) => {
+			const onNotification = (payload: NotificationSocketPayload) => {
 				const incoming = normalizeIncomingNotification(payload);
 
-				queryClient.setQueryData<Notification[]>(
+				queryClient.setQueryData<NotificationUiItem[]>(
 					['notifications', DEFAULT_NOTIFICATION_PAGE, DEFAULT_NOTIFICATION_LIMIT],
 					(oldData) => {
 						const prev = oldData ?? [];

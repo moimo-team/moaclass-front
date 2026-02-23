@@ -98,7 +98,7 @@ export const TeacherProfileModal = ({ isOpen, onClose, profile }: TeacherProfile
 		setValue('profileImageFile', file, { shouldValidate: true });
 	};
 
-	const onSubmit = async (data: TeacherProfileFormValues) => {
+	const onSubmit = (data: TeacherProfileFormValues) => {
 		const formData = new FormData();
 		formData.append('nickname', data.nickname);
 		formData.append('introduction', data.introduction);
@@ -107,16 +107,12 @@ export const TeacherProfileModal = ({ isOpen, onClose, profile }: TeacherProfile
 			formData.append('image', data.profileImageFile);
 		}
 
-		try {
-			if (profile) {
-				await updateMutation.mutateAsync(formData);
-			} else {
-				await createMutation.mutateAsync(formData);
-			}
-			onClose();
-		} catch {
-			// 에러는 Mutation의 onError에서 처리됨
-		}
+		const mutation = profile ? updateMutation : createMutation;
+		mutation.mutate(formData, {
+			onSuccess: () => {
+				onClose();
+			},
+		});
 	};
 
 	return (
