@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import StarRating from '@/components/common/StarRating';
+import AlertNotification from '@/components/features/modal/AlertNotification';
 import { FormImageUpload } from '@/components/features/modal/components/FormImageUpload';
 import { FormModal } from '@/components/features/modal/components/FormModal';
 import { Textarea } from '@/components/ui/textarea';
@@ -85,6 +86,7 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 }) => {
 	const { mutateAsync: writeReview, isPending: isWriting } = useReviewMutation();
 	const { mutateAsync: updateReview, isPending: isUpdating } = useUpdateReviewMutation();
+	const [isImageAlertOpen, setIsImageAlertOpen] = React.useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const {
 		control,
@@ -202,9 +204,28 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 
 		// 이미지 처리
 		if (isEditMode) {
-			// 기존 URL(http로 시작)은 백엔드 DTO Body에 포함되면 안 됨 (400 에러 원인)
 			const existingUrls = data.images.filter((img) => img.startsWith('http'));
 			const newFiles = data.imageFiles ?? [];
+
+			// 원래 이미지가 있었는데 하나도 남지 않은 경우 (기존 URL도 없고 새 파일도 없음)
+			const originalImages = [
+				existingReview?.review?.image1,
+				existingReview?.review?.image2,
+				existingReview?.review?.image3,
+				existingReview?.review?.image4,
+				existingReview?.review?.image5,
+				existingReview?.review?.image6,
+				existingReview?.review?.image7,
+				existingReview?.review?.image8,
+			].filter((img) => img !== null && img !== undefined);
+
+			const hadOriginalImages = originalImages.length > 0;
+			const hasCurrentImages = existingUrls.length > 0 || newFiles.length > 0;
+
+			if (hadOriginalImages && !hasCurrentImages) {
+				setIsImageAlertOpen(true);
+				return;
+			}
 
 			// 신규 파일만 전송하되, 인덱스는 기존 이미지 개수 다음부터 시작하여 슬롯 번호를 맞춤
 			newFiles.forEach((file, i) => {
@@ -316,6 +337,13 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 					</p>
 				</div>
 			</div>
+			<AlertNotification
+				open={isImageAlertOpen}
+				onOpenChange={setIsImageAlertOpen}
+				title="알림"
+				description="이미지 리뷰 작성 보상 쿠폰을 받았으므로 모든 이미지 삭제는 불가합니다"
+				hasButton={true}
+			/>
 		</FormModal>
 	);
 };
