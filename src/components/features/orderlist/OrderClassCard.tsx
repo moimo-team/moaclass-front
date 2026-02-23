@@ -136,6 +136,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
 									/>
 								}
 								disabled={order.status !== '수강완료'}
+								// disabled={false}
 								className="w-full"
 								onClick={() => setIsReviewModalOpen(true)}
 							/>
