@@ -24,6 +24,8 @@ import {
 } from '@/hooks/useAuthMutations';
 import { ENV } from '@/utils/env';
 
+import type { AxiosError } from 'axios';
+
 // zod schema 정의
 export const loginSchema = z.object({
 	email: z.string().min(1, '이메일을 입력해주세요.').email('이메일 형식이 올바르지 않습니다.'),
@@ -67,11 +69,21 @@ const LoginClient = () => {
 			} else {
 				router.push('/');
 			}
-		} catch {
-			setError('root', {
-				type: 'manual',
-				message: '로그인에 실패했습니다',
-			});
+		} catch (error) {
+			const axiosError = error as AxiosError<{ message: string }>;
+			const status = axiosError.response?.status;
+
+			if (status === 401) {
+				setError('root', {
+					type: 'manual',
+					message: '일치하는 이메일이 없습니다.',
+				});
+			} else {
+				setError('root', {
+					type: 'manual',
+					message: '로그인에 실패했습니다',
+				});
+			}
 		}
 	};
 
