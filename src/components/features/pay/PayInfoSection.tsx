@@ -9,6 +9,7 @@ import type { CreatePaymentResponse } from '@/api/pay.api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { useAuthQuery } from '@/hooks/useAuthQuery';
 import { usePayMutation } from '@/hooks/usePayMutations';
 import { usePayCalculation } from '@/hooks/usePayQuery';
 import type { CouponInfo } from '@/models/coupon.model';
@@ -39,9 +40,12 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId, email }: PayInf
 		quantity,
 		subtotal,
 		availableCoupons,
-		userPoints,
 		canPay: initialCanPay,
 	} = payPreview;
+
+	const { data: userData } = useAuthQuery();
+	const userPoints = userData?.point || 0;
+
 	const router = useRouter();
 	const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
 	const [appliedCoupon, setAppliedCoupon] = useState<CouponInfo | null>(null);

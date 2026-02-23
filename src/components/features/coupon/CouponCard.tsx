@@ -58,7 +58,7 @@ export const CouponCard = ({
 			onClick={isAvailable ? onClick : undefined}
 			className={`relative p-5 rounded-xl border transition-all overflow-hidden group h-full ${
 				isAvailable
-					? `bg-white cursor-pointer shadow-sm ${
+					? `bg-white shadow-sm ${
 							selected
 								? 'border-[#4f8f6a] ring-1 ring-[#4f8f6a]/20'
 								: 'border-slate-200 hover:border-[#4f8f6a]/30'

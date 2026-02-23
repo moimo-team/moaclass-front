@@ -23,8 +23,8 @@ type TabStatus = (typeof POINT_TABS)[number];
  * @returns 탭에서 사용하는 상태 ("전체" | "적립" | "사용")
  */
 const mapPointToPointTab = createPointMapper<typeof POINT_TABS>({
-	CHARGE: '적립',
-	REFUND: '적립',
+	CHARGE: '충전 및 환불',
+	REFUND: '충전 및 환불',
 	USE: '사용',
 });
 
@@ -112,13 +112,12 @@ const Points = () => {
 											{formatDateTime(item.createdAt, { type: 'date' })}
 										</div>
 										<div className="space-y-1">
-											<div className="flex items-center gap-1 cursor-pointer">
-												<h3 className="text-[15px] font-bold text-[#2f2f2f] line-clamp-1 group-hover:text-primary transition-colors">
+											<div className="flex items-center gap-1">
+												<h3 className="text-[15px] font-bold text-[#2f2f2f] line-clamp-1">
 													{item.type === 'CHARGE'
 														? '포인트 충전'
 														: item.lessonName}
 												</h3>
-												<ChevronRight className="w-4 h-4 text-black/20" />
 											</div>
 											<div className="flex items-center text-[12px] text-black/30 font-medium">
 												{/* 시간 파싱 (예: 13:00) */}
@@ -128,7 +127,8 @@ const Points = () => {
 													})}
 												</span>
 												<div className="mx-1.5 w-px h-2 bg-black/10" />
-												{mapPointToPointTab(item.type) === '적립' && (
+												{mapPointToPointTab(item.type) ===
+													'충전 및 환불' && (
 													<div className="ml-1 w-3 h-3 rounded-full bg-black/5 flex items-center justify-center">
 														<ChevronRight className="w-2 h-2 rotate-90" />
 													</div>
@@ -139,12 +139,12 @@ const Points = () => {
 									<div className="flex items-center gap-2">
 										<span
 											className={`text-[15px] font-black tabular-nums ${
-												mapPointToPointTab(item.type) === '적립'
+												mapPointToPointTab(item.type) === '충전 및 환불'
 													? 'text-[#4f8f6a]'
 													: 'text-[#2f2f2f]'
 											}`}
 										>
-											{mapPointToPointTab(item.type) === '적립'
+											{mapPointToPointTab(item.type) === '충전 및 환불'
 												? `+${item.amount.toLocaleString()}`
 												: item.amount.toLocaleString()}
 											원
