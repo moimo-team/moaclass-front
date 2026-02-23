@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -20,6 +20,7 @@ function Header() {
 
 	const [searchTopic, setSearchTopic] = useState('');
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
+	const headerRef = useRef<HTMLElement | null>(null);
 
 	const filterStore = useFilterStore();
 
@@ -75,8 +76,27 @@ function Header() {
 	const handleInputFocus = () => setIsFilterOpen(true);
 	const handleCloseFilter = () => setIsFilterOpen(false);
 
+	useEffect(() => {
+		if (!isFilterOpen) return;
+
+		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as Node | null;
+			if (!target) return;
+			if (headerRef.current?.contains(target)) return;
+			setIsFilterOpen(false);
+		};
+
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [isFilterOpen]);
+
 	return (
-		<header className="w-full h-[80px] bg-card sticky top-0 z-50 shrink-0 border-b border-gray-300">
+		<header
+			ref={headerRef}
+			className="w-full h-[80px] bg-card sticky top-0 z-50 shrink-0 border-b border-gray-300"
+		>
 			<div className="flex items-center w-full h-full max-w-7xl mx-auto px-4 md:px-8">
 				<Button
 					asChild
