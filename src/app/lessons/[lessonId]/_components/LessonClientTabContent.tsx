@@ -64,17 +64,20 @@ export const LessonClientTabContent = ({
 	// 섹션 참조를 위한 내부 ref (필요한 경우)
 	// const introRef = useRef<HTMLElement>(null);
 
+	const teacherProfileImage =
+		teacher?.image && teacher.image.trim().length > 0 ? teacher.image : defaultProfileImage;
+
 	return (
 		<>
 			{/* 탭 네비게이션 */}
-			<div className="sticky top-0 bg-background z-10 border-b border-border/50">
-				<div className="flex overflow-x-auto scrollbar-hide py-2">
+			<div className="sticky top-[80px] z-20 rounded-b-xl border border-border/60 bg-muted shadow-sm">
+				<div className="flex items-center gap-1 overflow-x-auto scrollbar-hide px-2 py-2 sm:px-4 sm:py-3 lg:px-6">
 					{tabTitles.map((tab) => (
 						<Button
 							key={tab.id}
 							variant="ghost"
 							className={cn(
-								'whitespace-nowrap rounded-none border-b-2 border-transparent px-2 sm:px-4 py-2 text-base sm:text-lg font-medium text-muted-foreground transition-colors hover:text-foreground',
+								'whitespace-nowrap rounded-md border-b-2 border-transparent px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:px-4 sm:py-2.5 sm:text-base lg:px-5',
 								activeTab === tab.id && 'border-primary text-foreground',
 							)}
 							onClick={() => handleTabClick(tab.id)}
@@ -122,7 +125,7 @@ export const LessonClientTabContent = ({
 							{teacher && (
 								<div className="flex items-center gap-4 mb-6 p-4 border rounded-lg bg-secondary/10">
 									<Image
-										src={teacher.image || defaultProfileImage}
+										src={teacherProfileImage}
 										alt={teacher.nickname}
 										width={80}
 										height={80}
@@ -135,9 +138,7 @@ export const LessonClientTabContent = ({
 										<Button
 											variant="link"
 											className="p-0 h-auto text-primary text-sm hover:underline"
-											onClick={() =>
-												navigate(`/mypage/profile/${teacher.id}`)
-											}
+											onClick={() => navigate(`/teachers/${teacher.id}`)}
 										>
 											모멘토 페이지 바로가기
 										</Button>
