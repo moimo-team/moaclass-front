@@ -5,8 +5,26 @@ import { useAuthStore } from '@/store/authStore';
 import { ENV } from '@/utils/env';
 
 export const createClient = (config?: AxiosRequestConfig) => {
+	// 서버 사이드(Next.js)에서 호출 시 절대 경로가 필요함
+	const getBaseURL = () => {
+		if (config?.baseURL) return config.baseURL;
+
+		const apiUrl = ENV.API_URL;
+		// 절대 경로인 경우 그대로 사용
+		if (apiUrl.startsWith('http')) return apiUrl;
+
+		// 서버 사이드에서 상대 경로인 경우 (Next.js generateMetadata 등)
+		if (typeof window === 'undefined') {
+			// 개발 환경 기본값 또는 환경 변수 기반 절대 경로 구성
+			const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+			return `${baseUrl}${apiUrl}`;
+		}
+
+		return apiUrl;
+	};
+
 	const axiosInstance = axios.create({
-		baseURL: ENV.API_URL,
+		baseURL: getBaseURL(),
 		headers: {
 			'Content-Type': 'application/json',
 		},
