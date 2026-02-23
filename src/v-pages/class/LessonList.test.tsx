@@ -4,6 +4,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { REVERSE_DAYS_MAP } from '@/constants/dayConstants';
+import { LEVEL_MAP } from '@/constants/lessonConstants';
 import type { FetchLessonsParams, FetchLessonsResponse, Lesson } from '@/models/lesson.model';
 import {
 	LESSON_LIST_EMPTY_RESPONSE,
@@ -163,9 +165,13 @@ describe('LessonListPage', () => {
 			expect(mockSetAllFilters).toHaveBeenCalled();
 		});
 		const filters = mockSetAllFilters.mock.calls[0][0] as Record<string, unknown>;
-		expect(filters.selectedCategories).toEqual(['10']);
+		expect(filters.selectedCategories).toEqual([]);
+		expect(filters.activeMainCategoryId).toBe(10);
 		expect(filters.selectedRegions).toEqual(['1']);
 		expect(filters.selectedSort).toBe('LIKES');
+		expect(filters.selectedDays).toEqual([REVERSE_DAYS_MAP.WEEKDAY]);
+		expect(filters.selectedDifficulty).toEqual([LEVEL_MAP.BEGINNER]);
+		expect(filters.selectedStatus).toBe('ACTIVE');
 		expect(filters.priceRange).toEqual([10000, 50000]);
 	});
 
@@ -219,8 +225,8 @@ describe('LessonListPage', () => {
 		expect(mockSetSearchParams).toHaveBeenCalledTimes(1);
 		const params = mockSetSearchParams.mock.calls[0][0] as URLSearchParams;
 		expect(params.get('page')).toBe('1');
-		expect(params.getAll('regionId')).toEqual(['1', '2']);
-		expect(params.getAll('subCategoryId')).toEqual(['10', '11']);
+		expect(params.get('regionId')).toBe('1,2');
+		expect(params.get('subCategoryId')).toBe('10,11');
 		expect(params.get('sort')).toBe('LIKES');
 		expect(params.get('minPrice')).toBe('10000');
 		expect(params.get('maxPrice')).toBe('30000');

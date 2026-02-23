@@ -50,6 +50,7 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 		selectedDays,
 		selectedDifficulty,
 		selectedCategories,
+		selectedSubCategoryIds,
 		activeMainCategoryId,
 		selectedMainCategory,
 		selectedStatus,
@@ -64,6 +65,7 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 		toggleSubCategory,
 		removeCategoryBadge,
 		resetFilters,
+		setAllFilters,
 		getFetchLessonsParams,
 		setRegionIdMap,
 		setCategoryIdMap,
@@ -79,8 +81,22 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 		if (regions && !isRegionsLoading) {
 			const newRegionMap = new Map(regions.map((region) => [region.name, region.id]));
 			setRegionIdMap(newRegionMap);
+
+			const isHydratedWithRegionIds =
+				selectedRegions.length > 0 &&
+				selectedRegions.every((region) => /^\d+$/.test(region));
+			if (isHydratedWithRegionIds) {
+				const regionNames = selectedRegions
+					.map((regionIdText) => Number(regionIdText))
+					.map((regionId) => regions.find((region) => region.id === regionId)?.name)
+					.filter((regionName): regionName is string => !!regionName);
+
+				if (regionNames.length > 0) {
+					setAllFilters({ selectedRegions: regionNames });
+				}
+			}
 		}
-	}, [regions, isRegionsLoading, setRegionIdMap]);
+	}, [regions, isRegionsLoading, selectedRegions, setAllFilters, setRegionIdMap]);
 
 	useEffect(() => {
 		if (lessonCategories && !isCategoriesLoading) {
@@ -88,8 +104,27 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 				lessonCategories.map((category) => [category.name, category.id]),
 			);
 			setCategoryIdMap(newCategoryMap);
+
+			if (activeMainCategoryId && !selectedMainCategory) {
+				const mainCategory = lessonCategories.find(
+					(category) => category.id === activeMainCategoryId,
+				);
+				if (mainCategory) {
+					setAllFilters({
+						selectedMainCategory: mainCategory.name,
+						selectedCategories: [mainCategory.name],
+					});
+				}
+			}
 		}
-	}, [lessonCategories, isCategoriesLoading, setCategoryIdMap]);
+	}, [
+		lessonCategories,
+		isCategoriesLoading,
+		activeMainCategoryId,
+		selectedMainCategory,
+		setAllFilters,
+		setCategoryIdMap,
+	]);
 
 	useEffect(() => {
 		// 선택한 대분류가 있을 때만 소분류 카테고리 맵 생성
@@ -106,7 +141,29 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 		);
 		if (isSameMap(subCategoryIdMap, newSubCategoryMap)) return;
 		setSubCategoryIdMap(newSubCategoryMap);
-	}, [activeMainCategoryId, subCategoriesData, subCategoryIdMap, setSubCategoryIdMap]);
+
+		if (selectedSubCategoryIds.length > 0 && selectedMainCategory) {
+			const subCategoryNames = selectedSubCategoryIds
+				.map(
+					(subCategoryId) =>
+						subCategoriesData.find((subCategory) => subCategory.id === subCategoryId)
+							?.name,
+				)
+				.filter((subCategoryName): subCategoryName is string => !!subCategoryName);
+
+			setAllFilters({
+				selectedCategories: [selectedMainCategory, ...subCategoryNames],
+			});
+		}
+	}, [
+		activeMainCategoryId,
+		subCategoriesData,
+		selectedMainCategory,
+		selectedSubCategoryIds,
+		subCategoryIdMap,
+		setAllFilters,
+		setSubCategoryIdMap,
+	]);
 
 	const getRegionButtonText = () => {
 		if (!selectedRegions.length) return '지역을 선택하세요';
@@ -183,8 +240,8 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 						activeMainCategoryId={activeMainCategoryId}
 						selectedMainCategory={selectedMainCategory}
 						handleMainCategoryClick={selectMainCategory}
-						handleSubCategoryCheckedChange={(subCategoryName, _subCategoryId) =>
-							toggleSubCategory(subCategoryName)
+						handleSubCategoryCheckedChange={(subCategoryName, subCategoryId) =>
+							toggleSubCategory(subCategoryName, subCategoryId)
 						}
 					/>
 
@@ -215,7 +272,11 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 						<Select
 							value={selectedStatus || 'ALL_STATUSES'}
 							onValueChange={(value) =>
-								toggleStatus(value === 'ALL_STATUSES' ? null : value)
+								toggleStatus(
+									value === 'ALL_STATUSES'
+										? null
+										: (value as 'ACTIVE' | 'INACTIVE'),
+								)
 							}
 						>
 							<SelectTrigger className="w-[180px]">
@@ -223,8 +284,8 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="ALL_STATUSES">전체</SelectItem>
-								<SelectItem value="운영중">모집중</SelectItem>
-								<SelectItem value="휴면 상태">모집 종료</SelectItem>
+								<SelectItem value="ACTIVE">모집중</SelectItem>
+								<SelectItem value="INACTIVE">모집 종료</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
@@ -290,7 +351,7 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 			{/* 배지 영역 */}
 			<FilterBadges
 				regions={selectedRegions}
-				categories={selectedCategories.slice(1)}
+				categories={selectedCategories}
 				onRemoveRegion={(region) => toggleRegion(region)}
 				onRemoveCategory={removeCategoryBadge}
 			/>

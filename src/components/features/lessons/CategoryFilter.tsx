@@ -28,6 +28,10 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
 		activeMainCategoryId || 0,
 	);
 
+	const handleMainCategorySelect = (category: LessonCategory) => {
+		handleMainCategoryClick(category);
+	};
+
 	const getCategoryButtonText = (mainCategory: string | null) => {
 		if (!mainCategory) return '카테고리를 선택하세요';
 		const subSelectionsCount = Math.max(0, selectedCategories.length - 1);
@@ -69,18 +73,24 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
 												activeMainCategoryId === category.id &&
 													'bg-gray-100 font-medium',
 											)}
-											onClick={() => handleMainCategoryClick(category)}
+											onClick={() => handleMainCategorySelect(category)}
 										>
 											<Checkbox
 												id={`main-cat-${category.id}`}
 												checked={selectedMainCategory === category.name}
 												onCheckedChange={() =>
-													handleMainCategoryClick(category)
+													handleMainCategorySelect(category)
 												}
+												onClick={(event) => event.stopPropagation()}
 												className="shrink-0"
 											/>
 											<label
 												htmlFor={`main-cat-${category.id}`}
+												onClick={(event) => {
+													event.preventDefault();
+													event.stopPropagation();
+													handleMainCategorySelect(category);
+												}}
 												className="text-sm leading-none cursor-pointer flex-grow truncate"
 											>
 												{category.name}

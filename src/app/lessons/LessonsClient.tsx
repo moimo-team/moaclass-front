@@ -15,11 +15,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
+import { REVERSE_DAYS_MAP } from '@/constants/dayConstants';
+import { LEVEL_MAP } from '@/constants/lessonConstants';
 import { REVERSE_SORT_MAP, type SortEnum } from '@/constants/sortConstants';
 import { useLessonsQuery } from '@/hooks/useLessonsQuery';
 import type { FetchLessonsParams, Lesson } from '@/models/lesson.model';
 import { useFilterStore } from '@/store/filterStore';
 import type { FilterState } from '@/store/filterStore';
+import { buildLessonFilterSearchParams, parseMultiValueParam } from '@/utils/lessonFilterQuery';
 import { scrollToTop } from '@/utils/setScrollTo';
 
 const LessonListDisplay: React.FC<{
@@ -56,13 +59,29 @@ export function LessonsClient() {
 	const setSelectedSort = useFilterStore((state) => state.setSelectedSort);
 
 	useEffect(() => {
+		const categoryIds = parseMultiValueParam(searchParams, 'categoryId');
+		const subCategoryIds = parseMultiValueParam(searchParams, 'subCategoryId');
+		const statusValues = parseMultiValueParam(searchParams, 'status');
+		const dayValues = parseMultiValueParam(searchParams, 'days');
+		const levelValues = parseMultiValueParam(searchParams, 'level');
+
 		const filtersFromUrl: Partial<FilterState> = {
-			selectedCategories: searchParams.get('categoryId')?.split(',') || [],
-			selectedRegions: searchParams.get('regionId')?.split(',') || [],
-			selectedDays: searchParams.get('days')?.split(',') || [],
-			selectedDifficulty: searchParams.get('level')?.split(',') || [],
+			selectedCategories: [],
+			selectedRegions: parseMultiValueParam(searchParams, 'regionId'),
+			selectedDays: dayValues.map((value) => REVERSE_DAYS_MAP[value] ?? value),
+			selectedDifficulty: levelValues.map(
+				(value) => LEVEL_MAP[value as keyof typeof LEVEL_MAP] ?? value,
+			),
+			selectedSubCategoryIds: subCategoryIds
+				.map((subCategoryIdText) => Number(subCategoryIdText))
+				.filter((subCategoryId) => !Number.isNaN(subCategoryId)),
+			activeMainCategoryId:
+				categoryIds.length > 0 && !Number.isNaN(Number(categoryIds[0]))
+					? Number(categoryIds[0])
+					: null,
 			selectedPersonnel: searchParams.get('maxParticipants') || '',
-			selectedStatus: searchParams.get('status') || null,
+			selectedStatus:
+				statusValues.length > 0 ? (statusValues[0] as FilterState['selectedStatus']) : null,
 			selectedSort: (searchParams.get('sort') as SortEnum) || null,
 			timeRange: searchParams.get('timeRange')
 				? (searchParams.get('timeRange')?.split('-').map(Number) as [number, number])
@@ -100,15 +119,7 @@ export function LessonsClient() {
 	};
 
 	const handleSearchClick = (mappedParams: FetchLessonsParams) => {
-		const params = new URLSearchParams();
-		Object.entries(mappedParams).forEach(([key, value]) => {
-			if (value === undefined || value === null) return;
-			if (Array.isArray(value)) {
-				value.forEach((item) => params.append(key, String(item)));
-			} else {
-				params.append(key, String(value));
-			}
-		});
+		const params = buildLessonFilterSearchParams(mappedParams);
 		params.set('page', '1');
 		updateUrl(params);
 	};
