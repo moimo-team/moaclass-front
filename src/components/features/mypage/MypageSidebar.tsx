@@ -28,9 +28,14 @@ export const MypageSidebar = ({ onMenuItemClick }: MypageSidebarProps) => {
 	if (!user) return null;
 
 	const handleDeleteUser = async () => {
-		router.replace('/');
-		await deleteUser();
-		setIsConfirmOpen(false);
+		try {
+			await deleteUser();
+			router.replace('/');
+		} catch (error) {
+			console.error('회원 탈퇴 실패:', error);
+		} finally {
+			setIsConfirmOpen(false);
+		}
 	};
 
 	const isActive = (path: string) => pathname === path;

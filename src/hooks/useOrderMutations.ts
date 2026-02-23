@@ -15,6 +15,7 @@ export const useCancelClassMutation = () => {
 	return useMutation({
 		mutationFn: ({ enrollmentId, data }: { enrollmentId: number; data: CancelClassRequest }) =>
 			cancelClass(enrollmentId, data),
+		meta: { useBackendError: true },
 		onSuccess: (data: RefundResponse) => {
 			// 주문 목록 무효화
 			queryClient.invalidateQueries({
