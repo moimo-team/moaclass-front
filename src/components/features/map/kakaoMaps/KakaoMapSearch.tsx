@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { isKakaoMapLoaded } from '@/hooks/useKakaoMap';
+import { isKakaoMapLoaded, useKakaoMap } from '@/hooks/useKakaoMap';
 import { cn } from '@/lib/utils';
 import type { PlaceInfo } from '@/models/kakao-maps.model';
 
@@ -16,6 +16,8 @@ interface KakaoMapSearchProps {
 }
 
 function KakaoMapSearch({ onPlaceSelect, defaultValue = '', className }: KakaoMapSearchProps) {
+	// SDK 초기화 훅 호출 - autoload=false 방식에서 반드시 필요
+	const { isLoaded } = useKakaoMap();
 	const [keyword, setKeyword] = useState(defaultValue);
 	const [searchResults, setSearchResults] = useState<PlaceInfo[]>([]);
 	const [selectedPlace, setSelectedPlace] = useState<PlaceInfo | null>(null);
@@ -41,7 +43,7 @@ function KakaoMapSearch({ onPlaceSelect, defaultValue = '', className }: KakaoMa
 			return;
 		}
 
-		if (!isKakaoMapLoaded()) {
+		if (!isLoaded || !isKakaoMapLoaded()) {
 			toast.error('카카오맵 API를 불러오는 중입니다. 잠시 후 다시 시도해주세요');
 			return;
 		}
