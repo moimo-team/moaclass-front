@@ -109,7 +109,11 @@ export const LessonTabContent = ({
 
 			{/* 클래스 정보 섹션 */}
 			<div className="space-y-8" aria-label="클래스 상세 콘텐츠">
-				<section id="intro" ref={(el) => onSectionRef('intro', el)}>
+				<section
+					id="intro"
+					ref={(el) => onSectionRef('intro', el)}
+					className="scroll-mt-[164px]"
+				>
 					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
 							<CardTitle className="text-xl font-bold">클래스 소개</CardTitle>
@@ -122,7 +126,11 @@ export const LessonTabContent = ({
 					</Card>
 				</section>
 
-				<section id="curriculum" ref={(el) => onSectionRef('curriculum', el)}>
+				<section
+					id="curriculum"
+					ref={(el) => onSectionRef('curriculum', el)}
+					className="scroll-mt-[164px]"
+				>
 					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
 							<CardTitle className="text-xl font-bold">커리큘럼</CardTitle>
@@ -135,7 +143,11 @@ export const LessonTabContent = ({
 					</Card>
 				</section>
 
-				<section id="momento" ref={(el) => onSectionRef('momento', el)}>
+				<section
+					id="momento"
+					ref={(el) => onSectionRef('momento', el)}
+					className="scroll-mt-[164px]"
+				>
 					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
 							<CardTitle className="text-xl font-bold">모멘토 소개</CardTitle>
@@ -171,7 +183,11 @@ export const LessonTabContent = ({
 					</Card>
 				</section>
 
-				<section id="location" ref={(el) => onSectionRef('location', el)}>
+				<section
+					id="location"
+					ref={(el) => onSectionRef('location', el)}
+					className="scroll-mt-[164px]"
+				>
 					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
 							<CardTitle className="text-xl font-bold">위치</CardTitle>
@@ -207,7 +223,11 @@ export const LessonTabContent = ({
 					</Card>
 				</section>
 
-				<section id="reviews" ref={(el) => onSectionRef('reviews', el)}>
+				<section
+					id="reviews"
+					ref={(el) => onSectionRef('reviews', el)}
+					className="scroll-mt-[164px]"
+				>
 					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
 							<CardTitle className="text-xl font-bold">후기</CardTitle>
