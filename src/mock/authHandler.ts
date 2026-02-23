@@ -326,8 +326,8 @@ const resetPassword = http.put(`${httpUrl}/users/password-reset/confirm`, async 
 	return HttpResponse.json({ message: '비밀번호가 성공적으로 변경되었습니다.' }, { status: 200 });
 });
 
-// 토큰 갱신 핸들러
-const refresh = http.post(`${httpUrl}/auth/refresh`, async ({ cookies }) => {
+// 토큰 갱신 핸들러 (apiClient.post('/users/refresh') 대응)
+const refresh = http.post(`${httpUrl}/users/refresh`, async ({ cookies }) => {
 	await delay(500);
 
 	if (cookies.refreshToken === 'mock-refresh-token') {

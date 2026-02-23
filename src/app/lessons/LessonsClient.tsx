@@ -73,8 +73,9 @@ export function LessonsClient() {
 			] as [number, number],
 		};
 		setAllFilters(filtersFromUrl);
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setIsInitialized(true);
-	}, [searchParams, setAllFilters]);
+	}, [searchParams, setAllFilters, setIsInitialized]);
 
 	const currentPage = Number(searchParams.get('page')) || 1;
 
@@ -139,15 +140,11 @@ export function LessonsClient() {
 						<SelectValue placeholder="정렬 기준" />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="LATEST">생성일 최신순</SelectItem>{' '}
-						{Object.entries(REVERSE_SORT_MAP).map(
-							([backendValue, frontendName]) =>
-								backendValue !== 'LATEST' && (
-									<SelectItem key={backendValue} value={backendValue as SortEnum}>
-										{frontendName}
-									</SelectItem>
-								),
-						)}
+						{Object.entries(REVERSE_SORT_MAP).map(([backendValue, frontendName]) => (
+							<SelectItem key={backendValue} value={backendValue as SortEnum}>
+								{frontendName}
+							</SelectItem>
+						))}
 					</SelectContent>
 				</Select>
 			</section>

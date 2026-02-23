@@ -1,13 +1,37 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { createTeacherProfile, fetchTeacherProfile, updateTeacherProfile } from '@/api/teacher.api';
+import {
+	createTeacherProfile,
+	deleteTeacherProfile,
+	fetchTeacherProfile,
+	updateTeacherProfile,
+} from '@/api/teacher.api';
+
+// ... (existing functions)
+
+// 선생님 프로필 삭제 Mutation
+export const useDeleteTeacherProfileMutation = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: deleteTeacherProfile,
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['authUser'] });
+			queryClient.invalidateQueries({ queryKey: ['teacherProfile'] });
+			toast.success('모멘토 프로필이 삭제되었습니다.');
+		},
+	});
+};
 
 // 선생님 프로필 조회 Query
 export const useTeacherProfileQuery = (userId?: number) => {
 	return useQuery({
 		queryKey: ['teacherProfile', userId],
-		queryFn: () => fetchTeacherProfile(userId!),
+		queryFn: async () => {
+			if (!userId) throw new Error('UserId is required');
+			return fetchTeacherProfile(userId);
+		},
 		enabled: !!userId,
 	});
 };

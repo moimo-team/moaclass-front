@@ -170,7 +170,7 @@ export const queryClient = new QueryClient({ ... });
 
 프론트엔드의 기획에 꼭 필요한 기능이자 백엔드에 요구되어야 할 사양을 멋대로 판단하여 지워버리지 않기
 
-### 5. API 감사 및 통합 5계명 (Error-Free API Integration)
+### 5. API 감사 및 통합 6계명 (Error-Free API Integration)
 
 오류 없는 코드와 백엔드와의 완벽한 공조를 위해 다음 원칙을 반드시 준수합니다.
 
@@ -179,6 +179,10 @@ export const queryClient = new QueryClient({ ... });
 3.  **연결 고리 전수 조사 (Side Effect Trace)**: API 이름이나 경로, 반환 구조를 변경할 때는 이를 사용하는 모든 **Hook과 Component를 `grep`으로 수색**하여 에러를 예방하세요.
 4.  **모델의 완전성 (Type Precision)**: `LessonSchedule`과 `Schedule` 같이 유사한 모델들 사이에서 `id`, `status`, `createdAt` 등의 필드가 누락되지 않도록 일치시켜 타입 에러를 원천 차단하세요.
 5.  **전역 설정과의 조화**: 개별 Hook에서 `staleTime`, `retry` 등을 설정하기 전, `queryClient.ts`에 정의된 전역 기본값과 중복되거나 충돌하지 않는지 확인하세요.
+6.  **UI-Data-Backend 삼각 정합성 유지 (Triple Sync)**:
+    - UI 요소(드롭다운 옵션 등), 프론트엔드 상수(`sortConstants.ts` 등), 백엔드 사양 간의 불일치를 발견하면 **단순히 지우기보다 '왜' 다른지 먼저 파악**하세요.
+    - 특히 모델(`models`)이나 상수(`constants`)에 정의가 남아있는 UI 요소를 제거할 때는 **"이게 정말 기획상 불필요한 것인지"** 아니면 **"백엔드 사양 업데이트가 누락된 것인지"** 사용자에게 한 번 더 확인하세요.
+    - 정합성이 깨진 코드는 기능 장애뿐 아니라 사용자 경험(UX)에도 혼란을 줍니다. 항상 **"사용자가 보는 화면 - 코드의 데이터 - 실제 통신"**이 한 세트로 움직여야 함을 명심하세요.
 
 ---
 

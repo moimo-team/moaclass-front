@@ -103,7 +103,7 @@ src/app/
 | `lessons/page.tsx`                                   | `class/LessonList.tsx`                    | ✅ 완료  |
 | `lessons/[lessonId]/page.tsx`                        | `class/LessonDetail.tsx`                  | ✅ 완료  |
 | `lessons/[lessonId]/schedule/page.tsx`               | `class/manage/ScheduleManagementPage.tsx` | ✅ 완료  |
-| `lessons/manage/page.tsx`                            | `class/ClassDashboardPage.tsx`            | ✅ 완료  |
+| `classes-manage/page.tsx`                            | `class/ClassDashboardPage.tsx`            | ✅ 완료  |
 | **기타**                                             |                                           |          |
 | `interests/page.tsx`                                 | `interests/Interests.tsx`                 | ✅ 완료  |
 | `moimer-intro/page.tsx`                              | `moimer/MoimerIntro.tsx`                  | ✅ 완료  |

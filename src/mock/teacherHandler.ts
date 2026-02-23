@@ -142,7 +142,7 @@ const updateTeacherProfile = http.put(`${httpUrl}/teachers`, async ({ request })
 		teacherProfileStore.set(userId, updatedProfile);
 
 		await delay(1000);
-		return new HttpResponse(null, { status: 204 });
+		return new HttpResponse(null, { status: 200 }); // NO_CONTENT 대신 200으로 통일 (프론트/백 정합성)
 	} catch {
 		return new HttpResponse(null, { status: 500 });
 	}
@@ -169,33 +169,31 @@ const getTeacherProfile = http.get(`${httpUrl}/teachers/:userId`, async ({ param
 });
 
 // 선생님 프로필 삭제
-const deleteTeacherProfile = http.delete(
-	`${httpUrl}/teachers/:userId`,
-	async ({ request, params }) => {
-		try {
-			const authHeader = request.headers.get('Authorization');
-			if (!authHeader) {
-				return new HttpResponse(null, { status: 401 });
-			}
-
-			const userId = Number(params.userId);
-
-			const profile = teacherProfileStore.get(userId);
-			if (!profile) {
-				return new HttpResponse(JSON.stringify({ message: '프로필을 찾을 수 없습니다.' }), {
-					status: 404,
-				});
-			}
-
-			teacherProfileStore.delete(userId);
-
-			await delay(500);
-			return new HttpResponse(null, { status: 204 });
-		} catch {
-			return new HttpResponse(null, { status: 500 });
+const deleteTeacherProfile = http.delete(`${httpUrl}/teachers`, async ({ request }) => {
+	try {
+		const authHeader = request.headers.get('Authorization');
+		if (!authHeader) {
+			return new HttpResponse(null, { status: 401 });
 		}
-	},
-);
+
+		// Mock userId (실제로는 토큰에서 추출)
+		const userId = 3;
+
+		const profile = teacherProfileStore.get(userId);
+		if (!profile) {
+			return new HttpResponse(JSON.stringify({ message: '프로필을 찾을 수 없습니다.' }), {
+				status: 404,
+			});
+		}
+
+		teacherProfileStore.delete(userId);
+
+		await delay(500);
+		return new HttpResponse(null, { status: 200 });
+	} catch {
+		return new HttpResponse(null, { status: 500 });
+	}
+});
 
 // 특정 모멘토가 받은 후기 조회
 const getTeacherReviews = http.get(
