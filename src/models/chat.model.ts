@@ -12,17 +12,14 @@ export interface ChatMessage {
 	id: number;
 	content: string;
 	senderId: number;
-	roomId?: number;
-	meetingId?: number;
+	roomId: number;
 	createdAt: string;
-	sender?: MessageSender;
-	senderNickname?: string;
+	sender: MessageSender;
 }
 
 // 메세지 목록 조회 API 응답
 export interface ChatMessageResponse {
 	roomId?: number;
-	meetingId?: number;
 	messages: ChatMessage[];
 }
 

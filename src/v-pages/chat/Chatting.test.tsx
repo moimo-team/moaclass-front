@@ -312,7 +312,7 @@ describe('ChattingContent', () => {
 			expect(screen.getByText('meeting-history')).toBeInTheDocument();
 		});
 
-		await userEvent.click(screen.getByRole('button', { name: '레슨 채팅' }));
+		await userEvent.click(screen.getByRole('button', { name: '클래스 채팅' }));
 		await userEvent.click(await screen.findByText(`select-lesson-${lessonRoom.roomId}`));
 		await waitFor(() => {
 			expect(screen.getByText('lesson-history')).toBeInTheDocument();

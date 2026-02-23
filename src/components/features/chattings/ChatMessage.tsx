@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { ChatMessage as ChatMessageType } from '@/models/chat.model';
+import { getImageSrc } from '@/utils/imageUtils';
 
 interface ChatMessageProps {
 	message: ChatMessageType;
@@ -18,13 +19,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 	hostBadgeLabel = '호스트',
 }) => {
 	const { content, createdAt } = message;
-	const sender = message.sender ?? {
-		id: message.senderId,
-		nickname: message.senderNickname ?? '알 수 없음',
-		image: '',
-	};
+	const sender = message.sender;
 
 	const isHost = sender.id === hostId;
+	const defaultProfileImage = getImageSrc(defaultProfileIcon);
+	const senderImageSrc =
+		typeof sender.image === 'string' && sender.image.trim().length > 0
+			? sender.image
+			: defaultProfileImage;
 
 	return (
 		<div
@@ -35,7 +37,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 		>
 			{!isMine && (
 				<Avatar className="w-10 h-10">
-					<AvatarImage src={sender.image || defaultProfileIcon} alt={sender.nickname} />
+					<AvatarImage src={senderImageSrc} alt={sender.nickname} />
 					<AvatarFallback>{sender.nickname?.slice(0, 2) || 'NN'}</AvatarFallback>
 				</Avatar>
 			)}

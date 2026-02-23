@@ -48,13 +48,7 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
 		try {
 			const room = await joinChatRoom({ lessonId: order.lessonId });
 			await queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
-			navigate('/chats', {
-				state: {
-					chatType: 'lesson',
-					roomId: room.roomId,
-					lessonId: order.lessonId,
-				},
-			});
+			navigate(`/chats?chatType=lesson&roomId=${room.roomId}&lessonId=${order.lessonId}`);
 		} catch {
 			toast.error('문의 채팅방을 열지 못했습니다. 잠시 후 다시 시도해 주세요.');
 		}

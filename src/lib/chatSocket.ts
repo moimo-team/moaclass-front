@@ -13,8 +13,8 @@ const isMockingEnabled = ENV.ENABLE_MOCK;
 
 let socketInstance: ChatSocket | null = null;
 
-const ensureChatsNamespace = (url: string) =>
-	url.endsWith('/chats') ? url : `${url.replace(/\/$/, '')}/chats`;
+const ensureChatNamespace = (url: string) =>
+	url.endsWith('/chat') ? url : `${url.replace(/\/$/, '')}/chat`;
 
 const createSocket = async (accessToken: string): Promise<ChatSocket> => {
 	if (isMockingEnabled) {
@@ -22,7 +22,7 @@ const createSocket = async (accessToken: string): Promise<ChatSocket> => {
 		return createMockSocket();
 	}
 
-	const socketUrl = ensureChatsNamespace(ENV.SOCKET_URL || CHAT_API_URL);
+	const socketUrl = ensureChatNamespace(ENV.SOCKET_URL || CHAT_API_URL);
 
 	return io(socketUrl, {
 		auth: { token: accessToken },

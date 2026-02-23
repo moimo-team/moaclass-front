@@ -54,9 +54,6 @@ const ChatMessageSection: React.FC<ChatMessageSectionProps> = ({
 				<FaArrowLeft className="cursor-pointer text-xl" onClick={onBackToList} />
 				<div>
 					<h2 className="text-xl font-bold">{selectedMeeting.title}</h2>
-					<p className="text-sm text-muted-foreground">
-						멤버 {selectedMeeting.memberCount}명
-					</p>
 				</div>
 			</div>
 

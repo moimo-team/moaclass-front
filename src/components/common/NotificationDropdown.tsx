@@ -60,7 +60,14 @@ export const NotificationDropdown = () => {
 		const chatType = mapLinkTypeToChatType(notification.linkType);
 
 		if (notification.roomId) {
-			router.push('/chats');
+			router.push(
+				buildChatsUrl({
+					roomId: notification.roomId,
+					chatType,
+					meetingId: chatType === 'meeting' ? notification.linkId : undefined,
+					lessonId: chatType === 'lesson' ? notification.linkId : undefined,
+				}),
+			);
 			// roomId state 전달은 Next.js router.push에서 직접적으로는 안되므로
 			// 세션스토리지 등을 사용하거나 URL 파라미터로 변경이 필요할 수 있음.
 			// 여기서는 일단 경로 이동만 보장함.

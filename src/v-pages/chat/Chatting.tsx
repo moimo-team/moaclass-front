@@ -21,24 +21,10 @@ type ChatLocationState = {
 } | null;
 
 const getRoomIdFromRoom = (room: ChatRoom): number => room.roomId ?? room.meetingId ?? 0;
-const getRoomIdFromMessage = (message: ChatMessage): number | null =>
-	message.roomId ?? message.meetingId ?? null;
+const getRoomIdFromMessage = (message: ChatMessage): number => message.roomId;
 
 // API/socket payload 차이 정규화
-const normalizeMessage = (message: ChatMessage): ChatMessage => {
-	const roomId = getRoomIdFromMessage(message);
-	const sender = message.sender ?? {
-		id: message.senderId,
-		nickname: message.senderNickname ?? '알 수 없음',
-		image: '',
-	};
-
-	return {
-		...message,
-		roomId: roomId ?? undefined,
-		sender,
-	};
-};
+const normalizeMessage = (message: ChatMessage): ChatMessage => message;
 
 const resolveChatType = (room: ChatRoom): ChatType => {
 	if (room.chatType) return room.chatType;
@@ -71,6 +57,7 @@ export const ChattingContent = ({
 	const { userId } = useAuthStore();
 	const location = useLocation();
 	const locationState = (location.state as ChatLocationState) ?? null;
+	// Query props are the canonical source in Next.js; location.state is fallback only.
 	const routeRoomId = toNumber(initialRoomId) ?? locationState?.roomId;
 	const routeMeetingId = toNumber(initialMeetingId) ?? locationState?.meetingId;
 	const routeLessonId = toNumber(initialLessonId) ?? locationState?.lessonId;
@@ -166,15 +153,8 @@ export const ChattingContent = ({
 	const handleNewMessage = useCallback(
 		(newMessage: ChatMessage) => {
 			const normalizedMessage = normalizeMessage(newMessage);
-			const resolvedRoomId = getRoomIdFromMessage(normalizedMessage) ?? selectedRoomId;
-			if (!resolvedRoomId) return;
-
-			const messageForState =
-				normalizedMessage.roomId != null
-					? normalizedMessage
-					: { ...normalizedMessage, roomId: resolvedRoomId };
+			const messageForState = normalizedMessage;
 			const incomingRoomId = getRoomIdFromMessage(messageForState);
-			if (!incomingRoomId) return;
 
 			if (incomingRoomId === selectedRoomId) {
 				setMessages((prev) => [...prev, messageForState]);
@@ -190,10 +170,7 @@ export const ChattingContent = ({
 							lastMessage: {
 								content: messageForState.content,
 								createdAt: messageForState.createdAt,
-								sender:
-									messageForState.sender?.nickname ??
-									messageForState.senderNickname ??
-									'알 수 없음',
+								sender: messageForState.sender.nickname,
 							},
 						};
 					}

@@ -53,7 +53,6 @@ const generateMeetingMessages = (roomId: number, count: number): ChatMessage[] =
 			content: `[모임 ${roomId}] ${sender.nickname}의 ${i + 1}번째 메시지`,
 			senderId: sender.id,
 			roomId,
-			meetingId: roomId,
 			createdAt: new Date(Date.now() - (count - i) * 60 * 1000).toISOString(),
 			sender: {
 				id: sender.id,

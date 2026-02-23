@@ -56,7 +56,7 @@ function MeetingActionButtons({
 	};
 
 	const handleChatClick = () => {
-		navigate('/chats', { state: { meetingId } });
+		navigate(`/chats?chatType=meeting&meetingId=${meetingId}`);
 	};
 
 	// Host

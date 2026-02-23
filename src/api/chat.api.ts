@@ -7,10 +7,19 @@ type JoinChatRoomRequest =
 	| { lessonId: number; studentId?: number }
 	| { lessonId: number; studentId: number };
 
+// 오류 방지를 위해 삭제하지 않음
 type JoinChatRoomResponse = {
 	roomId: number;
 	meetingId?: number;
 	lessonId?: number;
+};
+
+// 백엔드 응답에 맞춘 타입
+type RawJoinChatRoomResponse = {
+	id?: number;
+	roomId?: number;
+	meetingId?: number | null;
+	lessonId?: number | null;
 };
 
 // 내 채팅방 목록 조회
@@ -24,8 +33,22 @@ export const getChatRooms = getMyChatRooms;
 
 // 채팅방 생성/조회
 export const joinChatRoom = async (payload: JoinChatRoomRequest): Promise<JoinChatRoomResponse> => {
-	const response = await chatApiClient.post<JoinChatRoomResponse>('/chats/rooms/join', payload);
-	return response.data;
+	const response = await chatApiClient.post<RawJoinChatRoomResponse>(
+		'/chats/rooms/join',
+		payload,
+	);
+	const raw = response.data;
+	const roomId = raw.roomId ?? raw.id;
+
+	if (typeof roomId !== 'number') {
+		throw new Error('채팅방 ID가 응답에 없습니다.');
+	}
+
+	return {
+		roomId,
+		meetingId: raw.meetingId ?? undefined,
+		lessonId: raw.lessonId ?? undefined,
+	};
 };
 
 // 룸 메시지 내역 조회

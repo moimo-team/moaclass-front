@@ -1,22 +1,19 @@
 import { markNewChatEmitted, shouldEmitNewChat } from '@/lib/newChatNotificationState';
 import { mockChatMessages, mockChatRooms } from '@/mock/mockData/chatMock';
+import type {
+	JoinRoomAck,
+	JoinRoomPayload,
+	NewMessagePayload,
+	SendMessageAck,
+	SendMessagePayload,
+} from '@/models/chat-socket.model';
 import type { ChatMessage } from '@/models/chat.model';
 import type { Notification } from '@/models/notification.model';
-
-type JoinRoomPayload = number | { roomId: number };
-type SendMessagePayload = {
-	roomId?: number;
-	meetingId?: number;
-	content: string;
-};
-
-type JoinRoomAck = { status: 'success'; roomId: number };
-type SendMessageAck = { status: 'sent'; message: ChatMessage };
 
 type SocketEvents = {
 	connect: () => void;
 	notification: (payload: Notification) => void;
-	newMessage: (message: ChatMessage) => void;
+	newMessage: (message: NewMessagePayload) => void;
 };
 
 type EmitFn = {
@@ -39,9 +36,6 @@ export type MockSocketClient = {
 	disconnect: () => void;
 	connected: boolean;
 };
-
-const extractRoomId = (payload: JoinRoomPayload): number =>
-	typeof payload === 'number' ? payload : payload.roomId;
 
 const emitNewChatNotification = (
 	roomId: number,
@@ -82,7 +76,7 @@ export const createMockSocket = (): MockSocketClient => {
 
 	const connectListeners: Array<() => void> = [];
 	const notificationListeners: Array<(payload: Notification) => void> = [];
-	const newMessageListeners: Array<(message: ChatMessage) => void> = [];
+	const newMessageListeners: Array<(message: NewMessagePayload) => void> = [];
 
 	const on: MockSocketClient['on'] = (eventName, listener) => {
 		if (eventName === 'connect') {
@@ -95,7 +89,7 @@ export const createMockSocket = (): MockSocketClient => {
 			return client;
 		}
 
-		newMessageListeners.push(listener as (message: ChatMessage) => void);
+		newMessageListeners.push(listener as (message: NewMessagePayload) => void);
 		return client;
 	};
 
@@ -112,7 +106,7 @@ export const createMockSocket = (): MockSocketClient => {
 			return client;
 		}
 
-		const idx = newMessageListeners.indexOf(listener as (message: ChatMessage) => void);
+		const idx = newMessageListeners.indexOf(listener as (message: NewMessagePayload) => void);
 		if (idx >= 0) newMessageListeners.splice(idx, 1);
 		return client;
 	};
@@ -133,7 +127,7 @@ export const createMockSocket = (): MockSocketClient => {
 		callback?: ((res: JoinRoomAck) => void) | ((res: SendMessageAck) => void),
 	): void {
 		if (event === 'joinRoom') {
-			const roomId = extractRoomId(payload as JoinRoomPayload);
+			const roomId = payload as JoinRoomPayload;
 			activeRoomId = roomId;
 			if (callback) {
 				(callback as (res: JoinRoomAck) => void)({ status: 'success', roomId });
@@ -142,13 +136,12 @@ export const createMockSocket = (): MockSocketClient => {
 		}
 
 		const messagePayload = payload as SendMessagePayload;
-		const roomId = messagePayload.roomId ?? messagePayload.meetingId ?? activeRoomId;
+		const roomId = messagePayload.roomId ?? activeRoomId;
 		if (!roomId) return;
 
 		const newMessage: ChatMessage = {
 			id: Date.now(),
 			roomId,
-			meetingId: roomId,
 			senderId: userId,
 			content: messagePayload.content,
 			createdAt: new Date().toISOString(),
