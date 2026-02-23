@@ -1,7 +1,6 @@
 ﻿import { useAuthStore } from '@store/authStore';
 
 import Banner from '@/components/features/home/banner';
-import CategorySection from '@/components/features/home/CategorySection';
 import HostedMeetingsList from '@/components/features/home/HostedMeetingsList';
 import JoinedMeetingsList from '@/components/features/home/JoinedMeetingsList';
 import PendingMeetingsList from '@/components/features/home/PendingMeetingsList';
@@ -27,13 +26,6 @@ function Home() {
 				aria-label="메인 콘텐츠"
 				data-testid="home-main-content"
 			>
-				<section
-					className="w-full"
-					aria-label="카테고리"
-					data-testid="home-section-category"
-				>
-					<CategorySection />
-				</section>
 				<section
 					className="w-full"
 					aria-label="신규 클래스"
