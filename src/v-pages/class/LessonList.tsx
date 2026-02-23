@@ -17,6 +17,7 @@ import { useLessonsQuery } from '@/hooks/useLessonsQuery';
 import type { FetchLessonsParams, Lesson } from '@/models/lesson.model';
 import { useFilterStore } from '@/store/filterStore';
 import type { FilterState } from '@/store/filterStore';
+import { scrollToTop } from '@/utils/setScrollTo';
 
 const LessonListDisplay: React.FC<{
 	lessons: Lesson[];
@@ -85,7 +86,7 @@ const LessonListPage: React.FC = () => {
 	const handlePageChange = (page: number) => {
 		searchParams.set('page', String(page));
 		setSearchParams(searchParams);
-		window.scrollTo(0, 0);
+		scrollToTop();
 	};
 
 	const handleSearchClick = (mappedParams: FetchLessonsParams) => {
@@ -105,7 +106,7 @@ const LessonListPage: React.FC = () => {
 	const handleResetAllFilters = () => {
 		resetFilters();
 		setSearchParams({});
-		window.scrollTo(0, 0);
+		scrollToTop();
 	};
 
 	return (

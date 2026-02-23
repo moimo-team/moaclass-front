@@ -38,7 +38,7 @@ export const useCancelLikeMutation = () => {
 
 				return {
 					...old,
-					data: old.data.filter((item) => item.lessonId !== lessonId),
+					data: old.data.filter((item) => item.id !== lessonId),
 					meta: {
 						...old.meta,
 						totalCount: old.meta.totalCount - 1,

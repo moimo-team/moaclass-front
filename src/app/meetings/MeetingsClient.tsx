@@ -18,6 +18,7 @@ import { useInterestQuery } from '@/hooks/useInterestQuery';
 import { useMeetingFilter } from '@/hooks/useMeetingFilter';
 import { useMeetingsQuery } from '@/hooks/useMeetingsQuery';
 import { usePagination } from '@/hooks/usePagination';
+import { scrollToTop } from '@/utils/setScrollTo';
 
 const MeetingsClient = () => {
 	const searchParams = useSearchParams();
@@ -54,7 +55,7 @@ const MeetingsClient = () => {
 	};
 
 	useEffect(() => {
-		window.scrollTo({ top: 0, behavior: 'smooth' });
+		scrollToTop();
 	}, [page]);
 
 	const {

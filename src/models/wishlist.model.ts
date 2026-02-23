@@ -25,7 +25,7 @@ export interface WishlistLessonItem {
 
 // 위시리스트 목록 조회 response
 export interface WishlistResponse {
-	data: WishlistLessonItem[];
+	data: Lesson[];
 	meta: PaginationMeta;
 }
 

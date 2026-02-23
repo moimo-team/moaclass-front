@@ -198,7 +198,44 @@ export function formatDateTime(
 
 	const { type = 'full', separator } = options || {};
 
-	// 숫자가 아닌 문자를 제거하여 순수 숫자만 추출
+	// Date 객체 생성을 시도하여 유효한 날짜인지 확인
+	const date = new Date(dateString);
+
+	if (!isNaN(date.getTime())) {
+		// Asia/Seoul 타임존 기준 포맷팅 옵션
+		const dtfOptions: Intl.DateTimeFormatOptions = {
+			timeZone: 'Asia/Seoul',
+			year: 'numeric',
+			month: '2-digit',
+			day: '2-digit',
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit',
+			hour12: false,
+		};
+
+		const formatter = new Intl.DateTimeFormat('ko-KR', dtfOptions);
+		const parts = formatter.formatToParts(date);
+		const p: Record<string, string> = {};
+		parts.forEach(({ type, value }) => {
+			p[type] = value;
+		});
+
+		const sep = separator ?? (type === 'date' ? '.' : ':');
+
+		if (type === 'date') {
+			// YY.MM.DD 형식 (기존과 동일하게 연도 끝 2자리 사용)
+			return `${p.year.slice(2)}${sep}${p.month}${sep}${p.day}`;
+		}
+		if (type === 'time') {
+			// HH:mm 형식
+			return `${p.hour}${sep}${p.minute}`;
+		}
+		// full 형식: YYYY-MM-DD HH:mm:ss
+		return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second}`;
+	}
+
+	// 날짜 변환 실패 시(Invalid Date) 기존의 숫자 추출 방식(Fallback) 유지
 	const numbers = dateString.replace(/\D/g, '');
 
 	if (type === 'full') {
@@ -214,24 +251,18 @@ export function formatDateTime(
 		return dateString;
 	}
 
-	// 구분자 설정 (기본값: 날짜는 '.', 시간은 ':')
 	const sep = separator ?? (type === 'date' ? '.' : ':');
 
 	if (type === 'date') {
-		// 8자리(YYYYMMDD)인 경우 YY{sep}MM{sep}DD 형식으로 변환
 		if (numbers.length >= 8) {
-			// 뒤에서부터 8자리를 기준으로 처리하거나 앞에서부터 처리
-			// 보통 YYYYMMDD 형식이므로 마지막 8자리를 가져옴 (시각이 포함된 경우 대비)
 			const datePart = numbers.slice(0, 8);
 			return `${datePart.slice(2, 4)}${sep}${datePart.slice(4, 6)}${sep}${datePart.slice(6, 8)}`;
 		}
 	} else if (type === 'time') {
-		// 시간 부분 추출 (보통 날짜 뒤에 오므로 numbers가 12자리 이상이면 시각은 8번째부터)
 		if (numbers.length >= 12) {
 			const timePart = numbers.slice(8, 12);
 			return `${timePart.slice(0, 2)}${sep}${timePart.slice(2, 4)}`;
 		}
-		// 4자리만 있는 경우 바로 처리
 		if (numbers.length >= 4) {
 			return `${numbers.slice(0, 2)}${sep}${numbers.slice(2, 4)}`;
 		}
