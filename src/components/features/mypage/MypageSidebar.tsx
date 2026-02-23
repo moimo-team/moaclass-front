@@ -29,8 +29,8 @@ export const MypageSidebar = ({ onMenuItemClick }: MypageSidebarProps) => {
 
 	const handleDeleteUser = async () => {
 		try {
-			await deleteUser();
 			router.replace('/');
+			await deleteUser();
 		} catch (error) {
 			console.error('회원 탈퇴 실패:', error);
 		} finally {
@@ -81,19 +81,18 @@ export const MypageSidebar = ({ onMenuItemClick }: MypageSidebarProps) => {
 			{/* Navigation Menu */}
 			<nav className="w-full px-8 flex-1 overflow-y-auto">
 				<div className="flex flex-col gap-8">
-					{/* 프로필 */}
+					{/* 사용자 정보 */}
 					<div>
-						<Link
-							href="/mypage/profile"
-							onClick={onMenuItemClick}
-							className={`block text-lg font-bold transition-colors ${
-								isActive('/mypage/profile')
-									? 'text-primary'
-									: 'text-gray-900 hover:text-gray-700'
-							}`}
-						>
-							프로필
-						</Link>
+						<h3 className="text-lg font-bold text-gray-900 mb-4">사용자 정보</h3>
+						<div className="flex flex-col gap-3 pl-2">
+							<Link
+								href="/mypage/profile"
+								onClick={onMenuItemClick}
+								className={navItemClass('/mypage/profile')}
+							>
+								프로필
+							</Link>
+						</div>
 					</div>
 
 					{/* 원데이클래스 */}
