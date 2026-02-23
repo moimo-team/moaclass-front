@@ -1,0 +1,2 @@
+export const BANNER_COUPON_ID = 4;
+export const BANNER_COUPON_CODE = 'NEW_SEMESTER_2026';

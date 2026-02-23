@@ -4,14 +4,11 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
-		"dev:next": "next dev",
-		"build:vite": "tsc && vite build",
+		"dev": "next dev",
 		"build": "next build",
-		"start:next": "next start",
+		"start": "next start",
 		"lint": "eslint .",
 		"lint:next": "next lint",
-		"preview": "vite preview",
 		"test": "vitest",
 		"test:ui": "vitest --ui",
 		"prepare": "husky install"

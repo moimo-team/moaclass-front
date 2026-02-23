@@ -1,13 +1,18 @@
+'use client';
+
 import { useState } from 'react';
 
 import { Check } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 
 import defaultProfile from '@/assets/images/profile.png';
 import ConfirmDialog from '@/components/features/modal/ConfirmDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useDeleteUserMutation } from '@/hooks/useAuthMutations';
 import { useAuthQuery } from '@/hooks/useAuthQuery';
+
+import type { StaticImageData } from 'next/image';
 
 interface MypageSidebarProps {
 	onMenuItemClick?: () => void;
@@ -17,14 +22,23 @@ export const MypageSidebar = ({ onMenuItemClick }: MypageSidebarProps) => {
 	const { data: user } = useAuthQuery();
 	const { mutateAsync: deleteUser } = useDeleteUserMutation();
 	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+	const pathname = usePathname();
+	const router = useRouter();
 
 	if (!user) return null;
 
-	// 회원 탈퇴 핸들러
 	const handleDeleteUser = async () => {
+		router.replace('/');
 		await deleteUser();
 		setIsConfirmOpen(false);
 	};
+
+	const isActive = (path: string) => pathname === path;
+
+	const navItemClass = (path: string) =>
+		`transition-colors ${
+			isActive(path) ? 'text-primary font-bold' : 'text-gray-500 hover:text-gray-900'
+		}`;
 
 	return (
 		<aside className="w-full h-full bg-white flex flex-col items-center py-10 border-r border-gray-100">
@@ -33,7 +47,13 @@ export const MypageSidebar = ({ onMenuItemClick }: MypageSidebarProps) => {
 				<div className="relative mb-4">
 					<Avatar className="w-24 h-24 border-2 border-gray-100 bg-white">
 						<AvatarImage
-							src={user.profileImage || defaultProfile}
+							src={
+								user.profileImage
+									? user.profileImage
+									: typeof defaultProfile === 'string'
+										? defaultProfile
+										: (defaultProfile as StaticImageData).src
+							}
 							alt={user.nickname || 'user'}
 							className="object-cover"
 						/>
@@ -58,75 +78,51 @@ export const MypageSidebar = ({ onMenuItemClick }: MypageSidebarProps) => {
 				<div className="flex flex-col gap-8">
 					{/* 프로필 */}
 					<div>
-						<NavLink
-							to="/mypage/profile"
+						<Link
+							href="/mypage/profile"
 							onClick={onMenuItemClick}
-							className={({ isActive }) =>
-								`block text-lg font-bold transition-colors ${
-									isActive ? 'text-primary' : 'text-gray-900 hover:text-gray-700'
-								}`
-							}
+							className={`block text-lg font-bold transition-colors ${
+								isActive('/mypage/profile')
+									? 'text-primary'
+									: 'text-gray-900 hover:text-gray-700'
+							}`}
 						>
 							프로필
-						</NavLink>
+						</Link>
 					</div>
 
 					{/* 원데이클래스 */}
 					<div>
 						<h3 className="text-lg font-bold text-gray-900 mb-4">원데이클래스</h3>
 						<div className="flex flex-col gap-3 pl-2">
-							<NavLink
-								to="/mypage/class/wish-list"
+							<Link
+								href="/mypage/class/wish-list"
 								onClick={onMenuItemClick}
-								className={({ isActive }) =>
-									`transition-colors ${
-										isActive
-											? 'text-primary font-bold'
-											: 'text-gray-500 hover:text-gray-900'
-									}`
-								}
+								className={navItemClass('/mypage/class/wish-list')}
 							>
 								위시리스트
-							</NavLink>
-							<NavLink
-								to="/mypage/class/points"
+							</Link>
+							<Link
+								href="/mypage/class/points"
 								onClick={onMenuItemClick}
-								className={({ isActive }) =>
-									`transition-colors ${
-										isActive
-											? 'text-primary font-bold'
-											: 'text-gray-500 hover:text-gray-900'
-									}`
-								}
+								className={navItemClass('/mypage/class/points')}
 							>
 								포인트
-							</NavLink>
-							<NavLink
-								to="/mypage/class/coupons"
+							</Link>
+							<Link
+								href="/mypage/class/coupons"
 								onClick={onMenuItemClick}
-								className={({ isActive }) =>
-									`transition-colors ${
-										isActive
-											? 'text-primary font-bold'
-											: 'text-gray-500 hover:text-gray-900'
-									}`
-								}
+								className={navItemClass('/mypage/class/coupons')}
 							>
 								쿠폰
-							</NavLink>
-							<NavLink
-								to="/mypage/class/orders"
+							</Link>
+							<Link
+								href="/mypage/class/orders"
 								onClick={onMenuItemClick}
-								className={({ isActive }) =>
-									`transition-colors ${
-										isActive
-											? 'text-primary font-bold'
-											: 'text-gray-500 hover:text-gray-900'
-									}`
-								}
+								className={navItemClass('/mypage/class/orders')}
 							>
 								클래스 결제 내역
-							</NavLink>
+							</Link>
 						</div>
 					</div>
 
@@ -134,32 +130,20 @@ export const MypageSidebar = ({ onMenuItemClick }: MypageSidebarProps) => {
 					<div>
 						<h3 className="text-lg font-bold text-gray-900 mb-4">모임</h3>
 						<div className="flex flex-col gap-3 pl-2">
-							<NavLink
-								to="/mypage/meetings/join"
+							<Link
+								href="/mypage/meetings/join"
 								onClick={onMenuItemClick}
-								className={({ isActive }) =>
-									`transition-colors ${
-										isActive
-											? 'text-primary font-bold'
-											: 'text-gray-500 hover:text-gray-900'
-									}`
-								}
+								className={navItemClass('/mypage/meetings/join')}
 							>
 								참여 모임
-							</NavLink>
-							<NavLink
-								to="/mypage/meetings/hosting"
+							</Link>
+							<Link
+								href="/mypage/meetings/hosting"
 								onClick={onMenuItemClick}
-								className={({ isActive }) =>
-									`transition-colors ${
-										isActive
-											? 'text-primary font-bold'
-											: 'text-gray-500 hover:text-gray-900'
-									}`
-								}
+								className={navItemClass('/mypage/meetings/hosting')}
 							>
 								내 모임
-							</NavLink>
+							</Link>
 						</div>
 					</div>
 
@@ -168,32 +152,20 @@ export const MypageSidebar = ({ onMenuItemClick }: MypageSidebarProps) => {
 						<div>
 							<h3 className="text-lg font-bold text-gray-900 mb-4">모멘토</h3>
 							<div className="flex flex-col gap-3 pl-2">
-								<NavLink
-									to="/classes-manage"
+								<Link
+									href="/classes-manage"
 									onClick={onMenuItemClick}
-									className={({ isActive }) =>
-										`transition-colors ${
-											isActive
-												? 'text-primary font-bold'
-												: 'text-gray-500 hover:text-gray-900'
-										}`
-									}
+									className={navItemClass('/classes-manage')}
 								>
 									클래스 관리
-								</NavLink>
-								<NavLink
-									to="/mypage/class/profit"
+								</Link>
+								<Link
+									href="/mypage/class/profit"
 									onClick={onMenuItemClick}
-									className={({ isActive }) =>
-										`transition-colors ${
-											isActive
-												? 'text-primary font-bold'
-												: 'text-gray-500 hover:text-gray-900'
-										}`
-									}
+									className={navItemClass('/mypage/class/profit')}
 								>
 									수익 내역
-								</NavLink>
+								</Link>
 							</div>
 						</div>
 					)}
@@ -220,9 +192,12 @@ export const MypageSidebar = ({ onMenuItemClick }: MypageSidebarProps) => {
 				description={`회원 탈퇴를 진행하면 내 클래스, 모임, 쿠폰, 포인트 내역 등이 모두 사라지며\n복구가 불가합니다.\n정말 탈퇴하시겠습니까?`}
 				confirmText="탈퇴하기"
 				cancelText="취소"
+				showCancel={true}
 				onConfirm={handleDeleteUser}
 				variant="destructive"
 			/>
 		</aside>
 	);
 };
+
+export default MypageSidebar;
