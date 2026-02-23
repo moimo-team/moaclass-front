@@ -75,7 +75,7 @@ const chargePoint = http.post(`${httpUrl}/points/charge`, async ({ request }) =>
 			},
 			{ status: 201 },
 		);
-	} catch (error) {
+	} catch {
 		return HttpResponse.json(
 			{ message: '포인트 충전 중 오류가 발생했습니다.' },
 			{ status: 500 },

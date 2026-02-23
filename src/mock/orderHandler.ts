@@ -92,7 +92,7 @@ const cancelClass = http.put(
 				},
 				{ status: 200 },
 			);
-		} catch (error) {
+		} catch {
 			return HttpResponse.json(
 				{ message: '요청 데이터를 찾을 수 없습니다.' },
 				{ status: 400 },

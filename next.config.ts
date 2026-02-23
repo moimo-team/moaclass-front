@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
 		return [
 			{
 				source: '/api/:path*',
-				destination: 'https://moaclass-back.vercel.app/:path*',
+				destination: 'https://moaclass-back.onrender.com/:path*',
 			},
 		];
 	},

@@ -33,7 +33,7 @@ const getEnv = (key: string, defaultValue: string = ''): string => {
 		if (viteEnv) {
 			return ((viteEnv[key] || viteEnv[`VITE_${key}`] || defaultValue) as string).trim();
 		}
-	} catch (e) {
+	} catch {
 		// Next.js 환경 등에서는 import.meta.env 접근 시 에러가 날 수 있음
 	}
 

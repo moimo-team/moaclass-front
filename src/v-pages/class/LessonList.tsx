@@ -74,7 +74,6 @@ const LessonListPage: React.FC = () => {
 	}, [searchParams, setAllFilters]);
 
 	const currentPage = Number(searchParams.get('page')) || 1;
-	//const itemsPerPage = 12; // TODO: 한 페이지에 보여줄 아이템 수 정의 필요
 
 	const { data, isLoading, isError } = useLessonsQuery(
 		getFetchLessonsParams(),

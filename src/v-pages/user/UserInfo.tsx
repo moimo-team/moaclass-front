@@ -70,7 +70,7 @@ const UserInfo = () => {
 
 			await userUpdateMutation.mutateAsync(formData);
 			navigate('/');
-		} catch (error) {
+		} catch {
 			setError('root', {
 				type: 'manual',
 				message: '프로필 등록에 실패했습니다',

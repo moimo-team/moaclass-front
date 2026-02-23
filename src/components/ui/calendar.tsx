@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { ko } from 'date-fns/locale';
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { DayPicker, getDefaultClassNames } from 'react-day-picker';
 
@@ -24,16 +25,18 @@ function Calendar({
 
 	return (
 		<DayPicker
+			locale={props.locale ?? ko}
 			showOutsideDays={showOutsideDays}
 			className={cn(
-				'bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent',
+				'bg-background group/calendar p-4 [--cell-size:4.5rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent',
 				String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
 				String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
 				className,
 			)}
 			captionLayout={captionLayout}
 			formatters={{
-				formatMonthDropdown: (date) => date.toLocaleString('default', { month: 'short' }),
+				formatMonthDropdown: (date) => `${date.getMonth() + 1}월`,
+				formatCaption: (date) => `${date.getFullYear()}년 ${date.getMonth() + 1}월`,
 				...formatters,
 			}}
 			classNames={{
@@ -75,12 +78,12 @@ function Calendar({
 					defaultClassNames.caption_label,
 				),
 				table: 'w-full border-collapse',
-				weekdays: cn('flex', defaultClassNames.weekdays),
+				weekdays: cn('flex gap-2', defaultClassNames.weekdays),
 				weekday: cn(
 					'text-muted-foreground flex-1 select-none rounded-md text-[0.8rem] font-normal',
 					defaultClassNames.weekday,
 				),
-				week: cn('mt-2 flex w-full', defaultClassNames.week),
+				week: cn('mt-4 flex w-full gap-2', defaultClassNames.week),
 				week_number_header: cn(
 					'w-[--cell-size] select-none',
 					defaultClassNames.week_number_header,
@@ -175,13 +178,16 @@ function CalendarDayButton({
 			data-range-start={modifiers.range_start}
 			data-range-end={modifiers.range_end}
 			data-range-middle={modifiers.range_middle}
+			data-has-schedule={modifiers.hasSchedule}
 			className={cn(
-				'data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 flex aspect-square h-auto w-full min-w-[--cell-size] flex-col gap-1 font-normal leading-none data-[range-end=true]:rounded-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] [&>span]:text-xs [&>span]:opacity-70',
+				'data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[has-schedule=true]:bg-carrot/10 data-[has-schedule=true]:text-carrot data-[has-schedule=true]:hover:bg-accent data-[has-schedule=true]:hover:text-accent-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 flex aspect-square h-auto w-full min-w-[--cell-size] flex-col gap-1 font-normal leading-none data-[range-end=true]:rounded-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] [&>span]:text-xs [&>span]:opacity-70',
 				defaultClassNames.day,
 				className,
 			)}
 			{...props}
-		/>
+		>
+			<span>{day.date.getDate()}</span>
+		</Button>
 	);
 }
 

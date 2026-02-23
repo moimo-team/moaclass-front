@@ -1,4 +1,4 @@
-import { useAuthStore } from '@store/authStore';
+﻿import { useAuthStore } from '@store/authStore';
 
 import Banner from '@/components/features/home/banner';
 import CategorySection from '@/components/features/home/CategorySection';
@@ -6,36 +6,75 @@ import HostedMeetingsList from '@/components/features/home/HostedMeetingsList';
 import JoinedMeetingsList from '@/components/features/home/JoinedMeetingsList';
 import PendingMeetingsList from '@/components/features/home/PendingMeetingsList';
 import ReviewListSection from '@/components/features/home/ReviewListSection';
+import HomeLessonSection from '@/components/features/lessons/HomeLessonSection';
 import NewLessonList from '@/components/features/lessons/NewLessonList';
+import { REGIONS } from '@/constants/regions';
+import { useCategoryQuery } from '@/hooks/useCategoryQuery';
 
 function Home() {
 	const { isLoggedIn } = useAuthStore();
+	const { data: categories } = useCategoryQuery();
+
+	const experienceCategory = categories?.find((category) => category.name === '체험');
+	const handmadeCategory = categories?.find((category) => category.name === '핸드메이드');
+	const seoulRegion = REGIONS.find((region) => region.name === '서울');
 
 	return (
 		<>
 			<Banner />
-			<section className="flex flex-col pt-8 items-center w-full" aria-label="홈 콘텐츠">
-				<section aria-label="카테고리">
+			<section className="flex w-full flex-col items-center pt-8" aria-label="메인 콘텐츠">
+				<section className="w-full" aria-label="카테고리">
 					<CategorySection />
 				</section>
-				{/* TODO: LikeMeetingList(좋아요순), 특정 카테고리 몇 개 추가 */}
-				<section aria-label="신규 클래스">
+				<section className="w-full" aria-label="신규 클래스">
 					<NewLessonList />
 				</section>
-				{/* TODO: 후기 리스트 추가 후 mock 데이터 삭제 */}
-				<section aria-label="후기">
+				<section className="w-full" aria-label="좋아요 많은 클래스">
+					<HomeLessonSection
+						title="좋아요 많은 클래스"
+						seeMoreHref="/lessons?sort=LIKES"
+						queryParams={{ sort: 'LIKES' }}
+					/>
+				</section>
+				{experienceCategory && (
+					<section className="w-full" aria-label="체험 추천 클래스">
+						<HomeLessonSection
+							title="체험 추천 클래스"
+							seeMoreHref={`/lessons?categoryId=${experienceCategory.id}&sort=LATEST`}
+							queryParams={{ categoryId: experienceCategory.id, sort: 'LATEST' }}
+						/>
+					</section>
+				)}
+				{handmadeCategory && (
+					<section className="w-full" aria-label="핸드메이드 추천 클래스">
+						<HomeLessonSection
+							title="핸드메이드 추천 클래스"
+							seeMoreHref={`/lessons?categoryId=${handmadeCategory.id}&sort=LATEST`}
+							queryParams={{ categoryId: handmadeCategory.id, sort: 'LATEST' }}
+						/>
+					</section>
+				)}
+				{seoulRegion && (
+					<section className="w-full" aria-label="서울 지역 추천 클래스">
+						<HomeLessonSection
+							title="서울 지역 추천 클래스"
+							seeMoreHref={`/lessons?regionId=${seoulRegion.id}&sort=LATEST`}
+							queryParams={{ regionId: [seoulRegion.id], sort: 'LATEST' }}
+						/>
+					</section>
+				)}
+				<section className="w-full" aria-label="후기">
 					<ReviewListSection />
 				</section>
 				{isLoggedIn && (
 					<>
-						{/* TODO: 리스트 삭제 or 그대로 사용할지 회의 */}
-						<section aria-label="참여 중인 모임">
+						<section className="w-full" aria-label="참여 중인 모임">
 							<JoinedMeetingsList />
 						</section>
-						<section aria-label="주최 모임">
+						<section className="w-full" aria-label="주최 모임">
 							<HostedMeetingsList />
 						</section>
-						<section aria-label="승인 대기 모임">
+						<section className="w-full" aria-label="승인 대기 모임">
 							<PendingMeetingsList />
 						</section>
 					</>

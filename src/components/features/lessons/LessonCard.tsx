@@ -1,4 +1,4 @@
-import Image from 'next/image';
+﻿import Image from 'next/image';
 import { IoIosHeartEmpty, IoIosHeart } from 'react-icons/io';
 import { IoLocationOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
@@ -33,15 +33,6 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 		} else {
 			toggleLike({ lessonId: id, newIsLiked: !isLiked });
 		}
-	};
-
-	// 렌더링 최적화를 위해 변수로 분리 (any 제거)
-	const getImageUrl = (image: string | { src: string } | unknown): string => {
-		if (typeof image === 'string') return image;
-		if (image && typeof image === 'object' && 'src' in image) {
-			return (image as { src: string }).src;
-		}
-		return String(image || '');
 	};
 
 	return (
