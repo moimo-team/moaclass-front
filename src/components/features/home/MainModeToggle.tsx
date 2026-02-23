@@ -15,10 +15,10 @@ interface MainModeToggleProps {
 export const MainModeToggle = ({ mode, setMode }: MainModeToggleProps) => {
 	return (
 		<nav
-			className="w-full bg-white border-b border-gray-100 flex justify-center sticky top-[80px] z-30"
+			className="w-full sticky top-[80px] z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 flex justify-center py-4"
 			aria-label="메인 모드 전환"
 		>
-			<div className="flex py-4">
+			<div className="flex">
 				<Tabs
 					value={mode}
 					onValueChange={(value) => setMode(value as MainMode)}

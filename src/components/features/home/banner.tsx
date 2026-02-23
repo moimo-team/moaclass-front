@@ -40,7 +40,6 @@ const getStatusCode = (error: unknown): number | undefined => {
 };
 
 function Banner() {
-	const negativeMarginClasses = '-mx-4 md:-mx-32';
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 	const [isCouponIssued, setIsCouponIssued] = useState(false);
@@ -200,7 +199,7 @@ function Banner() {
 	];
 
 	return (
-		<div className={`relative w-screen ${negativeMarginClasses}`}>
+		<div className="relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] w-screen overflow-hidden">
 			<Carousel
 				setApi={setApi}
 				plugins={[
