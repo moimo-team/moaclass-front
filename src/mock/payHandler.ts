@@ -72,6 +72,7 @@ const createEnrollment = http.post(`${httpUrl}/enrollments`, async ({ request })
 			scheduleId: _scheduleId,
 			finalPrice,
 			couponId: _couponId,
+			email,
 		} = (await request.json()) as any;
 
 		const currentPoints = userStore.userInfo.point || 0;
@@ -107,6 +108,7 @@ const createEnrollment = http.post(`${httpUrl}/enrollments`, async ({ request })
 					status: 'COMPLETED',
 				},
 				remainingPoints: remainingPoints,
+				email: email,
 			},
 			{ status: 201 },
 		);
