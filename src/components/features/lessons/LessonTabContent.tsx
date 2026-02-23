@@ -89,16 +89,16 @@ export const LessonTabContent = ({
 		<>
 			{/* 탭 네비게이션 */}
 			<nav
-				className="sticky top-0 bg-background z-10 border-b border-border/50"
+				className="sticky top-[80px] z-20 rounded-b-xl border border-border/60 bg-muted shadow-sm"
 				aria-label="클래스 상세 탭"
 			>
-				<div className="flex overflow-x-auto scrollbar-hide py-2">
+				<div className="flex items-center gap-1 overflow-x-auto scrollbar-hide px-2 py-2 sm:px-4 sm:py-3 lg:px-6">
 					{tabTitles.map((tab) => (
 						<Button
 							key={tab.id}
 							variant="ghost"
 							className={cn(
-								'whitespace-nowrap rounded-none border-b-2 border-transparent px-2 sm:px-4 py-2 text-base sm:text-lg font-medium text-muted-foreground transition-colors hover:text-foreground',
+								'whitespace-nowrap rounded-none border-b-2 border-transparent px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:px-4 sm:py-2.5 sm:text-base lg:px-5',
 								activeTab === tab.id && 'border-primary text-foreground',
 							)}
 							onClick={() => handleTabClick(tab.id)}
