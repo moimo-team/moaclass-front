@@ -134,7 +134,7 @@ export const LessonDetailContent = ({
 				},
 			});
 		} catch (err) {
-			console.error('레슨 문의 채팅방 생성 실패:', err);
+			console.error('클래스 문의 채팅방 생성 실패:', err);
 			toast.error('문의 채팅방을 열지 못했습니다. 잠시 후 다시 시도해 주세요.');
 		}
 	};
