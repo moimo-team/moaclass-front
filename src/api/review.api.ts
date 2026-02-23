@@ -73,7 +73,7 @@ export const writeReview = async (data: FormData) => {
 };
 
 export const getMyReview = async (enrollmentId: number) => {
-	const response = await apiClient.get<MyReviewItem>(`/reviews/me/${enrollmentId}`);
+	const response = await apiClient.get<MyReviewItem>(`/reviews/me/enrollments/${enrollmentId}`);
 	return response.data;
 };
 

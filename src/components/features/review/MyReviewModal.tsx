@@ -69,8 +69,6 @@ interface ReviewModalProps {
 	onOpenChange: (open: boolean) => void;
 	/** 후기를 작성할 클래스 결제내역 아이디 */
 	enrollmentId?: number;
-	/** 후기를 작성할 클래스 아이디 */
-	lessonId?: number;
 	/** 초기 수정 모드 여부 (이미 리뷰가 존재하는지 여부) */
 	isEditMode?: boolean;
 }
@@ -83,7 +81,6 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 	open,
 	onOpenChange,
 	enrollmentId,
-	lessonId,
 	isEditMode: initialIsEditMode = false,
 }) => {
 	const { mutateAsync: writeReview, isPending: isWriting } = useReviewMutation();
@@ -116,6 +113,9 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 
 	// 데이터 로드 시 폼 초기화
 	useEffect(() => {
+		// 데이터를 불러오는 중일 때는 초기화를 건너뛰어 빈 화면이 보이지 않게 함
+		if (isDataLoading) return;
+
 		if (existingReview?.hasReview && existingReview.review && open) {
 			const review = existingReview.review;
 			// image1~image8 개별 필드에서 null을 제외한 URL 배열 생성
@@ -188,30 +188,30 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 	 * 후기 등록 처리
 	 */
 	const onSubmit = async (data: ReviewFormData) => {
-		if (!lessonId) return;
+		if (!enrollmentId) return;
 
 		const formData = new FormData();
-		formData.append('lessonId', lessonId.toString());
+
+		// 신규 작성 시에만 enrollmentId 전송 (백엔드 UpdateReviewDto는 이 필드를 허용하지 않음)
+		if (!isEditMode) {
+			formData.append('enrollmentId', enrollmentId.toString());
+		}
+
 		formData.append('rating', data.rating.toString());
 		formData.append('content', data.content);
 
 		// 이미지 처리
-		// - 수정 모드: images 배열에서 기존 URL(파일 아님)을 image1~8로 전송 + imageFiles는 신규 파일
-		// - 작성 모드: imageFiles만 전송
 		if (isEditMode) {
-			// 기존 URL(http로 시작)과 신규 파일(imageFiles) 구분
+			// 기존 URL(http로 시작)은 백엔드 DTO Body에 포함되면 안 됨 (400 에러 원인)
 			const existingUrls = data.images.filter((img) => img.startsWith('http'));
 			const newFiles = data.imageFiles ?? [];
 
-			// 기존 URL을 image1부터 순서대로 전송
-			existingUrls.forEach((url, i) => {
-				formData.append(`image${i + 1}`, url);
-			});
-			// 신규 파일은 기존 URL 다음 순서로 이어서 전송
+			// 신규 파일만 전송하되, 인덱스는 기존 이미지 개수 다음부터 시작하여 슬롯 번호를 맞춤
 			newFiles.forEach((file, i) => {
 				formData.append(`image${existingUrls.length + i + 1}`, file);
 			});
 		} else {
+			// 신규 작성 모드
 			if (data.imageFiles && data.imageFiles.length > 0) {
 				data.imageFiles.forEach((file, i) => {
 					formData.append(`image${i + 1}`, file);
@@ -223,7 +223,7 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 			// 수정 로직 (훅 사용)
 			await updateReview({
 				reviewId: existingReview.review.id,
-				lessonId,
+				enrollmentId: enrollmentId!,
 				data: formData,
 			});
 		} else {

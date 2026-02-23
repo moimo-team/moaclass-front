@@ -168,7 +168,6 @@ const OrderClassCard = ({ order, onDetailClick }: OrderClassCardProps) => {
 			<MyReviewModal
 				open={isReviewModalOpen}
 				onOpenChange={setIsReviewModalOpen}
-				lessonId={order.lessonId}
 				enrollmentId={order.enrollmentId}
 				isEditMode={hasReview}
 			/>
