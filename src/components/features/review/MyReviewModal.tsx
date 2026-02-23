@@ -116,22 +116,23 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 
 	// 데이터 로드 시 폼 초기화
 	useEffect(() => {
-		if (existingReview && open) {
+		if (existingReview?.hasReview && existingReview.review && open) {
+			const review = existingReview.review;
 			// image1~image8 개별 필드에서 null을 제외한 URL 배열 생성
 			const existingImages = [
-				existingReview.image1,
-				existingReview.image2,
-				existingReview.image3,
-				existingReview.image4,
-				existingReview.image5,
-				existingReview.image6,
-				existingReview.image7,
-				existingReview.image8,
+				review.image1,
+				review.image2,
+				review.image3,
+				review.image4,
+				review.image5,
+				review.image6,
+				review.image7,
+				review.image8,
 			].filter((img): img is string => img !== null && img !== undefined);
 
 			reset({
-				rating: existingReview.rating,
-				content: existingReview.content,
+				rating: review.rating ?? 0,
+				content: review.content ?? '',
 				images: existingImages,
 				imageFiles: [],
 			});
@@ -218,10 +219,10 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 			}
 		}
 
-		if (isEditMode && existingReview && existingReview.id !== undefined) {
+		if (isEditMode && existingReview?.hasReview && existingReview.review?.id !== undefined) {
 			// 수정 로직 (훅 사용)
 			await updateReview({
-				reviewId: existingReview.id,
+				reviewId: existingReview.review.id,
 				lessonId,
 				data: formData,
 			});
