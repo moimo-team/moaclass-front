@@ -34,6 +34,7 @@ function MeetingDetailClient() {
 	const meetingIdFromParams = params.meetingId as string;
 	const meetingId = Number(meetingIdFromParams);
 	const router = useRouter();
+	const meetingChatUrl = `/chats?chatType=meeting&meetingId=${meetingId}`;
 
 	useLayoutEffect(() => {
 		scrollToTop();
@@ -269,15 +270,7 @@ function MeetingDetailClient() {
 								isLoggedIn={isLoggedIn}
 								isClosed={isClosed}
 								onJoin={handleJoinMeeting}
-								onChat={() =>
-									router.push('/chats', {
-										// @ts-expect-error - Next.js router doesn't officially support state in push but some wrappers might,
-										// for now we follow the existing pattern if possible or handle differently.
-										// Actually standard Next.js router doesn't have state.
-										// We might need to handle this via URL or Store if it breaks.
-										state: { meetingId: meetingId },
-									})
-								}
+								onChat={() => router.push(meetingChatUrl)}
 							/>
 						</div>
 					</section>
@@ -353,7 +346,7 @@ function MeetingDetailClient() {
 				isLoggedIn={isLoggedIn}
 				isClosed={isClosed}
 				onJoin={handleJoinMeeting}
-				onChat={() => router.push('/chats')}
+				onChat={() => router.push(meetingChatUrl)}
 			/>
 			<DeleteConfirmDialog />
 

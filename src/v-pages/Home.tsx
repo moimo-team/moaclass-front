@@ -22,14 +22,30 @@ function Home() {
 	return (
 		<>
 			<Banner />
-			<section className="flex w-full flex-col items-center pt-8" aria-label="메인 콘텐츠">
-				<section className="w-full" aria-label="카테고리">
+			<section
+				className="flex w-full flex-col items-center pt-8"
+				aria-label="메인 콘텐츠"
+				data-testid="home-main-content"
+			>
+				<section
+					className="w-full"
+					aria-label="카테고리"
+					data-testid="home-section-category"
+				>
 					<CategorySection />
 				</section>
-				<section className="w-full" aria-label="신규 클래스">
+				<section
+					className="w-full"
+					aria-label="신규 클래스"
+					data-testid="home-section-new-lessons"
+				>
 					<NewLessonList />
 				</section>
-				<section className="w-full" aria-label="좋아요 많은 클래스">
+				<section
+					className="w-full"
+					aria-label="좋아요 많은 클래스"
+					data-testid="home-section-likes"
+				>
 					<HomeLessonSection
 						title="좋아요 많은 클래스"
 						seeMoreHref="/lessons?sort=LIKES"
@@ -37,7 +53,11 @@ function Home() {
 					/>
 				</section>
 				{experienceCategory && (
-					<section className="w-full" aria-label="체험 추천 클래스">
+					<section
+						className="w-full"
+						aria-label="체험 추천 클래스"
+						data-testid="home-section-experience"
+					>
 						<HomeLessonSection
 							title="체험 추천 클래스"
 							seeMoreHref={`/lessons?categoryId=${experienceCategory.id}&sort=LATEST`}
@@ -46,7 +66,11 @@ function Home() {
 					</section>
 				)}
 				{handmadeCategory && (
-					<section className="w-full" aria-label="핸드메이드 추천 클래스">
+					<section
+						className="w-full"
+						aria-label="핸드메이드 추천 클래스"
+						data-testid="home-section-handmade"
+					>
 						<HomeLessonSection
 							title="핸드메이드 추천 클래스"
 							seeMoreHref={`/lessons?categoryId=${handmadeCategory.id}&sort=LATEST`}
@@ -55,7 +79,11 @@ function Home() {
 					</section>
 				)}
 				{seoulRegion && (
-					<section className="w-full" aria-label="서울 지역 추천 클래스">
+					<section
+						className="w-full"
+						aria-label="서울 지역 추천 클래스"
+						data-testid="home-section-seoul"
+					>
 						<HomeLessonSection
 							title="서울 지역 추천 클래스"
 							seeMoreHref={`/lessons?regionId=${seoulRegion.id}&sort=LATEST`}
@@ -63,18 +91,30 @@ function Home() {
 						/>
 					</section>
 				)}
-				<section className="w-full" aria-label="후기">
+				<section className="w-full" aria-label="후기" data-testid="home-section-review">
 					<ReviewListSection />
 				</section>
 				{isLoggedIn && (
 					<>
-						<section className="w-full" aria-label="참여 중인 모임">
+						<section
+							className="w-full"
+							aria-label="참여 중인 모임"
+							data-testid="home-section-joined-meetings"
+						>
 							<JoinedMeetingsList />
 						</section>
-						<section className="w-full" aria-label="주최 모임">
+						<section
+							className="w-full"
+							aria-label="주최 모임"
+							data-testid="home-section-hosted-meetings"
+						>
 							<HostedMeetingsList />
 						</section>
-						<section className="w-full" aria-label="승인 대기 모임">
+						<section
+							className="w-full"
+							aria-label="승인 대기 모임"
+							data-testid="home-section-pending-meetings"
+						>
 							<PendingMeetingsList />
 						</section>
 					</>

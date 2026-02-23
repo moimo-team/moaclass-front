@@ -91,7 +91,7 @@ const TeacherProfit = () => {
 										<div className="space-y-1">
 											<div className="flex items-center gap-1 cursor-pointer">
 												<h3 className="text-[15px] font-bold text-[#2f2f2f] line-clamp-1 group-hover:text-primary transition-colors">
-													{item.title}
+													{item.lessonName}
 												</h3>
 												<ChevronRight className="w-4 h-4 text-black/20" />
 											</div>

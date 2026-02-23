@@ -1,7 +1,7 @@
 import Script from 'next/script';
 
 import Footer from '@/components/common/Footer';
-import HeaderNext from '@/components/common/next/HeaderNext';
+import Header from '@/components/common/Header';
 import Providers from '@/components/providers/Providers';
 import { SITE_URL } from '@/constants/site';
 
@@ -62,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<div id="root">
 					<Providers>
 						<div className="flex flex-col min-h-screen">
-							<HeaderNext />
+							<Header />
 							<main className="flex-1 flex flex-col w-full px-4 md:px-32">
 								{children}
 							</main>

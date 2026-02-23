@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 
 import { FaRegHeart, FaHeart, FaCalendarAlt } from 'react-icons/fa';
 import { toast } from 'sonner';
@@ -32,6 +32,7 @@ interface LessonReservationSidebarProps {
 	showLoginPrompt: (show: boolean) => void;
 	maxParticipants: number;
 	isLiked: boolean | undefined;
+	isOwnedByCurrentUser: boolean;
 }
 
 export const LessonReservationSidebar = ({
@@ -49,6 +50,7 @@ export const LessonReservationSidebar = ({
 	showLoginPrompt,
 	maxParticipants,
 	isLiked,
+	isOwnedByCurrentUser,
 }: LessonReservationSidebarProps) => {
 	const parseDateKeyToDate = (dateKey: string): Date => {
 		const [year, month, day] = dateKey.split('-').map(Number);
@@ -93,6 +95,9 @@ export const LessonReservationSidebar = ({
 	};
 
 	const handleApplyClick = () => {
+		if (isOwnedByCurrentUser) {
+			return;
+		}
 		if (!isLoggedIn) {
 			showLoginPrompt(true);
 			return;
@@ -170,38 +175,44 @@ export const LessonReservationSidebar = ({
 					</div>
 
 					{/* 스케줄 리스트 */}
-					{filteredSchedules.length > 0 && (
+					{selectedDate && (
 						<div className="mb-6 space-y-2 border rounded-md p-4">
 							<p className="text-lg font-semibold mb-2">시간 선택</p>
-							<div className="max-h-48 overflow-y-auto pr-2">
-								{filteredSchedules.map((schedule) => (
-									<Button
-										key={schedule.id}
-										variant={
-											selectedScheduleId === schedule.id
-												? 'secondary'
-												: 'outline'
-										}
-										className="w-full justify-between h-auto py-2 px-4 mb-2"
-										onClick={() => setSelectedScheduleId(schedule.id)}
-									>
-										<span className="text-base">
-											{formatTime(schedule.startAt)} ~{' '}
-											{formatTime(schedule.endAt)}
-										</span>
-										<span
-											className={cn(
-												'text-sm',
+							{filteredSchedules.length > 0 ? (
+								<div className="max-h-48 overflow-y-auto pr-2">
+									{filteredSchedules.map((schedule) => (
+										<Button
+											key={schedule.id}
+											variant={
 												selectedScheduleId === schedule.id
-													? 'text-secondary-foreground'
-													: 'text-muted-foreground',
-											)}
+													? 'secondary'
+													: 'outline'
+											}
+											className="w-full justify-between h-auto py-2 px-4 mb-2"
+											onClick={() => setSelectedScheduleId(schedule.id)}
 										>
-											{schedule.currentParticipants} / {maxParticipants}명
-										</span>
-									</Button>
-								))}
-							</div>
+											<span className="text-base">
+												{formatTime(schedule.startAt)} ~{' '}
+												{formatTime(schedule.endAt)}
+											</span>
+											<span
+												className={cn(
+													'text-sm',
+													selectedScheduleId === schedule.id
+														? 'text-secondary-foreground'
+														: 'text-muted-foreground',
+												)}
+											>
+												{schedule.currentParticipants} / {maxParticipants}명
+											</span>
+										</Button>
+									))}
+								</div>
+							) : (
+								<p className="text-sm text-muted-foreground py-2">
+									현재 열린 클래스가 없어요.
+								</p>
+							)}
 						</div>
 					)}
 
@@ -279,7 +290,7 @@ export const LessonReservationSidebar = ({
 					<Button
 						className="w-full text-lg py-6 bg-primary text-primary-foreground hover:bg-primary/90 mt-3"
 						onClick={handleApplyClick}
-						disabled={!selectedScheduleId}
+						disabled={!selectedScheduleId || isOwnedByCurrentUser}
 					>
 						클래스 신청
 					</Button>

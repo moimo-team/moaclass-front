@@ -4,8 +4,8 @@ import { useCallback, useState } from 'react';
 
 import { Menu } from 'lucide-react';
 
-import { MypageSidebarNext } from '@/components/common/next/MypageSidebarNext';
-import ProtectedRouteNext from '@/components/common/next/ProtectedRouteNext';
+import ProtectedRoute from '@/components/common/protected/ProtectedRoute';
+import { MypageSidebar } from '@/components/features/mypage/MypageSidebar';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
@@ -18,7 +18,7 @@ const MypageLayout = ({ children }: { children: React.ReactNode }) => {
 	}, []);
 
 	return (
-		<ProtectedRouteNext>
+		<ProtectedRoute>
 			<div className="flex w-full flex-col lg:flex-row flex-1 bg-background">
 				{/* Mobile Header - 화면 너비 1024px 미만일 때 표시 (lg:hidden) */}
 				<div className="lg:hidden p-4 border-b flex items-center bg-white sticky top-0 z-10">
@@ -31,7 +31,7 @@ const MypageLayout = ({ children }: { children: React.ReactNode }) => {
 						</SheetTrigger>
 						<SheetContent side="left" className="p-0 w-[300px]">
 							{/* 모바일 사이드바에서 메뉴 클릭 시 시트 닫기 */}
-							<MypageSidebarNext onMenuItemClick={handleMenuItemClick} />
+							<MypageSidebar onMenuItemClick={handleMenuItemClick} />
 						</SheetContent>
 					</Sheet>
 					<h1 className="ml-2 font-bold text-lg">마이페이지</h1>
@@ -39,7 +39,7 @@ const MypageLayout = ({ children }: { children: React.ReactNode }) => {
 
 				{/* Desktop leftSidebar - 마이페이지바 (LG 이상에서만 보임) */}
 				<div className="hidden lg:flex w-[280px] shrink-0 flex-col overflow-hidden">
-					<MypageSidebarNext />
+					<MypageSidebar />
 				</div>
 
 				{/* 메인 영역 - 스크롤 가능하도록 설정 */}
@@ -47,7 +47,7 @@ const MypageLayout = ({ children }: { children: React.ReactNode }) => {
 					{children}
 				</div>
 			</div>
-		</ProtectedRouteNext>
+		</ProtectedRoute>
 	);
 };
 

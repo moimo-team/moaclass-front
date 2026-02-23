@@ -62,6 +62,7 @@ describe('LessonReservationSidebar', () => {
 				showLoginPrompt={vi.fn()}
 				maxParticipants={10}
 				isLiked={false}
+				isOwnedByCurrentUser={false}
 			/>,
 		);
 
@@ -86,6 +87,7 @@ describe('LessonReservationSidebar', () => {
 				showLoginPrompt={vi.fn()}
 				maxParticipants={10}
 				isLiked={false}
+				isOwnedByCurrentUser={false}
 			/>,
 		);
 

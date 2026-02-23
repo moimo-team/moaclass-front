@@ -6,10 +6,11 @@ import { getAvailableCoupons, getUserCoupons } from '@/api/coupon.api';
  * 사용자 쿠폰 내역 조회
  * @returns 쿠폰 목록
  */
-export const useUserCouponsQuery = () => {
+export const useUserCouponsQuery = (options?: { enabled?: boolean }) => {
 	return useQuery({
 		queryKey: ['coupons', 'me'],
 		queryFn: () => getUserCoupons(),
+		enabled: options?.enabled ?? true,
 	});
 };
 
