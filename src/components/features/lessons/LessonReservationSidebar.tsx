@@ -145,9 +145,14 @@ export const LessonReservationSidebar = ({
 										: '날짜 선택'}
 								</Button>
 							</PopoverTrigger>
-							<PopoverContent className="w-auto p-4" align="start">
+							<PopoverContent
+								className="w-[var(--radix-popover-trigger-width)] p-3"
+								align="start"
+							>
 								<Calendar
 									mode="single"
+									className="w-full [--cell-size:clamp(2.25rem,calc((var(--radix-popover-trigger-width)-2rem-0.75rem)/7),3rem)]"
+									classNames={{ root: 'w-full' }}
 									selected={
 										selectedDate ? parseDateKeyToDate(selectedDate) : undefined
 									}
@@ -158,7 +163,7 @@ export const LessonReservationSidebar = ({
 										hasSchedule: (date) =>
 											availableScheduleDates.has(formatDateKeyLocal(date)),
 									}}
-									numberOfMonths={2}
+									numberOfMonths={1}
 								/>
 							</PopoverContent>
 						</Popover>

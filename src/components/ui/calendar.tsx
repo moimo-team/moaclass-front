@@ -28,7 +28,7 @@ function Calendar({
 			locale={props.locale ?? ko}
 			showOutsideDays={showOutsideDays}
 			className={cn(
-				'bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent',
+				'bg-background group/calendar p-4 [--cell-size:4.5rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent',
 				String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
 				String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
 				className,
@@ -78,12 +78,12 @@ function Calendar({
 					defaultClassNames.caption_label,
 				),
 				table: 'w-full border-collapse',
-				weekdays: cn('flex gap-1', defaultClassNames.weekdays),
+				weekdays: cn('flex gap-2', defaultClassNames.weekdays),
 				weekday: cn(
 					'text-muted-foreground flex-1 select-none rounded-md text-[0.8rem] font-normal',
 					defaultClassNames.weekday,
 				),
-				week: cn('mt-3 flex w-full gap-1', defaultClassNames.week),
+				week: cn('mt-4 flex w-full gap-2', defaultClassNames.week),
 				week_number_header: cn(
 					'w-[--cell-size] select-none',
 					defaultClassNames.week_number_header,
