@@ -25,6 +25,7 @@ type TabStatus = (typeof POINT_TABS)[number];
 const mapPointToPointTab = createPointMapper<typeof POINT_TABS>({
 	CHARGE: '충전 및 환불',
 	REFUND: '충전 및 환불',
+	EVENT: '충전 및 환불',
 	USE: '사용',
 });
 
@@ -116,7 +117,9 @@ const Points = () => {
 												<h3 className="text-[15px] font-bold text-[#2f2f2f] line-clamp-1">
 													{item.type === 'CHARGE'
 														? '포인트 충전'
-														: item.lessonName}
+														: item.type === 'EVENT'
+															? '이벤트'
+															: item.lessonName}
 												</h3>
 											</div>
 											<div className="flex items-center text-[12px] text-black/30 font-medium">

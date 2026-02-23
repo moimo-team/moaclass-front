@@ -1,7 +1,7 @@
 import type { CouponInfo } from './coupon.model';
 import type { PayStatus } from './pay.model';
 
-export type PointType = 'CHARGE' | 'USE' | 'REFUND' | 'EARN' | 'DEDUCT'; // 충전 / 사용 / 환불 / 수익 / 차감
+export type PointType = 'CHARGE' | 'USE' | 'REFUND' | 'EVENT' | 'EARN' | 'DEDUCT'; // 충전 / 사용 / 환불 / 이벤트 / 수익 / 차감
 
 // 포인트 히스토리
 export interface PointHistory {
