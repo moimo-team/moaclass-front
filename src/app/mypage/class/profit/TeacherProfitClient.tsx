@@ -1,13 +1,13 @@
 'use client';
 
-import TeacherProtectedRouteNext from '@/components/common/next/TeacherProtectedRouteNext';
+import TeacherProtectedRoute from '@/components/common/protected/TeacherProtectedRoute';
 import TeacherProfit from '@/pages/mypage/TeacherProfit';
 
 const TeacherProfitClient = () => {
 	return (
-		<TeacherProtectedRouteNext>
+		<TeacherProtectedRoute>
 			<TeacherProfit />
-		</TeacherProtectedRouteNext>
+		</TeacherProtectedRoute>
 	);
 };
 

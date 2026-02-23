@@ -1,4 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
+
+import { useRouter } from 'next/navigation';
 
 import { useAuthQuery } from '@/hooks/useAuthQuery';
 import { useAuthStore } from '@/store/authStore';
@@ -14,7 +16,7 @@ interface TeacherProtectedRouteProps {
 const TeacherProtectedRoute = ({ children }: TeacherProtectedRouteProps) => {
 	const { isLoggedIn, isTeacher } = useAuthStore();
 	const { isLoading } = useAuthQuery();
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	if (isLoading) {
 		return <LoadingSpinner />;
@@ -23,7 +25,7 @@ const TeacherProtectedRoute = ({ children }: TeacherProtectedRouteProps) => {
 	if (!isLoggedIn) {
 		return (
 			<div className="flex items-center justify-center min-h-[400px]">
-				<LoginRequiredDialog open={true} onCancel={() => navigate('/')} />
+				<LoginRequiredDialog open={true} onCancel={() => router.push('/')} />
 			</div>
 		);
 	}
@@ -39,8 +41,8 @@ const TeacherProtectedRoute = ({ children }: TeacherProtectedRouteProps) => {
 					confirmText="이동하기"
 					cancelText="취소"
 					showCancel={true}
-					onConfirm={() => navigate('/classes-manage')}
-					onCancel={() => navigate('/mypage/profile')}
+					onConfirm={() => router.push('/classes-manage')}
+					onCancel={() => router.push('/mypage/profile')}
 				/>
 			</div>
 		);
