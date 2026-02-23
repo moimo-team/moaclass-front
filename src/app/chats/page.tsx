@@ -1,5 +1,5 @@
 import ChattingClient from '@/app/chats/ChattingClient';
-import ProtectedRoute from '@/components/common/next/ProtectedRoute';
+import ProtectedRoute from '@/components/common/protected/ProtectedRoute';
 import { createPageMetadata } from '@/utils/metadata';
 
 export const metadata = createPageMetadata({

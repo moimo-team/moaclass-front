@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 
 import ClassPaymentClient from '@/app/payments/preview/ClassPaymentClient';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import ProtectedRoute from '@/components/common/next/ProtectedRoute';
+import ProtectedRoute from '@/components/common/protected/ProtectedRoute';
 import { createPageMetadata } from '@/utils/metadata';
 
 export const metadata = createPageMetadata({
