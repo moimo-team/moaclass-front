@@ -3,8 +3,6 @@ import { toast } from 'sonner';
 
 import { userInfoUpdate } from '@/api/userInfo.api';
 
-import type { AxiosError } from 'axios';
-
 export const useUserUpdateMutation = () => {
 	const queryClient = useQueryClient();
 
@@ -15,11 +13,7 @@ export const useUserUpdateMutation = () => {
 		onSuccess: () => {
 			// users/verify와 통합되었으므로 authUser 쿼리를 invalidate
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
-			toast.success('프로필 수정이 완료되었습니다.');
-		},
-		onError: (error: AxiosError<{ message: string }>) => {
-			console.error(error);
-			toast.error('프로필 수정에 실패했습니다.');
+			toast.success('새로운 프로필을 등록했습니다.');
 		},
 	});
 };

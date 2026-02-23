@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 import * as z from 'zod';
 
 import { RegionSelect } from '@/components/common/RegionSelect';
@@ -70,7 +69,6 @@ const UserInfo = () => {
 			formData.append('interests', JSON.stringify(data.interests));
 
 			await userUpdateMutation.mutateAsync(formData);
-			toast.success('프로필 등록이 완료되었습니다.');
 			navigate('/');
 		} catch (error) {
 			setError('root', {
