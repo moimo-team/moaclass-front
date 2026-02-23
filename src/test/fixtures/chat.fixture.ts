@@ -11,11 +11,8 @@ export const BASE_MEETING_ROOM: ChatRoom = {
 	memberCount: 5,
 	isLeader: false,
 	hostId: 2,
-	lastMessage: {
-		sender: '호스트',
-		content: '모임 공지입니다.',
-		createdAt: BASE_CREATED_AT,
-	},
+	lastMessage: '모임 공지입니다.',
+	updatedAt: BASE_CREATED_AT,
 };
 
 export const BASE_LESSON_ROOM: ChatRoom = {
@@ -27,11 +24,8 @@ export const BASE_LESSON_ROOM: ChatRoom = {
 	memberCount: 2,
 	isLeader: false,
 	hostId: 3,
-	lastMessage: {
-		sender: '모멘토',
-		content: '문의 남겨주세요.',
-		createdAt: BASE_CREATED_AT,
-	},
+	lastMessage: '문의 남겨주세요.',
+	updatedAt: BASE_CREATED_AT,
 };
 
 export const createChatRoomFixture = (overrides: Partial<ChatRoom> = {}): ChatRoom => {

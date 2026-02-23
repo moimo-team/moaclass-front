@@ -167,11 +167,8 @@ export const ChattingContent = ({
 					if (getRoomIdFromRoom(room) === incomingRoomId) {
 						return {
 							...room,
-							lastMessage: {
-								content: messageForState.content,
-								createdAt: messageForState.createdAt,
-								sender: messageForState.sender.nickname,
-							},
+							lastMessage: messageForState.content,
+							updatedAt: messageForState.createdAt,
 						};
 					}
 					return room;

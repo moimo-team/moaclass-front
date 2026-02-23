@@ -17,6 +17,11 @@ const ChatRoomItem: React.FC<ChatRoomItemProps> = ({
 	lastMessageContent,
 	lastMessageTime,
 }) => {
+	const previewMessage =
+		lastMessageContent.length > 24
+			? `${lastMessageContent.slice(0, 24)}...`
+			: lastMessageContent;
+
 	const defaultMeetingImage = getImageSrc(defaultMeetingIcon);
 	const meetingImageSrc =
 		typeof meetingImage === 'string' && meetingImage.trim().length > 0
@@ -35,7 +40,7 @@ const ChatRoomItem: React.FC<ChatRoomItemProps> = ({
 			<div className="flex flex-col flex-grow">
 				<div className="font-semibold text-base">{meetingTitle}</div>
 				<div className="flex flex-col items-start text-sm text-muted-foreground lg:flex-row lg:items-center lg:justify-between">
-					<p className="truncate max-w-[70%]">{lastMessageContent}</p>
+					<p className="truncate max-w-[65%]">{previewMessage}</p>
 					<time className="text-xs">{lastMessageTime}</time>
 				</div>
 			</div>

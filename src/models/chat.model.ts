@@ -35,9 +35,6 @@ export interface ChatRoom {
 	memberCount: number;
 	isLeader: boolean;
 	hostId: number;
-	lastMessage?: {
-		sender: string;
-		content: string;
-		createdAt: string;
-	};
+	lastMessage?: string;
+	updatedAt?: string;
 }

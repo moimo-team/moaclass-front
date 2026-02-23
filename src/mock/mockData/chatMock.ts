@@ -94,14 +94,16 @@ export const mockChatMessages: Record<number, ChatMessage[]> = {
 	102: generateLessonMessages(102, 1, lessonStudentB, 6),
 };
 
-const buildLastMessage = (roomId: number) => {
+const buildLastMessage = (roomId: number): string => {
 	const messages = mockChatMessages[roomId];
 	const lastMessage = messages[messages.length - 1];
-	return {
-		sender: lastMessage.sender?.nickname ?? '사용자',
-		content: lastMessage.content,
-		createdAt: lastMessage.createdAt,
-	};
+	return lastMessage.content;
+};
+
+const buildUpdatedAt = (roomId: number): string => {
+	const messages = mockChatMessages[roomId];
+	const lastMessage = messages[messages.length - 1];
+	return lastMessage.createdAt;
 };
 
 const meetingRooms: ChatRoom[] = [1, 2, 3].map((roomId, i) => ({
@@ -112,6 +114,7 @@ const meetingRooms: ChatRoom[] = [1, 2, 3].map((roomId, i) => ({
 	memberCount: faker.number.int({ min: 2, max: 10 }),
 	image: faker.image.urlLoremFlickr({ category: 'nature' }),
 	lastMessage: buildLastMessage(roomId),
+	updatedAt: buildUpdatedAt(roomId),
 	hostId: meetingUser1.id,
 	isLeader: i % 2 === 0,
 }));
@@ -138,6 +141,7 @@ const lessonRooms: ChatRoom[] = [
 	memberCount: 2,
 	image: faker.image.urlLoremFlickr({ category: 'people' }),
 	lastMessage: buildLastMessage(roomId),
+	updatedAt: buildUpdatedAt(roomId),
 	hostId: lessonMentor.id,
 	isLeader: false,
 }));

@@ -159,11 +159,8 @@ export const createMockSocket = (): MockSocketClient => {
 
 		const room = mockChatRooms.find((item) => item.roomId === roomId);
 		if (room) {
-			room.lastMessage = {
-				sender: nickname,
-				content: newMessage.content,
-				createdAt: newMessage.createdAt,
-			};
+			room.lastMessage = newMessage.content;
+			room.updatedAt = newMessage.createdAt;
 		}
 
 		newMessageListeners.forEach((listener) => listener(newMessage));

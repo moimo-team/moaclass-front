@@ -43,14 +43,10 @@ const LessonChatRoomListSection: React.FC<LessonChatRoomListSectionProps> = ({
 									id={room.roomId}
 									meetingImage={room.image}
 									meetingTitle={room.title}
-									lastMessageContent={
-										room.lastMessage?.content || '대화를 시작하세요'
-									}
+									lastMessageContent={room.lastMessage || '대화를 시작하세요'}
 									lastMessageTime={
-										room.lastMessage?.createdAt
-											? new Date(
-													room.lastMessage.createdAt,
-												).toLocaleTimeString([], {
+										room.updatedAt
+											? new Date(room.updatedAt).toLocaleTimeString([], {
 													hour: '2-digit',
 													minute: '2-digit',
 												})
