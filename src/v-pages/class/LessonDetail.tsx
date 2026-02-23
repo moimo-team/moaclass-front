@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect } from 'react';
+import { useState, useLayoutEffect, useEffect } from 'react';
 
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -54,7 +54,7 @@ export const LessonDetailContent = ({
 
 	const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
-	const { isLoggedIn } = useAuthStore();
+	const { isLoggedIn, userId } = useAuthStore();
 
 	const {
 		showConfirmApply,
@@ -70,6 +70,19 @@ export const LessonDetailContent = ({
 	});
 
 	const likeMutation = useLessonLikeMutation();
+	const [optimisticLikeState, setOptimisticLikeState] = useState<{
+		isLiked: boolean;
+		likeCount: number;
+	} | null>(null);
+
+	useEffect(() => {
+		if (!lessonDetail) return;
+		setOptimisticLikeState(null);
+	}, [lessonDetail]);
+
+	const displayedIsLiked = optimisticLikeState?.isLiked ?? lessonDetail?.isLiked ?? false;
+	const displayedLikeCount = optimisticLikeState?.likeCount ?? lessonDetail?.likeCount ?? 0;
+	const isOwnedByCurrentUser = !!lessonDetail && userId === lessonDetail.userId;
 
 	const handleWishlistToggle = () => {
 		if (!isLoggedIn) {
@@ -78,10 +91,30 @@ export const LessonDetailContent = ({
 		}
 		if (!lessonDetail) return;
 
-		likeMutation.mutate({
-			lessonId: lessonDetail.id,
-			newIsLiked: !lessonDetail.isLiked,
+		const prevIsLiked = displayedIsLiked;
+		const prevLikeCount = displayedLikeCount;
+		const nextIsLiked = !prevIsLiked;
+		const nextLikeCount = nextIsLiked ? prevLikeCount + 1 : Math.max(0, prevLikeCount - 1);
+
+		setOptimisticLikeState({
+			isLiked: nextIsLiked,
+			likeCount: nextLikeCount,
 		});
+
+		likeMutation.mutate(
+			{
+				lessonId: lessonDetail.id,
+				newIsLiked: nextIsLiked,
+			},
+			{
+				onError: () => {
+					setOptimisticLikeState({
+						isLiked: prevIsLiked,
+						likeCount: prevLikeCount,
+					});
+				},
+			},
+		);
 	};
 
 	const handleInquiry = async () => {
@@ -133,13 +166,13 @@ export const LessonDetailContent = ({
 							title={lessonDetail.title}
 							classCategoryName={lessonDetail.lessonCategoryName}
 							subCategories={lessonDetail.subCategories}
-							likeCount={lessonDetail.likeCount}
+							likeCount={displayedLikeCount}
 							rate={lessonDetail.rate}
 							durationMin={lessonDetail.durationMin}
 							address={lessonDetail.address}
 							level={lessonDetail.level}
 							maxParticipants={lessonDetail.maxParticipants}
-							isLiked={lessonDetail.isLiked}
+							isLiked={displayedIsLiked}
 						/>
 
 						{/* 탭 네비게이션 및 클래스 정보 섹션 */}
@@ -182,7 +215,8 @@ export const LessonDetailContent = ({
 							onInquiry={handleInquiry}
 							onApplyLesson={onApplyLessonFromSidebar}
 							showLoginPrompt={setShowLoginPrompt}
-							isLiked={lessonDetail.isLiked}
+							isLiked={displayedIsLiked}
+							isOwnedByCurrentUser={isOwnedByCurrentUser}
 						/>
 					</aside>
 				</div>

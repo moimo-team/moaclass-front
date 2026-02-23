@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 
 import { ReviewList } from '@components/features/lessons/ReviewList';
+import Image from 'next/image';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 
 import defaultProfileImage from '@/assets/images/profile.png';
@@ -50,14 +51,38 @@ export const LessonTabContent = ({
 }: LessonTabContentProps) => {
 	const [isMapReady, setIsMapReady] = useState(false);
 	const hasReviewAiSummary = Boolean(reviewAiSummary?.trim());
+	const teacherProfileImage =
+		teacher?.image && teacher.image.trim().length > 0 ? teacher.image : defaultProfileImage;
 
 	useEffect(() => {
-		if (typeof window === 'undefined' || !window.kakao?.maps) return;
+		if (typeof window === 'undefined') return;
 
-		// Next.js환경(autoload=false)과 Vite환경 모두 호환되도록 명시적 로드 처리
-		window.kakao.maps.load(() => {
-			setIsMapReady(true);
-		});
+		let isCancelled = false;
+
+		const tryLoadMap = () => {
+			if (!window.kakao?.maps) return false;
+			window.kakao.maps.load(() => {
+				if (!isCancelled) {
+					setIsMapReady(true);
+				}
+			});
+			return true;
+		};
+
+		if (tryLoadMap()) {
+			return () => {
+				isCancelled = true;
+			};
+		}
+
+		const retryTimer = window.setTimeout(() => {
+			tryLoadMap();
+		}, 300);
+
+		return () => {
+			isCancelled = true;
+			window.clearTimeout(retryTimer);
+		};
 	}, []);
 
 	return (
@@ -120,9 +145,11 @@ export const LessonTabContent = ({
 						<CardContent className="p-6">
 							{teacher && (
 								<div className="flex items-center gap-4 mb-6 p-4 border rounded-lg bg-secondary/10">
-									<img
-										src={teacher.image || defaultProfileImage}
+									<Image
+										src={teacherProfileImage}
 										alt={teacher.nickname}
+										width={80}
+										height={80}
 										className="w-20 h-20 rounded-full object-cover border border-border flex-shrink-0"
 									/>
 									<div className="flex-1">
