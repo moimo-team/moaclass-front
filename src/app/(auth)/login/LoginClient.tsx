@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { FcGoogle } from 'react-icons/fc';
-import { SiKakaotalk } from 'react-icons/si';
+// import { SiKakaotalk } from 'react-icons/si';
 import * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -265,7 +265,9 @@ const LoginClient = () => {
 								className="w-full h-12 flex items-center justify-center gap-2 bg-white text-foreground hover:bg-gray-50 border-input shadow-sm"
 							>
 								<FcGoogle size={24} />
-								<span className="text-sm font-medium">Google 계정으로 로그인</span>
+								<span className="text-sm font-semibold">
+									Google 계정으로 로그인
+								</span>
 							</Button>
 
 							<Button
@@ -273,8 +275,18 @@ const LoginClient = () => {
 								onClick={() => handleKakaoLogin()}
 								className="w-full h-12 flex items-center justify-center gap-2 bg-[#FEE500] text-[#191919] hover:bg-[#FEE500]/90 border-none shadow-sm"
 							>
-								<SiKakaotalk size={20} />
-								<span className="text-sm font-semibold">Kakao 계정으로 로그인</span>
+								<svg
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="#191919"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.45 1.328 4.624 3.4 6.033l-.87 3.22a.3.3 0 0 0 .445.336l3.78-2.366A10.9 10.9 0 0 0 12 18c5.523 0 10-3.358 10-7.5S17.523 3 12 3z" />
+								</svg>
+								<span className="text-sm font-semibold">
+									카카오 계정으로 로그인
+								</span>
 							</Button>
 
 							<Button
