@@ -12,8 +12,6 @@ import { cn } from '@/lib/utils';
 import type { TeacherProfile } from '@/models/lesson.model';
 import type { Review } from '@/models/review.model';
 
-import type { useNavigate } from 'react-router-dom';
-
 interface LessonTabContentProps {
 	activeTab: string;
 	tabTitles: { id: string; title: string }[];
@@ -27,7 +25,7 @@ interface LessonTabContentProps {
 	address: string;
 	detailAddress: string;
 	directionsText: string;
-	navigate: ReturnType<typeof useNavigate>;
+	navigate: (path: string) => void;
 	reviewAiSummary: string | null;
 	reviews: Review[];
 }

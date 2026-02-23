@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 
 import Autoplay from 'embla-carousel-autoplay';
 import { Check, Loader2 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
 
+import LoginRequiredClientDialog from '@/app/lessons/[lessonId]/_components/LoginRequiredClientDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -40,10 +41,10 @@ function Banner() {
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 	const [isCouponIssued, setIsCouponIssued] = useState(false);
+	const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 	const { isLoggedIn, userId } = useAuthStore();
-	const { data: userCoupons = [] } = useUserCouponsQuery();
+	const { data: userCoupons = [] } = useUserCouponsQuery({ enabled: isLoggedIn });
 	const issueCouponMutation = useIssueCouponMutation();
-	const navigate = useNavigate();
 
 	const hasIssuedCouponFromServer =
 		isLoggedIn &&
@@ -83,7 +84,7 @@ function Banner() {
 
 	const handleCouponIssue = async () => {
 		if (!isLoggedIn || !userId) {
-			navigate('/login');
+			setShowLoginPrompt(true);
 			return;
 		}
 
@@ -157,7 +158,7 @@ function Banner() {
 							</p>
 						</div>
 						<Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
-							<Link to="/" data-testid="banner-meeting-link">
+							<Link href="/" data-testid="banner-meeting-link">
 								구경하기
 							</Link>
 						</Button>
@@ -179,7 +180,7 @@ function Banner() {
 							</p>
 						</div>
 						<Button className="bg-carrot hover:bg-carrot-hover text-white" asChild>
-							<Link to="/lessons?category=쿠킹" data-testid="banner-lesson-link">
+							<Link href="/lessons?category=荑좏궧" data-testid="banner-lesson-link">
 								클래스 구경하기
 							</Link>
 						</Button>
@@ -232,6 +233,7 @@ function Banner() {
 					/>
 				))}
 			</div>
+			<LoginRequiredClientDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt} />
 		</div>
 	);
 }

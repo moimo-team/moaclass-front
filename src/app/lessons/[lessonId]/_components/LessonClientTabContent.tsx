@@ -64,6 +64,9 @@ export const LessonClientTabContent = ({
 	// 섹션 참조를 위한 내부 ref (필요한 경우)
 	// const introRef = useRef<HTMLElement>(null);
 
+	const teacherProfileImage =
+		teacher?.image && teacher.image.trim().length > 0 ? teacher.image : defaultProfileImage;
+
 	return (
 		<>
 			{/* 탭 네비게이션 */}
@@ -122,7 +125,7 @@ export const LessonClientTabContent = ({
 							{teacher && (
 								<div className="flex items-center gap-4 mb-6 p-4 border rounded-lg bg-secondary/10">
 									<Image
-										src={teacher.image || defaultProfileImage}
+										src={teacherProfileImage}
 										alt={teacher.nickname}
 										width={80}
 										height={80}
@@ -135,9 +138,7 @@ export const LessonClientTabContent = ({
 										<Button
 											variant="link"
 											className="p-0 h-auto text-primary text-sm hover:underline"
-											onClick={() =>
-												navigate(`/mypage/profile/${teacher.id}`)
-											}
+											onClick={() => navigate(`/teachers/${teacher.id}`)}
 										>
 											모멘토 페이지 바로가기
 										</Button>
