@@ -44,9 +44,12 @@ function HostedMeetingsList() {
 
 	return (
 		<div className="w-full max-w-6xl mx-auto py-8 pt-12">
-			<div className="flex justify-between w-full mb-4">
-				<div className="text-xl font-bold ">내 모임 한눈에 보기</div>
-				<Link to="/mypage/meetings/hosting" className="text-sm cursor-pointer">
+			<div className="flex justify-between items-center w-full mb-6">
+				<div className="text-2xl font-bold text-foreground">내 모임 한눈에 보기</div>
+				<Link
+					to="/mypage/meetings/hosting"
+					className="text-sm cursor-pointer text-muted-foreground hover:text-primary transition-colors"
+				>
 					전체보기
 				</Link>
 			</div>

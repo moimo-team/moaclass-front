@@ -100,7 +100,7 @@ function MeetingDetailPage() {
 			participations?.some((p) => p.status === 'PENDING') &&
 			!hasNotifiedRef.current
 		) {
-			toast.info('새로운 모이미가 승인 요청 중입니다!');
+			toast.info('새로운 모임원이 승인 요청 중입니다!');
 			hasNotifiedRef.current = true;
 		}
 	}, [isHost, participations]);
@@ -127,7 +127,7 @@ function MeetingDetailPage() {
 		if (!meetingId) return;
 		try {
 			await joinMeetingMutation.mutateAsync(Number(meetingId));
-			toast.success('모임 신청이 완료되었습니다. 모이머의 승인을 기다려주세요!');
+			toast.success('모임 신청이 완료되었습니다. 모임장의 승인을 기다려주세요!');
 			setShowJoinConfirm(false);
 		} catch (error: unknown) {
 			console.error('모임 신청 에러:', error);
