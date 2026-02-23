@@ -67,6 +67,8 @@ interface ReviewModalProps {
 	open: boolean;
 	/** 모달 오픈 상태 변경 함수 */
 	onOpenChange: (open: boolean) => void;
+	/** 후기를 작성할 클래스 결제내역 아이디 */
+	enrollmentId?: number;
 	/** 후기를 작성할 클래스 아이디 */
 	lessonId?: number;
 	/** 초기 수정 모드 여부 (이미 리뷰가 존재하는지 여부) */
@@ -80,6 +82,7 @@ interface ReviewModalProps {
 const MyReviewModal: React.FC<ReviewModalProps> = ({
 	open,
 	onOpenChange,
+	enrollmentId,
 	lessonId,
 	isEditMode: initialIsEditMode = false,
 }) => {
@@ -106,7 +109,7 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 	});
 
 	// 기존 리뷰 데이터 조회 (모달이 열릴 때만 조회하도록 최적화)
-	const { data: existingReview, isLoading: isDataLoading } = useMyReviewQuery(lessonId || 0, {
+	const { data: existingReview, isLoading: isDataLoading } = useMyReviewQuery(enrollmentId || 0, {
 		enabled: open && initialIsEditMode, // 수정 모드일 때만 데이터 로드
 	});
 	const isEditMode = initialIsEditMode;

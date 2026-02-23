@@ -27,18 +27,21 @@ const writeReview = http.post(`${httpUrl}/reviews`, async ({ request }) => {
 
 	const id = Math.floor(Math.random() * 10000);
 	const newReview: MyReviewItem = {
-		id,
-		lessonId,
-		rating,
-		content,
-		image1: getImageUrl('image1'),
-		image2: getImageUrl('image2'),
-		image3: getImageUrl('image3'),
-		image4: getImageUrl('image4'),
-		image5: getImageUrl('image5'),
-		image6: getImageUrl('image6'),
-		image7: getImageUrl('image7'),
-		image8: getImageUrl('image8'),
+		hasReview: true,
+		review: {
+			id,
+			lessonId,
+			rating,
+			content,
+			image1: getImageUrl('image1'),
+			image2: getImageUrl('image2'),
+			image3: getImageUrl('image3'),
+			image4: getImageUrl('image4'),
+			image5: getImageUrl('image5'),
+			image6: getImageUrl('image6'),
+			image7: getImageUrl('image7'),
+			image8: getImageUrl('image8'),
+		},
 	};
 
 	// 주문 데이터 연동: 해당 lessonId를 가진 주문의 reviewId 업데이트
@@ -51,15 +54,21 @@ const writeReview = http.post(`${httpUrl}/reviews`, async ({ request }) => {
 });
 
 // 내가 작성한 특정 클래스 리뷰 조회
-const getMyReview = http.get(`${httpUrl}/reviews/me/:lessonId`, async ({ params }) => {
+const getMyReview = http.get(`${httpUrl}/reviews/me/:enrollmentId`, async ({ params }) => {
 	await delay(500);
-	const lessonId = Number(params.lessonId);
+	const enrollmentId = Number(params.enrollmentId);
 
-	if (lessonId === 3) {
+	if (enrollmentId === 3) {
 		return HttpResponse.json(mockMyReview, { status: 200 });
 	}
 
-	return HttpResponse.json(null, { status: 200 });
+	return HttpResponse.json(
+		{
+			hasReview: false,
+			review: null,
+		},
+		{ status: 200 },
+	);
 });
 
 // 리뷰 수정
@@ -86,17 +95,17 @@ const updateReview = http.put(`${httpUrl}/reviews/:reviewId`, async ({ params, r
 	};
 
 	// mockMyReview가 해당 reviewId인 경우 업데이트
-	if (mockMyReview.id === Number(reviewId)) {
-		if (rating !== undefined) mockMyReview.rating = rating;
-		if (content !== undefined) mockMyReview.content = content;
-		mockMyReview.image1 = getImageUrl('image1', mockMyReview.image1);
-		mockMyReview.image2 = getImageUrl('image2', mockMyReview.image2);
-		mockMyReview.image3 = getImageUrl('image3', mockMyReview.image3);
-		mockMyReview.image4 = getImageUrl('image4', mockMyReview.image4);
-		mockMyReview.image5 = getImageUrl('image5', mockMyReview.image5);
-		mockMyReview.image6 = getImageUrl('image6', mockMyReview.image6);
-		mockMyReview.image7 = getImageUrl('image7', mockMyReview.image7);
-		mockMyReview.image8 = getImageUrl('image8', mockMyReview.image8);
+	if (mockMyReview.review?.id === Number(reviewId)) {
+		if (rating !== undefined) mockMyReview.review.rating = rating;
+		if (content !== undefined) mockMyReview.review.content = content;
+		mockMyReview.review.image1 = getImageUrl('image1', mockMyReview.review.image1);
+		mockMyReview.review.image2 = getImageUrl('image2', mockMyReview.review.image2);
+		mockMyReview.review.image3 = getImageUrl('image3', mockMyReview.review.image3);
+		mockMyReview.review.image4 = getImageUrl('image4', mockMyReview.review.image4);
+		mockMyReview.review.image5 = getImageUrl('image5', mockMyReview.review.image5);
+		mockMyReview.review.image6 = getImageUrl('image6', mockMyReview.review.image6);
+		mockMyReview.review.image7 = getImageUrl('image7', mockMyReview.review.image7);
+		mockMyReview.review.image8 = getImageUrl('image8', mockMyReview.review.image8);
 		return HttpResponse.json(mockMyReview, { status: 200 });
 	}
 

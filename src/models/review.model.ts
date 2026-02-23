@@ -71,4 +71,7 @@ export interface LatestReviewListResponse {
 	meta: PaginationMeta;
 }
 
-export type MyReviewItem = Partial<LessonReviewListItemRaw>;
+export type MyReviewItem = {
+	hasReview: boolean;
+	review: Partial<LessonReviewListItemRaw> | null;
+};
