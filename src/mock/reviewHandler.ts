@@ -15,7 +15,7 @@ const writeReview = http.post(`${httpUrl}/reviews`, async ({ request }) => {
 	}
 
 	const formData = await request.formData();
-	const lessonId = Number(formData.get('lessonId'));
+	const enrollmentId = Number(formData.get('enrollmentId'));
 	const rating = Number(formData.get('rating'));
 	const content = formData.get('content') as string;
 
@@ -30,7 +30,7 @@ const writeReview = http.post(`${httpUrl}/reviews`, async ({ request }) => {
 		hasReview: true,
 		review: {
 			id,
-			lessonId,
+			lessonId: enrollmentId, // mock에서는 enrollmentId를 lessonId로 매핑
 			rating,
 			content,
 			image1: getImageUrl('image1'),
@@ -44,8 +44,8 @@ const writeReview = http.post(`${httpUrl}/reviews`, async ({ request }) => {
 		},
 	};
 
-	// 주문 데이터 연동: 해당 lessonId를 가진 주문의 reviewId 업데이트
-	const order = MOCK_ORDERS.find((o) => o.lessonId === lessonId);
+	// 주문 데이터 연동: 해당 enrollmentId를 가진 주문의 reviewId 업데이트
+	const order = MOCK_ORDERS.find((o) => o.enrollmentId === enrollmentId);
 	if (order) {
 		order.reviewId = id;
 	}
@@ -54,22 +54,25 @@ const writeReview = http.post(`${httpUrl}/reviews`, async ({ request }) => {
 });
 
 // 내가 작성한 특정 클래스 리뷰 조회
-const getMyReview = http.get(`${httpUrl}/reviews/me/:enrollmentId`, async ({ params }) => {
-	await delay(500);
-	const enrollmentId = Number(params.enrollmentId);
+const getMyReview = http.get(
+	`${httpUrl}/reviews/me/enrollments/:enrollmentId`,
+	async ({ params }) => {
+		await delay(500);
+		const enrollmentId = Number(params.enrollmentId);
 
-	if (enrollmentId === 3) {
-		return HttpResponse.json(mockMyReview, { status: 200 });
-	}
+		if (enrollmentId === 3) {
+			return HttpResponse.json(mockMyReview, { status: 200 });
+		}
 
-	return HttpResponse.json(
-		{
-			hasReview: false,
-			review: null,
-		},
-		{ status: 200 },
-	);
-});
+		return HttpResponse.json(
+			{
+				hasReview: false,
+				review: null,
+			},
+			{ status: 200 },
+		);
+	},
+);
 
 // 리뷰 수정
 const updateReview = http.put(`${httpUrl}/reviews/:reviewId`, async ({ params, request }) => {
