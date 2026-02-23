@@ -1,7 +1,7 @@
 ﻿import Image from 'next/image';
+import Link from 'next/link';
 import { IoIosHeartEmpty, IoIosHeart } from 'react-icons/io';
 import { IoLocationOutline } from 'react-icons/io5';
-import { Link } from 'react-router-dom';
 
 import defaultLessonImage from '@/assets/images/moimer-intro.png';
 import defaultProfileImage from '@/assets/images/profile.png';
@@ -37,7 +37,7 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 
 	return (
 		<Link
-			to={href}
+			href={href}
 			className="relative block w-full h-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 		>
 			<Card

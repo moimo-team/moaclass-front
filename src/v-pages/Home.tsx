@@ -8,16 +8,18 @@ import PendingMeetingsList from '@/components/features/home/PendingMeetingsList'
 import ReviewListSection from '@/components/features/home/ReviewListSection';
 import HomeLessonSection from '@/components/features/lessons/HomeLessonSection';
 import NewLessonList from '@/components/features/lessons/NewLessonList';
-import { REGIONS } from '@/constants/regions';
+import { useAuthQuery } from '@/hooks/useAuthQuery';
 import { useCategoryQuery } from '@/hooks/useCategoryQuery';
 
 function Home() {
 	const { isLoggedIn } = useAuthStore();
 	const { data: categories } = useCategoryQuery();
+	const { data: authUser } = useAuthQuery();
 
 	const experienceCategory = categories?.find((category) => category.name === '체험');
 	const handmadeCategory = categories?.find((category) => category.name === '핸드메이드');
-	const seoulRegion = REGIONS.find((region) => region.name === '서울');
+	const userRegionId = authUser?.region?.id;
+	const userRegionName = authUser?.region?.name;
 
 	return (
 		<>
@@ -78,16 +80,16 @@ function Home() {
 						/>
 					</section>
 				)}
-				{seoulRegion && (
+				{isLoggedIn && userRegionId && userRegionName && (
 					<section
 						className="w-full"
-						aria-label="서울 지역 추천 클래스"
-						data-testid="home-section-seoul"
+						aria-label="지역 추천 클래스"
+						data-testid="home-section-region"
 					>
 						<HomeLessonSection
-							title="서울 지역 추천 클래스"
-							seeMoreHref={`/lessons?regionId=${seoulRegion.id}&sort=LATEST`}
-							queryParams={{ regionId: [seoulRegion.id], sort: 'LATEST' }}
+							title={`${userRegionName} 지역 추천 클래스`}
+							seeMoreHref={`/lessons?regionId=${userRegionId}&sort=LATEST`}
+							queryParams={{ regionId: [userRegionId], sort: 'LATEST' }}
 						/>
 					</section>
 				)}

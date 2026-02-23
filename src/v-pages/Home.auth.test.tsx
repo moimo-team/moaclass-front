@@ -8,6 +8,7 @@ import Home from './Home';
 
 const mockUseCategoryQuery = vi.fn();
 const mockUseAuthStore = vi.fn();
+const mockUseAuthQuery = vi.fn();
 
 vi.mock('@/hooks/useCategoryQuery', () => ({
 	useCategoryQuery: () => mockUseCategoryQuery(),
@@ -15,6 +16,10 @@ vi.mock('@/hooks/useCategoryQuery', () => ({
 
 vi.mock('@store/authStore', () => ({
 	useAuthStore: () => mockUseAuthStore(),
+}));
+
+vi.mock('@/hooks/useAuthQuery', () => ({
+	useAuthQuery: () => mockUseAuthQuery(),
 }));
 
 vi.mock('@/components/features/home/banner', () => ({
@@ -53,10 +58,14 @@ describe('Home auth-based rendering', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockUseCategoryQuery.mockReturnValue({ data: HOME_CATEGORIES.all });
+		mockUseAuthQuery.mockReturnValue({ data: null });
 	});
 
 	it('shows personalized meeting sections when logged in', () => {
 		mockUseAuthStore.mockReturnValue({ isLoggedIn: true, userId: 1 });
+		mockUseAuthQuery.mockReturnValue({
+			data: { region: { id: 2, name: '경기' } },
+		});
 
 		renderHome(<Home />);
 
@@ -71,6 +80,7 @@ describe('Home auth-based rendering', () => {
 
 	it('hides personalized meeting sections when logged out', () => {
 		mockUseAuthStore.mockReturnValue({ isLoggedIn: false, userId: null });
+		mockUseAuthQuery.mockReturnValue({ data: null });
 
 		renderHome(<Home />);
 
@@ -85,11 +95,21 @@ describe('Home auth-based rendering', () => {
 
 	it('does not crash on logged-in edge state without userId', () => {
 		mockUseAuthStore.mockReturnValue({ isLoggedIn: true, userId: null });
+		mockUseAuthQuery.mockReturnValue({ data: null });
 
 		renderHome(<Home />);
 
 		expect(screen.getByTestId('joined-meetings')).toBeInTheDocument();
 		expect(screen.getByTestId('hosted-meetings')).toBeInTheDocument();
 		expect(screen.getByTestId('pending-meetings')).toBeInTheDocument();
+	});
+
+	it('hides region section when logged in but region is missing', () => {
+		mockUseAuthStore.mockReturnValue({ isLoggedIn: true, userId: 1 });
+		mockUseAuthQuery.mockReturnValue({ data: { region: undefined } });
+
+		renderHome(<Home />);
+
+		expect(screen.queryByTestId('home-section-region')).not.toBeInTheDocument();
 	});
 });

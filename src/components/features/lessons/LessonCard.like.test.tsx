@@ -14,6 +14,14 @@ vi.mock('next/image', () => ({
 	default: ({ alt, src }: { alt: string; src: string }) => <img alt={alt} src={src} />,
 }));
 
+vi.mock('next/link', () => ({
+	default: ({ href, children, ...props }: { href: string; children: ReactNode }) => (
+		<a href={href} {...props}>
+			{children}
+		</a>
+	),
+}));
+
 vi.mock('@/hooks/useLessonLikeMutation', () => ({
 	useLessonLikeMutation: () => ({
 		mutate: mockMutate,

@@ -16,5 +16,5 @@ export const HOME_SECTION_LINKS = {
 	likes: '/lessons?sort=LIKES',
 	experience: (id: number) => `/lessons?categoryId=${id}&sort=LATEST`,
 	handmade: (id: number) => `/lessons?categoryId=${id}&sort=LATEST`,
-	seoul: '/lessons?regionId=1&sort=LATEST',
+	region: (id: number) => `/lessons?regionId=${id}&sort=LATEST`,
 };

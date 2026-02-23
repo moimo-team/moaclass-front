@@ -8,6 +8,7 @@ import Home from './Home';
 
 const mockUseCategoryQuery = vi.fn();
 const mockUseAuthStore = vi.fn();
+const mockUseAuthQuery = vi.fn();
 
 vi.mock('@/hooks/useCategoryQuery', () => ({
 	useCategoryQuery: () => mockUseCategoryQuery(),
@@ -15,6 +16,10 @@ vi.mock('@/hooks/useCategoryQuery', () => ({
 
 vi.mock('@store/authStore', () => ({
 	useAuthStore: () => mockUseAuthStore(),
+}));
+
+vi.mock('@/hooks/useAuthQuery', () => ({
+	useAuthQuery: () => mockUseAuthQuery(),
 }));
 
 vi.mock('@/components/features/home/banner', () => ({
@@ -66,6 +71,7 @@ describe('Home section navigation links', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockUseAuthStore.mockReturnValue({ isLoggedIn: false });
+		mockUseAuthQuery.mockReturnValue({ data: null });
 	});
 
 	it('renders all section links with correct hrefs when categories exist', () => {
@@ -87,10 +93,7 @@ describe('Home section navigation links', () => {
 			'href',
 			HOME_SECTION_LINKS.handmade(11),
 		);
-		expect(screen.getByTestId('home-see-more-seoul')).toHaveAttribute(
-			'href',
-			HOME_SECTION_LINKS.seoul,
-		);
+		expect(screen.queryByTestId('home-see-more-seoul')).not.toBeInTheDocument();
 	});
 
 	it('hides category sections when category does not exist', () => {
@@ -102,6 +105,19 @@ describe('Home section navigation links', () => {
 
 		expect(screen.getByTestId('home-see-more-experience')).toBeInTheDocument();
 		expect(screen.queryByTestId('home-see-more-handmade')).not.toBeInTheDocument();
-		expect(screen.getByTestId('home-see-more-seoul')).toBeInTheDocument();
+		expect(screen.queryByTestId('home-see-more-seoul')).not.toBeInTheDocument();
+	});
+
+	it('renders region link when logged in with region', () => {
+		mockUseAuthStore.mockReturnValue({ isLoggedIn: true });
+		mockUseAuthQuery.mockReturnValue({ data: { region: { id: 5, name: '대전' } } });
+		mockUseCategoryQuery.mockReturnValue({ data: HOME_CATEGORIES.all });
+
+		renderHome(<Home />);
+
+		expect(screen.getByTestId('home-see-more-unknown')).toHaveAttribute(
+			'href',
+			'/lessons?regionId=5&sort=LATEST',
+		);
 	});
 });

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 import LessonList from '@/components/features/lessons/LessonList';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -30,7 +30,7 @@ function LessonListSection({
 			<div className="flex justify-between w-full mb-4">
 				<div className="text-xl font-bold ">{title}</div>
 				{seeMoreHref && (
-					<Link to={seeMoreHref} className="text-sm cursor-pointer">
+					<Link href={seeMoreHref} className="text-sm cursor-pointer">
 						전체보기
 					</Link>
 				)}
