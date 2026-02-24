@@ -1,37 +1,42 @@
-import axios, { type AxiosRequestConfig } from 'axios';
+﻿import axios, { type AxiosRequestConfig } from 'axios';
 
 import { CHAT_API_URL } from '@/config/chatConfig';
 import { useAuthStore } from '@/store/authStore';
 import { ENV } from '@/utils/env';
 
+const trimTrailingSlash = (value: string): string => value.replace(/\/+$/, '');
+
+const resolveBaseUrl = (baseUrl: string): string => {
+	// 브라우저 환경: 상대 경로(/api) 그대로 사용
+	if (typeof window !== 'undefined') return baseUrl;
+
+	// 서버 환경: 절대 경로면 그대로 사용
+	if (baseUrl.startsWith('http://') || baseUrl.startsWith('https://')) return baseUrl;
+
+	// 서버 환경에서 상대 경로를 절대 경로 기준으로 변환
+	const normalizedPath = baseUrl.startsWith('/') ? baseUrl : `/${baseUrl}`;
+
+	if (process.env.VERCEL_URL) {
+		return `https://${trimTrailingSlash(process.env.VERCEL_URL)}${normalizedPath}`;
+	}
+
+	return `http://localhost:3000${normalizedPath}`;
+};
+
 export const createClient = (config?: AxiosRequestConfig) => {
-	// 서버 사이드(Next.js)에서 호출 시 절대 경로가 필요함
-	const getBaseURL = () => {
-		if (config?.baseURL) return config.baseURL;
-
-		const apiUrl = ENV.API_URL;
-		// 절대 경로인 경우 그대로 사용
-		if (apiUrl.startsWith('http')) return apiUrl;
-
-		// 서버 사이드에서 상대 경로인 경우 (Next.js generateMetadata 등)
-		if (typeof window === 'undefined') {
-			// 개발 환경 기본값 또는 환경 변수 기반 절대 경로 구성
-			const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-			return `${baseUrl}${apiUrl}`;
-		}
-
-		return apiUrl;
-	};
+	const configuredBaseUrl =
+		typeof config?.baseURL === 'string' && config.baseURL.length > 0
+			? config.baseURL
+			: ENV.API_URL;
 
 	const axiosInstance = axios.create({
-		baseURL: getBaseURL(),
 		headers: {
 			'Content-Type': 'application/json',
 		},
 		withCredentials: true, // 쿠키 전송을 위해 필수
 		...config,
+		baseURL: resolveBaseUrl(configuredBaseUrl),
 	});
-
 	// 인증이 필요 없는 API 목록
 	// const publicEndpoints = [
 	//     '/users/login',
@@ -117,6 +122,5 @@ export const apiClient = createClient();
 
 // Chat API를 위한 별도 클라이언트
 export const chatApiClient = createClient({
-	// baseURL: 'https://moaclass-back.onrender.com',
 	baseURL: CHAT_API_URL,
 });
