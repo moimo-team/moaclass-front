@@ -28,7 +28,7 @@ function Home() {
 
 	return (
 		<>
-			<Banner />
+			<Banner onMeetingBannerClick={() => setActiveMode('meeting')} />
 			<MainModeToggle mode={activeMode} setMode={setActiveMode} />
 
 			<section

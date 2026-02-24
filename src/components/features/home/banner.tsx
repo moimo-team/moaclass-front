@@ -39,7 +39,11 @@ const getStatusCode = (error: unknown): number | undefined => {
 	return typeof status === 'number' ? status : undefined;
 };
 
-function Banner() {
+interface BannerProps {
+	onMeetingBannerClick?: () => void;
+}
+
+function Banner({ onMeetingBannerClick }: BannerProps) {
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
 	const [isCouponIssued, setIsCouponIssued] = useState(false);
@@ -163,10 +167,12 @@ function Banner() {
 								다양한 주제의 모임으로 일상을 특별하게!
 							</p>
 						</div>
-						<Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
-							<Link href="/" data-testid="banner-meeting-link">
-								구경하기
-							</Link>
+						<Button
+							className="bg-green-600 hover:bg-green-700 text-white"
+							data-testid="banner-meeting-link"
+							onClick={onMeetingBannerClick}
+						>
+							구경하기
 						</Button>
 					</div>
 				</div>
