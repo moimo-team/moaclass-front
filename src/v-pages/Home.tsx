@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 
 import { useAuthStore } from '@store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -164,35 +164,20 @@ function Home() {
 
 							{isLoggedIn && (
 								<>
-<<<<<<< fix/notification
-									<section
-										className="w-full"
-										aria-label="마감 임박 모임"
-										data-testid="home-section-deadline-meetings"
-									>
-										<MeetingListSection
-											title="마감 임박 모임"
-											seeMoreHref="/meetings?sort=DEADLINE"
-											queryOptions={{ page: 1, limit: 8, sort: 'DEADLINE' }}
-											hideIfEmpty
-										/>
-									</section>
-=======
 									<ClassBox className="w-full">
 										<section
 											className="w-full"
-											aria-label="내 지역 인기 모임"
-											data-testid="home-section-popular-meetings"
+											aria-label="마감 임박 모임"
+											data-testid="home-section-deadline-meetings"
 										>
 											<MeetingListSection
-												title={`${userRegionName || '내 지역'} 인기 모임`}
-												seeMoreHref="/meetings"
-												queryOptions={{ page: 1, limit: 8, sort: 'UPDATE' }}
+												title="마감 임박 모임"
+												seeMoreHref="/meetings?sort=DEADLINE"
+												queryOptions={{ page: 1, limit: 8, sort: 'DEADLINE' }}
 												hideIfEmpty
 											/>
 										</section>
 									</ClassBox>
->>>>>>> main
 
 									<ClassBox className="w-full mt-8">
 										<section
