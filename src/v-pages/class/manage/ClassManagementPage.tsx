@@ -215,16 +215,15 @@ export const ClassManagementContent = () => {
 	}
 
 	return (
-		<div className="w-full">
-			<div className="mb-8">
+		<div className="w-full p-6 md:p-10">
+			<div className="mb-10">
 				<h1 className="text-3xl font-nanum-bold mb-2">클래스 관리</h1>
-				<p className="text-muted-foreground">원데이 클래스를 생성하고 관리하세요</p>
+				<p className="text-gray-500">소중한 클래스들을 한눈에 관리하고 운영하세요.</p>
 			</div>
 
-			{/* 클래스 그리드: 320px 아래로 작아지지 않게 하여 큼직하게 유지 */}
 			<div
-				className="grid gap-8"
-				style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 2fr))' }}
+				className="grid gap-6 md:gap-8"
+				style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}
 			>
 				<CreateClassButton onClick={handleCreateClick} />
 
