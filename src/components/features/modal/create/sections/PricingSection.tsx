@@ -71,6 +71,7 @@ export function PricingSection() {
 						suffix="원"
 						error={errors.price?.message}
 						required
+						labelClassName="text-lg"
 						onFocus={(e) => e.target.select()}
 						onKeyDown={handleNumericKeyDown}
 						onChange={handleNumericChange('price')}

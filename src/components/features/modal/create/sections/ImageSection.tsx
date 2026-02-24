@@ -147,6 +147,8 @@ export function ImageSection({
 				onRemoveImage={removeRepresentativeImage}
 				label="클래스 대표 사진 (썸네일)"
 				description="클래스를 대표할 사진을 선택해주세요 (4.5MB 이하)"
+				required={true}
+				labelClassName="text-lg"
 			/>
 
 			{/* 추가 이미지 */}

@@ -1,5 +1,6 @@
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
@@ -14,6 +15,7 @@ interface FormTextareaProps {
 	currentLength?: number;
 	error?: string;
 	className?: string;
+	labelClassName?: string;
 }
 
 /**
@@ -33,10 +35,11 @@ export const FormTextarea = ({
 	currentLength = 0,
 	error,
 	className = 'min-h-[200px]',
+	labelClassName,
 }: FormTextareaProps) => {
 	return (
 		<div className="space-y-2">
-			<Label htmlFor={id} className="text-sm font-bold text-gray-700">
+			<Label htmlFor={id} className={cn('text-sm font-bold text-gray-700', labelClassName)}>
 				{label} {required && <span className="text-red-500">*</span>}
 			</Label>
 			<Textarea

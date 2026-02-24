@@ -26,6 +26,7 @@ interface FormInputProps {
 	onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 	onClick?: (e: React.MouseEvent<HTMLInputElement>) => void;
 	icon?: React.ReactNode;
+	labelClassName?: string;
 }
 
 /**
@@ -56,6 +57,7 @@ export const FormInput = ({
 	onKeyDown,
 	onClick,
 	icon,
+	labelClassName,
 }: FormInputProps) => {
 	const inputStyles = cn(
 		'h-12 bg-white border-gray-200 rounded-lg focus-visible:ring-primary/30 font-bold',
@@ -103,7 +105,10 @@ export const FormInput = ({
 	return (
 		<div className="space-y-2 flex-1">
 			{label && (
-				<Label htmlFor={id} className="text-sm font-bold text-gray-700">
+				<Label
+					htmlFor={id}
+					className={cn('text-sm font-bold text-gray-700', labelClassName)}
+				>
 					{label} {required && <span className="text-red-500">*</span>}
 				</Label>
 			)}

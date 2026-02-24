@@ -30,6 +30,7 @@ interface FormImageUploadProps {
 	dragDropHintText?: React.ReactNode;
 	dragDropClassName?: string;
 	error?: string;
+	labelClassName?: string;
 }
 
 /**
@@ -61,6 +62,7 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 			dragDropHintText, // 드래그 앤 드롭 영역에 추가할 텍스트
 			dragDropClassName, // 드래그 앤 드롭 영역 className
 			error,
+			labelClassName,
 		},
 		ref,
 	) => {
@@ -149,7 +151,7 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 			return (
 				<div className={cn('flex flex-col items-center gap-4', className)}>
 					{label && (
-						<label className="text-sm font-bold text-gray-700">
+						<label className={cn('text-sm font-bold text-gray-700', labelClassName)}>
 							{label} {required && <span className="text-red-500">*</span>}
 						</label>
 					)}
@@ -199,7 +201,9 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 				<div className={cn('space-y-3', className)}>
 					{label && (
 						<div className="space-y-1">
-							<label className="text-sm font-bold text-gray-700">
+							<label
+								className={cn('text-sm font-bold text-gray-700', labelClassName)}
+							>
 								{label} {required && <span className="text-red-500">*</span>}
 							</label>
 							{description && <p className="text-xs text-gray-500">{description}</p>}
@@ -278,7 +282,7 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 			<div className={cn('space-y-3', className)}>
 				{label && (
 					<div className="space-y-1">
-						<label className="text-sm font-bold text-gray-700">
+						<label className={cn('text-sm font-bold text-gray-700', labelClassName)}>
 							{label} {required && <span className="text-red-500">*</span>}
 						</label>
 						{description && <p className="text-xs text-gray-500">{description}</p>}

@@ -105,7 +105,9 @@ function CreateClassModal({
 
 			if (existingLesson) {
 				const subCategoryIds =
-					existingLesson.subClassCategories?.map((sub) => sub.id) || [];
+					existingLesson.subCategories?.map((sub) => sub.id) ||
+					existingLesson.subClassCategories?.map((sub) => sub.id) ||
+					[];
 
 				// 복제 모드일 경우 제목 뒤에 번호 추가 ((1), (2) 등)
 				let title = existingLesson.title;
