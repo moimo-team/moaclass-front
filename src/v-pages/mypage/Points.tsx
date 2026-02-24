@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -13,6 +13,9 @@ import { usePointQuery } from '@/hooks/usePointQuery';
 import type { PointHistory } from '@/models/point.model';
 import { formatDateTime } from '@/utils/dateFormat';
 import { createPointMapper } from '@/utils/point/createPointMapper';
+
+// 가상 수익 내역 식별을 위한 상수
+const VIRTUAL_PROFIT_TRANSACTION_ID = -1;
 
 // 탭 상태 타입
 type TabStatus = (typeof POINT_TABS)[number];
@@ -43,18 +46,11 @@ const Points = () => {
 		await chargePoint(amount);
 	};
 
-	// 클라이언트 사이드 마운트 시점 고정 (SSR 하이드레이션 오류 방지용)
-	const [mountTime, setMountTime] = useState<string | null>(null);
-
-	useEffect(() => {
-		setMountTime(new Date().toISOString());
-	}, []);
-
 	// 포인트 목록을 탭 상태에 맞게 필터링
-	const filteredHistory = useMemo(() => {
-		if (!pointData) return [];
+	const { history: rawHistory = [], teacherProfit = 0 } = pointData || {};
 
-		const history = pointData.history.filter((point) => {
+	const filteredHistory = useMemo(() => {
+		const filtered = rawHistory.filter((point) => {
 			if (activeTab === '전체') {
 				return point.type === 'USE' || point.type === 'CHARGE' || point.type === 'REFUND';
 			}
@@ -64,23 +60,23 @@ const Points = () => {
 		// 강사인 경우 teacherProfit을 가상 내역으로 추가 (합계액을 하나의 항목으로 표시)
 		if (
 			userInfo?.teacherProfile &&
-			(pointData.teacherProfit || 0) > 0 &&
+			teacherProfit > 0 &&
 			(activeTab === '전체' || activeTab === '충전 및 환불')
 		) {
 			const virtualProfitItem: PointHistory = {
-				transactionId: -1,
+				transactionId: VIRTUAL_PROFIT_TRANSACTION_ID,
 				lessonName: '모멘토 수익내역',
 				type: 'CHARGE',
 				status: 'COMPLETED',
-				amount: pointData.teacherProfit,
+				amount: teacherProfit,
 				coupon: null,
-				createdAt: history[0]?.createdAt || mountTime || new Date(0).toISOString(), // 안정적인 타임스탬프 처리
+				createdAt: rawHistory[0]?.createdAt || new Date(0).toISOString(), // 안정적인 고정 타임스탬프 처리
 			};
-			return [virtualProfitItem, ...history];
+			return [virtualProfitItem, ...filtered];
 		}
 
-		return history;
-	}, [pointData, activeTab, userInfo?.teacherProfile, mountTime]);
+		return filtered;
+	}, [rawHistory, teacherProfit, activeTab, userInfo?.teacherProfile]);
 
 	return (
 		<div className="max-w-3xl mx-auto w-full p-6 space-y-6 bg-white min-h-screen">
@@ -143,7 +139,8 @@ const Points = () => {
 											<div className="flex items-center gap-1">
 												<h3 className="text-[15px] font-bold text-[#2f2f2f] line-clamp-1">
 													{item.type === 'CHARGE'
-														? item.transactionId === -1
+														? item.transactionId ===
+															VIRTUAL_PROFIT_TRANSACTION_ID
 															? '모멘토 수익내역'
 															: '포인트 충전'
 														: item.lessonName}
