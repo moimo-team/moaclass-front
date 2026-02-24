@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Plus } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ConfirmDialog from '@/components/features/modal/ConfirmDialog';
@@ -72,6 +73,11 @@ const TeacherProfilePage = ({ userId: userIdProp }: TeacherProfilePageProps) => 
 	);
 
 	const handleDeleteConfirm = async () => {
+		if (lessons.length > 0) {
+			toast.error('진행중인 클래스가 있어서 삭제가 불가합니다.');
+			setIsDeleteDialogOpen(false);
+			return;
+		}
 		await deleteMutation.mutateAsync();
 	};
 
