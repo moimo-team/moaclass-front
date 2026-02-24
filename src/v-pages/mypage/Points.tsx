@@ -6,6 +6,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { PointChargeModal } from '@/components/features/modal/point/PointChargeModal';
 import { PointCouponInfo } from '@/components/features/mypage/PointCouponInfo';
 import { Button } from '@/components/ui/button';
+import { VIRTUAL_PROFIT_TRANSACTION_ID } from '@/constants/point';
 import { POINT_TABS } from '@/constants/tabs';
 import { useAuthQuery } from '@/hooks/useAuthQuery';
 import { useChargePointMutation } from '@/hooks/usePointMutations';
@@ -13,9 +14,7 @@ import { usePointQuery } from '@/hooks/usePointQuery';
 import type { PointHistory } from '@/models/point.model';
 import { formatDateTime } from '@/utils/dateFormat';
 import { createPointMapper } from '@/utils/point/createPointMapper';
-
-// 가상 수익 내역 식별을 위한 상수
-const VIRTUAL_PROFIT_TRANSACTION_ID = -1;
+import { getPointHistoryDescription } from '@/utils/point/PointHistoryDescription';
 
 // 탭 상태 타입
 type TabStatus = (typeof POINT_TABS)[number];
@@ -28,6 +27,7 @@ type TabStatus = (typeof POINT_TABS)[number];
 const mapPointToPointTab = createPointMapper<typeof POINT_TABS>({
 	CHARGE: '충전 및 환불',
 	REFUND: '충전 및 환불',
+	EVENT: '충전 및 환불',
 	USE: '사용',
 });
 
@@ -52,7 +52,12 @@ const Points = () => {
 	const filteredHistory = useMemo(() => {
 		const filtered = rawHistory.filter((point) => {
 			if (activeTab === '전체') {
-				return point.type === 'USE' || point.type === 'CHARGE' || point.type === 'REFUND';
+				return (
+					point.type === 'USE' ||
+					point.type === 'CHARGE' ||
+					point.type === 'REFUND' ||
+					point.type === 'EVENT'
+				);
 			}
 			return mapPointToPointTab(point.type) === activeTab;
 		});
@@ -138,12 +143,7 @@ const Points = () => {
 										<div className="space-y-1">
 											<div className="flex items-center gap-1">
 												<h3 className="text-[15px] font-bold text-[#2f2f2f] line-clamp-1">
-													{item.type === 'CHARGE'
-														? item.transactionId ===
-															VIRTUAL_PROFIT_TRANSACTION_ID
-															? '모멘토 수익내역'
-															: '포인트 충전'
-														: item.lessonName}
+													{getPointHistoryDescription(item)}
 												</h3>
 											</div>
 											<div className="flex items-center text-[12px] text-black/30 font-medium">
