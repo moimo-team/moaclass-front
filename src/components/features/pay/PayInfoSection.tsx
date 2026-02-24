@@ -125,8 +125,8 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId, email }: PayInf
 
 	return (
 		<PaySectionCard title="결제 정보">
-			<div className="space-y-4">
-				<div className="space-y-1">
+			<div className="space-y-6">
+				<div className="space-y-2">
 					<div className="flex justify-between items-center text-sm font-semibold">
 						<span>
 							{lessons.title} {quantity}매
@@ -144,7 +144,7 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId, email }: PayInf
 
 				<Separator className="bg-border/60" />
 
-				<div className="space-y-2">
+				<div className="space-y-3">
 					<div className="flex justify-between items-center text-sm">
 						<span className="font-semibold text-xs">쿠폰</span>
 						<div className="flex flex-col items-end">
@@ -263,7 +263,7 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId, email }: PayInf
 
 				<Separator className="bg-border/60" />
 
-				<div className="space-y-2">
+				<div className="space-y-3">
 					<div className="flex justify-between items-center text-sm">
 						<span className="font-semibold text-xs">포인트 보유 현황</span>
 						<span className="text-[14px] text-red-500">
@@ -283,7 +283,7 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId, email }: PayInf
 
 				<Separator className="bg-border/60" />
 
-				<div className="space-y-1 pb-2">
+				<div className="space-y-2 pb-2">
 					<div className="flex justify-between items-center text-sm">
 						<span className="text-muted-foreground">총 상품금액</span>
 						<span>{subtotal.toLocaleString()} 원</span>
@@ -296,7 +296,7 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId, email }: PayInf
 							</span>
 						</div>
 					)}
-					<div className="flex justify-between items-end pt-2 border-t mt-2">
+					<div className="flex justify-between items-end pt-4 border-t mt-4">
 						<span className="text-sm font-bold">총 결제 금액</span>
 						<span className="text-xl font-black text-foreground">
 							{Math.max(0, finalPrice).toLocaleString()} 원
