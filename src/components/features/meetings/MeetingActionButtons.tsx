@@ -132,7 +132,7 @@ function MeetingActionButtons({
 					className="h-10 border-[1.5px] border-yellow-400 text-gray-900 shadow-none font-semibold gap-2 hover:bg-yellow-50"
 				>
 					<Users className="w-4 h-4 text-yellow-500" fill="currentColor" />
-					모이미 관리
+					모임원 관리
 				</Button>
 
 				{onEdit && (

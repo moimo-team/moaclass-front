@@ -1,7 +1,5 @@
 import { useState } from 'react';
 
-import { Link } from 'react-router-dom';
-
 import type { MyMeetingsResponse } from '@/api/me.api';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import PaginationComponent from '@/components/common/PaginationComponent';
@@ -81,26 +79,26 @@ const HostMeeting = () => {
 								<h3 className="text-2xl font-bold text-gray-900 mb-4">
 									아직 만든 모임이 없어요 :&lt;
 								</h3>
-								<Link
-									to="/moimer-intro"
-									className="text-gray-900 font-bold flex items-center hover:underline"
+								<button
+									onClick={() => setIsModalOpen(true)}
+									className="text-primary font-bold flex items-center hover:underline transition-all"
 								>
 									첫번째 모임을 만들어볼까요? &gt;
-								</Link>
+								</button>
 							</div>
 						)}
 					</>
 				)}
 			</div>
 
-			{/* 모임 수정 모달 */}
+			{/* 모임 생성/수정 모달 */}
 			<CreateMeetingModal
 				open={isModalOpen}
 				onOpenChange={(open) => {
 					setIsModalOpen(open);
 					if (!open) setSelectedMeeting(null);
 				}}
-				meeting={selectedMeeting || undefined} // Pass selected meeting for editing
+				meeting={selectedMeeting || undefined}
 			/>
 
 			{totalPages > 0 && (
