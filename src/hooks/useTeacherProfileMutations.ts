@@ -7,6 +7,9 @@ import {
 	fetchTeacherProfile,
 	updateTeacherProfile,
 } from '@/api/teacher.api';
+import { useAuthStore } from '@/store/authStore';
+
+import type { AxiosError } from 'axios';
 
 // ... (existing functions)
 
@@ -17,6 +20,10 @@ export const useDeleteTeacherProfileMutation = () => {
 	return useMutation({
 		mutationFn: deleteTeacherProfile,
 		onSuccess: () => {
+			const userId = useAuthStore.getState().userId;
+			if (userId) {
+				queryClient.setQueryData(['teacherProfile', userId], null);
+			}
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
 			queryClient.invalidateQueries({ queryKey: ['teacherProfile'] });
 			toast.success('모멘토 프로필이 삭제되었습니다.');
@@ -30,7 +37,15 @@ export const useTeacherProfileQuery = (userId?: number) => {
 		queryKey: ['teacherProfile', userId],
 		queryFn: async () => {
 			if (!userId) throw new Error('UserId is required');
-			return fetchTeacherProfile(userId);
+			try {
+				return await fetchTeacherProfile(userId);
+			} catch (error) {
+				const axiosError = error as AxiosError;
+				if (axiosError.response?.status === 404) {
+					return null;
+				}
+				throw error;
+			}
 		},
 		enabled: !!userId,
 	});
