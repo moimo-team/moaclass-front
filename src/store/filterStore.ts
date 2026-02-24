@@ -18,6 +18,10 @@ export interface FilterState {
 	selectedSubCategoryIds: number[];
 	activeMainCategoryId: number | null;
 	selectedMainCategory: string | null;
+	keyword?: string;
+	isLiked?: boolean;
+	finishedFilter?: boolean;
+	limit?: number;
 
 	setSelectedPersonnel: (value: string) => void;
 	setTimeRange: (value: [number, number]) => void;
@@ -62,6 +66,10 @@ const INITIAL_STATE = {
 	selectedSubCategoryIds: [],
 	activeMainCategoryId: null,
 	selectedMainCategory: null,
+	keyword: undefined,
+	isLiked: undefined,
+	finishedFilter: undefined,
+	limit: undefined,
 	regionIdMap: new Map<string, number>(),
 	categoryIdMap: new Map<string, number>(),
 	subCategoryIdMap: new Map<string, number>(),
@@ -254,6 +262,22 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 
 		if (state.selectedSort !== null) {
 			params.sort = state.selectedSort;
+		}
+
+		if (state.keyword && state.keyword.trim().length > 0) {
+			params.keyword = state.keyword.trim();
+		}
+
+		if (state.isLiked !== undefined) {
+			params.isLiked = state.isLiked;
+		}
+
+		if (state.finishedFilter !== undefined) {
+			params.finishedFilter = state.finishedFilter;
+		}
+
+		if (state.limit !== undefined) {
+			params.limit = state.limit;
 		}
 
 		return params;

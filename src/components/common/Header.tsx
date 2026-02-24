@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { IoIosSearch } from 'react-icons/io';
 
 import { NotificationDropdown } from '@/components/common/NotificationDropdown';
@@ -13,14 +13,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuthStore } from '@/store/authStore';
 import { useFilterStore } from '@/store/filterStore';
+import { buildLessonFilterSearchParams } from '@/utils/lessonFilterQuery';
 
 function Header() {
 	const { isLoggedIn } = useAuthStore();
 	const router = useRouter();
+	const searchParams = useSearchParams();
 
 	const [searchTopic, setSearchTopic] = useState('');
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
 	const headerRef = useRef<HTMLElement | null>(null);
+	const filterPanelRef = useRef<HTMLDivElement | null>(null);
 
 	const filterStore = useFilterStore();
 
@@ -28,48 +31,25 @@ function Header() {
 		event.preventDefault();
 		if (!searchTopic.trim()) return;
 
-		router.push(`/lessons?keyword=${encodeURIComponent(searchTopic)}`);
+		const params = new URLSearchParams(searchParams.toString());
+		params.set('keyword', searchTopic.trim());
+		params.set('page', '1');
+		router.push(`/lessons?${params.toString()}`);
 		setIsFilterOpen(false);
 	};
 
 	const handleFilterSearch = () => {
-		const params = new URLSearchParams();
-
-		if (
-			filterStore.selectedRegions.length > 0 &&
-			!filterStore.selectedRegions.includes('전체')
-		) {
-			params.append('regions', filterStore.selectedRegions.join(','));
+		const params = buildLessonFilterSearchParams(filterStore.getFetchLessonsParams());
+		const currentKeyword = searchParams.get('keyword');
+		const currentLimit = searchParams.get('limit');
+		if (!params.has('keyword') && currentKeyword) {
+			params.set('keyword', currentKeyword);
 		}
-
-		if (filterStore.selectedCategories.length > 0) {
-			params.append('categories', filterStore.selectedCategories.join(','));
+		if (!params.has('limit') && currentLimit) {
+			params.set('limit', currentLimit);
 		}
-
-		if (filterStore.selectedDays.length > 0) {
-			params.append('days', filterStore.selectedDays.join(','));
-		}
-
-		if (filterStore.selectedDifficulty.length > 0) {
-			params.append('difficulty', filterStore.selectedDifficulty.join(','));
-		}
-
-		if (filterStore.selectedPersonnel) {
-			const personnel = filterStore.selectedPersonnel.replace(/\D/g, '');
-			if (personnel) params.append('personnel', personnel);
-		}
-
-		if (filterStore.timeRange[0] > 0 || filterStore.timeRange[1] < 24) {
-			params.append('minTime', String(filterStore.timeRange[0]));
-			params.append('maxTime', String(filterStore.timeRange[1]));
-		}
-
-		if (filterStore.priceRange[0] > 0 || filterStore.priceRange[1] < 500000) {
-			params.append('minPrice', String(filterStore.priceRange[0]));
-			params.append('maxPrice', String(filterStore.priceRange[1]));
-		}
-
-		router.push(`/lessons?${params.toString()}`);
+		const queryString = params.toString();
+		router.push(queryString ? `/lessons?${queryString}` : '/lessons');
 		setIsFilterOpen(false);
 	};
 
@@ -80,9 +60,24 @@ function Header() {
 		if (!isFilterOpen) return;
 
 		const handleClickOutside = (event: MouseEvent) => {
-			const target = event.target as Node | null;
-			if (!target) return;
-			if (headerRef.current?.contains(target)) return;
+			const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
+
+			const isInsideAllowedArea = path.some((node) => {
+				if (!(node instanceof Node)) return false;
+
+				if (headerRef.current?.contains(node)) return true;
+				if (filterPanelRef.current?.contains(node)) return true;
+
+				return (
+					node instanceof Element &&
+					Boolean(node.closest('[data-filter-interactive-layer="true"]'))
+				);
+			});
+
+			if (isInsideAllowedArea) {
+				return;
+			}
+
 			setIsFilterOpen(false);
 		};
 
@@ -156,7 +151,10 @@ function Header() {
 			</div>
 
 			{isFilterOpen && (
-				<div className="absolute top-[80px] left-0 right-0 z-40 bg-card shadow-lg">
+				<div
+					ref={filterPanelRef}
+					className="absolute top-[80px] left-0 right-0 z-40 bg-card shadow-lg"
+				>
 					<LessonFilterSection
 						onClose={handleCloseFilter}
 						onSearch={handleFilterSearch}
