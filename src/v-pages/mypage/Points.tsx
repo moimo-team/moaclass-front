@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -43,6 +43,13 @@ const Points = () => {
 		await chargePoint(amount);
 	};
 
+	// 클라이언트 사이드 마운트 시점 고정 (SSR 하이드레이션 오류 방지용)
+	const [mountTime, setMountTime] = useState<string | null>(null);
+
+	useEffect(() => {
+		setMountTime(new Date().toISOString());
+	}, []);
+
 	// 포인트 목록을 탭 상태에 맞게 필터링
 	const filteredHistory = useMemo(() => {
 		if (!pointData) return [];
@@ -67,13 +74,13 @@ const Points = () => {
 				status: 'COMPLETED',
 				amount: pointData.teacherProfit,
 				coupon: null,
-				createdAt: history[0]?.createdAt || new Date().toISOString(), // 최신 내역과 시간 동기화
+				createdAt: history[0]?.createdAt || mountTime || new Date(0).toISOString(), // 안정적인 타임스탬프 처리
 			};
 			return [virtualProfitItem, ...history];
 		}
 
 		return history;
-	}, [pointData, activeTab, userInfo?.teacherProfile]);
+	}, [pointData, activeTab, userInfo?.teacherProfile, mountTime]);
 
 	return (
 		<div className="max-w-3xl mx-auto w-full p-6 space-y-6 bg-white min-h-screen">
