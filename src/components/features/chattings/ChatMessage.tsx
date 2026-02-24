@@ -17,7 +17,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 	message,
 	isMine,
 	hostId,
-	hostBadgeLabel = '?몄뒪??',
+	hostBadgeLabel = '호스트',
 	forceShowHostBadge,
 }) => {
 	const { content, createdAt } = message;

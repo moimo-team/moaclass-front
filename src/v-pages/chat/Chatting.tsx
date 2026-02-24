@@ -35,7 +35,8 @@ const resolveChatType = (room: ChatRoom): ChatType => {
 const isMentorLessonRoom = (room: ChatRoom): boolean => {
 	if (room.lessonId === null) return false;
 	const displayTitle = room.displayTitle?.trim();
-	return Boolean(displayTitle);
+	if (!displayTitle) return false;
+	return displayTitle !== room.title;
 };
 
 const resolveRoomTitle = (room: ChatRoom): string => {

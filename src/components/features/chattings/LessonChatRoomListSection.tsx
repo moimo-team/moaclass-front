@@ -35,7 +35,7 @@ const LessonChatRoomListSection: React.FC<LessonChatRoomListSectionProps> = ({
 								onClick={() => onSelectRoom(room)}
 								className={
 									selectedRoomId === room.roomId
-										? 'bg-muted/50'
+										? 'bg-muted border-l-2 border-primary'
 										: 'hover:bg-muted/50'
 								}
 							>

@@ -28,7 +28,9 @@ describe('ChatRoomListSection selection', () => {
 			/>,
 		);
 
-		const selectedContainers = container.querySelectorAll('div.bg-muted\\/50');
+		const selectedContainers = container.querySelectorAll(
+			'div.bg-muted.border-l-2.border-primary',
+		);
 		expect(selectedContainers.length).toBe(1);
 		expect(screen.getByText('선택된 방')).toBeInTheDocument();
 	});
