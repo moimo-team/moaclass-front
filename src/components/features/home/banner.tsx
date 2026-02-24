@@ -194,7 +194,10 @@ function Banner({ onMeetingBannerClick }: BannerProps) {
 							</p>
 						</div>
 						<Button className="bg-carrot hover:bg-carrot-hover text-white" asChild>
-							<Link href="/lessons?category=쿠킹" data-testid="banner-lesson-link">
+							<Link
+								href="/lessons?categoryId=2&sort=LATEST"
+								data-testid="banner-lesson-link"
+							>
 								클래스 구경하기
 							</Link>
 						</Button>
