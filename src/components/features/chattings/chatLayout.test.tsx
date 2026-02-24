@@ -62,7 +62,7 @@ describe('chat layout scrolling', () => {
 				chatRooms={Array.from({ length: 50 }).map((_, idx) => ({
 					...BASE_MEETING_ROOM,
 					roomId: 3000 + idx,
-					chatType: 'lesson',
+					meetingId: null,
 					lessonId: 5000 + idx,
 					title: `lesson-room-${idx + 1}`,
 				}))}

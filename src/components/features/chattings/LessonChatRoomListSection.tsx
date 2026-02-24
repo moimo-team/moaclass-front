@@ -19,8 +19,8 @@ const LessonChatRoomListSection: React.FC<LessonChatRoomListSectionProps> = ({
 	selectedRoomId,
 }) => {
 	return (
-		<div className="w-full lg:w-[28%] min-w-[300px] flex flex-col h-full min-h-0 border-r">
-			<div className="p-4 font-semibold shrink-0">클래스 채팅</div>
+		<div className="w-full lg:w-[28%] lg:min-w-[300px] flex flex-col h-full min-h-0 border-r">
+			<div className="p-4 font-semibold shrink-0">클래스 채팅 문의</div>
 			<Separator />
 			<div className="flex-1 min-h-0 overflow-y-auto">
 				{isLoading ? (
@@ -35,22 +35,18 @@ const LessonChatRoomListSection: React.FC<LessonChatRoomListSectionProps> = ({
 								onClick={() => onSelectRoom(room)}
 								className={
 									selectedRoomId === room.roomId
-										? 'bg-muted/50'
+										? 'bg-muted border-l-2 border-primary'
 										: 'hover:bg-muted/50'
 								}
 							>
 								<ChatRoomItem
 									id={room.roomId}
-									meetingImage={room.image}
+									meetingImage={room.representativeImage}
 									meetingTitle={room.title}
-									lastMessageContent={
-										room.lastMessage?.content || '대화를 시작하세요'
-									}
+									lastMessageContent={room.lastMessage || '대화를 시작하세요'}
 									lastMessageTime={
-										room.lastMessage?.createdAt
-											? new Date(
-													room.lastMessage.createdAt,
-												).toLocaleTimeString([], {
+										room.updatedAt
+											? new Date(room.updatedAt).toLocaleTimeString([], {
 													hour: '2-digit',
 													minute: '2-digit',
 												})

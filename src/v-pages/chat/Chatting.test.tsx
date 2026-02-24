@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+﻿import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -64,6 +64,7 @@ vi.mock('@/components/features/chattings/ChatRoomListSection', () => ({
 		<div>
 			<div data-testid="meeting-order">{chatRooms.map((room) => room.roomId).join(',')}</div>
 			<div data-testid="selected-meeting">{String(selectedMeetingId ?? '')}</div>
+			<div data-testid="meeting-titles">{chatRooms.map((room) => room.title).join('|')}</div>
 			{chatRooms.map((room) => (
 				<button key={room.roomId} type="button" onClick={() => onSelectRoom(room)}>
 					select-{room.roomId}
@@ -85,6 +86,7 @@ vi.mock('@/components/features/chattings/LessonChatRoomListSection', () => ({
 	}) => (
 		<div>
 			<div data-testid="selected-lesson">{String(selectedRoomId ?? '')}</div>
+			<div data-testid="lesson-titles">{chatRooms.map((room) => room.title).join('|')}</div>
 			{chatRooms.map((room) => (
 				<button key={room.roomId} type="button" onClick={() => onSelectRoom(room)}>
 					select-lesson-{room.roomId}
@@ -98,10 +100,12 @@ const MockMessageSection = ({
 	messages,
 	sendMessage,
 	setInputValue,
+	onBackToList,
 }: {
 	messages: ChatMessage[];
 	sendMessage: () => void;
 	setInputValue: (value: string) => void;
+	onBackToList: () => void;
 }) => (
 	<div>
 		<div data-testid="message-count">{messages.length}</div>
@@ -112,6 +116,9 @@ const MockMessageSection = ({
 		<button type="button" onClick={sendMessage}>
 			send
 		</button>
+		<button type="button" onClick={onBackToList}>
+			back-to-list
+		</button>
 	</div>
 );
 
@@ -120,6 +127,7 @@ vi.mock('@/components/features/chattings/ChatMessageSection', () => ({
 		messages: ChatMessage[];
 		sendMessage: () => void;
 		setInputValue: (value: string) => void;
+		onBackToList: () => void;
 	}) => <MockMessageSection {...props} />,
 }));
 
@@ -128,6 +136,7 @@ vi.mock('@/components/features/chattings/LessonChatMessageSection', () => ({
 		messages: ChatMessage[];
 		sendMessage: () => void;
 		setInputValue: (value: string) => void;
+		onBackToList: () => void;
 	}) => <MockMessageSection {...props} />,
 }));
 
@@ -142,7 +151,7 @@ const renderWithQueryClient = (props: Partial<Parameters<typeof ChattingContent>
 	const queryClient = createQueryClient();
 	return render(
 		<QueryClientProvider client={queryClient}>
-			<ChattingContent {...props} />
+			<ChattingContent initialChatType="meeting" {...props} />
 		</QueryClientProvider>,
 	);
 };
@@ -151,11 +160,11 @@ describe('ChattingContent', () => {
 	const meetingRoom1 = BASE_MEETING_ROOM;
 	const meetingRoom2 = createChatRoomFixture({
 		roomId: 102,
-		chatType: 'meeting',
 		meetingId: 11,
-		title: '저녁 러닝 모임',
+		lessonId: null,
+		title: '????щ떇 紐⑥엫',
 	});
-	const lessonRoom = BASE_LESSON_ROOM;
+	const lessonRoom = { ...BASE_LESSON_ROOM, displayTitle: `${BASE_LESSON_ROOM.title} | student` };
 
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -312,10 +321,41 @@ describe('ChattingContent', () => {
 			expect(screen.getByText('meeting-history')).toBeInTheDocument();
 		});
 
-		await userEvent.click(screen.getByRole('button', { name: '레슨 채팅' }));
+		await userEvent.click(screen.getByRole('button', { name: '클래스 채팅 문의' }));
 		await userEvent.click(await screen.findByText(`select-lesson-${lessonRoom.roomId}`));
 		await waitFor(() => {
 			expect(screen.getByText('lesson-history')).toBeInTheDocument();
+		});
+	});
+
+	it('uses displayTitle for lesson rooms when displayTitle differs from title', async () => {
+		renderWithQueryClient();
+		await userEvent.click(screen.getByRole('button', { name: '클래스 채팅 문의' }));
+
+		await waitFor(() => {
+			expect(screen.getByTestId('lesson-titles').textContent).toContain(
+				lessonRoom.displayTitle,
+			);
+		});
+	});
+	it('switches mobile single panel from list to message and back', async () => {
+		renderWithQueryClient({ initialChatType: 'meeting' });
+
+		expect(screen.getByTestId('meeting-list-panel').className).toContain('block');
+		expect(screen.getByTestId('meeting-message-panel').className).toContain('hidden');
+
+		await userEvent.click(await screen.findByText(`select-${meetingRoom1.roomId}`));
+
+		await waitFor(() => {
+			expect(screen.getByTestId('meeting-list-panel').className).toContain('hidden');
+			expect(screen.getByTestId('meeting-message-panel').className).toContain('block');
+		});
+
+		await userEvent.click(screen.getByText('back-to-list'));
+
+		await waitFor(() => {
+			expect(screen.getByTestId('meeting-list-panel').className).toContain('block');
+			expect(screen.getByTestId('meeting-message-panel').className).toContain('hidden');
 		});
 	});
 });
