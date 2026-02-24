@@ -82,7 +82,7 @@ const ChatMessageSection: React.FC<ChatMessageSectionProps> = ({
 								forceShowHostBadge={
 									typeof lessonMentorView === 'boolean'
 										? lessonMentorView
-											? msg.senderId === userId
+											? false
 											: msg.senderId !== userId
 										: undefined
 								}
