@@ -1,6 +1,7 @@
 ﻿import { useEffect, useState } from 'react';
 
 import Autoplay from 'embla-carousel-autoplay';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { Check, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -23,6 +24,7 @@ import { BANNER_COUPON_CODE, BANNER_COUPON_ID } from '@/constants/coupon';
 import { useIssueCouponMutation } from '@/hooks/useCouponMutations';
 import { useUserCouponsQuery } from '@/hooks/useCouponQuery';
 import { useAuthStore } from '@/store/authStore';
+
 export { BANNER_COUPON_ID, BANNER_COUPON_CODE };
 
 const getStatusCode = (error: unknown): number | undefined => {
@@ -42,6 +44,29 @@ const getStatusCode = (error: unknown): number | undefined => {
 interface BannerProps {
 	onMeetingBannerClick?: () => void;
 }
+
+const containerVariants: Variants = {
+	hidden: { opacity: 0 },
+	visible: {
+		opacity: 1,
+		transition: {
+			staggerChildren: 0.2,
+			delayChildren: 0.3,
+		},
+	},
+};
+
+const itemVariants: Variants = {
+	hidden: { opacity: 0, y: 30 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: {
+			duration: 0.8,
+			ease: [0.215, 0.61, 0.355, 1],
+		},
+	},
+};
 
 function Banner({ onMeetingBannerClick }: BannerProps) {
 	const [api, setApi] = useState<CarouselApi>();
@@ -116,135 +141,192 @@ function Banner({ onMeetingBannerClick }: BannerProps) {
 		{
 			id: 1,
 			content: (
-				<div className="w-full h-full bg-accent flex items-center justify-center relative">
+				<div className="w-full h-[550px] bg-accent flex items-center justify-center relative">
 					<Image src={bannerCouponImage} alt="" fill priority className="object-cover" />
-					<div className="absolute inset-0 bg-black/45" />
-					<div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6">
-						<div className="text-center">
-							<h2 className="text-xl md:text-2xl font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
-								새학기 맞이 원데이 클래스
-							</h2>
-							<p className="text-2xl md:text-3xl font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
-								10% 할인 쿠폰 증정
-							</p>
-						</div>
-						<Button
-							onClick={handleCouponIssue}
-							disabled={issueCouponMutation.isPending || hasIssuedCoupon}
-							data-testid="banner-coupon-button"
-							className="bg-primary hover:bg-primary/90 text-white"
+					<div className="absolute inset-0 bg-black/40 transition-opacity duration-700" />
+					<AnimatePresence mode="wait">
+						<motion.div
+							key={`content-1-${current === 0}`}
+							variants={containerVariants}
+							initial="hidden"
+							animate={current === 0 ? 'visible' : 'hidden'}
+							className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-6"
 						>
-							{hasIssuedCoupon ? (
-								<>
-									<Check className="mr-2 h-4 w-4" />
-									발급 완료
-								</>
-							) : issueCouponMutation.isPending ? (
-								<>
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									쿠폰 발급 중
-								</>
-							) : (
-								'쿠폰 받기'
-							)}
-						</Button>
-					</div>
+							<div className="text-center space-y-3">
+								<motion.h2
+									variants={itemVariants}
+									className="text-2xl md:text-3xl font-nanum-bold text-white [text-shadow:0_2px_4px_rgba(0,0,0,0.5)] tracking-tight"
+								>
+									새학기 맞이 원데이 클래스
+								</motion.h2>
+								<motion.p
+									variants={itemVariants}
+									className="text-3xl md:text-5xl font-nanum-extrabold text-white [text-shadow:0_2px_4px_rgba(0,0,0,0.5)]"
+								>
+									10% 할인 쿠폰 증정
+								</motion.p>
+							</div>
+							<motion.div variants={itemVariants}>
+								<Button
+									size="lg"
+									onClick={handleCouponIssue}
+									disabled={issueCouponMutation.isPending || hasIssuedCoupon}
+									data-testid="banner-coupon-button"
+									className="bg-primary hover:bg-primary/90 text-white min-w-[160px] h-14 text-lg rounded-full shadow-lg transition-all hover:scale-105"
+								>
+									{hasIssuedCoupon ? (
+										<>
+											<Check className="mr-2 h-5 w-5" />
+											발급 완료
+										</>
+									) : issueCouponMutation.isPending ? (
+										<>
+											<Loader2 className="mr-2 h-5 w-5 animate-spin" />
+											쿠폰 발급 중
+										</>
+									) : (
+										'쿠폰 받기'
+									)}
+								</Button>
+							</motion.div>
+						</motion.div>
+					</AnimatePresence>
 				</div>
 			),
 		},
 		{
 			id: 2,
 			content: (
-				<div className="w-full h-full bg-green-100 flex items-center justify-center relative">
+				<div className="w-full h-[550px] bg-green-100 flex items-center justify-center relative">
 					<Image src={bannerMeetingImage} alt="" fill className="object-cover" />
-					<div className="absolute inset-0 bg-black/45" />
-					<div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6">
-						<div className="text-center">
-							<h2 className="text-xl md:text-2xl font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
-								원데이 모임 구경하기
-							</h2>
-							<p className="text-2xl md:text-3xl font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
-								다양한 주제의 모임으로 일상을 특별하게!
-							</p>
-						</div>
-						<Button
-							className="bg-green-600 hover:bg-green-700 text-white"
-							data-testid="banner-meeting-link"
-							onClick={onMeetingBannerClick}
+					<div className="absolute inset-0 bg-black/40 transition-opacity duration-700" />
+					<AnimatePresence mode="wait">
+						<motion.div
+							key={`content-2-${current === 1}`}
+							variants={containerVariants}
+							initial="hidden"
+							animate={current === 1 ? 'visible' : 'hidden'}
+							className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-6"
 						>
-							구경하기
-						</Button>
-					</div>
+							<div className="text-center space-y-3">
+								<motion.h2
+									variants={itemVariants}
+									className="text-2xl md:text-3xl font-nanum-bold text-white [text-shadow:0_2px_4px_rgba(0,0,0,0.5)] tracking-tight"
+								>
+									원데이 모임 구경하기
+								</motion.h2>
+								<motion.p
+									variants={itemVariants}
+									className="text-3xl md:text-5xl font-nanum-extrabold text-white [text-shadow:0_2px_4px_rgba(0,0,0,0.5)] max-w-2xl leading-tight"
+								>
+									다양한 주제의 모임으로
+									<br />
+									일상을 특별하게!
+								</motion.p>
+							</div>
+							<motion.div variants={itemVariants}>
+								<Button
+									size="lg"
+									className="bg-green-600 hover:bg-green-700 text-white min-w-[160px] h-14 text-lg rounded-full shadow-lg transition-all hover:scale-105"
+									data-testid="banner-meeting-link"
+									onClick={onMeetingBannerClick}
+								>
+									구경하기
+								</Button>
+							</motion.div>
+						</motion.div>
+					</AnimatePresence>
 				</div>
 			),
 		},
 		{
 			id: 3,
 			content: (
-				<div className="w-full h-full bg-yellow-100 flex items-center justify-center relative">
+				<div className="w-full h-[550px] bg-yellow-100 flex items-center justify-center relative">
 					<Image src={bannerCookingImage} alt="" fill className="object-cover" />
-					<div className="absolute inset-0 bg-black/45" />
-					<div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6">
-						<div className="text-center">
-							<h2 className="text-xl md:text-2xl font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
-								쿠킹 클래스 찾기
-							</h2>
-							<p className="text-2xl md:text-3xl font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
-								따뜻한 쿠킹으로 힐링하는 시간!
-							</p>
-						</div>
-						<Button className="bg-carrot hover:bg-carrot-hover text-white" asChild>
-							<Link
-								href="/lessons?categoryId=2&sort=LATEST"
-								data-testid="banner-lesson-link"
-							>
-								클래스 구경하기
-							</Link>
-						</Button>
-					</div>
+					<div className="absolute inset-0 bg-black/40 transition-opacity duration-700" />
+					<AnimatePresence mode="wait">
+						<motion.div
+							key={`content-3-${current === 2}`}
+							variants={containerVariants}
+							initial="hidden"
+							animate={current === 2 ? 'visible' : 'hidden'}
+							className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-6"
+						>
+							<div className="text-center space-y-3">
+								<motion.h2
+									variants={itemVariants}
+									className="text-2xl md:text-3xl font-nanum-bold text-white [text-shadow:0_2px_4px_rgba(0,0,0,0.5)] tracking-tight"
+								>
+									쿠킹 클래스 찾기
+								</motion.h2>
+								<motion.p
+									variants={itemVariants}
+									className="text-3xl md:text-5xl font-nanum-extrabold text-white [text-shadow:0_2px_4px_rgba(0,0,0,0.5)]"
+								>
+									따뜻한 쿠킹으로 힐링하는 시간!
+								</motion.p>
+							</div>
+							<motion.div variants={itemVariants}>
+								<Button
+									size="lg"
+									className="bg-carrot hover:bg-carrot-hover text-white min-w-[160px] h-14 text-lg rounded-full shadow-lg transition-all hover:scale-105"
+									asChild
+								>
+									<Link
+										href="/lessons?categoryId=2&sort=LATEST"
+										data-testid="banner-lesson-link"
+									>
+										클래스 구경하기
+									</Link>
+								</Button>
+							</motion.div>
+						</motion.div>
+					</AnimatePresence>
 				</div>
 			),
 		},
 	];
 
 	return (
-		<div className="relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] w-screen overflow-hidden">
+		<div className="relative group left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] w-screen overflow-hidden">
 			<Carousel
 				setApi={setApi}
 				plugins={[
 					Autoplay({
-						delay: 5000,
+						delay: 8000,
 						stopOnInteraction: true,
 					}),
 				]}
 				opts={{
 					align: 'start',
 					loop: true,
+					skipSnaps: true,
 				}}
 				className="w-full"
 			>
-				<CarouselContent>
+				<CarouselContent className="-ml-0">
 					{bannerItems.map((item) => (
-						<CarouselItem key={item.id}>
-							<Card className="border-none">
-								<CardContent className="flex h-100 items-center justify-center p-0">
+						<CarouselItem key={item.id} className="pl-0">
+							<Card className="border-none rounded-none overflow-hidden">
+								<CardContent className="flex h-full items-center justify-center p-0">
 									{item.content}
 								</CardContent>
 							</Card>
 						</CarouselItem>
 					))}
 				</CarouselContent>
-				<CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10" />
-				<CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10" />
+				<CarouselPrevious className="absolute left-0 top-0 bottom-0 h-full w-32 bg-gray-500/10 hover:bg-gray-500/20 border-none text-white rounded-none translate-y-0 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[2px]" />
+				<CarouselNext className="absolute right-0 top-0 bottom-0 h-full w-32 bg-gray-500/10 hover:bg-gray-500/20 border-none text-white rounded-none translate-y-0 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[2px]" />
 			</Carousel>
 
-			<div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+			<div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-10">
 				{bannerItems.map((_, index) => (
 					<button
 						key={index}
 						onClick={() => handleDotClick(index)}
-						className={`w-2 h-2 rounded-full ${
-							current === index ? 'bg-gray-800' : 'bg-gray-400'
+						className={`h-1.5 rounded-full transition-all duration-300 ${
+							current === index ? 'w-8 bg-white' : 'w-2 bg-white/50'
 						}`}
 						aria-label={`Go to slide ${index + 1}`}
 					/>

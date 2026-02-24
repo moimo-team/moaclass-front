@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ConfirmDialog from '@/components/features/modal/ConfirmDialog';
@@ -72,6 +73,11 @@ const TeacherProfilePage = ({ userId: userIdProp }: TeacherProfilePageProps) => 
 	);
 
 	const handleDeleteConfirm = async () => {
+		if (lessons.length > 0) {
+			toast.error('진행중인 클래스가 있어서 삭제가 불가합니다.');
+			setIsDeleteDialogOpen(false);
+			return;
+		}
 		await deleteMutation.mutateAsync();
 	};
 
@@ -84,27 +90,12 @@ const TeacherProfilePage = ({ userId: userIdProp }: TeacherProfilePageProps) => 
 					{/* 프로필 사이드바 / 등록 유도 영역 */}
 					<div className="lg:col-span-1 space-y-6">
 						{teacherProfile ? (
-							<div className="relative group">
-								<TeacherProfileSidebar profile={teacherProfile} />
-								{isMe && (
-									<div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-										<Button
-											onClick={() => setIsModalOpen(true)}
-											className="rounded-full w-10 h-10 p-0 shadow-lg bg-white hover:bg-gray-100 text-gray-700 border border-gray-100"
-											title="프로필 수정"
-										>
-											<Pencil className="w-4 h-4" />
-										</Button>
-										<Button
-											onClick={() => setIsDeleteDialogOpen(true)}
-											className="rounded-full w-10 h-10 p-0 shadow-lg bg-white hover:bg-red-50 text-red-500 border border-gray-100"
-											title="모멘토 탈퇴"
-										>
-											<Trash2 className="w-4 h-4" />
-										</Button>
-									</div>
-								)}
-							</div>
+							<TeacherProfileSidebar
+								profile={teacherProfile}
+								isMe={isMe}
+								onEdit={() => setIsModalOpen(true)}
+								onDelete={() => setIsDeleteDialogOpen(true)}
+							/>
 						) : (
 							<div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 text-center space-y-4">
 								<div className="w-20 h-20 bg-gray-50 rounded-full mx-auto flex items-center justify-center">
@@ -146,9 +137,9 @@ const TeacherProfilePage = ({ userId: userIdProp }: TeacherProfilePageProps) => 
 			<ConfirmDialog
 				open={isDeleteDialogOpen}
 				onOpenChange={setIsDeleteDialogOpen}
-				title="모멘토 탈퇴"
+				title="모멘토 프로필 삭제"
 				description={`정말로 모멘토 프로필을 삭제하시겠습니까?\n프로필 삭제 시 등록된 모든 클래스와 정보가 삭제되며 되돌릴 수 없습니다.`}
-				confirmText="탈퇴하기"
+				confirmText="삭제하기"
 				variant="destructive"
 				onConfirm={handleDeleteConfirm}
 			/>

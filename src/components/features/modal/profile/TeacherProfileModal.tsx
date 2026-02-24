@@ -66,7 +66,7 @@ export const TeacherProfileModal = ({ isOpen, onClose, profile }: TeacherProfile
 		setValue,
 		watch,
 		reset,
-		formState: { errors, isValid },
+		formState: { errors, isValid, isSubmitted, touchedFields },
 	} = useForm<TeacherProfileFormValues>({
 		resolver: zodResolver(teacherProfileSchema),
 		mode: 'onChange',
@@ -97,6 +97,8 @@ export const TeacherProfileModal = ({ isOpen, onClose, profile }: TeacherProfile
 		setPreviewImage(dataUrl);
 		setValue('profileImageFile', file, { shouldValidate: true });
 	};
+
+	const showImageError = (isSubmitted || Object.keys(touchedFields).length > 0) && !previewImage;
 
 	const onSubmit = (data: TeacherProfileFormValues) => {
 		const formData = new FormData();
@@ -133,6 +135,8 @@ export const TeacherProfileModal = ({ isOpen, onClose, profile }: TeacherProfile
 					variant="profile"
 					previewImage={previewImage || ''}
 					onImageChange={handleImageChange}
+					error={showImageError ? '프로필 이미지를 등록해주세요.' : undefined}
+					required
 				/>
 			</div>
 

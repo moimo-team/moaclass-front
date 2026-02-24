@@ -1,4 +1,5 @@
-﻿import Image from 'next/image';
+﻿import { motion } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
 import { IoIosHeartEmpty, IoIosHeart } from 'react-icons/io';
 import { IoLocationOutline } from 'react-icons/io5';
@@ -36,76 +37,85 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 	};
 
 	return (
-		<Link
-			href={href}
-			className="relative block w-full h-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			whileInView={{ opacity: 1, y: 0 }}
+			viewport={{ once: false, margin: '-50px' }}
+			transition={{ duration: 0.5, ease: 'easeOut' }}
+			className="w-full h-full"
 		>
-			<Card
-				className={cn(
-					'h-full flex flex-col overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 bg-white border border-gray-100 group',
-					className,
-				)}
+			<Link
+				href={href}
+				className="relative block w-full h-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 			>
-				{/* 상단: 클래스 사진  */}
-				<div className="relative w-full aspect-[4/2.8] overflow-hidden bg-muted">
-					<Image
-						src={lesson.representativeImage || defaultLessonImage}
-						alt={title}
-						fill
-						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-						className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-					/>
-
-					{/* 좋아요 아이콘 */}
-					<button
-						type="button"
-						className={cn(
-							'absolute top-2 right-2 z-20 cursor-pointer p-1 rounded-full hover:bg-black/10 transition-colors',
-							isLiking && 'pointer-events-none opacity-70 animate-pulse',
-						)}
-						onClick={handleLikeClick}
-						aria-label={isLiked ? '좋아요 취소' : '좋아요'}
-					>
-						{isLiked ? (
-							<IoIosHeart className="text-red-500 text-2xl drop-shadow-sm" />
-						) : (
-							<IoIosHeartEmpty className="text-white text-2xl drop-shadow-lg" />
-						)}
-					</button>
-				</div>
-
-				{/* 정보 섹션 */}
-				<div className="p-3 flex flex-col gap-2.5 flex-1">
-					<div className="space-y-1.5">
-						{/* 평점, 좋아요, 지역 위치 정보 */}
-						<div className="flex justify-between items-center text-[10px] text-gray-500 font-medium">
-							<div className="flex items-center gap-2">
-								<span className="flex items-center gap-0.5">
-									⭐ {(lesson.rate ?? 0).toFixed(1)}
-								</span>
-								<span className="flex items-center gap-0.5">
-									❤️ {lesson.likeCount ?? 0}
-								</span>
-							</div>
-							<div className="flex items-center gap-0.5">
-								<IoLocationOutline className="w-3 h-3 text-primary/60" />
-								<span>{getDisplayAddress(address)}</span>
-							</div>
-						</div>
-
-						<ClassInfoBody
-							title={title}
-							category={
-								lesson.lessonCategoryName || lesson.classCategory?.name || '전체'
-							}
-							price={lesson.price ?? 0}
-							discountRate={lesson.discountRate ?? 0}
-							discountedPrice={lesson.discountedPrice ?? 0}
-							showDate={false}
-							titleClassName="text-[16px] line-clamp-1"
-							className="gap-1.5"
+				<Card
+					className={cn(
+						'h-full flex flex-col overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 bg-white border border-gray-100 group',
+						className,
+					)}
+				>
+					{/* 상단: 클래스 사진  */}
+					<div className="relative w-full aspect-[4/2.8] overflow-hidden bg-muted">
+						<Image
+							src={lesson.representativeImage || defaultLessonImage}
+							alt={title}
+							fill
+							sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+							className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
 						/>
+
+						{/* 좋아요 아이콘 */}
+						<button
+							type="button"
+							className={cn(
+								'absolute top-2 right-2 z-20 cursor-pointer p-1 rounded-full hover:bg-black/10 transition-colors',
+								isLiking && 'pointer-events-none opacity-70 animate-pulse',
+							)}
+							onClick={handleLikeClick}
+							aria-label={isLiked ? '좋아요 취소' : '좋아요'}
+						>
+							{isLiked ? (
+								<IoIosHeart className="text-red-500 text-2xl drop-shadow-sm" />
+							) : (
+								<IoIosHeartEmpty className="text-white text-2xl drop-shadow-lg" />
+							)}
+						</button>
 					</div>
+
+					{/* 정보 섹션 */}
+					<div className="p-3 flex flex-col gap-2.5 flex-1">
+						<div className="space-y-1.5">
+							{/* 평점, 좋아요, 지역 위치 정보 */}
+							<div className="flex justify-between items-center text-[10px] text-gray-500 font-medium">
+								<div className="flex items-center gap-2">
+									<span className="flex items-center gap-0.5">
+										⭐ {(lesson.rate ?? 0).toFixed(1)}
+									</span>
+									<span className="flex items-center gap-0.5">
+										❤️ {lesson.likeCount ?? 0}
+									</span>
+								</div>
+								<div className="flex items-center gap-0.5">
+									<IoLocationOutline className="w-3 h-3 text-primary/60" />
+									<span>{getDisplayAddress(address)}</span>
+								</div>
+							</div>
+
+							<ClassInfoBody
+								title={title}
+								category={
+									lesson.lessonCategoryName ||
+									lesson.classCategory?.name ||
+									'전체'
+								}
+								price={lesson.price ?? 0}
+								discountRate={lesson.discountRate ?? 0}
+								discountedPrice={lesson.discountedPrice ?? 0}
+								showDate={false}
+								titleClassName="text-[16px] line-clamp-1"
+								className="gap-1.5"
+							/>
+						</div>
 
 					{/* 모멘토 프로필 */}
 					<div className="flex items-center gap-2 pt-3 border-t border-gray-50 mt-auto">
@@ -125,9 +135,10 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 							{lesson.teacher?.nickname || '모멘토'}
 						</span>
 					</div>
-				</div>
-			</Card>
-		</Link>
+					</div>
+				</Card>
+			</Link>
+		</motion.div>
 	);
 }
 
