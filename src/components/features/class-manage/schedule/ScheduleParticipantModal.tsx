@@ -100,6 +100,9 @@ export const ScheduleParticipantModal = ({
 											<span className="font-black text-[15px] text-gray-900 leading-none">
 												{participant.nickname}
 											</span>
+											<span className="text-[12px] text-carrot font-bold">
+												{participant.quantity}명
+											</span>
 											<Badge
 												variant="secondary"
 												className="bg-carrot/10 text-carrot hover:bg-carrot/20 text-[10px] font-black px-1.5 py-0 h-4 border-none"

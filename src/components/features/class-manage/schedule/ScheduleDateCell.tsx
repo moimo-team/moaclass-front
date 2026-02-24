@@ -62,7 +62,7 @@ export const ScheduleDateCell = ({
 								: 'bg-primary/5 text-primary border border-primary/10',
 						)}
 					>
-						{hasParticipants ? '신청자 있음' : '일정 있음'}
+						{hasParticipants ? '모멘티 있음' : '일정 있음'}
 					</div>
 				)}
 			</div>

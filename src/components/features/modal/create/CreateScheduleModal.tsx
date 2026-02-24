@@ -2,16 +2,22 @@ import { useEffect, useState } from 'react';
 
 import { format, eachDayOfInterval } from 'date-fns';
 import { Plus, Trash2, Calendar as CalendarIcon } from 'lucide-react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { Controller, useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 
+import { TimePicker } from '@/components/common/TimePicker';
 import { FormInput } from '@/components/features/modal/components/FormInput';
 import { FormModal } from '@/components/features/modal/components/FormModal';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useLessonQuery } from '@/hooks/useLessonQuery';
 import { useCreateSchedulesMutation } from '@/hooks/useScheduleMutations';
-import { combineDateAndTime, isEndTimeAfterStartTime } from '@/utils/scheduleHelpers';
+import {
+	combineDateAndTime,
+	isEndTimeAfterStartTime,
+	addMinutesToTime,
+} from '@/utils/scheduleHelpers';
 
 interface CreateScheduleModalProps {
 	isOpen: boolean;
@@ -35,6 +41,9 @@ export const CreateScheduleModal = ({
 		}
 	}, [isOpen, selectedDates.length]);
 
+	const { data: lesson } = useLessonQuery(lessonId);
+	const durationMin = lesson?.durationMin ?? 60;
+
 	const singleForm = useForm({
 		defaultValues: {
 			timeSlots: [{ startTime: '09:00', endTime: '10:00' }],
@@ -45,6 +54,27 @@ export const CreateScheduleModal = ({
 		control: singleForm.control,
 		name: 'timeSlots',
 	});
+
+	// 개별 등록: 시작 시간 변경 시 종료 시간 자동 계산
+	const watchedTimeSlots = useWatch({
+		control: singleForm.control,
+		name: 'timeSlots',
+	});
+
+	useEffect(() => {
+		if (!watchedTimeSlots) return;
+
+		watchedTimeSlots.forEach((slot, index) => {
+			if (slot?.startTime) {
+				const calculatedEndTime = addMinutesToTime(slot.startTime, durationMin);
+				if (slot.endTime !== calculatedEndTime) {
+					singleForm.setValue(`timeSlots.${index}.endTime`, calculatedEndTime, {
+						shouldDirty: true,
+					});
+				}
+			}
+		});
+	}, [watchedTimeSlots, durationMin, singleForm]);
 
 	const onSingleSubmit = (data: { timeSlots: { startTime: string; endTime: string }[] }) => {
 		if (selectedDates.length === 0) {
@@ -90,6 +120,15 @@ export const CreateScheduleModal = ({
 			endTime: '10:00',
 		},
 	});
+
+	// 반복 등록: 시작 시간 변경 시 종료 시간 자동 계산
+	const watchedRecurringStartTime = recurringForm.watch('startTime');
+	useEffect(() => {
+		if (watchedRecurringStartTime) {
+			const calculatedEndTime = addMinutesToTime(watchedRecurringStartTime, durationMin);
+			recurringForm.setValue('endTime', calculatedEndTime);
+		}
+	}, [watchedRecurringStartTime, durationMin, recurringForm]);
 
 	const onRecurringSubmit = (data: RecurringFormData) => {
 		const start = new Date(data.startDate);
@@ -174,9 +213,17 @@ export const CreateScheduleModal = ({
 											type="button"
 											variant="ghost"
 											size="sm"
-											onClick={() =>
-												append({ startTime: '09:00', endTime: '10:00' })
-											}
+											onClick={() => {
+												const lastSlot =
+													fields[fields.length - 1] ||
+													watchedTimeSlots[0];
+												const startTime = lastSlot?.startTime || '09:00';
+												const endTime = addMinutesToTime(
+													startTime,
+													durationMin,
+												);
+												append({ startTime, endTime });
+											}}
 											className="h-8 text-primary font-bold gap-1 hover:bg-primary/5 px-2"
 										>
 											<Plus className="w-4 h-4" /> 슬롯 추가
@@ -189,21 +236,29 @@ export const CreateScheduleModal = ({
 												key={field.id}
 												className="flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200"
 											>
-												<FormInput
-													id={`start-${index}`}
-													type="time"
-													register={singleForm.register(
-														`timeSlots.${index}.startTime` as const,
+												<Controller
+													name={`timeSlots.${index}.startTime`}
+													control={singleForm.control}
+													render={({ field, fieldState }) => (
+														<TimePicker
+															value={field.value}
+															onChange={field.onChange}
+															error={fieldState.error?.message}
+														/>
 													)}
 												/>
-												<span className="text-gray-400 font-bold self-center mt-2">
+												<span className="text-gray-400 font-bold self-center">
 													~
 												</span>
-												<FormInput
-													id={`end-${index}`}
-													type="time"
-													register={singleForm.register(
-														`timeSlots.${index}.endTime` as const,
+												<Controller
+													name={`timeSlots.${index}.endTime`}
+													control={singleForm.control}
+													render={({ field, fieldState }) => (
+														<TimePicker
+															value={field.value}
+															onChange={field.onChange}
+															error={fieldState.error?.message}
+														/>
 													)}
 												/>
 												{fields.length > 1 && (
@@ -243,28 +298,42 @@ export const CreateScheduleModal = ({
 									id="startDate"
 									label="시작일"
 									type="date"
+									icon={<CalendarIcon className="w-4 h-4 text-primary" />}
 									register={recurringForm.register('startDate')}
 								/>
 								<FormInput
 									id="endDate"
 									label="종료일"
 									type="date"
+									icon={<CalendarIcon className="w-4 h-4 text-primary" />}
 									register={recurringForm.register('endDate')}
 								/>
 							</div>
 
 							<div className="grid grid-cols-2 gap-4">
-								<FormInput
-									id="startTime"
-									label="시작 시간"
-									type="time"
-									register={recurringForm.register('startTime')}
+								<Controller
+									name="startTime"
+									control={recurringForm.control}
+									render={({ field, fieldState }) => (
+										<TimePicker
+											label="시작 시간"
+											value={field.value}
+											onChange={field.onChange}
+											error={fieldState.error?.message}
+										/>
+									)}
 								/>
-								<FormInput
-									id="endTime"
-									label="종료 시간"
-									type="time"
-									register={recurringForm.register('endTime')}
+								<Controller
+									name="endTime"
+									control={recurringForm.control}
+									render={({ field, fieldState }) => (
+										<TimePicker
+											label="종료 시간"
+											value={field.value}
+											onChange={field.onChange}
+											error={fieldState.error?.message}
+										/>
+									)}
 								/>
 							</div>
 
