@@ -2,6 +2,7 @@ import { useRef } from 'react';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
@@ -24,6 +25,7 @@ interface FormInputProps {
 	onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
 	onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 	onClick?: (e: React.MouseEvent<HTMLInputElement>) => void;
+	icon?: React.ReactNode;
 }
 
 /**
@@ -53,8 +55,14 @@ export const FormInput = ({
 	onFocus,
 	onKeyDown,
 	onClick,
+	icon,
 }: FormInputProps) => {
-	const inputStyles = `h-12 bg-white border-gray-200 rounded-lg focus-visible:ring-yellow-400 pr-10 font-bold ${className}`;
+	const inputStyles = cn(
+		'h-12 bg-white border-gray-200 rounded-lg focus-visible:ring-primary/30 font-bold',
+		icon ? 'pl-10' : 'pl-3',
+		suffix ? 'pr-10' : 'pr-3',
+		className,
+	);
 
 	const wasFocusedRef = useRef(false);
 
@@ -100,6 +108,9 @@ export const FormInput = ({
 				</Label>
 			)}
 			<div className="relative">
+				{icon && (
+					<div className="absolute left-3 top-1/2 -translate-y-1/2 z-10">{icon}</div>
+				)}
 				{readOnly ? (
 					<div
 						className={`flex items-center justify-end border border-gray-200 bg-gray-50/30 ${inputStyles} cursor-default`}
@@ -135,6 +146,23 @@ export const FormInput = ({
 				</p>
 			)}
 			{error && <p className="text-xs text-red-500">{error}</p>}
+			<style jsx global>{`
+				input[type='date']::-webkit-calendar-picker-indicator,
+				input[type='time']::-webkit-calendar-picker-indicator {
+					background: transparent;
+					bottom: 0;
+					color: transparent;
+					cursor: pointer;
+					height: auto;
+					left: 0;
+					position: absolute;
+					right: 0;
+					top: 0;
+					width: auto;
+					opacity: 0;
+					z-index: 20;
+				}
+			`}</style>
 		</div>
 	);
 };

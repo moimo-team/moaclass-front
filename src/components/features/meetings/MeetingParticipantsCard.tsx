@@ -94,7 +94,7 @@ export function MeetingParticipantsCard({
 						<section className="flex-shrink-0 w-[200px]" aria-label="모임장 정보">
 							<div className="border-r border-border/30 pr-6">
 								<div
-									onClick={() => handleUserClick(finalHost.userId)}
+									// onClick={() => handleUserClick(finalHost.userId)}
 									className="flex flex-col items-center gap-3 p-4 hover:bg-muted/30 cursor-pointer transition-colors rounded-lg"
 								>
 									<div className="relative">
@@ -145,7 +145,7 @@ export function MeetingParticipantsCard({
 										{visibleGuests.map((guest) => (
 											<li
 												key={guest.userId}
-												onClick={() => handleUserClick(guest.userId)}
+												// onClick={() => handleUserClick(guest.userId)}
 												className="flex flex-col items-center gap-2 p-2 hover:bg-muted/30 cursor-pointer transition-colors rounded-lg"
 											>
 												<Avatar className="w-16 h-16 border border-border bg-muted flex items-center justify-center">

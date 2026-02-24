@@ -15,6 +15,7 @@ import { FormImageUpload } from '@/components/features/modal/components/FormImag
 import { FormInput } from '@/components/features/modal/components/FormInput';
 import { FormModal } from '@/components/features/modal/components/FormModal';
 import { FormTextarea } from '@/components/features/modal/components/FormTextarea';
+import ConfirmDialog from '@/components/features/modal/ConfirmDialog';
 import { Slider } from '@/components/ui/slider';
 import { useInterestQuery } from '@/hooks/useInterestQuery';
 import { useCreateMeetingMutation, useUpdateMeetingMutation } from '@/hooks/useMeetingMutations';
@@ -53,6 +54,8 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [previewImage, setPreviewImage] = useState<string | null>(null);
 	const [isFormReady, setIsFormReady] = useState(false);
+	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+	const [pendingData, setPendingData] = useState<MeetingFormValues | null>(null);
 
 	const { data: meetingDetail, isLoading: isMeetingLoading } = useMeetingQuery(
 		open && meeting
@@ -168,15 +171,14 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 	};
 
 	const onSubmit = async (data: MeetingFormValues) => {
-		const confirmed = window.confirm(
-			meeting
-				? '모임을 수정하시겠습니까?'
-				: '모임을 생성하시겠습니까?\n신청 내용은 마이페이지에서 언제든지 수정 가능합니다.',
-		);
+		setPendingData(data);
+		setIsConfirmOpen(true);
+	};
 
-		if (!confirmed) {
-			return;
-		}
+	const handleConfirmSubmit = async () => {
+		if (!pendingData) return;
+
+		const data = pendingData;
 
 		try {
 			// 날짜와 시간 결합 (유틸 함수 사용)
@@ -233,6 +235,9 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 			toast.error('모임 생성에 실패했습니다', {
 				description: displayMessage || '입력 정보를 확인해주세요',
 			});
+		} finally {
+			setIsConfirmOpen(false);
+			setPendingData(null);
 		}
 	};
 
@@ -368,6 +373,19 @@ function CreateMeetingModal({ open, onOpenChange, meeting }: CreateMeetingModalP
 					<p className="text-xs text-red-500 mt-1">{errors.maxParticipants.message}</p>
 				)}
 			</FormField>
+
+			<ConfirmDialog
+				open={isConfirmOpen}
+				onOpenChange={setIsConfirmOpen}
+				title={meeting ? '모임 수정' : '모임 생성'}
+				description={
+					meeting
+						? '모임을 수정하시겠습니까?'
+						: '모임을 생성하시겠습니까?\n신청 내용은 마이페이지에서 언제든지 수정 가능합니다.'
+				}
+				confirmText={meeting ? '수정하기' : '생성하기'}
+				onConfirm={handleConfirmSubmit}
+			/>
 		</FormModal>
 	);
 }

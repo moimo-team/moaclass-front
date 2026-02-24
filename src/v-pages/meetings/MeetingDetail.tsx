@@ -263,9 +263,9 @@ function MeetingDetailPage() {
 								isClosed={isClosed}
 								onJoin={handleJoinMeeting}
 								onChat={() =>
-									navigate('/chats', {
-										state: { meetingId: Number(meetingId) },
-									})
+									navigate(
+										`/chats?chatType=meeting&meetingId=${Number(meetingId)}`,
+									)
 								}
 							/>
 						</div>
@@ -342,7 +342,7 @@ function MeetingDetailPage() {
 				isLoggedIn={isLoggedIn}
 				isClosed={isClosed}
 				onJoin={handleJoinMeeting}
-				onChat={() => navigate('/chats', { state: { meetingId: Number(meetingId) } })}
+				onChat={() => navigate(`/chats?chatType=meeting&meetingId=${Number(meetingId)}`)}
 			/>
 			<DeleteConfirmDialog />
 

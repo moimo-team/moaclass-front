@@ -51,7 +51,11 @@ export const LessonTabContent = ({
 	const [isMapReady, setIsMapReady] = useState(false);
 	const hasReviewAiSummary = Boolean(reviewAiSummary?.trim());
 	const teacherProfileImage =
-		teacher?.image && teacher.image.trim().length > 0 ? teacher.image : defaultProfileImage;
+		teacher?.profileImage && teacher.profileImage.trim().length > 0
+			? teacher.profileImage
+			: teacher?.image && teacher.image.trim().length > 0
+				? teacher.image
+				: defaultProfileImage;
 
 	useEffect(() => {
 		if (typeof window === 'undefined') return;

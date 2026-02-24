@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+﻿import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { getMyChatRooms, getRoomMessages } from '@/api/chat.api';
+import { getMyChatRooms, getRoomMessages, joinChatRoom } from '@/api/chat.api';
 import ChatMessageSection from '@/components/features/chattings/ChatMessageSection';
 import ChatRoomListSection from '@/components/features/chattings/ChatRoomListSection';
 import LessonChatMessageSection from '@/components/features/chattings/LessonChatMessageSection';
@@ -20,30 +20,27 @@ type ChatLocationState = {
 	lessonId?: number;
 } | null;
 
-const getRoomIdFromRoom = (room: ChatRoom): number => room.roomId ?? room.meetingId ?? 0;
-const getRoomIdFromMessage = (message: ChatMessage): number | null =>
-	message.roomId ?? message.meetingId ?? null;
+const getRoomIdFromRoom = (room: ChatRoom): number => room.roomId;
+const getRoomIdFromMessage = (message: ChatMessage): number => message.roomId;
 
 // API/socket payload 차이 정규화
-const normalizeMessage = (message: ChatMessage): ChatMessage => {
-	const roomId = getRoomIdFromMessage(message);
-	const sender = message.sender ?? {
-		id: message.senderId,
-		nickname: message.senderNickname ?? '알 수 없음',
-		image: '',
-	};
-
-	return {
-		...message,
-		roomId: roomId ?? undefined,
-		sender,
-	};
-};
+const normalizeMessage = (message: ChatMessage): ChatMessage => message;
 
 const resolveChatType = (room: ChatRoom): ChatType => {
-	if (room.chatType) return room.chatType;
-	if (room.lessonId) return 'lesson';
+	if (room.meetingId !== null) return 'meeting';
+	if (room.lessonId !== null) return 'lesson';
 	return 'meeting';
+};
+
+const isMentorLessonRoom = (room: ChatRoom): boolean => {
+	if (room.lessonId === null) return false;
+	const displayTitle = room.displayTitle?.trim();
+	if (!displayTitle) return false;
+	return displayTitle !== room.title;
+};
+
+const resolveRoomTitle = (room: ChatRoom): string => {
+	return isMentorLessonRoom(room) ? room.displayTitle!.trim() : room.title;
 };
 
 interface ChattingContentProps {
@@ -68,9 +65,10 @@ export const ChattingContent = ({
 	initialMeetingId,
 	initialLessonId,
 }: ChattingContentProps) => {
-	const { userId } = useAuthStore();
+	const { userId, isLoggedIn } = useAuthStore();
 	const location = useLocation();
 	const locationState = (location.state as ChatLocationState) ?? null;
+	// Query props are the canonical source in Next.js; location.state is fallback only.
 	const routeRoomId = toNumber(initialRoomId) ?? locationState?.roomId;
 	const routeMeetingId = toNumber(initialMeetingId) ?? locationState?.meetingId;
 	const routeLessonId = toNumber(initialLessonId) ?? locationState?.lessonId;
@@ -80,7 +78,7 @@ export const ChattingContent = ({
 	const [selectedLessonRoom, setSelectedLessonRoom] = useState<ChatRoom | null>(null);
 	const [useInitialRouteSelection, setUseInitialRouteSelection] = useState(true);
 	const [inputValue, setInputValue] = useState('');
-	const [chatType, setChatType] = useState<ChatType>(() => routeChatType ?? 'meeting');
+	const [chatType, setChatType] = useState<ChatType>(() => routeChatType ?? 'lesson');
 
 	const [messages, setMessages] = useState<ChatMessage[]>([]);
 	const scrollRef = useRef<HTMLDivElement>(null);
@@ -97,11 +95,34 @@ export const ChattingContent = ({
 	});
 
 	const meetingRooms = useMemo(
-		() => chatRooms?.filter((room) => resolveChatType(room) === 'meeting') ?? [],
+		() =>
+			chatRooms
+				?.filter((room) => resolveChatType(room) === 'meeting')
+				.map((room) => ({
+					...room,
+					title: resolveRoomTitle(room),
+				})) ?? [],
 		[chatRooms],
 	);
 	const lessonRooms = useMemo(
-		() => chatRooms?.filter((room) => resolveChatType(room) === 'lesson') ?? [],
+		() =>
+			chatRooms
+				?.filter((room) => resolveChatType(room) === 'lesson')
+				.map((room) => ({
+					...room,
+					title: resolveRoomTitle(room),
+				})) ?? [],
+		[chatRooms],
+	);
+	const mentorLessonRoomIds = useMemo(
+		() =>
+			new Set(
+				(chatRooms ?? [])
+					.filter(
+						(room) => resolveChatType(room) === 'lesson' && isMentorLessonRoom(room),
+					)
+					.map((room) => room.roomId),
+			),
 		[chatRooms],
 	);
 
@@ -161,20 +182,14 @@ export const ChattingContent = ({
 			? (selectedMeeting ?? initialMeetingRoomFromRoute)
 			: (selectedLessonRoom ?? initialLessonRoomFromRoute);
 	const selectedRoomId = selectedRoom ? getRoomIdFromRoom(selectedRoom) : null;
+	const hasSelectedRoom = Boolean(selectedRoom);
 
 	// 열린 방은 append, 전체 방 목록은 정렬만 갱신
 	const handleNewMessage = useCallback(
 		(newMessage: ChatMessage) => {
 			const normalizedMessage = normalizeMessage(newMessage);
-			const resolvedRoomId = getRoomIdFromMessage(normalizedMessage) ?? selectedRoomId;
-			if (!resolvedRoomId) return;
-
-			const messageForState =
-				normalizedMessage.roomId != null
-					? normalizedMessage
-					: { ...normalizedMessage, roomId: resolvedRoomId };
+			const messageForState = normalizedMessage;
 			const incomingRoomId = getRoomIdFromMessage(messageForState);
-			if (!incomingRoomId) return;
 
 			if (incomingRoomId === selectedRoomId) {
 				setMessages((prev) => [...prev, messageForState]);
@@ -187,14 +202,8 @@ export const ChattingContent = ({
 					if (getRoomIdFromRoom(room) === incomingRoomId) {
 						return {
 							...room,
-							lastMessage: {
-								content: messageForState.content,
-								createdAt: messageForState.createdAt,
-								sender:
-									messageForState.sender?.nickname ??
-									messageForState.senderNickname ??
-									'알 수 없음',
-							},
+							lastMessage: messageForState.content,
+							updatedAt: messageForState.createdAt,
 						};
 					}
 					return room;
@@ -216,6 +225,43 @@ export const ChattingContent = ({
 	);
 
 	const { sendMessage } = useChatSocket(selectedRoomId, handleNewMessage);
+
+	useEffect(() => {
+		if (!useInitialRouteSelection || !isLoggedIn) return;
+
+		const ensureMeetingRoomFromRoute = async () => {
+			if (routeChatType !== 'meeting' || !routeMeetingId) return;
+			if (initialMeetingRoomFromRoute) return;
+
+			try {
+				const joinedRoom = await joinChatRoom({ meetingId: routeMeetingId });
+				const refetchResult = await refetchChatRooms();
+				const rooms = refetchResult.data ?? [];
+				const matchedRoom =
+					rooms.find((room) => room.roomId === joinedRoom.roomId) ??
+					rooms.find((room) => room.meetingId === routeMeetingId);
+
+				if (matchedRoom) {
+					setSelectedMeeting({
+						...matchedRoom,
+						title: resolveRoomTitle(matchedRoom),
+					});
+					setUseInitialRouteSelection(false);
+				}
+			} catch {
+				toast.error('모임 채팅방을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+			}
+		};
+
+		void ensureMeetingRoomFromRoute();
+	}, [
+		useInitialRouteSelection,
+		isLoggedIn,
+		routeChatType,
+		routeMeetingId,
+		initialMeetingRoomFromRoute,
+		refetchChatRooms,
+	]);
 
 	// 방 전환 시 history는 REST로 새로 로드(socket은 실시간 이벤트 전용)
 	useEffect(() => {
@@ -272,6 +318,19 @@ export const ChattingContent = ({
 				{/* type으로 모임과 원데이클래스 채팅을 구분 */}
 				<button
 					className={`px-4 py-2 text-lg font-semibold ${
+						chatType === 'lesson'
+							? 'text-primary border-b-2 border-primary'
+							: 'text-foreground'
+					}`}
+					onClick={() => {
+						setUseInitialRouteSelection(false);
+						setChatType('lesson');
+					}}
+				>
+					클래스 채팅 문의
+				</button>
+				<button
+					className={`px-4 py-2 text-lg font-semibold ${
 						chatType === 'meeting'
 							? 'text-primary border-b-2 border-primary'
 							: 'text-foreground'
@@ -283,64 +342,74 @@ export const ChattingContent = ({
 				>
 					모임 채팅
 				</button>
-				<button
-					className={`px-4 py-2 text-lg font-semibold ${
-						chatType === 'lesson'
-							? 'text-primary border-b-2 border-primary'
-							: 'text-foreground'
-					}`}
-					onClick={() => {
-						setUseInitialRouteSelection(false);
-						setChatType('lesson');
-					}}
-				>
-					클래스 채팅
-				</button>
 			</div>
 
 			{chatType === 'meeting' ? (
 				<div className="flex flex-row flex-grow min-h-0 overflow-hidden">
-					<ChatRoomListSection
-						chatRooms={meetingRooms}
-						isLoading={isLoading}
-						onSelectRoom={(room) => {
-							setUseInitialRouteSelection(false);
-							setSelectedMeeting(room);
-						}}
-						selectedMeetingId={selectedRoom?.meetingId ?? selectedRoom?.roomId}
-					/>
-					<ChatMessageSection
-						selectedMeeting={selectedMeeting}
-						messages={messages}
-						sendMessage={handleSendMessage}
-						inputValue={inputValue}
-						setInputValue={setInputValue}
-						onBackToList={handleBackToList}
-						scrollRef={scrollRef}
-						userId={userId}
-					/>
+					<div
+						data-testid="meeting-list-panel"
+						className={`${hasSelectedRoom ? 'hidden' : 'block'} w-full lg:contents`}
+					>
+						<ChatRoomListSection
+							chatRooms={meetingRooms}
+							isLoading={isLoading}
+							onSelectRoom={(room) => {
+								setUseInitialRouteSelection(false);
+								setSelectedMeeting(room);
+							}}
+							selectedMeetingId={selectedRoom?.meetingId ?? selectedRoom?.roomId}
+						/>
+					</div>
+					<div
+						data-testid="meeting-message-panel"
+						className={`${hasSelectedRoom ? 'block' : 'hidden'} w-full lg:contents`}
+					>
+						<ChatMessageSection
+							selectedMeeting={selectedMeeting}
+							messages={messages}
+							sendMessage={handleSendMessage}
+							inputValue={inputValue}
+							setInputValue={setInputValue}
+							onBackToList={handleBackToList}
+							scrollRef={scrollRef}
+							userId={userId}
+						/>
+					</div>
 				</div>
 			) : (
 				<div className="flex flex-row flex-grow min-h-0 overflow-hidden">
-					<LessonChatRoomListSection
-						chatRooms={lessonRooms}
-						isLoading={isLoading}
-						onSelectRoom={(room) => {
-							setUseInitialRouteSelection(false);
-							setSelectedLessonRoom(room);
-						}}
-						selectedRoomId={selectedRoom?.roomId}
-					/>
-					<LessonChatMessageSection
-						selectedRoom={selectedRoom}
-						messages={messages}
-						sendMessage={handleSendMessage}
-						inputValue={inputValue}
-						setInputValue={setInputValue}
-						onBackToList={handleBackToList}
-						scrollRef={scrollRef}
-						userId={userId}
-					/>
+					<div
+						data-testid="lesson-list-panel"
+						className={`${hasSelectedRoom ? 'hidden' : 'block'} w-full lg:contents`}
+					>
+						<LessonChatRoomListSection
+							chatRooms={lessonRooms}
+							isLoading={isLoading}
+							onSelectRoom={(room) => {
+								setUseInitialRouteSelection(false);
+								setSelectedLessonRoom(room);
+							}}
+							selectedRoomId={selectedRoom?.roomId}
+						/>
+					</div>
+					<div
+						data-testid="lesson-message-panel"
+						className={`${hasSelectedRoom ? 'block' : 'hidden'} w-full lg:contents`}
+					>
+						<LessonChatMessageSection
+							selectedRoom={selectedRoom}
+							isMentorView={
+								selectedRoom ? mentorLessonRoomIds.has(selectedRoom.roomId) : false
+							}
+							messages={messages}
+							sendMessage={handleSendMessage}
+							inputValue={inputValue}
+							setInputValue={setInputValue}
+							onBackToList={handleBackToList}
+							scrollRef={scrollRef}
+							userId={userId}
+						/>
+					</div>
 				</div>
 			)}
 		</div>

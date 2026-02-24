@@ -22,7 +22,7 @@ import { scrollToTop } from '@/utils/setScrollTo';
 
 export interface LessonDetailProps {
 	lessonId: string;
-	navigate: (path: string, options?: { state?: unknown }) => void;
+	navigate: (path: string) => void;
 	onBack?: () => void;
 	LoginRequiredDialogComponent: React.ComponentType<{
 		open: boolean;
@@ -126,15 +126,9 @@ export const LessonDetailContent = ({
 
 		try {
 			const room = await joinChatRoom({ lessonId: lessonDetail.id });
-			navigate('/chats', {
-				state: {
-					chatType: 'lesson',
-					roomId: room.roomId,
-					lessonId: lessonDetail.id,
-				},
-			});
-		} catch (err) {
-			console.error('클래스 문의 채팅방 생성 실패:', err);
+			navigate(`/chats?chatType=lesson&roomId=${room.roomId}&lessonId=${lessonDetail.id}`);
+		} catch {
+			navigate(`/chats?chatType=lesson&lessonId=${lessonDetail.id}`);
 			toast.error('문의 채팅방을 열지 못했습니다. 잠시 후 다시 시도해 주세요.');
 		}
 	};
@@ -193,7 +187,7 @@ export const LessonDetailContent = ({
 							address={lessonDetail.address}
 							detailAddress={lessonDetail.detailAddress}
 							directionsText={lessonDetail.directionsText}
-							navigate={navigate as ReturnType<typeof useNavigate>}
+							navigate={(path) => navigate(path)}
 							reviewAiSummary={lessonDetail.reviewAiSummary}
 							reviews={reviewsData?.data ?? []}
 						/>
@@ -251,7 +245,7 @@ export const LessonDetail = () => {
 	return (
 		<LessonDetailContent
 			lessonId={lessonId!}
-			navigate={navigate}
+			navigate={(path) => navigate(path)}
 			onBack={() => navigate(-1)}
 			LoginRequiredDialogComponent={LoginRequiredDialog}
 			useApplicationConfirmationHook={useLessonApplicationConfirmation}

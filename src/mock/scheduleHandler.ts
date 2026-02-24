@@ -100,7 +100,7 @@ export const scheduleHandlers = [
 
 		if (schedule.currentParticipants > 0) {
 			return HttpResponse.json(
-				{ message: '신청자가 있어 삭제할 수 없습니다.' },
+				{ message: '모멘티가 있어 삭제할 수 없습니다.' },
 				{ status: 400 },
 			);
 		}
@@ -122,7 +122,7 @@ export const scheduleHandlers = [
 
 		if (hasParticipants) {
 			return HttpResponse.json(
-				{ message: '신청자가 있는 일정은 삭제할 수 없습니다.' },
+				{ message: '모멘티가 있는 일정은 삭제할 수 없습니다.' },
 				{ status: 400 },
 			);
 		}

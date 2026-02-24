@@ -139,8 +139,9 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 		const newSubCategoryMap = new Map(
 			subCategoriesData.map((subCategory) => [subCategory.name, subCategory.id]),
 		);
-		if (isSameMap(subCategoryIdMap, newSubCategoryMap)) return;
-		setSubCategoryIdMap(newSubCategoryMap);
+		if (!isSameMap(subCategoryIdMap, newSubCategoryMap)) {
+			setSubCategoryIdMap(newSubCategoryMap);
+		}
 
 		if (selectedSubCategoryIds.length > 0 && selectedMainCategory) {
 			const subCategoryNames = selectedSubCategoryIds

@@ -15,6 +15,7 @@ describe('LessonChatMessageSection', () => {
 		render(
 			<LessonChatMessageSection
 				selectedRoom={BASE_LESSON_ROOM}
+				isMentorView={true}
 				messages={[createChatMessageFixture({ id: 1, roomId: BASE_LESSON_ROOM.roomId })]}
 				sendMessage={vi.fn()}
 				inputValue=""

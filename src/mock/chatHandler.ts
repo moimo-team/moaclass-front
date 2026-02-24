@@ -5,6 +5,10 @@ import { CHAT_API_URL } from '@/config/chatConfig';
 import { lessonChatParticipants, mockChatMessages, mockChatRooms } from './mockData/chatMock';
 
 const DEFAULT_STUDENT_ID = lessonChatParticipants.studentA.id;
+const lessonRoomStudentMap = new Map<number, number>([
+	[101, lessonChatParticipants.studentA.id],
+	[102, lessonChatParticipants.studentB.id],
+]);
 
 const getMyChatRooms = http.get(`${CHAT_API_URL}/chats/rooms/me`, async () => {
 	await delay(300);
@@ -44,9 +48,10 @@ const joinRoom = http.post(`${CHAT_API_URL}/chats/rooms/join`, async ({ request 
 
 	if (body.lessonId) {
 		const studentId = body.studentId ?? DEFAULT_STUDENT_ID;
-		const existingLessonRoom = mockChatRooms.find(
-			(room) => room.lessonId === body.lessonId && room.studentId === studentId,
-		);
+		const existingLessonRoom = mockChatRooms.find((room) => {
+			if (room.lessonId !== body.lessonId) return false;
+			return lessonRoomStudentMap.get(room.roomId) === studentId;
+		});
 		if (existingLessonRoom) {
 			return HttpResponse.json({
 				roomId: existingLessonRoom.roomId,
@@ -57,15 +62,14 @@ const joinRoom = http.post(`${CHAT_API_URL}/chats/rooms/join`, async ({ request 
 		const roomId = Date.now();
 		mockChatRooms.unshift({
 			roomId,
-			chatType: 'lesson',
+			meetingId: null,
 			lessonId: body.lessonId,
-			studentId,
 			title: `레슨 ${body.lessonId} 문의 (학생 ${studentId})`,
-			image: null,
-			memberCount: 2,
-			hostId: lessonChatParticipants.mentor.id,
-			isLeader: false,
+			representativeImage: null,
+			lastMessage: null,
+			updatedAt: new Date().toISOString(),
 		});
+		lessonRoomStudentMap.set(roomId, studentId);
 
 		mockChatMessages[roomId] = [
 			{

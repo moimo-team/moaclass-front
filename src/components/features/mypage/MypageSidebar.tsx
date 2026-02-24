@@ -38,7 +38,11 @@ export const MypageSidebar = ({ onMenuItemClick }: MypageSidebarProps) => {
 		}
 	};
 
-	const isActive = (path: string) => pathname === path;
+	const isActive = (path: string) => {
+		if (pathname === path) return true;
+		if (path !== '/' && pathname.startsWith(`${path}/`)) return true;
+		return false;
+	};
 
 	const navItemClass = (path: string) =>
 		`transition-colors ${

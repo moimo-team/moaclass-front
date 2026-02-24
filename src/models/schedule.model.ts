@@ -16,6 +16,7 @@ export interface LessonSchedule {
 	currentParticipants: number;
 	maxParticipants: number;
 	status: LessonScheduleStatus;
+	durationMin: number;
 	createdAt: string;
 }
 
@@ -42,4 +43,5 @@ export interface ScheduleParticipant {
 	userId: number;
 	nickname: string;
 	profileImage: string | null;
+	quantity: number;
 }

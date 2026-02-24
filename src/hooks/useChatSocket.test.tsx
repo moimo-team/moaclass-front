@@ -73,7 +73,7 @@ describe('useChatSocket', () => {
 		rerender({ roomId: 101 });
 
 		await waitFor(() => {
-			expect(mockSocket.emit).toHaveBeenCalledWith('joinRoom', { roomId: 101 });
+			expect(mockSocket.emit).toHaveBeenCalledWith('joinRoom', 101);
 		});
 	});
 
@@ -135,7 +135,7 @@ describe('useChatSocket', () => {
 		});
 
 		await waitFor(() => {
-			expect(mockSocket.emit).toHaveBeenCalledWith('joinRoom', { roomId: 101 });
+			expect(mockSocket.emit).toHaveBeenCalledWith('joinRoom', 101);
 		});
 		const initialJoinCalls = mockSocket.emit.mock.calls.filter(
 			(call) => call[0] === 'joinRoom',

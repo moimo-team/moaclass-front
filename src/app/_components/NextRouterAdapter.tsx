@@ -3,9 +3,15 @@
 import { Suspense, useLayoutEffect, useMemo, useState, useTransition } from 'react';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Router } from 'react-router-dom';
+import { Router, createPath } from 'react-router-dom';
 
 import type { NavigationType, To } from 'react-router-dom';
+
+const toSafeHref = (to: To): string => {
+	const href = typeof to === 'string' ? to : createPath(to);
+	if (!href || href.includes('[object Object]')) return '/';
+	return href;
+};
 
 /**
  * Next.js 환경에서 react-router-dom의 Link 컴포넌트가 작동하도록 해주는 어댑터입니다.
@@ -50,19 +56,16 @@ function NextRouterContent({ children }: { children: React.ReactNode }) {
 	const navigator = useMemo(
 		() => ({
 			createHref: (to: To) => {
-				if (typeof to === 'string') return to;
-				return to.pathname + (to.search || '') + (to.hash || '');
+				return toSafeHref(to);
 			},
 			push: (to: To) => {
-				const href =
-					typeof to === 'string' ? to : to.pathname + (to.search || '') + (to.hash || '');
+				const href = toSafeHref(to);
 				startTransition(() => {
 					router.push(href);
 				});
 			},
 			replace: (to: To) => {
-				const href =
-					typeof to === 'string' ? to : to.pathname + (to.search || '') + (to.hash || '');
+				const href = toSafeHref(to);
 				startTransition(() => {
 					router.replace(href);
 				});

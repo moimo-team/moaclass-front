@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 
 import { useAuthStore } from '@store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -61,11 +61,11 @@ function Home() {
 							<ClassBox className="w-full">
 								<section
 									className="w-full"
-									aria-label="좋아요 많은 클래스"
+									aria-label="좋아요를 많이 받은 클래스"
 									data-testid="home-section-likes"
 								>
 									<HomeLessonSection
-										title="좋아요 많은 클래스"
+										title="좋아요를 많이 받은 클래스"
 										seeMoreHref="/lessons?sort=LIKES"
 										queryParams={{ sort: 'LIKES' }}
 									/>
@@ -167,13 +167,17 @@ function Home() {
 									<ClassBox className="w-full">
 										<section
 											className="w-full"
-											aria-label="내 지역 인기 모임"
-											data-testid="home-section-popular-meetings"
+											aria-label="마감 임박 모임"
+											data-testid="home-section-deadline-meetings"
 										>
 											<MeetingListSection
-												title={`${userRegionName || '내 지역'} 인기 모임`}
-												seeMoreHref="/meetings"
-												queryOptions={{ page: 1, limit: 8, sort: 'UPDATE' }}
+												title="마감 임박 모임"
+												seeMoreHref="/meetings?sort=DEADLINE"
+												queryOptions={{
+													page: 1,
+													limit: 8,
+													sort: 'DEADLINE',
+												}}
 												hideIfEmpty
 											/>
 										</section>

@@ -40,6 +40,7 @@ export const queryClient = new QueryClient({
 			let message = '';
 
 			// 1. 백엔드 메시지 우선 사용 설정 확인
+			// meta: { useBackendError: true },
 			if (mutation.meta?.useBackendError) {
 				message = axiosError.response?.data?.message || '';
 			}
