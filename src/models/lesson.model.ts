@@ -1,4 +1,4 @@
-import type { PaginationMeta } from '@/models/pagination.model';
+﻿import type { PaginationMeta } from '@/models/pagination.model';
 import type { Review } from '@/models/review.model';
 import type { Schedule } from '@/models/schedule.model';
 
@@ -97,7 +97,8 @@ export interface TeacherProfile {
 	id: number;
 	userId?: number;
 	nickname: string; // 선생님 활동 닉네임/상호명
-	image: string; // 선생님 프로필 이미지
+	image?: string | null; // 선생님 프로필 이미지
+	profileImage?: string | null;
 	introduction?: string; // 40자~600자
 	createdAt?: string;
 	updatedAt?: string;

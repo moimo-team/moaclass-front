@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
 			'images.unsplash.com',
 			'example.com',
 			'lh3.googleusercontent.com',
+			'k.kakaocdn.net',
 		],
 	},
 	async rewrites() {

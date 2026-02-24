@@ -111,7 +111,10 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 					<div className="flex items-center gap-2 pt-3 border-t border-gray-50 mt-auto">
 						<div className="w-5 h-5 rounded-full overflow-hidden border border-gray-100 shrink-0">
 							<Image
-								src={lesson.teacher?.image || defaultProfileImage}
+								src={
+									(lesson.teacher?.profileImage ?? lesson.teacher?.image) ||
+									defaultProfileImage
+								}
 								alt={lesson.teacher?.nickname || '모멘토'}
 								width={20}
 								height={20}
