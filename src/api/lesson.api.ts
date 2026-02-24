@@ -6,13 +6,36 @@ import type {
 	LessonDetail,
 } from '@/models/lesson.model';
 
-// --- 클래스 조회(GET) 관련 ---
+const normalizeTeacher = (teacher: Lesson['teacher']): Lesson['teacher'] => {
+	return {
+		...teacher,
+		image: teacher.image ?? teacher.profileImage ?? null,
+		profileImage: teacher.profileImage ?? teacher.image ?? null,
+	};
+};
+
+const normalizeLesson = <T extends Lesson>(lesson: T): T => ({
+	...lesson,
+	teacher: normalizeTeacher(lesson.teacher),
+});
+
+const normalizeLessonDetail = (lesson: LessonDetail): LessonDetail => ({
+	...normalizeLesson(lesson),
+	reviews:
+		lesson.reviews?.map((review) => ({
+			...review,
+			user: {
+				...review.user,
+				profileImage: review.user.profileImage ?? null,
+			},
+		})) ?? [],
+});
 
 export const fetchLatestLessons = async (): Promise<Lesson[]> => {
 	const response = await apiClient.get<FetchLessonsResponse>('/lessons', {
 		params: { limit: 10, sort: 'LATEST', page: 1 },
 	});
-	return response.data.data;
+	return response.data.data.map(normalizeLesson);
 };
 
 export const fetchLessons = async (params: FetchLessonsParams): Promise<FetchLessonsResponse> => {
@@ -21,8 +44,6 @@ export const fetchLessons = async (params: FetchLessonsParams): Promise<FetchLes
 	Object.entries(params).forEach(([key, value]) => {
 		if (value === undefined || value === null || value === '') return;
 
-		// 백엔드 DTO의 @Transform 로직에 맞춰
-		// 배열 데이터는 쉼표로 구분된 하나의 문자열로 직렬화하여 전송합니다.
 		if (Array.isArray(value)) {
 			queryParams.append(key, value.map(String).join(','));
 		} else {
@@ -34,12 +55,16 @@ export const fetchLessons = async (params: FetchLessonsParams): Promise<FetchLes
 	const response = await apiClient.get<FetchLessonsResponse>(
 		queryString ? `/lessons?${queryString}` : '/lessons',
 	);
-	return response.data;
+
+	return {
+		...response.data,
+		data: response.data.data.map(normalizeLesson),
+	};
 };
 
 export const fetchLesson = async (lessonId: number): Promise<LessonDetail> => {
 	const response = await apiClient.get<LessonDetail>(`/lessons/${lessonId}`);
-	return response.data;
+	return normalizeLessonDetail(response.data);
 };
 
 // --- 클래스 생성/수정/삭제 관련 ---
