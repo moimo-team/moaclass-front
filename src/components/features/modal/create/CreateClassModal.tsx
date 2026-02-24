@@ -218,19 +218,46 @@ function CreateClassModal({
 			formData.append('reservationLeadDays', (data.reservationLeadDays || 1).toString());
 			formData.append('status', status);
 
-			// 임시저장인데 대표이미지가 없는 경우, 백엔드 필수 체크를 통과하기 위해 투명 1x1 픽셀 더미 이미지 전송
+			// 이미지 처리
+			const currentRemoveSequences = data.removeSequences || [];
+
+			// 1. 대표 이미지 (image1)
 			if (data.representativeImageFile) {
-				formData.append('representativeImage', data.representativeImageFile);
-			} else if (isDraftStatus) {
+				formData.append('image1', data.representativeImageFile);
+			} else if (isDraftStatus && !existingLesson?.representativeImage) {
+				// 임시저장인데 기존 이미지가 없고 새로 추가도 안한 경우
 				const res = await fetch(TRANSPARENT_PIXEL);
 				const blob = await res.blob();
 				const dummyFile = new File([blob], 'draft_placeholder.png', { type: 'image/png' });
-				formData.append('representativeImage', dummyFile);
+				formData.append('image1', dummyFile);
 			}
 
+			// 2. 삭제된 시퀀스 전송
+			currentRemoveSequences.forEach((seq) => {
+				formData.append('removeSequences', seq.toString());
+			});
+
+			// 3. 추가 이미지 (image2~image6)
 			if (data.additionalImageFiles && data.additionalImageFiles.length > 0) {
-				data.additionalImageFiles.forEach((file: File) => {
-					formData.append('lessonImages', file);
+				// 현재 사용 중인 슬롯들 (기존 이미지 중 삭제되지 않은 것들)
+				const usedSlots = new Set<number>();
+				if (existingLesson?.images) {
+					existingLesson.images.forEach((img) => {
+						const slot = img.sequence + 1; // sequence 1 -> slot 2
+						if (!currentRemoveSequences.includes(slot)) {
+							usedSlots.add(slot);
+						}
+					});
+				}
+
+				// 사용 가능한 슬롯들 (2~6 중 usedSlots에 없는 것들)
+				const availableSlots = [2, 3, 4, 5, 6].filter((s) => !usedSlots.has(s));
+
+				data.additionalImageFiles.forEach((file, i) => {
+					const slot = availableSlots[i];
+					if (slot) {
+						formData.append(`image${slot}`, file);
+					}
 				});
 			}
 
@@ -291,6 +318,7 @@ function CreateClassModal({
 					initialPreviewImage={
 						isDuplicating || isDraft ? existingLesson?.representativeImage : null
 					}
+					initialAdditionalImages={existingLesson?.images}
 				/>
 				<CurriculumSection />
 				<PricingSection />

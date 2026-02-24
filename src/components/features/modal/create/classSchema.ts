@@ -17,7 +17,7 @@ export const classSchema = z.object({
 	level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED'], { message: '난이도를 선택해주세요' }),
 	duration: z.number().min(30, '최소 30분 이상').max(480, '최대 8시간까지'),
 	price: z.number().min(0, '가격을 입력해주세요'),
-	discountRate: z.number().min(0).max(100),
+	discountRate: z.number().min(0).max(99, '할인율은 최대 99%까지 입력 가능합니다'),
 	maxParticipants: z.number().min(1, '최소 1명 이상').max(50, '최대 50명까지'),
 	regionId: z.number().min(1, '지역을 선택해주세요'),
 	address: z.string().min(1, '클래스 장소를 입력해주세요'),
@@ -28,6 +28,8 @@ export const classSchema = z.object({
 	reservationLeadDays: z.number().min(0).max(10),
 	representativeImageFile: z.instanceof(File).optional(),
 	additionalImageFiles: z.array(z.instanceof(File)).optional(),
+	additionalImagesPreviews: z.array(z.string()).optional(),
+	removeSequences: z.array(z.number()).optional(),
 });
 
 export type ClassFormValues = z.infer<typeof classSchema>;

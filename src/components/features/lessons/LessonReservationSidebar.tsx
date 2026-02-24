@@ -59,6 +59,7 @@ export const LessonReservationSidebar = ({
 	};
 
 	const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined);
+	const [calendarMonth, setCalendarMonth] = useState<Date>(today);
 	const [headcount, setHeadcount] = useState(1);
 	const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 	const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
@@ -95,6 +96,7 @@ export const LessonReservationSidebar = ({
 	const handleDateSelect = (date: Date | undefined) => {
 		if (date) {
 			setSelectedDate(formatDateKeyLocal(date));
+			setCalendarMonth(date);
 			setSelectedScheduleId(null);
 			setIsCalendarOpen(false);
 		} else {
@@ -117,6 +119,17 @@ export const LessonReservationSidebar = ({
 			setHeadcount(effectiveHeadcountMax);
 		}
 	}, [effectiveHeadcountMax, headcount]);
+
+	useEffect(() => {
+		if (!isCalendarOpen) return;
+
+		if (selectedDate) {
+			setCalendarMonth(parseDateKeyToDate(selectedDate));
+			return;
+		}
+
+		setCalendarMonth(today);
+	}, [isCalendarOpen, selectedDate, today]);
 
 	const handleApplyClick = () => {
 		if (isOwnedByCurrentUser) {
@@ -180,6 +193,8 @@ export const LessonReservationSidebar = ({
 									mode="single"
 									className="w-full [--cell-size:clamp(2.25rem,calc((var(--radix-popover-trigger-width)-2rem-0.75rem)/7),3rem)]"
 									classNames={{ root: 'w-full' }}
+									month={calendarMonth}
+									onMonthChange={setCalendarMonth}
 									selected={
 										selectedDate ? parseDateKeyToDate(selectedDate) : undefined
 									}

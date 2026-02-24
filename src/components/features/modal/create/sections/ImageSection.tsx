@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useFormContext } from 'react-hook-form';
 
@@ -34,13 +34,30 @@ async function fetchAndSetDuplicateImage(
 interface ImageSectionProps {
 	// 복제 모드일 때 기존 대표이미지 URL (CORS 폴백 처리용)
 	initialPreviewImage?: string | null;
+	// 기존 추가 이미지 목록
+	initialAdditionalImages?: { image: string; sequence: number }[];
 }
 
-export function ImageSection({ initialPreviewImage }: ImageSectionProps) {
-	const { setValue, getValues } = useFormContext<ClassFormValues>();
+export function ImageSection({
+	initialPreviewImage,
+	initialAdditionalImages = [],
+}: ImageSectionProps) {
+	const { setValue, getValues, watch } = useFormContext<ClassFormValues>();
 
 	const [previewImage, setPreviewImage] = useState<string | null>(initialPreviewImage ?? null);
-	const [additionalImages, setAdditionalImages] = useState<string[]>([]);
+
+	// 기존 이미지 URL -> 슬롯 번호(1~5) 매핑 저장
+	const initialUrlToSlotMap = useRef<Record<string, number>>({});
+
+	useEffect(() => {
+		const map: Record<string, number> = {};
+		initialAdditionalImages.forEach((img) => {
+			map[img.image] = img.sequence;
+		});
+		initialUrlToSlotMap.current = map;
+	}, [initialAdditionalImages]);
+
+	const previewImages = watch('additionalImagesPreviews') || [];
 
 	const representativeImageRef = useRef<HTMLInputElement>(null);
 	const additionalImagesRef = useRef<HTMLInputElement>(null);
@@ -48,28 +65,75 @@ export function ImageSection({ initialPreviewImage }: ImageSectionProps) {
 	const handleImageChange = (dataUrl: string, file: File) => {
 		setPreviewImage(dataUrl);
 		setValue('representativeImageFile', file, { shouldValidate: true });
+
+		const currentRemove = getValues('removeSequences') || [];
+		setValue(
+			'removeSequences',
+			currentRemove.filter((s) => s !== 1),
+			{ shouldValidate: true },
+		);
 	};
 
 	const removeRepresentativeImage = () => {
 		setPreviewImage(null);
 		setValue('representativeImageFile', undefined, { shouldValidate: true });
+
+		if (initialPreviewImage) {
+			const currentRemove = getValues('removeSequences') || [];
+			setValue('removeSequences', Array.from(new Set([...currentRemove, 1])), {
+				shouldValidate: true,
+			});
+		}
 	};
 
 	const handleAdditionalImagesChange = (dataUrls: string[], newFiles: File[]) => {
-		setAdditionalImages(dataUrls);
+		setValue('additionalImagesPreviews', dataUrls, {
+			shouldValidate: true,
+		});
+
 		const currentFiles = getValues('additionalImageFiles') || [];
 		setValue('additionalImageFiles', [...currentFiles, ...newFiles], { shouldValidate: true });
 	};
 
 	const removeAdditionalImage = (index: number) => {
-		setAdditionalImages((prev) => prev.filter((_, i) => i !== index));
+		const currentPreviews = getValues('additionalImagesPreviews') || [];
+		const targetUrl = currentPreviews[index];
+
+		if (targetUrl && initialUrlToSlotMap.current[targetUrl]) {
+			const sequence = initialUrlToSlotMap.current[targetUrl];
+			const slot = sequence + 1;
+
+			const currentRemove = getValues('removeSequences') || [];
+			setValue('removeSequences', Array.from(new Set([...currentRemove, slot])), {
+				shouldValidate: true,
+			});
+		}
+
 		const currentFiles = getValues('additionalImageFiles') || [];
+		const firstNewFileIndex = currentPreviews.length - currentFiles.length;
+
+		if (index >= firstNewFileIndex) {
+			const fileIndex = index - firstNewFileIndex;
+			setValue(
+				'additionalImageFiles',
+				currentFiles.filter((_, i) => i !== fileIndex),
+				{ shouldValidate: true },
+			);
+		}
+
 		setValue(
-			'additionalImageFiles',
-			currentFiles.filter((_, i) => i !== index),
+			'additionalImagesPreviews',
+			currentPreviews.filter((_, i) => i !== index),
 			{ shouldValidate: true },
 		);
 	};
+
+	useEffect(() => {
+		if (initialAdditionalImages.length > 0) {
+			const urls = initialAdditionalImages.map((img) => img.image);
+			setValue('additionalImagesPreviews', urls);
+		}
+	}, [initialAdditionalImages, setValue]);
 
 	return (
 		<>
@@ -90,7 +154,7 @@ export function ImageSection({ initialPreviewImage }: ImageSectionProps) {
 				ref={additionalImagesRef}
 				variant="multiple"
 				shape="square"
-				previewImages={additionalImages}
+				previewImages={previewImages}
 				onImagesChange={handleAdditionalImagesChange}
 				onRemoveImage={removeAdditionalImage}
 				label="추가 이미지 (선택)"

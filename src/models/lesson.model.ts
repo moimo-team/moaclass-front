@@ -112,10 +112,11 @@ export interface TeacherProfileRequest {
 
 // 클래스 목록 조회 params & response
 export interface FetchLessonsParams {
-	regionId?: number[];
-	categoryId?: number;
-	subCategoryId?: number[];
-	level?: string[];
+	page?: number;
+	regionId?: number | number[];
+	categoryId?: number | number[];
+	subCategoryId?: number | number[];
+	level?: string | string[];
 	days?: string[];
 	timeRange?: string; // "HH-HH"
 	minPrice?: number;
@@ -124,6 +125,8 @@ export interface FetchLessonsParams {
 	maxParticipants?: number;
 	status?: string | string[];
 	userId?: number;
+	keyword?: string;
+	finishedFilter?: boolean;
 	isLiked?: boolean;
 	limit?: number;
 }

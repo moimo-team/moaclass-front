@@ -225,6 +225,7 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 									<button
 										type="button"
 										onClick={() => handleRemove(0)}
+										aria-label="이미지 삭제"
 										className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity border border-gray-200"
 									>
 										<X className="h-4 w-4 text-gray-600" />
@@ -290,6 +291,10 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 						<div className="grid grid-cols-5 gap-3">
 							{previewImages.map((image, index) => (
 								<div key={index} className="relative group">
+									{/* 순서 숫자 (1, 2, 3...) */}
+									<div className="absolute top-2 left-2 z-10 bg-black/60 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm min-w-[18px] text-center border border-white/20 pointer-events-none">
+										{index + 1}
+									</div>
 									<Image
 										src={image}
 										alt={`이미지 ${index + 1}`}
@@ -302,6 +307,7 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 										<button
 											type="button"
 											onClick={() => handleRemove(index)}
+											aria-label="이미지 삭제"
 											className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity border border-gray-200"
 										>
 											<X className="h-4 w-4 text-gray-600" />

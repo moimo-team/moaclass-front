@@ -13,6 +13,7 @@ import AlertNotification from '@/components/features/modal/AlertNotification';
 import { FormImageUpload } from '@/components/features/modal/components/FormImageUpload';
 import { FormModal } from '@/components/features/modal/components/FormModal';
 import { Textarea } from '@/components/ui/textarea';
+import { MAX_REVIEW_IMAGES, IMAGE_SLOTS } from '@/constants/images';
 import { useMyReviewQuery } from '@/hooks/useMyReviewQuery';
 import { useReviewMutation, useUpdateReviewMutation } from '@/hooks/useReviewMutations';
 
@@ -87,6 +88,13 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 	const { mutateAsync: writeReview, isPending: isWriting } = useReviewMutation();
 	const { mutateAsync: updateReview, isPending: isUpdating } = useUpdateReviewMutation();
 	const [isImageAlertOpen, setIsImageAlertOpen] = React.useState(false);
+	// 기존 이미지 URL -> 슬롯 번호(1~8) 매핑 저장
+	const [initialUrlToSlotMap, setInitialUrlToSlotMap] = React.useState<Record<string, number>>(
+		{},
+	);
+	// 삭제된 기존 이미지의 슬롯 번호들
+	const [removeSequences, setRemoveSequences] = React.useState<number[]>([]);
+
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const {
 		control,
@@ -120,17 +128,21 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 
 		if (existingReview?.hasReview && existingReview.review && open) {
 			const review = existingReview.review;
-			// image1~image8 개별 필드에서 null을 제외한 URL 배열 생성
-			const existingImages = [
-				review.image1,
-				review.image2,
-				review.image3,
-				review.image4,
-				review.image5,
-				review.image6,
-				review.image7,
-				review.image8,
-			].filter((img): img is string => img !== null && img !== undefined);
+
+			// image1~image8 슬롯 맵 생성 및 기존 이미지 목록 생성
+			const slotMap: Record<string, number> = {};
+			const existingImages: string[] = [];
+			for (let i = 1; i <= MAX_REVIEW_IMAGES; i++) {
+				const key = `image${i}` as keyof typeof review;
+				const url = review[key] as string | null | undefined;
+				if (url) {
+					existingImages.push(url);
+					slotMap[url] = i;
+				}
+			}
+
+			setInitialUrlToSlotMap(slotMap);
+			setRemoveSequences([]); // 초기화
 
 			reset({
 				rating: review.rating ?? 0,
@@ -139,6 +151,8 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 				imageFiles: [],
 			});
 		} else if (!open) {
+			setInitialUrlToSlotMap({});
+			setRemoveSequences([]);
 			reset({
 				rating: 0,
 				content: '',
@@ -146,7 +160,7 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 				imageFiles: [],
 			});
 		}
-	}, [existingReview, reset, open]);
+	}, [existingReview, reset, open, isDataLoading]);
 
 	// 이미지 상태 감시 (성능 최적화 및 커스텀 핸들링 위해)
 	const images = useWatch({ control, name: 'images' });
@@ -158,14 +172,20 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 		setValue('imageFiles', [...currentFiles, ...newFiles], { shouldValidate: true });
 	};
 
-	// 이미지 삭제 콜백 (images와 imageFiles의 동기화 보장)
+	// 이미지 삭제 콜백 (images와 imageFiles의 동기화 보장 및 삭제 슬롯 추적)
 	const handleRemoveImage = useCallback(
 		(index: number) => {
 			const currentImages = getValues('images');
-			const currentFiles = getValues('imageFiles');
+			const targetImage = currentImages[index];
 
-			// 기존 이미지와 신규 파일이 섞여 있을 때를 대비한 동기화 로직
-			// 신규 파일은 항상 currentImages 배열의 끝에 추가됨
+			// 1. 기존 이미지 삭제인 경우 removeSequences에 기록
+			if (targetImage && initialUrlToSlotMap[targetImage]) {
+				const slot = initialUrlToSlotMap[targetImage];
+				setRemoveSequences((prev) => Array.from(new Set([...prev, slot])));
+			}
+
+			// 2. 폼 상태 업데이트
+			const currentFiles = getValues('imageFiles') || [];
 			const firstNewFileIndex = currentImages.length - currentFiles.length;
 
 			if (index >= firstNewFileIndex) {
@@ -183,7 +203,7 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 				{ shouldValidate: true },
 			);
 		},
-		[setValue, getValues],
+		[setValue, getValues, initialUrlToSlotMap],
 	);
 
 	/**
@@ -207,29 +227,33 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 			const existingUrls = data.images.filter((img) => img.startsWith('http'));
 			const newFiles = data.imageFiles ?? [];
 
-			// 원래 이미지가 있었는데 하나도 남지 않은 경우 (기존 URL도 없고 새 파일도 없음)
-			const originalImages = [
-				existingReview?.review?.image1,
-				existingReview?.review?.image2,
-				existingReview?.review?.image3,
-				existingReview?.review?.image4,
-				existingReview?.review?.image5,
-				existingReview?.review?.image6,
-				existingReview?.review?.image7,
-				existingReview?.review?.image8,
-			].filter((img) => img !== null && img !== undefined);
+			// 1. 이미지 삭제 제한 체크
+			const originalImagesCount = Object.keys(initialUrlToSlotMap).length;
+			const isCurrentlyEmpty = existingUrls.length === 0 && newFiles.length === 0;
 
-			const hadOriginalImages = originalImages.length > 0;
-			const hasCurrentImages = existingUrls.length > 0 || newFiles.length > 0;
-
-			if (hadOriginalImages && !hasCurrentImages) {
+			if (originalImagesCount > 0 && isCurrentlyEmpty) {
 				setIsImageAlertOpen(true);
 				return;
 			}
 
-			// 신규 파일만 전송하되, 인덱스는 기존 이미지 개수 다음부터 시작하여 슬롯 번호를 맞춤
+			// 2. 삭제된 시퀀스 추가
+			removeSequences.forEach((seq) => {
+				formData.append('removeSequences', seq.toString());
+			});
+
+			// 3. 신규 파일 슬롯 할당
+			// 현재 사용 중인 슬롯 번호들 (URL을 통해 추적)
+			const usedSlots = new Set(
+				existingUrls.map((url) => initialUrlToSlotMap[url]).filter(Boolean),
+			);
+			// 사용 가능한 슬롯 번호 (1~MAX_REVIEW_IMAGES 중 사용 중이지 않은 것)
+			const availableSlots = IMAGE_SLOTS.filter((slot) => !usedSlots.has(slot));
+
 			newFiles.forEach((file, i) => {
-				formData.append(`image${existingUrls.length + i + 1}`, file);
+				const slot = availableSlots[i];
+				if (slot) {
+					formData.append(`image${slot}`, file);
+				}
 			});
 		} else {
 			// 신규 작성 모드
@@ -318,7 +342,7 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 						previewImages={images}
 						onImagesChange={handleImagesChange}
 						onRemoveImage={handleRemoveImage}
-						maxImages={8}
+						maxImages={MAX_REVIEW_IMAGES}
 						enableDragAndDrop={true}
 						dragDropHintText={
 							<p>

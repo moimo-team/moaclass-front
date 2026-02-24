@@ -189,7 +189,10 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 									{getRegionButtonText()}
 								</Button>
 							</PopoverTrigger>
-							<PopoverContent className="w-auto p-0">
+							<PopoverContent
+								className="w-auto p-0"
+								data-filter-interactive-layer="true"
+							>
 								<div className="grid grid-cols-3 gap-4 p-4">
 									{/* 전체 버튼 */}
 									<div className="flex items-center space-x-2">
@@ -282,7 +285,7 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 							<SelectTrigger className="w-[180px]">
 								<SelectValue placeholder="상태를 선택하세요" />
 							</SelectTrigger>
-							<SelectContent>
+							<SelectContent data-filter-interactive-layer="true">
 								<SelectItem value="ALL_STATUSES">전체</SelectItem>
 								<SelectItem value="ACTIVE">모집중</SelectItem>
 								<SelectItem value="INACTIVE">모집 종료</SelectItem>
@@ -295,11 +298,17 @@ export const LessonFilterSection: React.FC<LessonFilterSectionProps> = ({
 						<label className="block text-lg font-bold text-gray-700 min-w-[70px]">
 							인원
 						</label>
-						<Select value={selectedPersonnel} onValueChange={setSelectedPersonnel}>
+						<Select
+							value={selectedPersonnel || 'ALL_PARTICIPANTS'}
+							onValueChange={(value) =>
+								setSelectedPersonnel(value === 'ALL_PARTICIPANTS' ? '' : value)
+							}
+						>
 							<SelectTrigger className="w-[180px]">
 								<SelectValue placeholder="인원을 선택하세요" />
 							</SelectTrigger>
-							<SelectContent>
+							<SelectContent data-filter-interactive-layer="true">
+								<SelectItem value="ALL_PARTICIPANTS">전체</SelectItem>
 								{[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
 									<SelectItem key={num} value={String(num)}>
 										{num}명

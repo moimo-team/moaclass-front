@@ -67,6 +67,7 @@ export function LessonsClient() {
 
 		const filtersFromUrl: Partial<FilterState> = {
 			selectedCategories: [],
+			selectedMainCategory: null,
 			selectedRegions: parseMultiValueParam(searchParams, 'regionId'),
 			selectedDays: dayValues.map((value) => REVERSE_DAYS_MAP[value] ?? value),
 			selectedDifficulty: levelValues.map(
@@ -90,6 +91,17 @@ export function LessonsClient() {
 				Number(searchParams.get('minPrice')) || 0,
 				Number(searchParams.get('maxPrice')) || 500000,
 			] as [number, number],
+			keyword: searchParams.get('keyword') || undefined,
+			isLiked:
+				searchParams.get('isLiked') === null
+					? undefined
+					: searchParams.get('isLiked') === 'true',
+			finishedFilter:
+				searchParams.get('finishedFilter') === null
+					? undefined
+					: searchParams.get('finishedFilter') === 'true',
+			limit:
+				searchParams.get('limit') === null ? undefined : Number(searchParams.get('limit')),
 		};
 		setAllFilters(filtersFromUrl);
 		// eslint-disable-next-line react-hooks/set-state-in-effect

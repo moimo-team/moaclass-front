@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -20,6 +22,8 @@ interface FormInputProps {
 	type?: string;
 	className?: string;
 	onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
+	onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+	onClick?: (e: React.MouseEvent<HTMLInputElement>) => void;
 }
 
 /**
@@ -47,8 +51,46 @@ export const FormInput = ({
 	type = 'text',
 	className = '',
 	onFocus,
+	onKeyDown,
+	onClick,
 }: FormInputProps) => {
 	const inputStyles = `h-12 bg-white border-gray-200 rounded-lg focus-visible:ring-yellow-400 pr-10 font-bold ${className}`;
+
+	const wasFocusedRef = useRef(false);
+
+	const handleMouseDown = (e: React.MouseEvent<HTMLInputElement>) => {
+		if (type === 'time' || type === 'date') {
+			// 클릭이 시작되는 시점(mousedown)에 이미 포커스가 있었는지 확인
+			wasFocusedRef.current = document.activeElement === e.currentTarget;
+		}
+	};
+
+	const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
+		if (type === 'time' || type === 'date') {
+			try {
+				if (wasFocusedRef.current) {
+					// 이미 포커스된 상태였다면(창이 열려있을 확률이 높음) 포커스 해제하여 닫기
+					e.currentTarget.blur();
+				} else {
+					// 포커스가 없었다면 선택창 열기
+					e.currentTarget.showPicker();
+				}
+			} catch (err) {
+				console.error('showPicker failed:', err);
+			}
+		}
+		onClick?.(e);
+	};
+
+	// react-hook-form의 register와 커스텀 onChange를 통합
+	const { onChange: registerOnChange, ...registerRest } = register || {};
+
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		// register의 onChange 실행
+		registerOnChange?.(e);
+		// props로 전달된 onChange 실행
+		onChange?.(e);
+	};
 
 	return (
 		<div className="space-y-2 flex-1">
@@ -68,14 +110,17 @@ export const FormInput = ({
 					<Input
 						id={id}
 						type={type}
-						{...register}
 						value={value}
-						onChange={onChange}
 						disabled={disabled}
 						placeholder={placeholder}
 						className={inputStyles}
 						maxLength={maxLength}
 						onFocus={onFocus}
+						onKeyDown={onKeyDown}
+						onMouseDown={handleMouseDown}
+						onClick={handleClick}
+						onChange={handleChange}
+						{...registerRest}
 					/>
 				)}
 				{suffix && (
