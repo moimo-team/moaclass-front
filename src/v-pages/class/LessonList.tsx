@@ -63,6 +63,7 @@ const LessonListPage: React.FC = () => {
 
 		const filtersFromUrl: Partial<FilterState> = {
 			selectedCategories: [],
+			selectedMainCategory: null,
 			selectedRegions: parseMultiValueParam(searchParams, 'regionId'),
 			selectedDays: dayValues.map((value) => REVERSE_DAYS_MAP[value] ?? value),
 			selectedDifficulty: levelValues.map(
