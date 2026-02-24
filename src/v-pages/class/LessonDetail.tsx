@@ -161,7 +161,11 @@ export const LessonDetailContent = ({
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
 					{/* 왼쪽 메인 컨테이너 */}
 					<section className="md:col-span-2 space-y-8" aria-label="클래스 상세 정보">
-						<LessonGallery title={lessonDetail.title} images={lessonDetail.images} />
+						<LessonGallery
+							title={lessonDetail.title}
+							images={lessonDetail.images}
+							representativeImage={lessonDetail.representativeImage}
+						/>
 						<LessonHeader
 							title={lessonDetail.title}
 							classCategoryName={lessonDetail.lessonCategoryName}

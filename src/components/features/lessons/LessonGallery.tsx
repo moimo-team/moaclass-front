@@ -11,9 +11,10 @@ import type { LessonImage } from '@/models/lesson.model';
 interface LessonGalleryProps {
 	title: string;
 	images: LessonImage[] | undefined;
+	representativeImage?: string | null;
 }
 
-export const LessonGallery = ({ title, images }: LessonGalleryProps) => {
+export const LessonGallery = ({ title, images, representativeImage }: LessonGalleryProps) => {
 	const [activeIndex, setActiveIndex] = useState(() => {
 		const hasImages = images && images.length > 0;
 		return hasImages ? 0 : -1;
@@ -22,8 +23,8 @@ export const LessonGallery = ({ title, images }: LessonGalleryProps) => {
 	const currentMainImage = useMemo(() => {
 		return images && images.length > 0 && activeIndex !== -1 && activeIndex < images.length
 			? images[activeIndex].image
-			: moimoMeeting;
-	}, [images, activeIndex]);
+			: representativeImage || moimoMeeting;
+	}, [images, activeIndex, representativeImage]);
 
 	const goToPrevImage = () => {
 		if (!images || images.length <= 1) return;
