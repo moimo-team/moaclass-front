@@ -42,4 +42,5 @@ export interface ScheduleParticipant {
 	userId: number;
 	nickname: string;
 	profileImage: string | null;
+	quantity: number;
 }
