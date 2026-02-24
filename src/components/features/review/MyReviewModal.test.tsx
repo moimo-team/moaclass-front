@@ -128,15 +128,14 @@ describe('MyReviewModal', () => {
 		// 업로드 시뮬레이션 후 에러 없이 동작하는지 확인
 	});
 
-	it('4. 이미지 삭제가 되는가?', async () => {
+	it('4. 이미지 삭제 제한 알림이 정상적으로 표시되는가?', async () => {
 		// 이미지가 1개 존재하는 상태로 설정 (수정 모드 활용)
 		renderModal({ enrollmentId: 999, isEditMode: true });
 
 		// 데이터 로딩 및 초기화 대기
 		await screen.findByDisplayValue(mockReviewData.review.content);
 
-		// 이미지 미리보기의 삭제 버튼 찾기 (X 아이콘이 들어있는 버튼)
-		// FormImageUpload에서 삭제 버튼은 className에 '-top-2'를 포함함
+		// 이미지 미리보기의 삭제 버튼 찾기
 		const buttons = screen.getAllByRole('button');
 		const removeButton = buttons.find((btn) => btn.className.includes('-top-2'));
 
@@ -151,6 +150,9 @@ describe('MyReviewModal', () => {
 			expect(
 				await screen.findByText(/이미지 리뷰 작성 보상 쿠폰을 받았으므로/),
 			).toBeInTheDocument();
+
+			// 실제 API 호출은 되지 않아야 함
+			expect(mockUpdateReview).not.toHaveBeenCalled();
 		}
 	});
 
@@ -199,12 +201,21 @@ describe('MyReviewModal', () => {
 		expect(screen.getByDisplayValue(mockReviewData.review.content)).toBeInTheDocument();
 	});
 
-	it('7. 수정 모드일 때 기존 리뷰 데이터가 수정이 되는가?', async () => {
+	it('7. 이미지 삭제 시 removeSequences가 정확히 전송되는가?', async () => {
+		// 이미지가 1개(slot 1) 있는 리뷰 로드
 		renderModal({ enrollmentId: 999, isEditMode: true });
+		await screen.findByDisplayValue(mockReviewData.review.content);
 
-		const textarea = await screen.findByDisplayValue(mockReviewData.review.content);
-		await userEvent.clear(textarea);
-		await userEvent.type(textarea, '수정된 리뷰 내용입니다. 10자 이상.');
+		// 이미지 삭제
+		const removeButton = screen
+			.getAllByRole('button')
+			.find((btn) => btn.className.includes('-top-2'));
+		if (removeButton) await userEvent.click(removeButton);
+
+		// 새로운 이미지 추가 (제한 통과를 위해)
+		const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+		const file = new File(['new image'], 'new.png', { type: 'image/png' });
+		await userEvent.upload(fileInput, file);
 
 		const submitButton = screen.getByRole('button', { name: '수정' });
 		await waitFor(() => expect(submitButton).not.toBeDisabled());
@@ -212,13 +223,24 @@ describe('MyReviewModal', () => {
 
 		await waitFor(() => {
 			expect(mockUpdateReview).toHaveBeenCalled();
+			const formData = mockUpdateReview.mock.calls[0][0].data as FormData;
+
+			// removeSequences에 1번 슬롯(image1)이 포함되어야 함
+			expect(formData.get('removeSequences')).toBe('1');
 		});
 	});
 
-	it('8. 수정 모드일 때 이미지 삭제 및 변경이 잘 저장되는가?', async () => {
+	it('8. 이미지 삭제 후 추가 시 비어있는 슬롯(imageN)에 신규 파일이 할당되는가?', async () => {
 		renderModal({ enrollmentId: 999, isEditMode: true });
+		await screen.findByDisplayValue(mockReviewData.review.content);
 
-		// 신규 이미지 추가 시뮬레이션
+		// 1번 슬롯 이미지 삭제
+		const removeButton = screen
+			.getAllByRole('button')
+			.find((btn) => btn.className.includes('-top-2'));
+		if (removeButton) await userEvent.click(removeButton);
+
+		// 신규 이미지 1개 추가
 		const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
 		const file = new File(['hello'], 'hello.png', { type: 'image/png' });
 		await userEvent.upload(fileInput, file);
@@ -229,6 +251,11 @@ describe('MyReviewModal', () => {
 
 		await waitFor(() => {
 			expect(mockUpdateReview).toHaveBeenCalled();
+			const formData = mockUpdateReview.mock.calls[0][0].data as FormData;
+
+			// 1번이 삭제되었으므로, 신규 이미지는 가장 낮은 가용 슬롯인 'image1'에 할당되어야 함
+			expect(formData.get('image1')).toBeInstanceOf(File);
+			expect(formData.get('removeSequences')).toBe('1');
 		});
 	});
 });
