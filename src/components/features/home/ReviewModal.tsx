@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 import Image from 'next/image';
 import { Link } from 'react-router-dom';
@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 import defaultMeetingImage from '@/assets/images/moaclass.png';
 import defaultProfileImage from '@/assets/images/profile.png';
 import StarRating from '@/components/common/StarRating';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@/components/ui/dialog';
 import type { LatestReviewItem } from '@/models/review.model';
@@ -21,7 +20,6 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ open, onOpenChange, review })
 	const displayImage = review.representativeImage || defaultMeetingImage;
 	const reviewerProfileImage = review.profileImage || defaultProfileImage;
 	const reviewerName = review.nickname?.trim() || '모멘티';
-	const reviewerInitial = reviewerName.charAt(0);
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -48,10 +46,15 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ open, onOpenChange, review })
 					<div className="p-4 flex-grow overflow-y-auto scrollbar-hide">
 						<div className="flex items-start justify-between mb-3">
 							<div className="flex items-center gap-2">
-								<Avatar className="h-8 w-8">
-									<AvatarImage src={reviewerProfileImage} />
-									<AvatarFallback>{reviewerInitial}</AvatarFallback>
-								</Avatar>
+								<div className="relative h-8 w-8 overflow-hidden rounded-full border border-border/50">
+									<Image
+										src={reviewerProfileImage}
+										alt={reviewerName}
+										fill
+										sizes="32px"
+										className="object-cover"
+									/>
+								</div>
 								<div>
 									<p className="font-semibold text-sm">{reviewerName}</p>
 								</div>

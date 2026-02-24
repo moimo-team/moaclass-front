@@ -6,9 +6,10 @@ import { toAbsoluteUrl } from '@/constants/site';
 import { createPageMetadata } from '@/utils/metadata';
 
 export const metadata = createPageMetadata({
-	title: '모임 목록',
-	description: '모아클래스에서 다양한 모임을 찾아보세요.',
+	title: '지금 참여 가능한 모임 찾기',
+	description: '마감 임박 모임부터 최신 모임까지.',
 	canonical: '/meetings',
+	image: '/og/og-meetings.png',
 });
 
 export default function MeetingsPage() {

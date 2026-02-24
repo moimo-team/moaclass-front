@@ -2,11 +2,11 @@ import HomeClient from '@/app/HomeClient';
 import { toAbsoluteUrl } from '@/constants/site';
 import { createPageMetadata } from '@/utils/metadata';
 
-// 메타 데이터 적용
 export const metadata = createPageMetadata({
 	title: '모아클래스',
-	description: '모아클래스에서 다양한 강의를 만나보세요.',
+	description: '원데이 클래스와 모임을 한곳에서.',
 	canonical: '/',
+	image: '/og/og-home.png',
 });
 
 export default function Page() {
