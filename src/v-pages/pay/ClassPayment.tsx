@@ -33,7 +33,7 @@ export const ClassPaymentContent = ({ scheduleId, quantity, onBack }: ClassPayme
 	if (!payPreview) return <div>데이터를 불러올 수 없습니다.</div>;
 
 	return (
-		<div className="w-full max-w-5xl mx-auto p-4 md:p-6 pb-20">
+		<div className="w-full max-w-6xl mx-auto px-0 py-4 md:py-6 pb-20">
 			{/* Header */}
 			<header className="flex items-center gap-2 mb-6">
 				<Button variant="ghost" size="icon" className="h-8 w-8" onClick={onBack}>

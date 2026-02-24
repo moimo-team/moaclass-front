@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import moimoMeeting from '@/assets/images/moimo-meetings.png';
+import moimoMeeting from '@/assets/images/moaclass.png';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import LoginRequiredDialog from '@/components/features/login/LoginRequiredDialog';
 import KakaoMapView from '@/components/features/map/kakaoMaps/KakaoMapView';

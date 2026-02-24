@@ -4,7 +4,7 @@ import { AiOutlineTeam } from 'react-icons/ai';
 import { IoLocationOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 
-import defaultMeetingImage from '@/assets/images/moimo-meetings.png';
+import defaultMeetingImage from '@/assets/images/moaclass.png';
 import { Card, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { Meeting } from '@/models/meeting.model';

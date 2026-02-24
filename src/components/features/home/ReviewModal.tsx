@@ -3,7 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Link } from 'react-router-dom';
 
-import defaultMeetingImage from '@/assets/images/moimo-meetings.png';
+import defaultMeetingImage from '@/assets/images/moaclass.png';
 import defaultProfileImage from '@/assets/images/profile.png';
 import StarRating from '@/components/common/StarRating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

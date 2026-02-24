@@ -1,4 +1,4 @@
-import defaultMeetingIcon from '@/assets/images/moimer.png'; // 모임 기본 이미지 import
+import defaultMeetingIcon from '@/assets/images/moaclass-chat.png'; // 모임 기본 이미지 import
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getImageSrc } from '@/utils/imageUtils';
 

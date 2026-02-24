@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { FormModal } from '@/components/features/modal/components/FormModal';
 import { useCreateLessonMutation, useUpdateLessonMutation } from '@/hooks/useLessonMutations';
 import { useLessonQuery } from '@/hooks/useLessonQuery';
+import type { LessonImage } from '@/models/lesson.model';
 
 import { classSchema } from './classSchema';
 import { BasicInfoSection } from './sections/BasicInfoSection';
@@ -87,6 +88,14 @@ function CreateClassModal({
 
 	const selectedCategoryId = watch('classCategoryId');
 
+	// DRAFT 상태에서 불러온 경우도 생성 모드로 처리
+	const isCreationMode = !classId || isDuplicating || isDraft;
+
+	// 갤러리 이미지 중 대표 이미지(sequence 0) 제외 (무한 루프 방지를 위해 메모이제이션)
+	const initialAdditionalImages: LessonImage[] = useMemo(() => {
+		return existingLesson?.images?.filter((img) => img.sequence !== 0) || [];
+	}, [existingLesson?.images]);
+
 	// 모달 열릴 때 / 기존 데이터 로드 완료 시 폼 초기화
 	useEffect(() => {
 		if (!open) return;
@@ -132,7 +141,7 @@ function CreateClassModal({
 
 				// CORS로 인해 외부 이미지 직접 fetch가 차단될 수 있으므로 try/catch로 처리
 				// 실패 시 투명 1x1 픽셀로 대체하여 백엔드 필수 이미지 체크 통과
-				if (isDuplicating && existingLesson.representativeImage) {
+				if (isCreationMode && existingLesson.representativeImage) {
 					fetchAndSetDuplicateImage(existingLesson.representativeImage, setValue);
 				}
 
@@ -143,7 +152,17 @@ function CreateClassModal({
 			reset(DEFAULT_VALUES);
 			prevCategoryIdRef.current = 0;
 		}
-	}, [open, classId, isLoadingLesson, existingLesson, isDuplicating, isDraft, reset, setValue]);
+	}, [
+		open,
+		classId,
+		isLoadingLesson,
+		existingLesson,
+		isDuplicating,
+		isDraft,
+		reset,
+		setValue,
+		isCreationMode,
+	]);
 
 	// 대분류 카테고리가 실제로 변경되었을 때만 소분류 초기화
 	useEffect(() => {
@@ -243,8 +262,9 @@ function CreateClassModal({
 				const usedSlots = new Set<number>();
 				if (existingLesson?.images) {
 					existingLesson.images.forEach((img) => {
-						const slot = img.sequence + 1; // sequence 1 -> slot 2
-						if (!currentRemoveSequences.includes(slot)) {
+						// 백엔드에서 온 sequence 1은 2번 슬롯(image2)을 의미함
+						const slot = img.sequence + 1; // 0번(대표) 제외, 1번(갤러리1) -> 2번 슬롯
+						if (slot >= 2 && slot <= 6 && !currentRemoveSequences.includes(slot)) {
 							usedSlots.add(slot);
 						}
 					});
@@ -292,9 +312,6 @@ function CreateClassModal({
 		handleFinalSubmit(data, 'DRAFT');
 	};
 
-	// DRAFT 상태에서 불러온 경우도 생성 모드로 처리
-	const isCreationMode = !classId || isDuplicating || isDraft;
-
 	// 카테고리 선택 전까지는 소분류 로딩 중이므로 폼 준비 상태 체크
 	const isFormReady = open && (!classId || !isLoadingLesson);
 
@@ -315,10 +332,8 @@ function CreateClassModal({
 				<BasicInfoSection />
 				<CategorySection />
 				<ImageSection
-					initialPreviewImage={
-						isDuplicating || isDraft ? existingLesson?.representativeImage : null
-					}
-					initialAdditionalImages={existingLesson?.images}
+					initialPreviewImage={existingLesson?.representativeImage}
+					initialAdditionalImages={initialAdditionalImages}
 				/>
 				<CurriculumSection />
 				<PricingSection />

@@ -1,4 +1,4 @@
-import defaultMeetingImage from '@/assets/images/moimo-meetings.png';
+import defaultMeetingImage from '@/assets/images/moaclass.png';
 import type { Meeting } from '@/models/meeting.model';
 import type { MyReviewItem } from '@/models/review.model';
 

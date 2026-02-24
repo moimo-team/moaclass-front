@@ -173,7 +173,11 @@ function Home() {
 											<MeetingListSection
 												title="마감 임박 모임"
 												seeMoreHref="/meetings?sort=DEADLINE"
-												queryOptions={{ page: 1, limit: 8, sort: 'DEADLINE' }}
+												queryOptions={{
+													page: 1,
+													limit: 8,
+													sort: 'DEADLINE',
+												}}
 												hideIfEmpty
 											/>
 										</section>
