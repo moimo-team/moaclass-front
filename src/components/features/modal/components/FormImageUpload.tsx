@@ -222,6 +222,7 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 									<button
 										type="button"
 										onClick={() => handleRemove(0)}
+										aria-label="이미지 삭제"
 										className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity border border-gray-200"
 									>
 										<X className="h-4 w-4 text-gray-600" />
@@ -298,6 +299,7 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 										<button
 											type="button"
 											onClick={() => handleRemove(index)}
+											aria-label="이미지 삭제"
 											className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity border border-gray-200"
 										>
 											<X className="h-4 w-4 text-gray-600" />

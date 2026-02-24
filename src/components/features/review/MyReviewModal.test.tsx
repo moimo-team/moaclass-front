@@ -136,8 +136,7 @@ describe('MyReviewModal', () => {
 		await screen.findByDisplayValue(mockReviewData.review.content);
 
 		// 이미지 미리보기의 삭제 버튼 찾기
-		const buttons = screen.getAllByRole('button');
-		const removeButton = buttons.find((btn) => btn.className.includes('-top-2'));
+		const removeButton = screen.queryByRole('button', { name: /이미지 삭제/i });
 
 		if (removeButton) {
 			await userEvent.click(removeButton);
@@ -186,12 +185,9 @@ describe('MyReviewModal', () => {
 		await userEvent.clear(textarea);
 		await userEvent.type(textarea, '10자가 넘는 리뷰 내용을 입력합니다.');
 
-		await waitFor(
-			() => {
-				expect(submitButton).not.toBeDisabled();
-			},
-			{ timeout: 3000 },
-		);
+		await waitFor(() => {
+			expect(submitButton).not.toBeDisabled();
+		});
 	});
 
 	it('6. 수정 모드일 때 기존 리뷰 데이터가 불러와지는가?', async () => {
@@ -207,9 +203,7 @@ describe('MyReviewModal', () => {
 		await screen.findByDisplayValue(mockReviewData.review.content);
 
 		// 이미지 삭제
-		const removeButton = screen
-			.getAllByRole('button')
-			.find((btn) => btn.className.includes('-top-2'));
+		const removeButton = screen.queryByRole('button', { name: /이미지 삭제/i });
 		if (removeButton) await userEvent.click(removeButton);
 
 		// 새로운 이미지 추가 (제한 통과를 위해)
@@ -235,9 +229,7 @@ describe('MyReviewModal', () => {
 		await screen.findByDisplayValue(mockReviewData.review.content);
 
 		// 1번 슬롯 이미지 삭제
-		const removeButton = screen
-			.getAllByRole('button')
-			.find((btn) => btn.className.includes('-top-2'));
+		const removeButton = screen.queryByRole('button', { name: /이미지 삭제/i });
 		if (removeButton) await userEvent.click(removeButton);
 
 		// 신규 이미지 1개 추가

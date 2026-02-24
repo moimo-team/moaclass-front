@@ -128,26 +128,17 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 		if (existingReview?.hasReview && existingReview.review && open) {
 			const review = existingReview.review;
 
-			// image1~image8 슬롯 맵 생성
+			// image1~image8 슬롯 맵 생성 및 기존 이미지 목록 생성
 			const slotMap: Record<string, number> = {};
-			const imagesWithSlots = [
-				{ url: review.image1, slot: 1 },
-				{ url: review.image2, slot: 2 },
-				{ url: review.image3, slot: 3 },
-				{ url: review.image4, slot: 4 },
-				{ url: review.image5, slot: 5 },
-				{ url: review.image6, slot: 6 },
-				{ url: review.image7, slot: 7 },
-				{ url: review.image8, slot: 8 },
-			];
-
 			const existingImages: string[] = [];
-			imagesWithSlots.forEach((item) => {
-				if (item.url) {
-					existingImages.push(item.url);
-					slotMap[item.url] = item.slot;
+			for (let i = 1; i <= 8; i++) {
+				const key = `image${i}` as keyof typeof review;
+				const url = review[key] as string | null | undefined;
+				if (url) {
+					existingImages.push(url);
+					slotMap[url] = i;
 				}
-			});
+			}
 
 			setInitialUrlToSlotMap(slotMap);
 			setRemoveSequences([]); // 초기화
