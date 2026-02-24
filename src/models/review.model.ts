@@ -61,6 +61,8 @@ export interface LatestReviewItem {
 	lessonId: number;
 	lessonTitle: string;
 	userId: number;
+	nickname: string;
+	profileImage: string | null;
 	rating: number;
 	content: string;
 	representativeImage: string | null;

@@ -274,7 +274,7 @@ function Banner({ onMeetingBannerClick }: BannerProps) {
 									asChild
 								>
 									<Link
-										href="/lessons?category=쿠킹"
+										href="/lessons?categoryId=2&sort=LATEST"
 										data-testid="banner-lesson-link"
 									>
 										클래스 구경하기

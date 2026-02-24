@@ -61,11 +61,11 @@ function Home() {
 							<ClassBox className="w-full">
 								<section
 									className="w-full"
-									aria-label="좋아요 많은 클래스"
+									aria-label="좋아요를 많이 받은 클래스"
 									data-testid="home-section-likes"
 								>
 									<HomeLessonSection
-										title="좋아요 많은 클래스"
+										title="좋아요를 많이 받은 클래스"
 										seeMoreHref="/lessons?sort=LIKES"
 										queryParams={{ sort: 'LIKES' }}
 									/>
@@ -164,6 +164,20 @@ function Home() {
 
 							{isLoggedIn && (
 								<>
+<<<<<<< fix/notification
+									<section
+										className="w-full"
+										aria-label="마감 임박 모임"
+										data-testid="home-section-deadline-meetings"
+									>
+										<MeetingListSection
+											title="마감 임박 모임"
+											seeMoreHref="/meetings?sort=DEADLINE"
+											queryOptions={{ page: 1, limit: 8, sort: 'DEADLINE' }}
+											hideIfEmpty
+										/>
+									</section>
+=======
 									<ClassBox className="w-full">
 										<section
 											className="w-full"
@@ -178,6 +192,7 @@ function Home() {
 											/>
 										</section>
 									</ClassBox>
+>>>>>>> main
 
 									<ClassBox className="w-full mt-8">
 										<section
