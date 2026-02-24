@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 		return createPageMetadata({
 			title: '클래스를 찾을 수 없습니다',
 			description: '유효하지 않은 클래스 경로입니다.',
+			image: '/og/og-lessons.png',
 			noindex: true,
 		});
 	}
@@ -27,13 +28,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 		return createPageMetadata({
 			title: lesson.title,
 			description: lesson.description || '모아클래스 클래스 상세 페이지입니다.',
-			image: lesson.representativeImage,
+			image: lesson.representativeImage || '/og/og-lessons.png',
 			canonical: `/lessons/${id}`,
 		});
 	} catch {
 		return createPageMetadata({
 			title: '클래스를 찾을 수 없습니다',
 			description: '요청한 클래스를 찾지 못했습니다.',
+			image: '/og/og-lessons.png',
 			noindex: true,
 		});
 	}
