@@ -16,6 +16,7 @@ import { useLessonLikeMutation } from '@/hooks/useLessonLikeMutation';
 import { useLessonQuery } from '@/hooks/useLessonQuery';
 import { useLessonReviewsQuery } from '@/hooks/useLessonReviewsQuery';
 import { useLessonTabs } from '@/hooks/useLessonTabs';
+import { useTeacherProfileQuery } from '@/hooks/useTeacherProfileMutations';
 import { useAuthStore } from '@/store/authStore';
 import { formatFullDateTime } from '@/utils/dateFormat';
 import { scrollToTop } from '@/utils/setScrollTo';
@@ -83,6 +84,16 @@ export const LessonDetailContent = ({
 	const displayedIsLiked = optimisticLikeState?.isLiked ?? lessonDetail?.isLiked ?? false;
 	const displayedLikeCount = optimisticLikeState?.likeCount ?? lessonDetail?.likeCount ?? 0;
 	const isOwnedByCurrentUser = !!lessonDetail && userId === lessonDetail.userId;
+
+	const teacherId = lessonDetail?.teacher?.id;
+	const { data: teacherProfile } = useTeacherProfileQuery(teacherId);
+	const mergedTeacher =
+		lessonDetail && lessonDetail.teacher
+			? {
+					...lessonDetail.teacher,
+					introduction: teacherProfile?.introduction ?? lessonDetail.teacher.introduction,
+				}
+			: lessonDetail?.teacher;
 
 	const handleWishlistToggle = () => {
 		if (!isLoggedIn) {
@@ -181,7 +192,7 @@ export const LessonDetailContent = ({
 							onSectionRef={handleSectionRef}
 							description={lessonDetail.description}
 							curriculum={lessonDetail.curriculum}
-							teacher={lessonDetail.teacher}
+							teacher={mergedTeacher ?? lessonDetail.teacher}
 							latitude={lessonDetail.latitude}
 							longitude={lessonDetail.longitude}
 							address={lessonDetail.address}
