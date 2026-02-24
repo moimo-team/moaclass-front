@@ -31,8 +31,8 @@ const normalizeLessonReview = (review: LessonReviewListItemRaw): Review => {
 		userId: review.userId,
 		user: {
 			id: review.userId,
-			nickname: `User ${review.userId}`,
-			profileImage: null,
+			nickname: review.nickname,
+			profileImage: review.profileImage,
 		},
 		rating: review.rating,
 		representativeImage: images[0] ?? null,
