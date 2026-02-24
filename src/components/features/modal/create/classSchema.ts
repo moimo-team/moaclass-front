@@ -28,6 +28,8 @@ export const classSchema = z.object({
 	reservationLeadDays: z.number().min(0).max(10),
 	representativeImageFile: z.instanceof(File).optional(),
 	additionalImageFiles: z.array(z.instanceof(File)).optional(),
+	additionalImagesPreviews: z.array(z.string()).optional(),
+	removeSequences: z.array(z.number()).optional(),
 });
 
 export type ClassFormValues = z.infer<typeof classSchema>;
