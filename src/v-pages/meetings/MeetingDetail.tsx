@@ -16,7 +16,6 @@ import CreateMeetingModal from '@/components/features/modal/create/CreateMeeting
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useDeleteMeetingDialog } from '@/hooks/useDeleteMeetingDialog';
-import { useInterestQuery } from '@/hooks/useInterestQuery';
 import { useJoinMeetingMutation } from '@/hooks/useMeetingMutations';
 import { useMeetingQuery } from '@/hooks/useMeetingQuery';
 import { useMeQuery } from '@/hooks/useMeQuery';
@@ -70,9 +69,6 @@ function MeetingDetailPage() {
 		{ enabled: isLoggedIn },
 	);
 
-	// 카테고리 목록 조회 (이름 매핑용)
-	const { data: interests } = useInterestQuery();
-
 	// 내 모임인지 확인
 	const isHost = meetingDetail?.host.nickname === nickname;
 
@@ -100,7 +96,7 @@ function MeetingDetailPage() {
 			participations?.some((p) => p.status === 'PENDING') &&
 			!hasNotifiedRef.current
 		) {
-			toast.info('새로운 모이미가 승인 요청 중입니다!');
+			toast.info('새로운 모임원이 승인 요청 중입니다!');
 			hasNotifiedRef.current = true;
 		}
 	}, [isHost, participations]);
@@ -127,7 +123,7 @@ function MeetingDetailPage() {
 		if (!meetingId) return;
 		try {
 			await joinMeetingMutation.mutateAsync(Number(meetingId));
-			toast.success('모임 신청이 완료되었습니다. 모이머의 승인을 기다려주세요!');
+			toast.success('모임 신청이 완료되었습니다. 모임장의 승인을 기다려주세요!');
 			setShowJoinConfirm(false);
 		} catch (error: unknown) {
 			console.error('모임 신청 에러:', error);
@@ -205,27 +201,23 @@ function MeetingDetailPage() {
 						aria-label="모임 상세 정보"
 					>
 						<div>
-							<div className="flex items-start justify-between pb-8">
-								<div className="flex items-center gap-2 mb-2">
-									<Badge className="bg-primary/10 text-primary hover:bg-primary/20 text-base px-3 py-1.5 font-medium border-primary/20">
-										{meetingDetail.interestName ||
-											interests?.find(
-												(i) => i.id === meetingDetail.interestId,
-											)?.name ||
-											'카테고리 없음'}
-									</Badge>
-								</div>
+							<div className="flex items-center justify-between mb-4">
+								<Badge
+									variant="secondary"
+									className="px-3 py-1 text-sm font-medium"
+								>
+									{meetingDetail.interestName}
+								</Badge>
+
 								{/* 수정/삭제 버튼 - 호스트일 때만 표시 */}
 								{isHost && (
-									<div className="ml-auto">
-										<MeetingActionButtons
-											meetingId={Number(meetingId)}
-											role="host"
-											location="detail-top"
-											onEdit={() => setShowEditModal(true)}
-											onDelete={() => handleDeleteMeeting(Number(meetingId))}
-										/>
-									</div>
+									<MeetingActionButtons
+										meetingId={Number(meetingId)}
+										role="host"
+										location="detail-top"
+										onEdit={() => setShowEditModal(true)}
+										onDelete={() => handleDeleteMeeting(Number(meetingId))}
+									/>
 								)}
 							</div>
 

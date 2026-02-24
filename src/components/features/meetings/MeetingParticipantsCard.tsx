@@ -39,10 +39,10 @@ export function MeetingParticipantsCard({
 
 	// 참여자 목록 정렬 및 가공
 	const { hostParticipant, guests } = useMemo(() => {
-		// 모이머
+		// 모임장
 		const hostParticipant = participants.find((p) => p.isHost);
 
-		// 모이미만 있는 목록
+		// 모임원만 있는 목록
 		const guests = participants.filter((p) => !p.isHost);
 
 		return { hostParticipant, guests };
@@ -90,7 +90,7 @@ export function MeetingParticipantsCard({
 
 				<CardContent className="p-6">
 					<section className="flex gap-6" aria-label="모임 참여자 목록">
-						{/* 왼쪽: 모이머 (호스트) */}
+						{/* 왼쪽: 모임장 (호스트) */}
 						<section className="flex-shrink-0 w-[200px]" aria-label="모임장 정보">
 							<div className="border-r border-border/30 pr-6">
 								<div
@@ -123,7 +123,7 @@ export function MeetingParticipantsCard({
 											variant="secondary"
 											className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs px-2 py-0.5"
 										>
-											모이머
+											모임장
 										</Badge>
 										<p className="text-sm text-muted-foreground mt-2 line-clamp-2">
 											{finalHost.bio || '모임장입니다.'}
@@ -133,11 +133,11 @@ export function MeetingParticipantsCard({
 							</div>
 						</section>
 
-						{/* 오른쪽: 모이미들 (게스트) */}
+						{/* 오른쪽: 모임원들 (게스트) */}
 						<section className="flex-1" aria-label="참여자 정보">
 							{guests.length === 0 ? (
 								<div className="flex items-center justify-center h-full text-muted-foreground">
-									아직 참여한 모이미가 없습니다.
+									아직 참여한 모임원이 없습니다.
 								</div>
 							) : (
 								<>
@@ -166,7 +166,7 @@ export function MeetingParticipantsCard({
 														variant="outline"
 														className="text-muted-foreground text-[10px] px-1.5 py-0 h-4 border-border mt-1"
 													>
-														모이미
+														모임원
 													</Badge>
 												</div>
 											</li>
