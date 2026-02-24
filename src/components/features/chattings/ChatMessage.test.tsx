@@ -10,32 +10,40 @@ describe('ChatMessage badge label', () => {
 			senderId: 7,
 			sender: {
 				id: 7,
-				nickname: '모임장',
+				nickname: 'host',
 				image: '',
 			},
 		});
 
-		render(<ChatMessage message={message} isMine={false} hostId={7} hostBadgeLabel="호스트" />);
-
-		expect(screen.getByText('호스트')).toBeInTheDocument();
-	});
-
-	it('shows mentor badge label for lesson host message', () => {
-		const message = createChatMessageFixture({
-			senderId: 9,
-			sender: {
-				id: 9,
-				nickname: '모멘토',
-				image: '',
-			},
-		});
-
-		render(<ChatMessage message={message} isMine={false} hostId={9} hostBadgeLabel="모멘토" />);
+		render(<ChatMessage message={message} isMine={false} hostId={7} hostBadgeLabel="host" />);
 
 		const badge = screen
-			.getAllByText('모멘토')
+			.getAllByText('host')
 			.find((element) => element.className.includes('bg-orange-100'));
 		expect(badge).toBeTruthy();
+	});
+
+	it('shows badge for my message when forceShowHostBadge is true', () => {
+		const message = createChatMessageFixture({
+			senderId: 46,
+			sender: {
+				id: 46,
+				nickname: 'myself',
+				image: '',
+			},
+		});
+
+		render(
+			<ChatMessage
+				message={message}
+				isMine={true}
+				hostId={9}
+				hostBadgeLabel="mentor"
+				forceShowHostBadge={true}
+			/>,
+		);
+
+		expect(screen.getByText('mentor')).toBeInTheDocument();
 	});
 
 	it('does not show badge for non-host sender', () => {
@@ -43,13 +51,13 @@ describe('ChatMessage badge label', () => {
 			senderId: 11,
 			sender: {
 				id: 11,
-				nickname: '참가자',
+				nickname: 'guest',
 				image: '',
 			},
 		});
 
-		render(<ChatMessage message={message} isMine={false} hostId={9} hostBadgeLabel="모멘토" />);
+		render(<ChatMessage message={message} isMine={false} hostId={9} hostBadgeLabel="mentor" />);
 
-		expect(screen.queryByText('모멘토')).not.toBeInTheDocument();
+		expect(screen.queryByText('mentor')).not.toBeInTheDocument();
 	});
 });

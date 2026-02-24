@@ -1,37 +1,25 @@
-import type { ChatMessage, ChatRoom } from '@/models/chat.model';
+﻿import type { ChatMessage, ChatRoom } from '@/models/chat.model';
 
 const BASE_CREATED_AT = '2026-02-21T10:00:00.000Z';
 
 export const BASE_MEETING_ROOM: ChatRoom = {
 	roomId: 101,
-	chatType: 'meeting',
 	meetingId: 10,
-	title: '주말 스터디 모임',
-	image: null,
-	memberCount: 5,
-	isLeader: false,
-	hostId: 2,
-	lastMessage: {
-		sender: '호스트',
-		content: '모임 공지입니다.',
-		createdAt: BASE_CREATED_AT,
-	},
+	lessonId: null,
+	title: 'Weekend study meetup',
+	representativeImage: null,
+	lastMessage: 'Meeting notice',
+	updatedAt: BASE_CREATED_AT,
 };
 
 export const BASE_LESSON_ROOM: ChatRoom = {
 	roomId: 201,
-	chatType: 'lesson',
+	meetingId: null,
 	lessonId: 20,
-	title: '도예 원데이 클래스',
-	image: null,
-	memberCount: 2,
-	isLeader: false,
-	hostId: 3,
-	lastMessage: {
-		sender: '모멘토',
-		content: '문의 남겨주세요.',
-		createdAt: BASE_CREATED_AT,
-	},
+	title: 'One-day class inquiry',
+	representativeImage: null,
+	lastMessage: 'Please answer the inquiry',
+	updatedAt: BASE_CREATED_AT,
 };
 
 export const createChatRoomFixture = (overrides: Partial<ChatRoom> = {}): ChatRoom => {
@@ -43,13 +31,13 @@ export const createChatRoomFixture = (overrides: Partial<ChatRoom> = {}): ChatRo
 
 export const BASE_CHAT_MESSAGE: ChatMessage = {
 	id: 1,
-	content: '안녕하세요',
+	content: 'hello',
 	senderId: 46,
 	roomId: 101,
 	createdAt: BASE_CREATED_AT,
 	sender: {
 		id: 46,
-		nickname: '모멘티',
+		nickname: 'mentor',
 		image: '',
 	},
 };

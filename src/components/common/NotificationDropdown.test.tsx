@@ -14,7 +14,7 @@ import {
 // 사용자가 실제로 알림을 클릭했을 때의 핵심 UX 흐름을 검증
 // 알림 클릭 동작 회귀를 막는 통합 테스트
 
-const mockNavigate = vi.fn();
+const mockPush = vi.fn();
 const mockJoinChatRoom = vi.fn();
 const mockMarkAsReadMutate = vi.fn();
 const mockMarkAllAsReadMutate = vi.fn();
@@ -25,8 +25,10 @@ let mockNotifications: NotificationUiItem[] = [];
 let mockIsLoading = false;
 let mockIsError = false;
 
-vi.mock('react-router-dom', () => ({
-	useNavigate: () => mockNavigate,
+vi.mock('next/navigation', () => ({
+	useRouter: () => ({
+		push: mockPush,
+	}),
 }));
 
 vi.mock('@/api/chat.api', () => ({
@@ -149,7 +151,7 @@ describe('NotificationDropdown', () => {
 		await userEvent.click(screen.getByText('item-10'));
 
 		expect(mockMarkAsReadMutate).toHaveBeenCalledWith(10);
-		expect(mockNavigate).toHaveBeenCalledWith('/lessons/77', undefined);
+		expect(mockPush).toHaveBeenCalledWith('/lessons/77');
 	});
 
 	it('handles NEW_CHAT with roomId', async () => {
@@ -166,7 +168,7 @@ describe('NotificationDropdown', () => {
 
 		expect(mockMarkAsReadMutate).toHaveBeenCalledWith(20);
 		expect(mockResetNewChatByRoom).toHaveBeenCalledWith(101);
-		expect(mockNavigate).toHaveBeenCalledWith('/chats?roomId=101&chatType=lesson');
+		expect(mockPush).toHaveBeenCalledWith('/chats?roomId=101&chatType=lesson&lessonId=23');
 	});
 
 	it('handles NEW_CHAT without roomId (lesson) with join success', async () => {
@@ -185,9 +187,7 @@ describe('NotificationDropdown', () => {
 
 		await waitFor(() => {
 			expect(mockJoinChatRoom).toHaveBeenCalledWith({ lessonId: 55 });
-			expect(mockNavigate).toHaveBeenCalledWith(
-				'/chats?roomId=300&chatType=lesson&lessonId=55',
-			);
+			expect(mockPush).toHaveBeenCalledWith('/chats?roomId=300&chatType=lesson&lessonId=55');
 		});
 	});
 
@@ -206,7 +206,7 @@ describe('NotificationDropdown', () => {
 		await userEvent.click(screen.getByText('item-22'));
 
 		await waitFor(() => {
-			expect(mockNavigate).toHaveBeenCalledWith('/chats?chatType=lesson&lessonId=56');
+			expect(mockPush).toHaveBeenCalledWith('/chats?chatType=lesson&lessonId=56');
 		});
 	});
 
@@ -226,7 +226,7 @@ describe('NotificationDropdown', () => {
 
 		await waitFor(() => {
 			expect(mockJoinChatRoom).toHaveBeenCalledWith({ meetingId: 57 });
-			expect(mockNavigate).toHaveBeenCalledWith(
+			expect(mockPush).toHaveBeenCalledWith(
 				'/chats?roomId=301&chatType=meeting&meetingId=57',
 			);
 		});
@@ -247,7 +247,7 @@ describe('NotificationDropdown', () => {
 		await userEvent.click(screen.getByText('item-24'));
 
 		await waitFor(() => {
-			expect(mockNavigate).toHaveBeenCalledWith('/chats?chatType=meeting&meetingId=58');
+			expect(mockPush).toHaveBeenCalledWith('/chats?chatType=meeting&meetingId=58');
 		});
 	});
 

@@ -3,12 +3,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { ChatMessage as ChatMessageType } from '@/models/chat.model';
+import { getImageSrc } from '@/utils/imageUtils';
 
 interface ChatMessageProps {
 	message: ChatMessageType;
 	isMine: boolean;
-	hostId: number;
+	hostId?: number;
 	hostBadgeLabel?: string;
+	forceShowHostBadge?: boolean;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
@@ -16,35 +18,41 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 	isMine,
 	hostId,
 	hostBadgeLabel = '호스트',
+	forceShowHostBadge,
 }) => {
 	const { content, createdAt } = message;
-	const sender = message.sender ?? {
-		id: message.senderId,
-		nickname: message.senderNickname ?? '알 수 없음',
-		image: '',
-	};
+	const sender = message.sender;
 
-	const isHost = sender.id === hostId;
+	const isHost = typeof hostId === 'number' ? sender.id === hostId : false;
+	const showHostBadge =
+		typeof forceShowHostBadge === 'boolean' ? forceShowHostBadge : !isMine && isHost;
+	const defaultProfileImage = getImageSrc(defaultProfileIcon);
+	const senderImageSrc =
+		typeof sender.image === 'string' && sender.image.trim().length > 0
+			? sender.image
+			: defaultProfileImage;
 
 	return (
 		<div
 			className={cn(
-				'flex items-start gap-3 p-4 max-w-[75%]',
+				'flex items-start gap-3 p-4 max-w-[82%] lg:max-w-[75%]',
 				isMine ? 'self-end flex-row-reverse' : 'self-start',
 			)}
 		>
 			{!isMine && (
 				<Avatar className="w-10 h-10">
-					<AvatarImage src={sender.image || defaultProfileIcon} alt={sender.nickname} />
+					<AvatarImage src={senderImageSrc} alt={sender.nickname} />
 					<AvatarFallback>{sender.nickname?.slice(0, 2) || 'NN'}</AvatarFallback>
 				</Avatar>
 			)}
 
 			<div className={cn('flex flex-col gap-1', isMine ? 'items-end' : 'items-start')}>
-				{!isMine && (
+				{(!isMine || showHostBadge) && (
 					<div className="flex items-center gap-2">
-						<span className="font-semibold text-sm">{sender.nickname}</span>
-						{isHost && (
+						{!isMine && (
+							<span className="font-semibold text-sm">{sender.nickname}</span>
+						)}
+						{showHostBadge && (
 							<Badge
 								variant="outline"
 								className="bg-orange-100 text-orange-700 border-orange-300"
@@ -63,7 +71,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 				>
 					<div
 						className={cn(
-							'p-3 rounded-lg max-w-md',
+							'p-3 rounded-lg max-w-md break-words',
 							isMine
 								? 'bg-primary text-primary-foreground rounded-tr-none'
 								: 'bg-muted rounded-tl-none',

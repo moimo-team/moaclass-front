@@ -12,7 +12,7 @@ export const useLatestLessonsQuery = () => {
 
 export const useLessonsQuery = (params: FetchLessonsParams, page: number, enabled: boolean) => {
 	const queryParams = { ...params, page };
-	const queryKey = ['lessons', 'list', params, page];
+	const queryKey = ['lessons', 'list', queryParams];
 
 	const queryResult = useQuery<FetchLessonsResponse, Error>({
 		queryKey,

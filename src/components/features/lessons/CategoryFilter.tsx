@@ -54,7 +54,11 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
 						</span>
 					</Button>
 				</PopoverTrigger>
-				<PopoverContent className="w-[400px] p-0 flex" align="start">
+				<PopoverContent
+					className="w-[400px] p-0 flex"
+					align="start"
+					data-filter-interactive-layer="true"
+				>
 					{/* 대분류 - 스크롤 추가 */}
 					<div className="w-1/2 border-r max-h-[300px] overflow-y-auto p-2">
 						<h4 className="font-semibold mb-2 px-2 sticky top-0 bg-white z-10">

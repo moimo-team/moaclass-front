@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { getChatSocket, initChatSocket, type ChatSocket } from '@/lib/chatSocket';
 import type { MockSocketClient } from '@/mock/mockData/socketMock';
-import type { ChatMessage } from '@/models/chat.model';
+import type { NewMessagePayload } from '@/models/chat-socket.model';
 import { useAuthStore } from '@/store/authStore';
 import { ENV } from '@/utils/env';
 
@@ -12,7 +12,10 @@ const isSocketIoClient = (socket: ChatSocket): socket is Exclude<ChatSocket, Moc
 	return 'io' in socket;
 };
 
-const attachNewMessageListener = (socket: ChatSocket, listener: (message: ChatMessage) => void) => {
+const attachNewMessageListener = (
+	socket: ChatSocket,
+	listener: (message: NewMessagePayload) => void,
+) => {
 	if (isSocketIoClient(socket)) {
 		socket.on('newMessage', listener);
 		return () => socket.off('newMessage', listener);
@@ -24,7 +27,7 @@ const attachNewMessageListener = (socket: ChatSocket, listener: (message: ChatMe
 
 export const useChatSocket = (
 	selectedRoomId: number | null,
-	onNewMessage: (message: ChatMessage) => void,
+	onNewMessage: (message: NewMessagePayload) => void,
 ) => {
 	const onNewMessageRef = useRef(onNewMessage);
 	const { accessToken, userId } = useAuthStore();
@@ -43,7 +46,7 @@ export const useChatSocket = (
 			const socket = await initChatSocket(accessToken);
 			if (!socket || detached) return;
 
-			const onMessage = (message: ChatMessage) => {
+			const onMessage = (message: NewMessagePayload) => {
 				onNewMessageRef.current(message);
 			};
 
@@ -64,7 +67,7 @@ export const useChatSocket = (
 		const joinSelectedRoom = async () => {
 			const socket = getChatSocket() ?? (await initChatSocket(accessToken));
 			if (!socket) return;
-			socket.emit('joinRoom', { roomId: selectedRoomId });
+			socket.emit('joinRoom', selectedRoomId);
 		};
 
 		void joinSelectedRoom();

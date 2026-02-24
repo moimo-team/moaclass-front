@@ -36,6 +36,8 @@ const ReviewList = ({ reviews, onReviewClick }: ReviewListProps) => {
 							<ReviewCard
 								className="h-80"
 								lessonTitle={review.lessonTitle}
+								nickname={review.nickname}
+								profileImage={review.profileImage}
 								representativeImage={review.representativeImage}
 								rating={review.rating}
 								content={review.content}
