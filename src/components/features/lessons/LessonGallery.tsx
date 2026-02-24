@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-import moimoMeeting from '@/assets/images/moimo-meetings.png';
+import moimoMeeting from '@/assets/images/moaclass.png';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { LessonImage } from '@/models/lesson.model';

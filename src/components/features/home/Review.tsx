@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import defaultMeetingImage from '@/assets/images/moimo-meetings.png';
+import defaultMeetingImage from '@/assets/images/moaclass.png';
 import StarRating from '@/components/common/StarRating';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
