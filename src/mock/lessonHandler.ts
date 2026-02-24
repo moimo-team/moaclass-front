@@ -87,7 +87,7 @@ export const lessonHandlers = [
 			})
 			.filter((lesson) => {
 				if (!maxParticipants) return true;
-				return lesson.maxParticipants >= maxParticipants;
+				return lesson.maxParticipants <= maxParticipants;
 			})
 			.filter((lesson) => {
 				if (!timeRange) return true;
