@@ -26,6 +26,11 @@ function Header() {
 	const filterPanelRef = useRef<HTMLDivElement | null>(null);
 
 	const filterStore = useFilterStore();
+	const keywordFromQuery = searchParams.get('keyword') ?? '';
+
+	useEffect(() => {
+		setSearchTopic(keywordFromQuery);
+	}, [keywordFromQuery]);
 
 	const handleTextSearch = (event: React.FormEvent) => {
 		event.preventDefault();
