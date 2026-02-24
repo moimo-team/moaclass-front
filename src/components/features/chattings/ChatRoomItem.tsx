@@ -37,11 +37,11 @@ const ChatRoomItem: React.FC<ChatRoomItemProps> = ({
 			</Avatar>
 
 			{/* 오른쪽: 모임 제목, 마지막 대화 내용, 보낸 시각 */}
-			<div className="flex flex-col flex-grow">
-				<div className="font-semibold text-base">{meetingTitle}</div>
-				<div className="flex flex-col items-start text-sm text-muted-foreground lg:flex-row lg:items-center lg:justify-between">
-					<p className="truncate max-w-[65%]">{previewMessage}</p>
-					<time className="text-xs">{lastMessageTime}</time>
+			<div className="flex min-w-0 flex-col flex-grow">
+				<div className="truncate font-semibold text-base">{meetingTitle}</div>
+				<div className="mt-0.5 flex items-center justify-between gap-2 text-sm text-muted-foreground">
+					<p className="min-w-0 flex-1 truncate lg:max-w-[65%]">{previewMessage}</p>
+					<time className="shrink-0 text-xs">{lastMessageTime}</time>
 				</div>
 			</div>
 		</div>

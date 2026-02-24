@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+﻿import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
@@ -78,7 +78,7 @@ export const ChattingContent = ({
 	const [selectedLessonRoom, setSelectedLessonRoom] = useState<ChatRoom | null>(null);
 	const [useInitialRouteSelection, setUseInitialRouteSelection] = useState(true);
 	const [inputValue, setInputValue] = useState('');
-	const [chatType, setChatType] = useState<ChatType>(() => routeChatType ?? 'meeting');
+	const [chatType, setChatType] = useState<ChatType>(() => routeChatType ?? 'lesson');
 
 	const [messages, setMessages] = useState<ChatMessage[]>([]);
 	const scrollRef = useRef<HTMLDivElement>(null);
@@ -182,6 +182,7 @@ export const ChattingContent = ({
 			? (selectedMeeting ?? initialMeetingRoomFromRoute)
 			: (selectedLessonRoom ?? initialLessonRoomFromRoute);
 	const selectedRoomId = selectedRoom ? getRoomIdFromRoom(selectedRoom) : null;
+	const hasSelectedRoom = Boolean(selectedRoom);
 
 	// 열린 방은 append, 전체 방 목록은 정렬만 갱신
 	const handleNewMessage = useCallback(
@@ -280,19 +281,6 @@ export const ChattingContent = ({
 				{/* type으로 모임과 원데이클래스 채팅을 구분 */}
 				<button
 					className={`px-4 py-2 text-lg font-semibold ${
-						chatType === 'meeting'
-							? 'text-primary border-b-2 border-primary'
-							: 'text-foreground'
-					}`}
-					onClick={() => {
-						setUseInitialRouteSelection(false);
-						setChatType('meeting');
-					}}
-				>
-					모임 채팅
-				</button>
-				<button
-					className={`px-4 py-2 text-lg font-semibold ${
 						chatType === 'lesson'
 							? 'text-primary border-b-2 border-primary'
 							: 'text-foreground'
@@ -304,54 +292,87 @@ export const ChattingContent = ({
 				>
 					클래스 채팅 문의
 				</button>
+				<button
+					className={`px-4 py-2 text-lg font-semibold ${
+						chatType === 'meeting'
+							? 'text-primary border-b-2 border-primary'
+							: 'text-foreground'
+					}`}
+					onClick={() => {
+						setUseInitialRouteSelection(false);
+						setChatType('meeting');
+					}}
+				>
+					모임 채팅
+				</button>
 			</div>
 
 			{chatType === 'meeting' ? (
 				<div className="flex flex-row flex-grow min-h-0 overflow-hidden">
-					<ChatRoomListSection
-						chatRooms={meetingRooms}
-						isLoading={isLoading}
-						onSelectRoom={(room) => {
-							setUseInitialRouteSelection(false);
-							setSelectedMeeting(room);
-						}}
-						selectedMeetingId={selectedRoom?.meetingId ?? selectedRoom?.roomId}
-					/>
-					<ChatMessageSection
-						selectedMeeting={selectedMeeting}
-						messages={messages}
-						sendMessage={handleSendMessage}
-						inputValue={inputValue}
-						setInputValue={setInputValue}
-						onBackToList={handleBackToList}
-						scrollRef={scrollRef}
-						userId={userId}
-					/>
+					<div
+						data-testid="meeting-list-panel"
+						className={`${hasSelectedRoom ? 'hidden' : 'block'} w-full lg:contents`}
+					>
+						<ChatRoomListSection
+							chatRooms={meetingRooms}
+							isLoading={isLoading}
+							onSelectRoom={(room) => {
+								setUseInitialRouteSelection(false);
+								setSelectedMeeting(room);
+							}}
+							selectedMeetingId={selectedRoom?.meetingId ?? selectedRoom?.roomId}
+						/>
+					</div>
+					<div
+						data-testid="meeting-message-panel"
+						className={`${hasSelectedRoom ? 'block' : 'hidden'} w-full lg:contents`}
+					>
+						<ChatMessageSection
+							selectedMeeting={selectedMeeting}
+							messages={messages}
+							sendMessage={handleSendMessage}
+							inputValue={inputValue}
+							setInputValue={setInputValue}
+							onBackToList={handleBackToList}
+							scrollRef={scrollRef}
+							userId={userId}
+						/>
+					</div>
 				</div>
 			) : (
 				<div className="flex flex-row flex-grow min-h-0 overflow-hidden">
-					<LessonChatRoomListSection
-						chatRooms={lessonRooms}
-						isLoading={isLoading}
-						onSelectRoom={(room) => {
-							setUseInitialRouteSelection(false);
-							setSelectedLessonRoom(room);
-						}}
-						selectedRoomId={selectedRoom?.roomId}
-					/>
-					<LessonChatMessageSection
-						selectedRoom={selectedRoom}
-						isMentorView={
-							selectedRoom ? mentorLessonRoomIds.has(selectedRoom.roomId) : false
-						}
-						messages={messages}
-						sendMessage={handleSendMessage}
-						inputValue={inputValue}
-						setInputValue={setInputValue}
-						onBackToList={handleBackToList}
-						scrollRef={scrollRef}
-						userId={userId}
-					/>
+					<div
+						data-testid="lesson-list-panel"
+						className={`${hasSelectedRoom ? 'hidden' : 'block'} w-full lg:contents`}
+					>
+						<LessonChatRoomListSection
+							chatRooms={lessonRooms}
+							isLoading={isLoading}
+							onSelectRoom={(room) => {
+								setUseInitialRouteSelection(false);
+								setSelectedLessonRoom(room);
+							}}
+							selectedRoomId={selectedRoom?.roomId}
+						/>
+					</div>
+					<div
+						data-testid="lesson-message-panel"
+						className={`${hasSelectedRoom ? 'block' : 'hidden'} w-full lg:contents`}
+					>
+						<LessonChatMessageSection
+							selectedRoom={selectedRoom}
+							isMentorView={
+								selectedRoom ? mentorLessonRoomIds.has(selectedRoom.roomId) : false
+							}
+							messages={messages}
+							sendMessage={handleSendMessage}
+							inputValue={inputValue}
+							setInputValue={setInputValue}
+							onBackToList={handleBackToList}
+							scrollRef={scrollRef}
+							userId={userId}
+						/>
+					</div>
 				</div>
 			)}
 		</div>

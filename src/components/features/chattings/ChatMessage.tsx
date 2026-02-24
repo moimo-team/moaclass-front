@@ -35,7 +35,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 	return (
 		<div
 			className={cn(
-				'flex items-start gap-3 p-4 max-w-[75%]',
+				'flex items-start gap-3 p-4 max-w-[82%] lg:max-w-[75%]',
 				isMine ? 'self-end flex-row-reverse' : 'self-start',
 			)}
 		>
@@ -71,7 +71,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 				>
 					<div
 						className={cn(
-							'p-3 rounded-lg max-w-md',
+							'p-3 rounded-lg max-w-md break-words',
 							isMine
 								? 'bg-primary text-primary-foreground rounded-tr-none'
 								: 'bg-muted rounded-tl-none',
