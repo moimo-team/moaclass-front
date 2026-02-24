@@ -29,7 +29,7 @@ const Participations = () => {
 	const handleApproveAll = () => {
 		approveAll(
 			{ meetingId },
-			{ onSuccess: () => toast.success('모든 모이미기 승인되었습니다!') },
+			{ onSuccess: () => toast.success('모든 모임원이 승인되었습니다!') },
 		);
 	};
 
@@ -50,7 +50,7 @@ const Participations = () => {
 				>
 					<ChevronLeft className="w-8 h-8 text-gray-900" />
 				</button>
-				<h1 className="text-2xl font-bold text-gray-900">모이미 관리</h1>
+				<h1 className="text-2xl font-bold text-gray-900">모임원 관리</h1>
 			</div>
 
 			{isLoading ? (
@@ -91,7 +91,7 @@ const Participations = () => {
 
 					{/* 승인된 멤버 섹션 */}
 					<ParticipantSection
-						title="승인된 모이미"
+						title="승인된 모임원"
 						count={confirmedParticipants.length}
 						isOpen={isConfirmedOpen}
 						onToggle={() => setIsConfirmedOpen(!isConfirmedOpen)}
@@ -107,7 +107,7 @@ const Participations = () => {
 
 					{/* 거절된 멤버 섹션 */}
 					<ParticipantSection
-						title="거절된 모이미"
+						title="거절된 모임원"
 						count={rejectedParticipants.length}
 						isOpen={isRejectedOpen}
 						onToggle={() => setIsRejectedOpen(!isRejectedOpen)}

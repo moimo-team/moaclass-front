@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import FormField from '@components/common/FormField';
 import { Controller, useFormContext } from 'react-hook-form';
 
@@ -11,6 +13,7 @@ export function PricingSection() {
 		register,
 		watch,
 		control,
+		setValue,
 		formState: { errors },
 	} = useFormContext<ClassFormValues>();
 
@@ -23,6 +26,36 @@ export function PricingSection() {
 	const discountRateValue = Number(discountRate) || 0;
 	const discountedPrice = Math.round(priceValue * (1 - discountRateValue / 100));
 
+	useEffect(() => {
+		if (priceValue <= 0) {
+			setValue('discountRate', 0);
+		} else if (discountRateValue > 99) {
+			setValue('discountRate', 99);
+		}
+	}, [priceValue, discountRateValue, setValue]);
+
+	const handleNumericKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (['e', 'E', '+', '-', '.'].includes(e.key)) {
+			e.preventDefault();
+		}
+	};
+
+	const handleNumericChange =
+		(name: 'price' | 'discountRate', max?: number) =>
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			const val = e.target.value;
+			// 선행 0 제거 (단, '0' 하나만 있는 경우는 제외)
+			let normalized = val.replace(/^0+/, '');
+			if (normalized === '') normalized = '0';
+
+			let numValue = Number(normalized);
+			if (max !== undefined && numValue > max) {
+				numValue = max;
+			}
+
+			setValue(name, numValue);
+		};
+
 	return (
 		<>
 			{/* 가격 및 할인 */}
@@ -32,22 +65,29 @@ export function PricingSection() {
 						id="price"
 						label="가격"
 						register={register('price', { valueAsNumber: true })}
+						value={priceValue}
 						type="number"
 						placeholder="0"
 						suffix="원"
 						error={errors.price?.message}
 						required
 						onFocus={(e) => e.target.select()}
+						onKeyDown={handleNumericKeyDown}
+						onChange={handleNumericChange('price')}
 					/>
 					<FormInput
 						id="discountRate"
 						label="할인율"
-						register={register('discountRate', { valueAsNumber: true })}
+						register={register('discountRate', { valueAsNumber: true, max: 99 })}
+						value={discountRateValue}
 						type="number"
-						placeholder="0"
+						placeholder={priceValue > 0 ? '0' : '가격을 먼저 입력하세요'}
 						suffix="%"
 						error={errors.discountRate?.message}
+						disabled={priceValue <= 0}
 						onFocus={(e) => e.target.select()}
+						onKeyDown={handleNumericKeyDown}
+						onChange={handleNumericChange('discountRate', 99)}
 					/>
 				</div>
 

@@ -177,29 +177,6 @@ export const ClassManagementContent = () => {
 	if (!isLoading && !teacherProfile) {
 		return (
 			<div className="w-full max-w-2xl mx-auto py-16 text-center">
-				<div className="relative w-full aspect-video rounded-3xl overflow-hidden mb-10 shadow-2xl shadow-primary/10 border border-white/20">
-					<img
-						src="https://images.unsplash.com/photo-1544717305-27a734ef4164?auto=format&fit=crop&q=80&w=800&h=450"
-						alt="Mentor Profile Required"
-						className="w-full h-full object-cover"
-						onError={(e) => {
-							(e.target as HTMLImageElement).src =
-								'https://placehold.co/800x450/4f46e5/ffffff?text=Create+Your+Profile';
-						}}
-					/>
-					<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-8 text-left">
-						<span className="inline-block px-3 py-1 rounded-full bg-primary/20 backdrop-blur-md text-primary-foreground text-xs font-bold mb-3 border border-primary/30">
-							STEP 01
-						</span>
-						<h2 className="text-3xl font-bold text-white mb-2">
-							클래스 운영을 위한 첫걸음
-						</h2>
-						<p className="text-white/80">
-							멋진 모멘토 프로필을 작성하고 당신의 재능을 나누어 보세요.
-						</p>
-					</div>
-				</div>
-
 				<h1 className="text-3xl font-nanum-bold mb-4 text-gray-900 leading-tight">
 					클래스 목록을 불러오기 위해서는
 					<br />

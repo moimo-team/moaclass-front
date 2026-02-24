@@ -43,7 +43,7 @@ export const MeetingFilterControls = ({
 			<div className="flex items-center gap-2">
 				{/* 카테고리 필터 */}
 				<Select value={filters.interestFilter} onValueChange={handleInterestFilterChange}>
-					<SelectTrigger className="w-[180px] bg-secondary/10 text-primary-foreground hover:bg-primary/20">
+					<SelectTrigger className="w-[180px] bg-accent/50 text-foreground hover:bg-accent hover:text-primary transition-colors">
 						<SelectValue placeholder="카테고리" />
 					</SelectTrigger>
 					<SelectContent>
@@ -75,7 +75,7 @@ export const MeetingFilterControls = ({
 					value={filters.sort}
 					onValueChange={(value) => handleSortChange(value as SortType)}
 				>
-					<SelectTrigger className="w-[120px] bg-secondary/10 text-primary-foreground hover:bg-primary/20">
+					<SelectTrigger className="w-[120px] bg-accent/50 text-foreground hover:bg-accent hover:text-primary transition-colors">
 						<SelectValue placeholder="정렬" />
 					</SelectTrigger>
 					<SelectContent>
@@ -92,9 +92,10 @@ export const MeetingFilterControls = ({
 					variant="outline"
 					onClick={() => handleFinishedFilterChange(!filters.finishedFilter)}
 					className={cn(
-						'min-w-[120px]',
-						!filters.finishedFilter &&
-							'bg-secondary/10 text-gray-900 border-primary/20 hover:bg-primary/20',
+						'min-w-[120px] transition-colors',
+						!filters.finishedFilter
+							? 'bg-accent/50 text-foreground border-primary/20 hover:bg-accent hover:text-primary'
+							: 'border-primary/20 text-muted-foreground hover:bg-accent',
 					)}
 				>
 					{filters.finishedFilter ? '전체 모임 보기' : '모집 중인 모임'}
@@ -105,7 +106,7 @@ export const MeetingFilterControls = ({
 					value={limit.toString()}
 					onValueChange={(value) => handleLimitChange(Number(value))}
 				>
-					<SelectTrigger className="w-[110px] bg-secondary/10 text-primary-foreground hover:bg-primary/20">
+					<SelectTrigger className="w-[110px] bg-accent/50 text-foreground hover:bg-accent hover:text-primary transition-colors">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>

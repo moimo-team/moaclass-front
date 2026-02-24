@@ -27,10 +27,13 @@ function LessonListSection({
 
 	return (
 		<div className="w-full py-8 pt-12">
-			<div className="flex justify-between w-full mb-4">
-				<div className="text-xl font-bold ">{title}</div>
+			<div className="flex justify-between items-center w-full mb-6">
+				<div className="text-2xl font-bold text-foreground">{title}</div>
 				{seeMoreHref && (
-					<Link href={seeMoreHref} className="text-sm cursor-pointer">
+					<Link
+						href={seeMoreHref}
+						className="text-sm cursor-pointer text-muted-foreground hover:text-primary transition-colors"
+					>
 						전체보기
 					</Link>
 				)}
