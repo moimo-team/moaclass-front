@@ -1,4 +1,4 @@
-import { fetchLesson } from '@/api/lesson.api';
+﻿import { fetchLesson } from '@/api/lesson.api';
 import LessonClient from '@/app/lessons/[lessonId]/LessonClient';
 import { toAbsoluteUrl } from '@/constants/site';
 import { createPageMetadata } from '@/utils/metadata';
