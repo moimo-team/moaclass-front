@@ -95,7 +95,9 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 
 						<ClassInfoBody
 							title={title}
-							category={lesson.classCategory?.name || '전체'}
+							category={
+								lesson.lessonCategoryName || lesson.classCategory?.name || '전체'
+							}
 							price={lesson.price ?? 0}
 							discountRate={lesson.discountRate ?? 0}
 							discountedPrice={lesson.discountedPrice ?? 0}
