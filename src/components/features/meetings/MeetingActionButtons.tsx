@@ -228,7 +228,7 @@ function MeetingActionButtons({
 				return (
 					<Button
 						onClick={onChat || handleChatClick}
-						className="w-full h-16 py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray font-semibold rounded-md transition-colors text-base"
+						className="w-full h-16 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-md transition-colors text-base"
 					>
 						채팅방으로 이동
 					</Button>
@@ -238,7 +238,7 @@ function MeetingActionButtons({
 				return (
 					<FixedBottomButton
 						onClick={onChat || handleChatClick}
-						className="bg-yellow-400 hover:bg-yellow-500 text-gray font-semibold"
+						className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
 					>
 						채팅방으로 이동
 					</FixedBottomButton>
