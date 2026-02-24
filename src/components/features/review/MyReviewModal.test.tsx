@@ -3,6 +3,8 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
+import { MAX_REVIEW_IMAGES } from '@/constants/images';
+
 import MyReviewModal from './MyReviewModal';
 
 // 훅 모킹
@@ -122,7 +124,9 @@ describe('MyReviewModal', () => {
 		const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
 		if (!fileInput) throw new Error('파일 입력창을 찾을 수 없습니다.');
 
-		const files = Array(8).fill(new File(['(⌐□_□)'], 'test.png', { type: 'image/png' }));
+		const files = Array(MAX_REVIEW_IMAGES).fill(
+			new File(['(⌐□_□)'], 'test.png', { type: 'image/png' }),
+		);
 		await userEvent.upload(fileInput, files);
 
 		// 업로드 시뮬레이션 후 에러 없이 동작하는지 확인

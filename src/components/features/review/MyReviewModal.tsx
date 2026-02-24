@@ -13,6 +13,7 @@ import AlertNotification from '@/components/features/modal/AlertNotification';
 import { FormImageUpload } from '@/components/features/modal/components/FormImageUpload';
 import { FormModal } from '@/components/features/modal/components/FormModal';
 import { Textarea } from '@/components/ui/textarea';
+import { MAX_REVIEW_IMAGES, IMAGE_SLOTS } from '@/constants/images';
 import { useMyReviewQuery } from '@/hooks/useMyReviewQuery';
 import { useReviewMutation, useUpdateReviewMutation } from '@/hooks/useReviewMutations';
 
@@ -131,7 +132,7 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 			// image1~image8 슬롯 맵 생성 및 기존 이미지 목록 생성
 			const slotMap: Record<string, number> = {};
 			const existingImages: string[] = [];
-			for (let i = 1; i <= 8; i++) {
+			for (let i = 1; i <= MAX_REVIEW_IMAGES; i++) {
 				const key = `image${i}` as keyof typeof review;
 				const url = review[key] as string | null | undefined;
 				if (url) {
@@ -245,8 +246,8 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 			const usedSlots = new Set(
 				existingUrls.map((url) => initialUrlToSlotMap[url]).filter(Boolean),
 			);
-			// 사용 가능한 슬롯 번호 (1~8 중 사용 중이지 않은 것)
-			const availableSlots = [1, 2, 3, 4, 5, 6, 7, 8].filter((slot) => !usedSlots.has(slot));
+			// 사용 가능한 슬롯 번호 (1~MAX_REVIEW_IMAGES 중 사용 중이지 않은 것)
+			const availableSlots = IMAGE_SLOTS.filter((slot) => !usedSlots.has(slot));
 
 			newFiles.forEach((file, i) => {
 				const slot = availableSlots[i];
@@ -341,7 +342,7 @@ const MyReviewModal: React.FC<ReviewModalProps> = ({
 						previewImages={images}
 						onImagesChange={handleImagesChange}
 						onRemoveImage={handleRemoveImage}
-						maxImages={8}
+						maxImages={MAX_REVIEW_IMAGES}
 						enableDragAndDrop={true}
 						dragDropHintText={
 							<p>
