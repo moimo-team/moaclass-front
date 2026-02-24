@@ -35,6 +35,7 @@ export function CurriculumSection() {
 				error={errors.curriculum?.message}
 				className="min-h-[120px]"
 				required
+				labelClassName="text-lg"
 			/>
 
 			{/* 난이도 */}

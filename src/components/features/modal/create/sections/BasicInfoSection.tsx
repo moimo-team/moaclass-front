@@ -26,6 +26,7 @@ export function BasicInfoSection() {
 				currentLength={titleLength}
 				error={errors.title?.message}
 				required
+				labelClassName="text-lg"
 			/>
 
 			<FormTextarea
@@ -38,6 +39,7 @@ export function BasicInfoSection() {
 				error={errors.description?.message}
 				className="min-h-[120px]"
 				required
+				labelClassName="text-lg"
 			/>
 		</>
 	);
