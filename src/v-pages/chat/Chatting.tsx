@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { getMyChatRooms, getRoomMessages } from '@/api/chat.api';
+import { getMyChatRooms, getRoomMessages, joinChatRoom } from '@/api/chat.api';
 import ChatMessageSection from '@/components/features/chattings/ChatMessageSection';
 import ChatRoomListSection from '@/components/features/chattings/ChatRoomListSection';
 import LessonChatMessageSection from '@/components/features/chattings/LessonChatMessageSection';
@@ -65,7 +65,7 @@ export const ChattingContent = ({
 	initialMeetingId,
 	initialLessonId,
 }: ChattingContentProps) => {
-	const { userId } = useAuthStore();
+	const { userId, isLoggedIn } = useAuthStore();
 	const location = useLocation();
 	const locationState = (location.state as ChatLocationState) ?? null;
 	// Query props are the canonical source in Next.js; location.state is fallback only.
@@ -225,6 +225,43 @@ export const ChattingContent = ({
 	);
 
 	const { sendMessage } = useChatSocket(selectedRoomId, handleNewMessage);
+
+	useEffect(() => {
+		if (!useInitialRouteSelection || !isLoggedIn) return;
+
+		const ensureMeetingRoomFromRoute = async () => {
+			if (routeChatType !== 'meeting' || !routeMeetingId) return;
+			if (initialMeetingRoomFromRoute) return;
+
+			try {
+				const joinedRoom = await joinChatRoom({ meetingId: routeMeetingId });
+				const refetchResult = await refetchChatRooms();
+				const rooms = refetchResult.data ?? [];
+				const matchedRoom =
+					rooms.find((room) => room.roomId === joinedRoom.roomId) ??
+					rooms.find((room) => room.meetingId === routeMeetingId);
+
+				if (matchedRoom) {
+					setSelectedMeeting({
+						...matchedRoom,
+						title: resolveRoomTitle(matchedRoom),
+					});
+					setUseInitialRouteSelection(false);
+				}
+			} catch {
+				toast.error('모임 채팅방을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+			}
+		};
+
+		void ensureMeetingRoomFromRoute();
+	}, [
+		useInitialRouteSelection,
+		isLoggedIn,
+		routeChatType,
+		routeMeetingId,
+		initialMeetingRoomFromRoute,
+		refetchChatRooms,
+	]);
 
 	// 방 전환 시 history는 REST로 새로 로드(socket은 실시간 이벤트 전용)
 	useEffect(() => {
