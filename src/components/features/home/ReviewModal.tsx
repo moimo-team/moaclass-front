@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Link } from 'react-router-dom';
 
 import defaultMeetingImage from '@/assets/images/moimo-meetings.png';
+import defaultProfileImage from '@/assets/images/profile.png';
 import StarRating from '@/components/common/StarRating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,9 @@ interface ReviewModalProps {
 
 const ReviewModal: React.FC<ReviewModalProps> = ({ open, onOpenChange, review }) => {
 	const displayImage = review.representativeImage || defaultMeetingImage;
-	const reviewerProfileImage = 'https://github.com/shadcn.png';
+	const reviewerProfileImage = review.profileImage || defaultProfileImage;
+	const reviewerName = review.nickname?.trim() || '모멘티';
+	const reviewerInitial = reviewerName.charAt(0);
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -47,12 +50,10 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ open, onOpenChange, review })
 							<div className="flex items-center gap-2">
 								<Avatar className="h-8 w-8">
 									<AvatarImage src={reviewerProfileImage} />
-									<AvatarFallback>
-										{String(review.userId).charAt(0)}
-									</AvatarFallback>
+									<AvatarFallback>{reviewerInitial}</AvatarFallback>
 								</Avatar>
 								<div>
-									<p className="font-semibold text-sm">User {review.userId}</p>
+									<p className="font-semibold text-sm">{reviewerName}</p>
 								</div>
 							</div>
 							<StarRating rating={review.rating} starSize={16} />
