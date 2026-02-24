@@ -26,16 +26,11 @@ export interface ChatMessageResponse {
 // 채팅방 목록 조회 API 응답
 export interface ChatRoom {
 	roomId: number;
-	chatType?: ChatType;
-	meetingId?: number;
-	lessonId?: number;
-	studentId?: number;
+	meetingId: number | null;
+	lessonId: number | null;
 	title: string;
 	displayTitle?: string;
-	image: string | null;
-	memberCount: number;
-	isLeader: boolean;
-	hostId: number;
-	lastMessage?: string;
-	updatedAt?: string;
+	lastMessage: string | null;
+	updatedAt: string;
+	representativeImage: string | null;
 }

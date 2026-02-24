@@ -160,8 +160,8 @@ describe('ChattingContent', () => {
 	const meetingRoom1 = BASE_MEETING_ROOM;
 	const meetingRoom2 = createChatRoomFixture({
 		roomId: 102,
-		chatType: 'meeting',
 		meetingId: 11,
+		lessonId: null,
 		title: '????щ떇 紐⑥엫',
 	});
 	const lessonRoom = { ...BASE_LESSON_ROOM, displayTitle: `${BASE_LESSON_ROOM.title} | student` };

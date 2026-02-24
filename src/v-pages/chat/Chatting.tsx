@@ -20,23 +20,22 @@ type ChatLocationState = {
 	lessonId?: number;
 } | null;
 
-const getRoomIdFromRoom = (room: ChatRoom): number => room.roomId ?? room.meetingId ?? 0;
+const getRoomIdFromRoom = (room: ChatRoom): number => room.roomId;
 const getRoomIdFromMessage = (message: ChatMessage): number => message.roomId;
 
 // API/socket payload 차이 정규화
 const normalizeMessage = (message: ChatMessage): ChatMessage => message;
 
 const resolveChatType = (room: ChatRoom): ChatType => {
-	if (room.chatType) return room.chatType;
-	if (room.lessonId) return 'lesson';
+	if (room.meetingId !== null) return 'meeting';
+	if (room.lessonId !== null) return 'lesson';
 	return 'meeting';
 };
 
 const isMentorLessonRoom = (room: ChatRoom): boolean => {
-	if (!room.lessonId) return false;
+	if (room.lessonId === null) return false;
 	const displayTitle = room.displayTitle?.trim();
-	if (!displayTitle) return false;
-	return displayTitle !== room.title;
+	return Boolean(displayTitle);
 };
 
 const resolveRoomTitle = (room: ChatRoom): string => {

@@ -1,4 +1,4 @@
-import { fakerKO as faker } from '@faker-js/faker';
+﻿import { fakerKO as faker } from '@faker-js/faker';
 
 import type { ChatMessage, ChatRoom, MessageSender } from '@/models/chat.model';
 import type { User } from '@/models/user.model';
@@ -106,44 +106,35 @@ const buildUpdatedAt = (roomId: number): string => {
 	return lastMessage.createdAt;
 };
 
-const meetingRooms: ChatRoom[] = [1, 2, 3].map((roomId, i) => ({
+const meetingRooms: ChatRoom[] = [1, 2, 3].map((roomId) => ({
 	roomId,
-	chatType: 'meeting',
 	meetingId: roomId,
+	lessonId: null,
 	title: `모임 채팅방 ${roomId}`,
-	memberCount: faker.number.int({ min: 2, max: 10 }),
-	image: faker.image.urlLoremFlickr({ category: 'nature' }),
+	representativeImage: faker.image.urlLoremFlickr({ category: 'nature' }),
 	lastMessage: buildLastMessage(roomId),
 	updatedAt: buildUpdatedAt(roomId),
-	hostId: meetingUser1.id,
-	isLeader: i % 2 === 0,
 }));
 
 const lessonRooms: ChatRoom[] = [
 	{
 		roomId: 101,
 		lessonId: 1,
-		studentId: lessonStudentA.id,
 		studentName: lessonStudentA.nickname,
 	},
 	{
 		roomId: 102,
 		lessonId: 1,
-		studentId: lessonStudentB.id,
 		studentName: lessonStudentB.nickname,
 	},
-].map(({ roomId, lessonId, studentId, studentName }) => ({
+].map(({ roomId, lessonId, studentName }) => ({
 	roomId,
-	chatType: 'lesson' as const,
+	meetingId: null,
 	lessonId,
-	studentId,
 	title: `레슨 ${lessonId} 문의 (${studentName})`,
-	memberCount: 2,
-	image: faker.image.urlLoremFlickr({ category: 'people' }),
+	representativeImage: faker.image.urlLoremFlickr({ category: 'people' }),
 	lastMessage: buildLastMessage(roomId),
 	updatedAt: buildUpdatedAt(roomId),
-	hostId: lessonMentor.id,
-	isLeader: false,
 }));
 
 export const mockChatRooms: ChatRoom[] = [...meetingRooms, ...lessonRooms];

@@ -77,7 +77,6 @@ const ChatMessageSection: React.FC<ChatMessageSectionProps> = ({
 							<ChatMessageItem
 								message={msg}
 								isMine={msg.senderId === userId}
-								hostId={selectedMeeting.hostId}
 								hostBadgeLabel={hostBadgeLabel}
 								forceShowHostBadge={
 									typeof lessonMentorView === 'boolean'

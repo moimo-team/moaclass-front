@@ -41,7 +41,7 @@ const LessonChatRoomListSection: React.FC<LessonChatRoomListSectionProps> = ({
 							>
 								<ChatRoomItem
 									id={room.roomId}
-									meetingImage={room.image}
+									meetingImage={room.representativeImage}
 									meetingTitle={room.title}
 									lastMessageContent={room.lastMessage || '대화를 시작하세요'}
 									lastMessageTime={

@@ -8,7 +8,7 @@ import { getImageSrc } from '@/utils/imageUtils';
 interface ChatMessageProps {
 	message: ChatMessageType;
 	isMine: boolean;
-	hostId: number;
+	hostId?: number;
 	hostBadgeLabel?: string;
 	forceShowHostBadge?: boolean;
 }
@@ -23,7 +23,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 	const { content, createdAt } = message;
 	const sender = message.sender;
 
-	const isHost = sender.id === hostId;
+	const isHost = typeof hostId === 'number' ? sender.id === hostId : false;
 	const showHostBadge =
 		typeof forceShowHostBadge === 'boolean' ? forceShowHostBadge : !isMine && isHost;
 	const defaultProfileImage = getImageSrc(defaultProfileIcon);

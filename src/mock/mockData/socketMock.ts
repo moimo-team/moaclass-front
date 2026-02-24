@@ -44,7 +44,7 @@ const emitNewChatNotification = (
 	notifyListeners: Array<(payload: Notification) => void>,
 ) => {
 	const room = mockChatRooms.find((item) => item.roomId === roomId);
-	if (!room || room.chatType !== 'lesson') return;
+	if (!room || room.lessonId === null) return;
 	if (!shouldEmitNewChat(roomId)) return;
 
 	const notification: Notification = {

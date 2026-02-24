@@ -22,10 +22,30 @@ type RawJoinChatRoomResponse = {
 	lessonId?: number | null;
 };
 
+type RawMyChatRoom = {
+	roomId: number;
+	meetingId: number | null;
+	lessonId: number | null;
+	title: string;
+	displayTitle?: string;
+	lastMessage: string | null;
+	updatedAt: string;
+	representativeImage: string | null;
+};
+
 // 내 채팅방 목록 조회
 export const getMyChatRooms = async (): Promise<ChatRoom[]> => {
-	const response = await chatApiClient.get<ChatRoom[]>('/chats/rooms/me');
-	return response.data;
+	const response = await chatApiClient.get<RawMyChatRoom[]>('/chats/rooms/me');
+	return response.data.map((room) => ({
+		roomId: room.roomId,
+		meetingId: room.meetingId,
+		lessonId: room.lessonId,
+		title: room.title,
+		displayTitle: room.displayTitle,
+		lastMessage: room.lastMessage,
+		updatedAt: room.updatedAt,
+		representativeImage: room.representativeImage,
+	}));
 };
 
 // 기존 호출부 호환용 alias
