@@ -137,7 +137,7 @@ export const ScheduleSidebar = ({
 							<div className="flex items-center gap-2 px-1">
 								<div className="w-1.5 h-1.5 rounded-full bg-carrot" />
 								<h4 className="text-xs font-black text-gray-400 uppercase tracking-widest">
-									모멘티 O
+									신청자 있음
 								</h4>
 							</div>
 							<div className="grid gap-2.5">
@@ -160,7 +160,7 @@ export const ScheduleSidebar = ({
 								<div className="flex items-center gap-2">
 									<div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
 									<h4 className="text-xs font-black text-gray-400 uppercase tracking-widest">
-										모멘티 X
+										일정 있음
 									</h4>
 								</div>
 								<div className="flex items-center gap-1.5">

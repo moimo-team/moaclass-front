@@ -17,6 +17,7 @@ import { ScheduleCalendar } from '@/components/features/class-manage/schedule/Sc
 import { ScheduleSidebar } from '@/components/features/class-manage/schedule/ScheduleSidebar';
 import { CreateScheduleModal } from '@/components/features/modal/create/CreateScheduleModal';
 import { Button } from '@/components/ui/button';
+import { useLessonQuery } from '@/hooks/useLessonQuery';
 import { useScheduleQuery } from '@/hooks/useScheduleQuery';
 
 export interface ScheduleManagementProps {
@@ -34,7 +35,12 @@ export const ScheduleManagementContent = ({
 	const [selectedDates, setSelectedDates] = useState<Date[]>([]);
 	const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
-	const { data, isLoading, isError } = useScheduleQuery(Number(lessonId));
+	const {
+		data,
+		isLoading: isScheduleLoading,
+		isError: isScheduleError,
+	} = useScheduleQuery(Number(lessonId));
+	const { data: lesson, isLoading: isLessonLoading } = useLessonQuery(Number(lessonId));
 
 	const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
 	const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
@@ -73,9 +79,9 @@ export const ScheduleManagementContent = ({
 		});
 	};
 
-	if (isLoading) return <LoadingSpinner />;
+	if (isScheduleLoading || isLessonLoading) return <LoadingSpinner />;
 
-	if (isError) {
+	if (isScheduleError) {
 		return (
 			<div className="flex flex-col items-center justify-center min-h-screen gap-4">
 				<p className="text-red-500 font-medium">일정을 불러올 수 없습니다.</p>
@@ -101,7 +107,10 @@ export const ScheduleManagementContent = ({
 							일정 및 예약 관리
 						</h1>
 						<p className="text-sm text-gray-500 mt-1 font-medium">
-							클래스 {lessonId}의 일정을 관리합니다.
+							<span className="font-bold">
+								{lesson?.title ? `${lesson.title}` : `${lessonId}`}
+							</span>
+							의 일정을 관리합니다.
 						</p>
 					</div>
 				</div>

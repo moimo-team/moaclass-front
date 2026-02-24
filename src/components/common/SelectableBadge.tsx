@@ -1,5 +1,3 @@
-import { X } from 'lucide-react';
-
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -62,7 +60,6 @@ export function SelectableBadge({
 			onClick={onClick}
 		>
 			{label}
-			{isSelected && <X className={cn('ml-1', size === 'md' ? 'h-3 w-3' : 'h-2.5 w-2.5')} />}
 		</Badge>
 	);
 }

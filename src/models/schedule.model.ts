@@ -16,6 +16,7 @@ export interface LessonSchedule {
 	currentParticipants: number;
 	maxParticipants: number;
 	status: LessonScheduleStatus;
+	durationMin: number;
 	createdAt: string;
 }
 
