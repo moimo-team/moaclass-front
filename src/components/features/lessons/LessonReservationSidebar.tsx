@@ -64,22 +64,50 @@ export const LessonReservationSidebar = ({
 	const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 	const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
 
+	// 오늘 날짜 00:00:00으로 정규화 (비교용)
+	const normalizedToday = useMemo(() => {
+		const d = new Date(today);
+		d.setHours(0, 0, 0, 0);
+		return d;
+	}, [today]);
+
+	const minSelectableDate = useMemo(() => {
+		const d = new Date(normalizedToday);
+		d.setDate(d.getDate() + reservationLeadDays);
+		return d;
+	}, [normalizedToday, reservationLeadDays]);
+
 	const availableScheduleDates = useMemo(
 		() =>
 			new Set(
 				schedules
-					.filter((schedule) => schedule.status === 'RECRUITING')
+					.filter((schedule) => {
+						const isRecruiting = schedule.status === 'RECRUITING';
+						const startAtDate = new Date(schedule.startAt);
+						// 이미 시작된 스케줄 제외
+						const isNotPast = startAtDate > today;
+						// 최소 리드 타임 준수 여부
+						const isWithinLeadTime = startAtDate >= minSelectableDate;
+
+						return isRecruiting && isNotPast && isWithinLeadTime;
+					})
 					.map((schedule) => toYYYYMMDD(schedule.startAt)),
 			),
-		[schedules],
+		[schedules, today, minSelectableDate],
 	);
 
 	const filteredSchedules = useMemo(() => {
 		if (selectedDate) {
-			return schedules.filter((s) => s.startAt.substring(0, 10) === selectedDate);
+			const dateStr = selectedDate;
+			return schedules.filter((s) => {
+				const isSameDay = s.startAt.substring(0, 10) === dateStr;
+				const isNotPast = new Date(s.startAt) > today;
+				const isWithinLeadTime = new Date(s.startAt) >= minSelectableDate;
+				return isSameDay && s.status === 'RECRUITING' && isNotPast && isWithinLeadTime;
+			});
 		}
 		return [];
-	}, [selectedDate, schedules]);
+	}, [selectedDate, schedules, today, minSelectableDate]);
 
 	const selectedSchedule = useMemo(
 		() => schedules.find((schedule) => schedule.id === selectedScheduleId) ?? null,
@@ -200,7 +228,9 @@ export const LessonReservationSidebar = ({
 									}
 									onSelect={handleDateSelect}
 									initialFocus
-									disabled={(date) => date < today || date > threeMonthsLater}
+									disabled={(date) =>
+										date < minSelectableDate || date > threeMonthsLater
+									}
 									modifiers={{
 										hasSchedule: (date) =>
 											availableScheduleDates.has(formatDateKeyLocal(date)),
