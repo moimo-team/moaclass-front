@@ -269,7 +269,6 @@ export const myMeetings: MyMeetingsResponse[] = Array.from({ length: 60 }, (_, i
 	const status: ParticipationStatus =
 		i % 4 === 0 ? 'PENDING' : i % 5 === 0 ? 'REJECTED' : 'ACCEPTED';
 	const interest = interestCategories[i % interestCategories.length];
-
 	return {
 		meetingId: 101 + i,
 		title: faker.company.catchPhrase(),

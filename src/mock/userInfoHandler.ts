@@ -5,7 +5,7 @@ import { httpUrl } from './mockData/mockData';
 const mockMemberInfo = {
 	id: 4,
 	email: 'moimi@email.com',
-	nickname: '모이미지롱',
+	nickname: '모임원지롱',
 	bio: '소개글입니다222',
 	interests: [
 		{ id: 1, name: '인간관계(친목)' },

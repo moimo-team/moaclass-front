@@ -55,7 +55,7 @@ function DateTimePicker({
 							!date && 'text-muted-foreground',
 						)}
 					>
-						<CalendarIcon className="mr-2 h-4 w-4" />
+						<CalendarIcon className="mr-2 h-4 w-4 text-primary" />
 						{date ? (
 							format(date, 'PPP', { locale: ko })
 						) : (
@@ -63,41 +63,17 @@ function DateTimePicker({
 						)}
 					</Button>
 				</PopoverTrigger>
-				<PopoverContent className="w-auto p-3" align="start">
+				<PopoverContent
+					className="w-[var(--radix-popover-trigger-width)] p-3"
+					align="start"
+				>
 					<Calendar
 						mode="single"
 						selected={date}
 						onSelect={handleDateSelect}
 						disabled={(date) => date < new Date()}
-						className="rounded-md border"
-						classNames={{
-							months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
-							month: 'space-y-4',
-							caption: 'flex justify-between pt-1 relative items-center w-full',
-							caption_label: 'text-sm font-medium',
-							nav: 'flex items-center gap-1',
-							nav_button:
-								'h-10 w-10 bg-transparent p-0 opacity-70 hover:opacity-100 border rounded-md hover:bg-accent transition-all',
-							nav_button_previous: '',
-							nav_button_next: '',
-							table: 'w-full border-collapse space-y-1 mt-4',
-							head_row: 'flex',
-							head_cell:
-								'text-muted-foreground rounded-md w-10 font-normal text-[0.8rem]',
-							row: 'flex w-full mt-2',
-							cell: 'h-10 w-10 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
-							day: 'h-10 w-10 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground rounded-md transition-colors',
-							day_range_end: 'day-range-end',
-							day_selected:
-								'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
-							day_today: 'bg-accent text-accent-foreground font-semibold',
-							day_outside:
-								'day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30',
-							day_disabled: 'text-muted-foreground opacity-50',
-							day_range_middle:
-								'aria-selected:bg-accent aria-selected:text-accent-foreground',
-							day_hidden: 'invisible',
-						}}
+						className="w-full [--cell-size:clamp(2.25rem,calc((var(--radix-popover-trigger-width)-2rem-0.75rem)/7),3rem)]"
+						classNames={{ root: 'w-full' }}
 					/>
 				</PopoverContent>
 			</Popover>

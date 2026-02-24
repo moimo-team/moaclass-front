@@ -6,6 +6,10 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import type { CreatePaymentResponse } from '@/api/pay.api';
+import { CouponModal } from '@/components/features/coupon/CouponModal';
+import AlertNotification from '@/components/features/modal/AlertNotification';
+import { FormInput } from '@/components/features/modal/components/FormInput';
+import ConfirmDialog from '@/components/features/modal/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
@@ -17,9 +21,6 @@ import type { PayPreviewResponse } from '@/models/pay.model';
 import type { PayErrorResponse } from '@/models/pay.model';
 
 import { PaySectionCard } from './PaySectionCard';
-import { CouponModal } from '../coupon/CouponModal';
-import AlertNotification from '../modal/AlertNotification';
-import { FormInput } from '../modal/components/FormInput';
 
 const PAY_ERROR_MESSAGES: Record<string, string> = {
 	INSUFFICIENT_POINTS: '보유 포인트가 부족하여 결제를 진행할 수 없습니다.',
@@ -51,6 +52,7 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId, email }: PayInf
 	const [appliedCoupon, setAppliedCoupon] = useState<CouponInfo | null>(null);
 	const [successData, setSuccessData] = useState<CreatePaymentResponse | null>(null);
 	const [errorData, setErrorData] = useState<PayErrorResponse | null>(null);
+	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 	const [paymentStatus, setPaymentStatus] = useState<{
 		isOpen: boolean;
 		type: 'SUCCESS' | 'ERROR' | null;
@@ -80,8 +82,8 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId, email }: PayInf
 	const finalPrice = appliedCoupon ? (calculationResult?.finalPrice ?? subtotal) : subtotal;
 	const canPay = appliedCoupon ? (calculationResult?.canPay ?? initialCanPay) : initialCanPay;
 
-	// 결제하기
-	const handlePay = async (e: React.MouseEvent<HTMLButtonElement>) => {
+	// 결제하기 클릭 시 확인 다이얼로그 노출
+	const handlePay = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 
 		if (!userId) {
@@ -89,6 +91,11 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId, email }: PayInf
 			return;
 		}
 
+		setIsConfirmOpen(true);
+	};
+
+	// 실제 결제 로직 수행
+	const executePayment = async () => {
 		try {
 			const payResult = await createPayment({
 				quantity,
@@ -187,6 +194,16 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId, email }: PayInf
 					selectedId={appliedCoupon?.id}
 					// availableCoupons={userCoupons || []} // API에서 불러온 쿠폰 목록 전달
 					availableCoupons={availableCoupons || []}
+				/>
+
+				<ConfirmDialog
+					open={isConfirmOpen}
+					onOpenChange={setIsConfirmOpen}
+					title="결제하시겠습니까?"
+					description={`총 ${finalPrice.toLocaleString()}원이 보유하신 포인트에서 차감됩니다.`}
+					confirmText="결제하기"
+					cancelText="취소"
+					onConfirm={executePayment}
 				/>
 
 				{/* 결제 성공/실패 알림창 */}

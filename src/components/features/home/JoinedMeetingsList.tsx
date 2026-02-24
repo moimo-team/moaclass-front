@@ -25,7 +25,11 @@ function JoinedMeetingsList() {
 
 	return (
 		<div className="w-full max-w-6xl mx-auto py-8">
-			<div className="text-xl font-bold mb-4">{nickname} 님이 가입한 모임</div>
+			<div className="flex justify-between items-center w-full mb-6">
+				<div className="text-2xl font-bold text-foreground">
+					{nickname} 님이 가입한 모임
+				</div>
+			</div>
 			<MeetingList meetings={meetings} />
 		</div>
 	);
