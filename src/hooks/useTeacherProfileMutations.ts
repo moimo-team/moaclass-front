@@ -59,6 +59,7 @@ export const useCreateTeacherProfileMutation = () => {
 		mutationFn: createTeacherProfile,
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
+			queryClient.invalidateQueries({ queryKey: ['teacherProfile'] });
 			toast.success('모멘토 프로필이 등록되었습니다.');
 		},
 	});
@@ -71,8 +72,13 @@ export const useUpdateTeacherProfileMutation = () => {
 	return useMutation({
 		mutationFn: updateTeacherProfile,
 		onSuccess: () => {
+			const userId = useAuthStore.getState().userId;
 			queryClient.invalidateQueries({ queryKey: ['authUser'] });
 			queryClient.invalidateQueries({ queryKey: ['teacherProfile'] });
+			// 특정 유저의 프로필 쿼리도 명시적으로 무효화
+			if (userId) {
+				queryClient.invalidateQueries({ queryKey: ['teacherProfile', userId] });
+			}
 			toast.success('모멘토 프로필이 수정되었습니다.');
 		},
 	});
