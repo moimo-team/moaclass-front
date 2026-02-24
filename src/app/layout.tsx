@@ -2,6 +2,7 @@ import Script from 'next/script';
 
 import Footer from '@/components/common/Footer';
 import Header from '@/components/common/Header';
+import ScrollToTop from '@/components/common/ScrollToTop';
 import Providers from '@/components/providers/Providers';
 import { SITE_URL } from '@/constants/site';
 
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			<body>
 				<div id="root">
 					<Providers>
+						<ScrollToTop />
 						<div className="flex flex-col min-h-screen">
 							<Header />
 							<main className="flex-1 flex flex-col w-full max-w-7xl mx-auto px-4 md:px-8">
