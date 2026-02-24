@@ -20,6 +20,7 @@ interface ChatMessageSectionProps {
 	scrollRef: React.RefObject<HTMLDivElement | null>;
 	userId: number | null;
 	hostBadgeLabel?: string;
+	lessonMentorView?: boolean;
 }
 
 const ChatMessageSection: React.FC<ChatMessageSectionProps> = ({
@@ -32,6 +33,7 @@ const ChatMessageSection: React.FC<ChatMessageSectionProps> = ({
 	scrollRef,
 	userId,
 	hostBadgeLabel,
+	lessonMentorView,
 }) => {
 	if (!selectedMeeting) {
 		return (
@@ -77,6 +79,13 @@ const ChatMessageSection: React.FC<ChatMessageSectionProps> = ({
 								isMine={msg.senderId === userId}
 								hostId={selectedMeeting.hostId}
 								hostBadgeLabel={hostBadgeLabel}
+								forceShowHostBadge={
+									typeof lessonMentorView === 'boolean'
+										? lessonMentorView
+											? msg.senderId === userId
+											: msg.senderId !== userId
+										: undefined
+								}
 							/>
 						</Fragment>
 					);

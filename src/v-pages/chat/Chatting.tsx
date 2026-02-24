@@ -32,6 +32,17 @@ const resolveChatType = (room: ChatRoom): ChatType => {
 	return 'meeting';
 };
 
+const isMentorLessonRoom = (room: ChatRoom): boolean => {
+	if (!room.lessonId) return false;
+	const displayTitle = room.displayTitle?.trim();
+	if (!displayTitle) return false;
+	return displayTitle !== room.title;
+};
+
+const resolveRoomTitle = (room: ChatRoom): string => {
+	return isMentorLessonRoom(room) ? room.displayTitle!.trim() : room.title;
+};
+
 interface ChattingContentProps {
 	initialRoomId?: number;
 	initialChatType?: ChatType;
@@ -84,11 +95,34 @@ export const ChattingContent = ({
 	});
 
 	const meetingRooms = useMemo(
-		() => chatRooms?.filter((room) => resolveChatType(room) === 'meeting') ?? [],
+		() =>
+			chatRooms
+				?.filter((room) => resolveChatType(room) === 'meeting')
+				.map((room) => ({
+					...room,
+					title: resolveRoomTitle(room),
+				})) ?? [],
 		[chatRooms],
 	);
 	const lessonRooms = useMemo(
-		() => chatRooms?.filter((room) => resolveChatType(room) === 'lesson') ?? [],
+		() =>
+			chatRooms
+				?.filter((room) => resolveChatType(room) === 'lesson')
+				.map((room) => ({
+					...room,
+					title: resolveRoomTitle(room),
+				})) ?? [],
+		[chatRooms],
+	);
+	const mentorLessonRoomIds = useMemo(
+		() =>
+			new Set(
+				(chatRooms ?? [])
+					.filter(
+						(room) => resolveChatType(room) === 'lesson' && isMentorLessonRoom(room),
+					)
+					.map((room) => room.roomId),
+			),
 		[chatRooms],
 	);
 
@@ -307,6 +341,9 @@ export const ChattingContent = ({
 					/>
 					<LessonChatMessageSection
 						selectedRoom={selectedRoom}
+						isMentorView={
+							selectedRoom ? mentorLessonRoomIds.has(selectedRoom.roomId) : false
+						}
 						messages={messages}
 						sendMessage={handleSendMessage}
 						inputValue={inputValue}

@@ -10,18 +10,22 @@ interface ChatMessageProps {
 	isMine: boolean;
 	hostId: number;
 	hostBadgeLabel?: string;
+	forceShowHostBadge?: boolean;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
 	message,
 	isMine,
 	hostId,
-	hostBadgeLabel = '호스트',
+	hostBadgeLabel = '?몄뒪??',
+	forceShowHostBadge,
 }) => {
 	const { content, createdAt } = message;
 	const sender = message.sender;
 
 	const isHost = sender.id === hostId;
+	const showHostBadge =
+		typeof forceShowHostBadge === 'boolean' ? forceShowHostBadge : !isMine && isHost;
 	const defaultProfileImage = getImageSrc(defaultProfileIcon);
 	const senderImageSrc =
 		typeof sender.image === 'string' && sender.image.trim().length > 0
@@ -43,10 +47,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 			)}
 
 			<div className={cn('flex flex-col gap-1', isMine ? 'items-end' : 'items-start')}>
-				{!isMine && (
+				{(!isMine || showHostBadge) && (
 					<div className="flex items-center gap-2">
-						<span className="font-semibold text-sm">{sender.nickname}</span>
-						{isHost && (
+						{!isMine && (
+							<span className="font-semibold text-sm">{sender.nickname}</span>
+						)}
+						{showHostBadge && (
 							<Badge
 								variant="outline"
 								className="bg-orange-100 text-orange-700 border-orange-300"

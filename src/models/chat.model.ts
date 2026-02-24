@@ -31,6 +31,7 @@ export interface ChatRoom {
 	lessonId?: number;
 	studentId?: number;
 	title: string;
+	displayTitle?: string;
 	image: string | null;
 	memberCount: number;
 	isLeader: boolean;

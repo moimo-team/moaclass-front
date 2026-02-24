@@ -64,6 +64,7 @@ vi.mock('@/components/features/chattings/ChatRoomListSection', () => ({
 		<div>
 			<div data-testid="meeting-order">{chatRooms.map((room) => room.roomId).join(',')}</div>
 			<div data-testid="selected-meeting">{String(selectedMeetingId ?? '')}</div>
+			<div data-testid="meeting-titles">{chatRooms.map((room) => room.title).join('|')}</div>
 			{chatRooms.map((room) => (
 				<button key={room.roomId} type="button" onClick={() => onSelectRoom(room)}>
 					select-{room.roomId}
@@ -85,6 +86,7 @@ vi.mock('@/components/features/chattings/LessonChatRoomListSection', () => ({
 	}) => (
 		<div>
 			<div data-testid="selected-lesson">{String(selectedRoomId ?? '')}</div>
+			<div data-testid="lesson-titles">{chatRooms.map((room) => room.title).join('|')}</div>
 			{chatRooms.map((room) => (
 				<button key={room.roomId} type="button" onClick={() => onSelectRoom(room)}>
 					select-lesson-{room.roomId}
@@ -155,7 +157,7 @@ describe('ChattingContent', () => {
 		meetingId: 11,
 		title: '저녁 러닝 모임',
 	});
-	const lessonRoom = BASE_LESSON_ROOM;
+	const lessonRoom = { ...BASE_LESSON_ROOM, displayTitle: `${BASE_LESSON_ROOM.title} | student` };
 
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -312,10 +314,21 @@ describe('ChattingContent', () => {
 			expect(screen.getByText('meeting-history')).toBeInTheDocument();
 		});
 
-		await userEvent.click(screen.getByRole('button', { name: '클래스 채팅' }));
+		await userEvent.click(screen.getByRole('button', { name: '클래스 채팅 문의' }));
 		await userEvent.click(await screen.findByText(`select-lesson-${lessonRoom.roomId}`));
 		await waitFor(() => {
 			expect(screen.getByText('lesson-history')).toBeInTheDocument();
+		});
+	});
+
+	it('uses displayTitle for lesson rooms when displayTitle differs from title', async () => {
+		renderWithQueryClient();
+		await userEvent.click(screen.getByRole('button', { name: '클래스 채팅 문의' }));
+
+		await waitFor(() => {
+			expect(screen.getByTestId('lesson-titles').textContent).toContain(
+				lessonRoom.displayTitle,
+			);
 		});
 	});
 });

@@ -5,6 +5,7 @@ import type { ChatMessage, ChatRoom } from '@/models/chat.model';
 
 interface LessonChatMessageSectionProps {
 	selectedRoom: ChatRoom | null;
+	isMentorView: boolean;
 	messages: ChatMessage[];
 	sendMessage: () => void;
 	inputValue: string;
@@ -16,6 +17,7 @@ interface LessonChatMessageSectionProps {
 
 const LessonChatMessageSection: React.FC<LessonChatMessageSectionProps> = ({
 	selectedRoom,
+	isMentorView,
 	messages,
 	sendMessage,
 	inputValue,
@@ -45,6 +47,7 @@ const LessonChatMessageSection: React.FC<LessonChatMessageSectionProps> = ({
 			onBackToList={onBackToList}
 			scrollRef={scrollRef}
 			userId={userId}
+			lessonMentorView={isMentorView}
 			hostBadgeLabel="모멘토"
 		/>
 	);
