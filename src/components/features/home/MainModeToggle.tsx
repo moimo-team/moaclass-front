@@ -28,7 +28,7 @@ export const MainModeToggle = ({ mode, setMode }: MainModeToggleProps) => {
 						<TabsTrigger
 							value="lesson"
 							className={cn(
-								'text-xl font-nanum-bold transition-all relative pb-3 px-2 rounded-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none',
+								'text-xl font-nanum-bold transition-all relative pb-3 px-2 rounded-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none w-[140px]',
 								'text-gray-400 hover:text-gray-600',
 							)}
 						>
@@ -44,7 +44,7 @@ export const MainModeToggle = ({ mode, setMode }: MainModeToggleProps) => {
 						<TabsTrigger
 							value="meeting"
 							className={cn(
-								'text-xl font-nanum-bold transition-all relative pb-3 px-2 rounded-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none',
+								'text-xl font-nanum-bold transition-all relative pb-3 px-2 rounded-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none w-[140px]',
 								'text-gray-400 hover:text-gray-600',
 							)}
 						>
