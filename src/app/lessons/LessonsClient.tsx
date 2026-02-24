@@ -100,8 +100,7 @@ export function LessonsClient() {
 				searchParams.get('finishedFilter') === null
 					? undefined
 					: searchParams.get('finishedFilter') === 'true',
-			limit:
-				searchParams.get('limit') === null ? undefined : Number(searchParams.get('limit')),
+			limit: searchParams.get('limit') === null ? 12 : Number(searchParams.get('limit')),
 		};
 		setAllFilters(filtersFromUrl);
 		// eslint-disable-next-line react-hooks/set-state-in-effect
