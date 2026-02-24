@@ -16,6 +16,7 @@ export const usePayMutation = () => {
 		mutationFn: async (data: PayInfoValues) => {
 			return await createEnrollment(data);
 		},
+		meta: { useBackendError: true },
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['orderlist', userId] });
 		},

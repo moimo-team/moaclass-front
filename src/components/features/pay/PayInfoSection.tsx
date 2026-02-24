@@ -235,7 +235,7 @@ export const PayInfoSection = ({ payPreview, scheduleId, userId, email }: PayInf
 						) : paymentStatus.type === 'ERROR' ? (
 							<div className="space-y-3 py-4 text-left">
 								<p className="text-sm font-medium text-destructive text-center mb-2">
-									{errorData
+									{errorData?.error?.code
 										? PAY_ERROR_MESSAGES[errorData.error.code] ||
 											PAY_ERROR_MESSAGES.DEFAULT
 										: PAY_ERROR_MESSAGES.DEFAULT}
