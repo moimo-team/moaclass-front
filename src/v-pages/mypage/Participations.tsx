@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { UserCheck, ChevronLeft } from 'lucide-react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -20,10 +20,10 @@ const Participations = () => {
 	const [isRejectedOpen, setIsRejectedOpen] = useState(false);
 	const { data: participants, isLoading } = useParticipationsQuery(meetingId);
 	const { mutate: approveAll, isPending: isApproveAllPending } = useApproveAllParticipations();
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	const handleBack = () => {
-		navigate(-1);
+		router.back();
 	};
 
 	const handleApproveAll = () => {
