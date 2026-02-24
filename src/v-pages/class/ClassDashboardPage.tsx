@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
+
+import { useSearchParams, useRouter } from 'next/navigation';
 
 import { useTeacherProfileQuery } from '@/hooks/useTeacherProfileMutations';
 import { cn } from '@/lib/utils';
@@ -10,23 +12,24 @@ import TeacherProfilePage from './teacher/TeacherProfilePage';
 type TabType = 'profile' | 'classes';
 
 export const ClassDashboardContent = () => {
+	const searchParams = useSearchParams();
+	const router = useRouter();
 	const userId = useAuthStore((state) => state.userId);
 	const { data: teacherProfile, isLoading } = useTeacherProfileQuery(userId ?? undefined);
 
-	// 프로필 유무에 따라 초기 탭 설정
-	const [activeTab, setActiveTab] = useState<TabType>('profile');
-	const [isInitialCheckDone, setIsInitialCheckDone] = useState(false);
+	// URL 파라미터에서 현재 탭 가져오기 (기본값: 'classes')
+	// 프로필이 로딩된 후 프로필이 없는 경우 강제로 'profile' 탭으로 간주 (등록 유도)
+	const activeTab = useMemo(() => {
+		const tabParam = searchParams.get('tab') as TabType;
+		if (!isLoading && !teacherProfile) return 'profile';
+		return tabParam || 'classes';
+	}, [searchParams, teacherProfile, isLoading]);
 
-	// 프로필 로딩 완료 후 최초 1회만 탭 자동 업데이트
-	useEffect(() => {
-		if (!isLoading && !isInitialCheckDone) {
-			if (teacherProfile) {
-				// eslint-disable-next-line react-hooks/set-state-in-effect
-				setActiveTab('classes');
-			}
-			setIsInitialCheckDone(true);
-		}
-	}, [teacherProfile, isLoading, isInitialCheckDone]);
+	const setActiveTab = (tab: TabType) => {
+		const params = new URLSearchParams(searchParams.toString());
+		params.set('tab', tab);
+		router.replace(`?${params.toString()}`, { scroll: false });
+	};
 
 	const tabs = [
 		{ id: 'profile' as TabType, label: '모멘토 프로필' },
