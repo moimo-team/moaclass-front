@@ -77,7 +77,7 @@ export function LessonCard({ lesson, className, onToggleLike }: LessonCardProps)
 							{isLiked ? (
 								<IoIosHeart className="text-red-500 text-2xl drop-shadow-sm" />
 							) : (
-								<IoIosHeartEmpty className="text-white text-2xl drop-shadow-lg" />
+								<IoIosHeartEmpty className="text-red-500 text-2xl drop-shadow-sm" />
 							)}
 						</button>
 					</div>
