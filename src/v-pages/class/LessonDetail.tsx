@@ -199,29 +199,30 @@ export const LessonDetailContent = ({
 						/>
 					</section>
 
-					{/* 결제 섹션 */}
-					<aside aria-label="클래스 예약 정보">
-						<LessonReservationSidebar
-							reservationLeadDays={lessonDetail.reservationLeadDays}
-							price={lessonDetail.price}
-							discountRate={lessonDetail.discountRate}
-							discountedPrice={lessonDetail.discountedPrice}
-							isLoggedIn={isLoggedIn}
-							today={new Date()}
-							threeMonthsLater={(() => {
-								const d = new Date();
-								d.setMonth(d.getMonth() + 3);
-								return d;
-							})()}
-							schedules={lessonDetail.schedules}
-							maxParticipants={lessonDetail.maxParticipants}
-							onWishlistToggle={handleWishlistToggle}
-							onInquiry={handleInquiry}
-							onApplyLesson={onApplyLessonFromSidebar}
-							showLoginPrompt={setShowLoginPrompt}
-							isLiked={displayedIsLiked}
-							isOwnedByCurrentUser={isOwnedByCurrentUser}
-						/>
+					<aside aria-label="클래스 예약 정보" className="relative">
+						<div className="sticky top-[100px] transition-all duration-300">
+							<LessonReservationSidebar
+								reservationLeadDays={lessonDetail.reservationLeadDays}
+								price={lessonDetail.price}
+								discountRate={lessonDetail.discountRate}
+								discountedPrice={lessonDetail.discountedPrice}
+								isLoggedIn={isLoggedIn}
+								today={new Date()}
+								threeMonthsLater={(() => {
+									const d = new Date();
+									d.setMonth(d.getMonth() + 3);
+									return d;
+								})()}
+								schedules={lessonDetail.schedules}
+								maxParticipants={lessonDetail.maxParticipants}
+								onWishlistToggle={handleWishlistToggle}
+								onInquiry={handleInquiry}
+								onApplyLesson={onApplyLessonFromSidebar}
+								showLoginPrompt={setShowLoginPrompt}
+								isLiked={displayedIsLiked}
+								isOwnedByCurrentUser={isOwnedByCurrentUser}
+							/>
+						</div>
 					</aside>
 				</div>
 			</div>

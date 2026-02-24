@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { AiOutlineTeam } from 'react-icons/ai';
 import { IoLocationOutline } from 'react-icons/io5';
@@ -20,71 +21,79 @@ function MeetingCard({ meeting, imageUrl, className, hasPendingApplicants }: Mee
 	const { meetingId, title, address, currentParticipants } = meeting;
 	const href = `/meetings/${meetingId}`;
 	return (
-		<Link
-			to={href}
-			className="relative block w-full h-80 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			whileInView={{ opacity: 1, y: 0 }}
+			viewport={{ once: false, margin: '-50px' }}
+			transition={{ duration: 0.5, ease: 'easeOut' }}
+			className="w-full h-80"
 		>
-			<Card
-				className={cn(
-					'h-full flex flex-col overflow-hidden cursor-pointer hover:shadow-lg transition-shadow',
-					className,
-				)}
+			<Link
+				to={href}
+				className="relative block w-full h-full rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 			>
-				{hasPendingApplicants && (
-					<div
-						className="absolute top-2 left-2 w-5 h-5 rounded-full bg-orange-500 border-2 border-white shadow-md z-20"
-						title="새로운 신청자가 있습니다"
-					/>
-				)}
-				{/* 상단: 모임 사진*/}
-				<div className="relative w-full h-[60%]">
-					{isMeetingClosed(
-						meeting.currentParticipants,
-						meeting.maxParticipants,
-						meeting.meetingDate,
-					) && (
-						<div className="absolute inset-0 z-10 bg-black/40 flex items-center justify-center">
-							<span className="bg-black/60 text-white px-3 py-1.5 rounded-full text-sm font-bold border border-white/20">
-								마감됨
-							</span>
-						</div>
+				<Card
+					className={cn(
+						'h-full flex flex-col overflow-hidden cursor-pointer hover:shadow-lg transition-shadow',
+						className,
 					)}
-					<Image
-						src={imageUrl || defaultMeetingImage}
-						alt={title}
-						fill
-						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-						className={cn(
-							'w-full h-full object-cover',
-							isMeetingClosed(
-								meeting.currentParticipants,
-								meeting.maxParticipants,
-								meeting.meetingDate,
-							) && 'grayscale-[0.5]',
+				>
+					{hasPendingApplicants && (
+						<div
+							className="absolute top-2 left-2 w-5 h-5 rounded-full bg-orange-500 border-2 border-white shadow-md z-20"
+							title="새로운 신청자가 있습니다"
+						/>
+					)}
+					{/* 상단: 모임 사진*/}
+					<div className="relative w-full h-[60%]">
+						{isMeetingClosed(
+							meeting.currentParticipants,
+							meeting.maxParticipants,
+							meeting.meetingDate,
+						) && (
+							<div className="absolute inset-0 z-10 bg-black/40 flex items-center justify-center">
+								<span className="bg-black/60 text-white px-3 py-1.5 rounded-full text-sm font-bold border border-white/20">
+									마감됨
+								</span>
+							</div>
 						)}
-					/>
-				</div>
-
-				{/* 중간: 모임 제목 */}
-				<CardHeader className="p-3 flex-grow">
-					<CardTitle className="text-base font-semibold text-foreground line-clamp-1">
-						{title}
-					</CardTitle>
-				</CardHeader>
-
-				{/* 하단: 위치 및 참여자 수 */}
-				<CardFooter className="p-3 pt-0 flex gap-4 items-center text-sm text-muted-foreground border-t border-gray-50 mt-auto">
-					<div className="flex items-center gap-1.5 transition-colors">
-						<IoLocationOutline className="text-primary/70 shrink-0" size={16} />
-						<span className="line-clamp-1">{getDisplayAddress(address)}</span>
+						<Image
+							src={imageUrl || defaultMeetingImage}
+							alt={title}
+							fill
+							sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+							className={cn(
+								'w-full h-full object-cover',
+								isMeetingClosed(
+									meeting.currentParticipants,
+									meeting.maxParticipants,
+									meeting.meetingDate,
+								) && 'grayscale-[0.5]',
+							)}
+						/>
 					</div>
-					<div className="flex items-center gap-1.5 transition-colors">
-						<AiOutlineTeam className="text-primary/70 shrink-0" size={16} />
-						<span>{currentParticipants} 명</span>
-					</div>
-				</CardFooter>
-			</Card>
-		</Link>
+
+					{/* 중간: 모임 제목 */}
+					<CardHeader className="p-3 flex-grow">
+						<CardTitle className="text-base font-semibold text-foreground line-clamp-1">
+							{title}
+						</CardTitle>
+					</CardHeader>
+
+					{/* 하단: 위치 및 참여자 수 */}
+					<CardFooter className="p-3 pt-0 flex gap-4 items-center text-sm text-muted-foreground border-t border-gray-50 mt-auto">
+						<div className="flex items-center gap-1.5 transition-colors">
+							<IoLocationOutline className="text-primary/70 shrink-0" size={16} />
+							<span className="line-clamp-1">{getDisplayAddress(address)}</span>
+						</div>
+						<div className="flex items-center gap-1.5 transition-colors">
+							<AiOutlineTeam className="text-primary/70 shrink-0" size={16} />
+							<span>{currentParticipants} 명</span>
+						</div>
+					</CardFooter>
+				</Card>
+			</Link>
+		</motion.div>
 	);
 }
 

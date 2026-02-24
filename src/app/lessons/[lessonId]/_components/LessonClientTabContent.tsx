@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 
@@ -90,10 +91,14 @@ export const LessonClientTabContent = ({
 
 			{/* 클래스 정보 섹션 */}
 			<div className="space-y-8">
-				<section
+				<motion.section
 					id="intro"
 					ref={(el) => onSectionRef('intro', el)}
 					className="scroll-mt-[164px]"
+					initial={{ opacity: 0, y: 20 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: false, margin: '-50px' }}
+					transition={{ duration: 0.5 }}
 				>
 					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
@@ -105,12 +110,16 @@ export const LessonClientTabContent = ({
 							</div>
 						</CardContent>
 					</Card>
-				</section>
+				</motion.section>
 
-				<section
+				<motion.section
 					id="curriculum"
 					ref={(el) => onSectionRef('curriculum', el)}
 					className="scroll-mt-[164px]"
+					initial={{ opacity: 0, y: 20 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: false, margin: '-50px' }}
+					transition={{ duration: 0.5, delay: 0.1 }}
 				>
 					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
@@ -122,12 +131,16 @@ export const LessonClientTabContent = ({
 							</div>
 						</CardContent>
 					</Card>
-				</section>
+				</motion.section>
 
-				<section
+				<motion.section
 					id="momento"
 					ref={(el) => onSectionRef('momento', el)}
 					className="scroll-mt-[164px]"
+					initial={{ opacity: 0, y: 20 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: false, margin: '-50px' }}
+					transition={{ duration: 0.5, delay: 0.2 }}
 				>
 					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
@@ -162,12 +175,16 @@ export const LessonClientTabContent = ({
 							</p>
 						</CardContent>
 					</Card>
-				</section>
+				</motion.section>
 
-				<section
+				<motion.section
 					id="location"
 					ref={(el) => onSectionRef('location', el)}
 					className="scroll-mt-[164px]"
+					initial={{ opacity: 0, y: 20 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: false, margin: '-50px' }}
+					transition={{ duration: 0.5 }}
 				>
 					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
@@ -202,12 +219,16 @@ export const LessonClientTabContent = ({
 							</div>
 						</CardContent>
 					</Card>
-				</section>
+				</motion.section>
 
-				<section
+				<motion.section
 					id="reviews"
 					ref={(el) => onSectionRef('reviews', el)}
 					className="scroll-mt-[164px]"
+					initial={{ opacity: 0, y: 20 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: false, margin: '-50px' }}
+					transition={{ duration: 0.5 }}
 				>
 					<Card className="border-2 border-border/50 shadow-sm overflow-hidden rounded-xl">
 						<CardHeader className="bg-primary/5 pb-4 border-b border-border/50">
@@ -217,7 +238,7 @@ export const LessonClientTabContent = ({
 							<ReviewList reviews={reviews} />
 						</CardContent>
 					</Card>
-				</section>
+				</motion.section>
 			</div>
 		</>
 	);
