@@ -29,6 +29,7 @@ interface FormImageUploadProps {
 	enableDragAndDrop?: boolean;
 	dragDropHintText?: React.ReactNode;
 	dragDropClassName?: string;
+	error?: string;
 }
 
 /**
@@ -59,6 +60,7 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 			enableDragAndDrop = false, // 드래그 앤 드롭 지원 여부
 			dragDropHintText, // 드래그 앤 드롭 영역에 추가할 텍스트
 			dragDropClassName, // 드래그 앤 드롭 영역 className
+			error,
 		},
 		ref,
 	) => {
@@ -186,6 +188,7 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 							disabled={readOnly}
 						/>
 					</div>
+					{error && <p className="text-xs text-red-500 mt-1">{error}</p>}
 				</div>
 			);
 		}
@@ -265,6 +268,7 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 							disabled={readOnly}
 						/>
 					</div>
+					{error && <p className="text-xs text-red-500 mt-1">{error}</p>}
 				</div>
 			);
 		}
@@ -349,6 +353,7 @@ export const FormImageUpload = forwardRef<HTMLInputElement, FormImageUploadProps
 						disabled={readOnly}
 					/>
 				</div>
+				{error && <p className="text-xs text-red-500 mt-1">{error}</p>}
 			</div>
 		);
 	},
