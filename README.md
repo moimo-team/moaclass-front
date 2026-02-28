@@ -50,12 +50,32 @@
 
 - 메인페이지  
   <img width="922" height="906" alt="Image" src="https://github.com/user-attachments/assets/2c5d1d70-5235-46f9-a8ae-f31f007aeb81" />
+  <img width="920" height="826" alt="image" src="https://github.com/user-attachments/assets/a0361a46-6f54-427f-a777-9bfe117dd768" />
+  <img width="922" height="827" alt="image" src="https://github.com/user-attachments/assets/6ff47a04-50f5-4f82-bf3e-d2ba7a3daf1b" />
 
 - 클래스 상세페이지
-- 마이페이지
-- 클래스 관리
-- 채팅
-- 알림
+  <img width="913" height="908" alt="image" src="https://github.com/user-attachments/assets/f647fd66-1dd0-45a7-a33e-cfacd8ab05e2" />
+
+- 결제 프리뷰 페이지
+  <img width="906" height="833" alt="image" src="https://github.com/user-attachments/assets/c84be5b5-61a1-49dc-8995-cb7baea48eed" />
+
+- 마이페이지  
+  <img width="899" height="833" alt="image" src="https://github.com/user-attachments/assets/a3d88a4d-7948-48af-abc8-4bac15e753f8" />
+  <img width="897" height="759" alt="image" src="https://github.com/user-attachments/assets/bdaa76af-ab2a-4a0e-81fa-bc4bae5e5118" />
+  <img width="860" height="724" alt="image" src="https://github.com/user-attachments/assets/307b3aa0-5779-463f-81b1-685106bdd132" />
+  <img width="850" height="712" alt="image" src="https://github.com/user-attachments/assets/8d81a991-a0ac-4694-8008-c410129851fa" />
+  <img width="944" height="811" alt="image" src="https://github.com/user-attachments/assets/99a61645-3dbe-4c26-bff1-09f8a8d1e7c3" />
+
+- 클래스 관리  
+  <img width="1053" height="835" alt="image" src="https://github.com/user-attachments/assets/947a1917-e526-4f93-a9dd-de10b0c2a482" />
+  <img width="1059" height="509" alt="image" src="https://github.com/user-attachments/assets/a0d8076a-d4f7-4cf6-af94-f5d939a34c2c" />
+  <img width="1102" height="583" alt="image" src="https://github.com/user-attachments/assets/cb5c6073-4c39-420d-a56c-bf0f26d6f98b" />
+
+- 채팅  
+  <img width="1081" height="821" alt="image" src="https://github.com/user-attachments/assets/dd85d8fc-f5ea-4432-a5a3-4d7202142586" />
+
+- 알림  
+  <img width="276" height="350" alt="image" src="https://github.com/user-attachments/assets/38c201ea-2817-4d49-ab75-bd8f9e79f742" />
 
 ## 🛠 기술 스택 (Tech Stack)
 
