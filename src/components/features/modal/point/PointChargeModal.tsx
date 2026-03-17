@@ -71,13 +71,7 @@ export const PointChargeModal = ({ open, onOpenChange, onCharge }: PointChargeMo
 					<span className="text-sm font-bold text-[#2f2f2f] whitespace-nowrap">
 						충전금액:
 					</span>
-					<FormInput
-						id="charge-amount"
-						value={amount}
-						readOnly
-						suffix="원"
-						className="text-right pr-4"
-					/>
+					<FormInput id="charge-amount" value={amount} readOnly suffix="원" />
 				</div>
 			</div>
 		</ConfirmDialog>
