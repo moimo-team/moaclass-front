@@ -3,7 +3,7 @@ import type { PaginationMeta } from '@/models/pagination.model';
 
 import type { MetadataRoute } from 'next';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'https://moaclass-back.onrender.com';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://13.55.7.237:3000';
 
 type ApiListResponse<T> = {
 	data: T[];
