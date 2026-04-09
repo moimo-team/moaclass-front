@@ -69,7 +69,7 @@ export function getNextPublicEnv(key: string, defaultValue: string = ''): string
 
 export const ENV = {
 	API_URL: getEnv('VITE_API_URL', '/api'),
-	SOCKET_URL: getEnv('VITE_SOCKET_URL', 'https://moaclass-back.onrender.com'),
+	SOCKET_URL: getEnv('VITE_SOCKET_URL', 'http://13.55.7.237:3000'),
 	ENABLE_MOCK: (() => {
 		const raw = getEnv('VITE_ENABLE_MOCK', 'true');
 		const value = raw.split('#')[0].trim();

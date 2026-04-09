@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
 			'localhost',
 			'moaclass-back.vercel.app',
 			'moaclass-back.onrender.com',
+			'13.55.7.237:3000',
 			'picsum.photos',
 			'avatars.githubusercontent.com',
 			'cdn.jsdelivr.net',
@@ -21,7 +22,7 @@ const nextConfig: NextConfig = {
 		return [
 			{
 				source: '/api/:path*',
-				destination: 'https://moaclass-back.onrender.com/:path*',
+				destination: 'http://13.55.7.237:3000/:path*',
 			},
 		];
 	},

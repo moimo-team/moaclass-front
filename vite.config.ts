@@ -32,7 +32,7 @@ export default defineConfig({
 	server: {
 		proxy: {
 			'/api': {
-				target: 'https://moaclass-back.onrender.com',
+				target: 'http://13.55.7.237:3000',
 				changeOrigin: true,
 				rewrite: (path) => path.replace(/^\/api/, ''),
 			},
