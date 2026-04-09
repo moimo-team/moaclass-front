@@ -3,7 +3,13 @@ import type { PaginationMeta } from '@/models/pagination.model';
 
 import type { MetadataRoute } from 'next';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://13.55.7.237:3000';
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://13.55.7.237:3000';
+const rawApiBase = process.env.NEXT_PUBLIC_API_URL ?? '/api';
+
+const API_BASE_URL =
+	rawApiBase.startsWith('http://') || rawApiBase.startsWith('https://')
+		? rawApiBase
+		: toAbsoluteUrl(rawApiBase);
 
 type ApiListResponse<T> = {
 	data: T[];
@@ -33,7 +39,8 @@ async function fetchAllPages<T>(path: string, limit = 100): Promise<T[]> {
 	let totalPages = 1;
 
 	while (page <= totalPages) {
-		const url = new URL(`${API_BASE_URL}${path}`);
+		// const url = new URL(`${API_BASE_URL}${path}`);
+		const url = new URL(path, API_BASE_URL);
 		url.searchParams.set('page', String(page));
 		url.searchParams.set('limit', String(limit));
 
