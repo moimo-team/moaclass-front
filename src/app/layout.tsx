@@ -1,4 +1,5 @@
-﻿import Script from 'next/script';
+﻿import { Analytics } from '@vercel/analytics/next';
+import Script from 'next/script';
 
 import Footer from '@/components/common/Footer';
 import Header from '@/components/common/Header';
@@ -72,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					strategy="beforeInteractive"
 					src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_API_KEY}&libraries=services&autoload=false`}
 				/>
+				<Analytics />
 			</body>
 		</html>
 	);
